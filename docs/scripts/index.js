@@ -179,7 +179,7 @@ function recuperer_mes_donnees(snapshot){
   //console.log(le_resultat)
 
   chercher_mes_matieres(mon_type, mon_cycle, ma_classe).then(snapshot => {
-    //console.log(snapshot)
+    
     lignes_matieres = snapshot
     if (lignes_matieres !== null){
       if (typeof(lignes_matieres) === "object") lignes_matieres = Object.values(lignes_matieres)
@@ -222,7 +222,7 @@ function recuperer_mes_donnees(snapshot){
       
       //DOSSIER DE MON CYCLE
       rechercher('ID_RENDUS','Cycle',mon_cycle,"dossier_rendus_cycle").then(snap => {
-         stocker('dossier_rendus_cycle', snap.val())
+         stocker('dossier_rendus_cycle', snap[0]['dossier_rendus_cycle'])
       })    
 
 
@@ -277,47 +277,6 @@ function actualiser_remarque(valeur_remarque, ma_classe, mon_type){
 
 
  async function chercher_mes_matieres(mon_type, mon_cycle, ma_classe){
-  //console.log("on va chercher les matieres d'un membre de "+ mon_type + " dans " +mon_cycle+ " / "+ma_classe)
-  /*
-  if (mon_type === "Administration"){
-    
-    requete = firebase.database().ref(nom_etablissement+"/Matieres").orderByChild("Cycle").equalTo(mon_cycle)
-    return retour_promise(requete)
-
-
-  }else if (mon_type === "Profs"){
-
-    les_classes_matieres = ma_classe.split(";")
-    un_retour = []
-    for (var i = 0; i< les_classes_matieres.length;i++) {
-      requete = await firebase.database().ref(nom_etablissement+"/Matieres").orderByChild("Classe_Matiere").equalTo(les_classes_matieres[i])
-      await retour_promise(requete).then(une_matiere => {
-        if (une_matiere !== null){
-          un_retour.push(renvoyer_resultat(une_matiere))
-        }
-        
-      })
-
-      
-    }
-
-    
-    console.log(un_retour)
-    return un_retour
-      
-
-
-  }else if (mon_type === "Eleves"){
-
-    requete = firebase.database().ref(nom_etablissement+"/Matieres").orderByChild("Classe").equalTo(ma_classe)
-    return retour_promise(requete)
-  }
-    
-    
-  */
-
-
-
 
   if (mon_type === "Administration"){
     //dans la table Matieres, on cherche toutes les matières dont le cycle est le mien
@@ -328,21 +287,26 @@ function actualiser_remarque(valeur_remarque, ma_classe, mon_type){
     les_classes_matieres = ma_classe.split(";")
     un_retour = []
     for (var i = 0; i< les_classes_matieres.length;i++) {
-      rechercher_contenant_motif(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher, nombrelimite).then(une_matiere => {
-        if (une_matiere !== null){
-          un_retour.push(renvoyer_resultat(une_matiere))
+      await rechercher_contenant_motif("Matieres", "Classe_Matiere", les_classes_matieres[i], "", 1).then(une_matiere => {
+        
+        //console.log(une_matiere)
+        if (une_matiere.length > 0){
+          une_matiere = renvoyer_resultat(une_matiere)
+          //console.log("on ajoute la matiere " + une_matiere['Classe_Matiere'])
+          un_retour.push(une_matiere)
         }
-      })        
+      })    
     }
 
-    
-    console.log(un_retour)
+    //console.log("on renvoie "+ un_retour)
     return un_retour
       
 
   }else if (mon_type === "Eleves"){
     //dans la table Matieres, on cherche toutes les matières dont la Classe est à moi
-    return rechercher("Matieres", "Classe", ma_classe).then(e => {return e})
+    un_retour = await rechercher("Matieres", "Classe", ma_classe)
+    console.log(un_retour)
+    return un_retour
   }
   
 }

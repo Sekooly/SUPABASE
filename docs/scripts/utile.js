@@ -26,6 +26,12 @@ function maintenant(){
 		
 }
 
+function maintenant_sans_caracteres_speciaux(){
+  var resultat = maintenant().replaceAll('/','-')
+  resultat = maintenant().replaceAll(':','-')
+  return resultat
+}
+
 
 
 function hasher(valeur) {
@@ -50,6 +56,11 @@ function actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouv
 function rechercher_tout(nom_table){
   url = racine_data + nom_table + "?" + apikey + "&limit=2000"
   return get_resultat_asynchrone(url)
+}
+
+function reinitialiser_mdp_datenotif(){
+  url = racine_data +  "rpc/initialiser" + "?" + apikey + "&limit=2000"
+  return post_resultat_asynchrone(url)
 }
 
 //on renvoie un array vide si non trouvé, la valeur sinon
@@ -263,7 +274,7 @@ async function switcher_le_champ(nom_champ, nouvelle_valeur){
 
 
 function extension_ok(extension){
-	return ",bmp,gif,jpeg,jpg,png,svg,pdf,bmp,xlsx,xls,xlsm,ppt,pptx,doc,docx,txt,html,csv,js,rtf,mp4,mp3,wav,youtube,".includes(","+extension.toLowerCase()+",")
+	return ",bmp,gif,jpeg,jpg,png,svg,pdf,bmp,xlsx,xls,xlsm,ppt,pptx,doc,docx,html,csv,js,rtf,mp4,mp3,wav,youtube,".includes(","+extension.toLowerCase()+",")
 }
 
 function element_DOM(nom_element){

@@ -1,9 +1,9 @@
 var mon_role = ""
 var elements_menu_haut = ["Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Alerte", "Logs", "Notifs", "Visio"]
-var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL Mapping","URL_agenda",
+var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL_Mapping","URL_agenda",
 								"id_googlecalendar","nb_avis_donnés", "nb_avis_max","nom_fiche","taux_conseil",
 								"Matiere_bis", "classe_id", "classe_bis", "type", "Derniere_consultation_notifs",
-								"id_formulaire_remediation", "id_fiche"
+								"id_formulaire_remediation", "id_fiche", "URL_Mapping"
 								]
 
 var elements_menu_haut_avec_modifs = ["Classes","Matieres","Eleves","Profs","Administration"]
@@ -691,7 +691,7 @@ function recuperer_mon_devoir(id_fichier_sujetdevoir,proprietaire,examen_termin�
 		rechercher("Rendus",'id_fichier_sujetdevoir',id_fichier_sujetdevoir,"").then(snapshot => {
 			chargement(false)
 
-			console.log(snapshot)
+			//console.log(snapshot)
 			afficher_rendus_devoirs(snapshot);
 		})
 
@@ -739,7 +739,7 @@ function afficher_rendus_devoirs(resultats){
 		un_devoir_rendu.id = resultats[i]["id_fichier"];
 		un_devoir_rendu.style = 'padding: 0.5%;';
 		un_devoir_rendu.innerHTML = "Devoir de "
-		un_devoir_rendu.innerHTML += '<b style="color: #3C99DC;" id="proprietaire">' + resultats[i]["proprietaire"].toUpperCase() + " </b>";
+		un_devoir_rendu.innerHTML += '<b style="color: #3C99DC;" id="proprietaire'+resultats[i]["id_fichier"]+'">' + resultats[i]["proprietaire"].toUpperCase() + " </b>";
 
 		//si il y a une remarque -> corrigé
 		var remarque = decodeURIComponent(resultats[i]["remarque"]);
@@ -815,17 +815,19 @@ function mettre_remarque_devoir(ceci,remarque){
 			"Role_derniere_modif": mon_role,
 		}
 
+		var valeur_proprio_devoir = $("#proprietaire"+id_fichier)[0].innerText
+		var id_notif = $("#devoir_choisi")[0].value+"-"+ valeur_proprio_devoir.trim().toLowerCase().replace(".","")
 		console.log(nouvelles_donnees_notif)
-		console.log(id_fichier)
-		actualiser("Notifs", "id_fichier_devoir", id_fichier, nouvelles_donnees_notif)
+		console.log(id_notif)
+		actualiser("Notifs", "id_notif", id_notif, nouvelles_donnees_notif)
 	}
 		
 
 
-
+	//au bout de 2 secondes
 	setTimeout(function(){
 		recuperer_mon_devoir(element_DOM('devoir_choisi').value);
-	}, 1000);
+	}, 2000);
 	
 	
 	chargement(false)
@@ -880,7 +882,7 @@ function supprimer_devoir(moi, id_fichier_donné, id_devoir_donné){
     html += '</form>';	                
 	                
 
-    console.log(html);
+    //console.log(html);
     $("body").append(html);
 
     
@@ -900,7 +902,11 @@ function supprimer_devoir(moi, id_fichier_donné, id_devoir_donné){
 			supprimer("Rendus","id_devoir",id_devoir)
 			supprimer("Notifs","id_notif",id_devoir)
 
-			recuperer_mon_devoir(element_DOM('devoir_choisi').value, recuperer('identifiant_courant'));
+			//au bout de 2 secondes
+			setTimeout(function(){
+				recuperer_mon_devoir(element_DOM('devoir_choisi').value, recuperer('identifiant_courant'));
+			}, 2000);
+
 
 			chargement(false);
 
@@ -1027,7 +1033,6 @@ function mettre_devoir_en_ligne(lien_script,params, nom_fichier, extension,id_do
 
     		//affiche le resultat obtenu par le serveur (id fichier)
     		success: function(data) {
-    			chargement(false);
 
     			//console.log(data);
 
@@ -1036,8 +1041,9 @@ function mettre_devoir_en_ligne(lien_script,params, nom_fichier, extension,id_do
     				return -1
     			}
 
-
-				recuperer_mon_devoir(element_DOM('devoir_choisi').value, recuperer('identifiant_courant'));
+				setTimeout(function(){
+					recuperer_mon_devoir(element_DOM('devoir_choisi').value, recuperer('identifiant_courant'));
+				}, 2000);
 
 				
 
@@ -1071,7 +1077,7 @@ function mettre_devoir_en_ligne(lien_script,params, nom_fichier, extension,id_do
 
 				nouvelle_notif = {
 					"id_notif":id_devoir,
-					"id_fichier_devoir": data,
+					//"id_fichier_devoir": data,
 					"Horodateur": date_heure_actuelle,
 					"Type_notif" : "devoir",
 					"Id_source" : id_fichier_sujetdevoir,
@@ -1105,6 +1111,7 @@ function mettre_devoir_en_ligne(lien_script,params, nom_fichier, extension,id_do
     			// on affiche l'alerte
 				afficher_alerte("Votre rendu a bien été mis en ligne.",false)
 
+    			chargement(false);
 
 			},
 
@@ -1788,13 +1795,20 @@ function recuperer_logs(){
 }
 
 // JSON à CSV
-function convertir_csv(arr){
+function convertir_csv(arr, entetes_seulement){
 	
 	const array = [Object.keys(arr[0])].concat(arr);
+
+	if(entetes_seulement){
+		return array[0].join(',');
+	}
+
 
 	return array.map(it => {
 		return Object.values(it);
 	}).join('\r\n');
+
+
 }
 
 function telecharger(nom_fichier,contenu_fichier){
@@ -2079,7 +2093,7 @@ function chargement_a_larrivee(){
 
 	est_en_maintenance().then(function(data){
 		
-		var je_peux = JSON.parse(recuperer('mes_donnees'))['Droit_acces_anticipe_examen']
+		var je_peux = JSON.parse(recuperer('mes_donnees'))['droit_hors_maintenance']
 		//console.log(je_peux)
 	    //console.log(data)
 	    //on déconnecte si maintenance, sur site, sans droits
@@ -4379,7 +4393,7 @@ $(function charger_fichiers(e){
         	e.preventDefault(); // rester sur la même page
 
 			if (!extension_ok(extension)){
-				alert("L'extension du fichier n'est pas supporté par la plateforme, merci de réessayer avec l'un de ces formats: bmp,gif,jpeg,jpg,png,svg,pdf,bmp,xlsx,xls,xlsm,ppt,pptx,doc,docx,txt,html,csv,js,rtf,mp4,mp3,wav")
+				alert("L'extension du fichier n'est pas supporté par la plateforme, merci de réessayer avec l'un de ces formats: bmp, gif, jpeg, jpg, png, svg, pdf, bmp, xlsx, xls, xlsm, ppt, pptx, doc, docx, txt, html, csv, js, rtf, mp4, mp3, wav")
 				chargement(false)
 				activer_envoi_fichier()
 				return -1;	            		
@@ -6508,6 +6522,7 @@ function appliquer_filtre_choisi(nom_champ_reference, valeur_champ_reference){
 
 
 function un_menu_clic(id_parametre){
+	$("#mini_popup").remove()
     mettre_en_forme_onglet_clicked(id_parametre);
     actualiser_filtre_onglet(id_parametre);
     actualiser_details_parametre(id_parametre);
@@ -6813,6 +6828,7 @@ function assigner_label_et_liste_parametres(etiquette_filtre, filtre_liste){
 	var bouton_supprimer = un_bouton_param("suppr_param", "supprimer_ligne_parameters", "Supprimer", "img_redtrash.png")
 	var bouton_dupliquer = un_bouton_param("dupliquer_param", "dupliquer_donnees_parametres", "Dupliquer", "img_dupliquer.png")
 	var bouton_telecharger = un_bouton_param("techarager_param", "telecharger_donnees_parametres", "Télécharger", "img_download.png")
+	var bouton_telecharger = un_bouton_param("reset_param", "init_donnees", "Initialiser", "img_reset.png")
 
 	$("#conteneur_filtre")[0].innerHTML	= $("#conteneur_filtre")[0].innerHTML + '<span id="boutons_params" style="cursor: pointer;"> ' +bouton_actualiser+bouton_ajouter+bouton_supprimer+bouton_dupliquer+bouton_telecharger+' </span>'
 
@@ -6921,7 +6937,7 @@ function rendre_td_modifiable(){
 
 			//mini fenetre de checkbox
 			//avec ok (todo) et annuler
-			var nouvelle_valeur = "" //annuler
+			var nouvelle_valeur = null //annuler
 
 		}else{
 			var nouvelle_valeur = prompt("Indiquez la nouvelle valeur",ancienne_valeur);
@@ -6967,16 +6983,6 @@ function rendre_td_modifiable(){
 
 
 		try{
-
-			/*
-			//si table = champ reference -> c'est un simple string
-			if(nom_table === nom_champ_reference){
-				switcher_le_champ(nom_table, nouvelle_valeur)
-			
-			// c'est tout un JSON
-			}else{
-				actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouveau_data);
-			}*/
 
 			actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouveau_data);
 			
@@ -7161,10 +7167,68 @@ function telecharger_donnees_parametres(id_parametre){
 	if(!id_parametre) id_parametre = $(".un_menu_orange")[0].id
 	id_ligne_supprimee = 0
 
-	alert("Téléchargement ici.")
-	
+	//alert("Téléchargement ici.")
+	var choix_entete_ou_tout_html = '<div id="mini_popup">'
+	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<div id="entete-fenetre" style="display: inline-flex;float: right;">'
+	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<img src="images/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div>'
+	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<div>Télécharger '+id_parametre+'</div><select style="width: 80%;" id="choix_download_param">'
+	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<option value="En-têtes">En-têtes</option>'
+	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<option value="Tout">Toutes les données</option></select>'
+	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<button type="button" class="rendre" onclick="telecharger_parametre()">Télécharger</button></div>'
+
+	$("#mini_popup").remove()
+	$("body").append(choix_entete_ou_tout_html)
+
 }
 
+
+function telecharger_parametre(id_parametre){
+
+	if(!id_parametre) id_parametre = $(".un_menu_orange")[0].id
+
+	var entetes_seulement = $("#choix_download_param")[0].value === "En-têtes" 
+	var contenu = convertir_csv(JSON.parse(recuperer(id_parametre)), entetes_seulement)
+	var suite_nom = entetes_seulement ? "-modele-" : ""
+	var nom_fichier =  id_parametre+suite_nom+maintenant_sans_caracteres_speciaux()+".csv";
+
+
+
+	enregistrer_donnees(contenu, nom_fichier);
+
+
+
+
+
+
+
+
+}
+
+
+function enregistrer_donnees(contenu,nom_fichier) {
+    var a = document.createElement("a");
+    document.body.appendChild(a);
+    a.style = "display: none";
+    var blob = new Blob([contenu], { type: 'text/csv;charset=utf-8;' });
+    url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = nom_fichier;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove()
+}
+
+
+function init_donnees(){
+
+	var confirmation = confirm("Êtes-vous sûr d'initialiser votre plateforme ? Cela remettra TOUS les mots de passe par défaut et ignorera toute consultation de notifications.")
+	if(confirmation){
+		chargement(true)
+		reinitialiser_mdp_datenotif()
+		actualiser_parametre()
+		chargement(false)
+	}
+}
 
 function recuperer_entetes_params(id_parametre){
 	if(!id_parametre) id_parametre = $(".un_menu_orange")[0].id
@@ -7177,6 +7241,8 @@ function recuperer_entetes_params(id_parametre){
 	return liste_champs
 
 }
+
+
 
 function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_duplicata){
 	var entete = '<div style="overflow:auto;" id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img src="images/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Nouvelle donnée dans ' +id_parametre+ '</div><form class="donnees_saisies" id="donnees_saisies" >'
@@ -7294,8 +7360,8 @@ function ajouter_donnees_saisies(id_parametre){
 			$("input[id='ID_URL']")[0].value = id_de_la_classe
 			//URL 
 			$("input[id='URL']")[0].value  = "https://drive.google.com/drive/folders/" + id_de_la_classe
-			//URL Mapping
-			$("input[id='URL Mapping']")[0].value  = id_de_la_classe
+			//URL_Mapping
+			$("input[id='URL_Mapping']")[0].value  = id_de_la_classe
 			//id_google_calendar
 			$("input[id='id_googlecalendar']")[0].value  = id_googlecalendar
 			//URL_agenda
@@ -7313,8 +7379,8 @@ function ajouter_donnees_saisies(id_parametre){
 			$("input[id='Matiere_bis']")[0].value = la_matiere		
 			//URL
 			$("input[id='URL']")[0].value = "https://drive.google.com/drive/folders/" + id_de_la_matiere		
-			//URL Mapping
-			$("input[id='URL Mapping']")[0].value = id_de_la_matiere
+			//URL_Mapping
+			$("input[id='URL_Mapping']")[0].value = id_de_la_matiere
 			//classe_id
 			$("input[id='classe_id']")[0].value = id_de_la_classe
 			
@@ -7334,8 +7400,8 @@ function ajouter_donnees_saisies(id_parametre){
 		$("input[id='Derniere_consultation_notifs']")[0].value = "30/12/1899 00:00:00"
 		$("input[id='type']")[0].value = id_parametre.includes("Admin") ? "Administration" : nom_table.slice(0, -1)
 		$("input[id='Droit_acces_anticipe_examen']")[0].value = id_parametre.includes("Eleves") ? "non" : "oui"
-		$("input[id='Droit_changer_ecolage']")[0].value = "non"
-		if($("input[id='Droits_modifs']")) $("input[id='Droits_modifs']")[0].value = "non"
+		if($("input[id='Droit_changer_ecolage']")[0]) $("input[id='Droit_changer_ecolage']")[0].value = "non"
+		if($("input[id='Droits_modifs']")[0]) $("input[id='Droits_modifs']")[0].value = "non"
 		$("input[id='Ecolage_OK']")[0].value = "oui"
 		$("input[id='code_hash']")[0].value = "nok"
 		$("input[id='Reponse_sondage']")[0].value = "non"
