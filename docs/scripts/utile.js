@@ -143,7 +143,7 @@ function envoyer_log(mon_identifiant, mon_statut, ma_classe, mon_type, partir){
 
   try{
     var data = get_resultat('https://ipapi.co/json/')
-    console.log(data);
+    //console.log(data);
 
 
     var mon_adresse_ip = data['ip'];
