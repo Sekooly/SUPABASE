@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link rel="shortcut icon" href="images/logo-no-background-128x128.png" type="image/x-icon">
+	<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Connectez-vous grâce à votre Identifiant et Code d'accès pour accéder aux ressources Sekooly." />
+
+
+	<script src="scripts/donnees_client.js"></script>
+
+
+
+	<script src="scripts/jquery.min.js"></script>
+	<script src="scripts/moment.js"></script>
+	<script type="text/javascript" src="scripts/hash.js"></script>
+
+
+
+</head> 
+
+<body>
+
+
+	<style>
+		
+		a{
+			text-decoration: none;
+		}
+
+		.logo_en_haut{			
+			width: 40%;
+		}
+
+		.mon_formulaire{
+			text-align: center;
+			margin-top: 5%;
+			font-family: Arial, sans-serif;
+		}
+
+		.mon_formulaire > div > label {
+			font-weight: bold;
+
+
+		}
+
+
+		.mon_formulaire > div > input{
+			width: 300px;
+			height: 20px;
+			
+		}
+
+		.mon_formulaire > div {
+
+			margin-top: 20px;
+
+		}
+
+		.bouton_connexion {
+			text-align: center;
+			margin-top: 20px;
+			width: 100px;
+			height: 25px;
+
+		}
+
+		.bas_de_page{
+			position: fixed;
+			bottom: 0px;
+			width: -moz-available;
+			text-align: center;
+			color: #bcbcbc;
+			font-size: 12px;
+		}
+
+		.lien_mail {
+			color: #bcbcbc;
+			font-weight: bold;
+		}
+
+	</style>
+
+	<iframe class="mon_log" src="" id="mon_log" style='display: none;'></iframe> 
+	<div style="text-align: center;">
+		<a href="https://sekooly.com">
+			<img class ="logo_en_haut" alt="SEKOOLY - Connexion" src="images/default-logo.svg">
+		</a><a href="https://www.lycee-hibiscus.mg/">
+			<img class ="logo_en_haut" alt="Site web d'Hibiscus" src="images/logo gif.gif">
+		</a>
+	</div>
+
+
+	<div class="mon_formulaire">
+		<div>
+			<label for="Identifiant">Identifiant:</label><br>
+			<input type="text" id="Identifiant" name="identifiant" autocomplete="off"  autocapitalize="none"><br>
+		</div>
+		
+		<div>
+			<label for="Code">Code d'accès:</label><br>
+			<input type="password" id="Code" name="code" autocomplete="off"  autocapitalize="none"> <br>
+	  	</div>
+
+		<input id="connect" class="bouton_connexion" type="submit" value="Se connecter">
+		<font color="red"> <p id="remarque">  </p> </font>
+
+	</div>
+
+  	
+
+	<div style="display:block;text-align:center;margin-right:auto;margin-left:auto">
+		<img id="img_chargement" alt="Chargement..." src="images/loading.webp" border="0" width="30">
+	</div>
+
+	<div class="bas_de_page">
+		<span> Pour tout problème de contenu, contactez l'Administration en envoyant un mail à <a class="lien_mail" id="contact_etablissement" href=""></a> en précisant votre nom, prénom, classe(s).</span>
+
+		<br><br>
+
+		<span> Pour tout problème d'ordre <strong>technique</strong>, contactez SEKOOLY en envoyant un mail à <a class="lien_mail" href="mailto:contact@sekooly.com">contact@sekooly.com</a> en précisant votre établissement.</span>
+
+	</div>
+
+	<script type="text/javascript" src="scripts/utile.js"></script>
+	<script type="text/javascript" src="scripts/index.js"></script>
+
+</body>
+
+
+</html>
