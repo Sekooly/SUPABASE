@@ -3,7 +3,7 @@ var elements_menu_haut = ["Cycles", "Classes", "Matieres", "Eleves","Profs", "Ad
 var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL_Mapping","URL_agenda",
 								"id_googlecalendar","nb_avis_donnés", "nb_avis_max","nom_fiche","taux_conseil",
 								"Matiere_bis", "classe_id", "classe_bis", "type", "Derniere_consultation_notifs",
-								"id_formulaire_remediation", "id_fiche", "URL_Mapping"
+								"id_formulaire_remediation", "id_fiche", "URL_Mapping","niveau"
 								]
 
 var elements_menu_haut_avec_modifs = ["Classes","Matieres","Eleves","Profs","Administration"]
@@ -6925,18 +6925,19 @@ function rendre_td_modifiable(){
 		//sinon: saisie libre
 		
 		var ancienne_valeur = e.target.innerText;
+		var id_parametre = $(".un_menu_orange")[0].id 
 
 		var est_classe = $("#Classe")[0] ? e.target.cellIndex === $("#Classe")[0].cellIndex : false
 		var est_classe_principale = $("#Classe_principale")[0] ? e.target.cellIndex === $("#Classe_principale")[0].cellIndex : false
 		var est_classe_bis = $("#classe_bis")[0] ? e.target.cellIndex === $("#classe_bis")[0].cellIndex : false
+		var nest_pas_onglet_classes = id_parametre !== "Classes"
 
-		if (est_classe || est_classe_principale || est_classe_bis){
+		if (nest_pas_onglet_classes && (est_classe || est_classe_principale || est_classe_bis)){
 
 			//mini fenetre de checkbox
 			//avec ok (todo) et annuler
 			var les_matieres = JSON.parse(recuperer('Matieres'))
-			var id_parametre = $(".un_menu_orange")[0].id 
-
+			
 			var valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Classe_Matiere")
 			//si c'est un admin -> (Tous|un_cycle)
 			if(id_parametre === "Administration"){
@@ -7196,8 +7197,16 @@ function supprimer_ligne_parameters(id_parametre){
 			var donnees_parametres = JSON.parse(recuperer(id_parametre))
 			var index_google_calendar = $("#id_googlecalendar").length > 0 ? $("#id_googlecalendar")[0].cellIndex : -1
 			var id_googlecalendar = index_google_calendar >= 0 ? $(".selected")[0].children[index_google_calendar].innerText : ""
-			var id_dossier = $(".selected")[0].id
-			supprimer_dossier(id_dossier, id_googlecalendar)
+			
+			//SI NON COMMUN
+			//TOUJOURS LE ID_URL pour classe/matiere
+			var commun =  $(".selected")[0].children[$('#commun_au_cycle')[0].cellIndex].innerText
+			if(commun !== "oui"){
+				var id_dossier = $(".selected")[0].children[$('#ID_URL')[0].cellIndex].innerText 	
+				//console.log("on va supprimer " + id_dossier)
+				supprimer_dossier(id_dossier, id_googlecalendar)
+			}
+			
 		}
 
 		//supprimer dans la BDD
@@ -7472,11 +7481,11 @@ function ajouter_donnees_saisies(id_parametre){
 	if(id_parametre === "Classes"){
 		var donnees_classes = JSON.parse(recuperer('Classes'))
 		var existence_classe = donnees_classes.some(e => {
-			if (e) return e['Classe'] === nom_classe
+			if (e) return e['Classe'] === nom_classe && e['cycle'] === nom_cycle
 		})
 		
 		if(existence_classe ){
-			alert("Cette classe existe déjà.")
+			alert("Cette classe existe déjà dans ce cycle.")
 			return -1;
 		}
 
@@ -7511,18 +7520,21 @@ function ajouter_donnees_saisies(id_parametre){
 		var param_nom_cycle = nom_cycle ? "&nom_cycle=" + nom_cycle : ""
 		var param_nom_classe = nom_classe ? "&nom_classe=" + nom_classe : ""
 		var param_nom_matiere = nom_matiere ? "&nom_matiere=" + nom_matiere : ""
-		
+		var param_commun_au_cycle = $('input#commun_au_cycle')[0] ? "&commun_au_cycle=" + $('input#commun_au_cycle')[0].value : ""
+				
 
 		var lien_script = "https://script.google.com/macros/s/AKfycbyGEGpbPE0WniCcBMbLCar_zGTNwKyABrnmfOE-zfb8TOUH4AY/exec"
 		lien_script = lien_script +  param_nom_etablissement
 		lien_script = lien_script +  param_nom_cycle
 		lien_script = lien_script +  param_nom_classe
 		lien_script = lien_script +  param_nom_matiere
+		lien_script = lien_script +  param_commun_au_cycle
 
 
 		//console.log(lien_script)
 		chargement(true)
 		var les_ids_recus= get_resultat(lien_script)
+		
 		//console.log(les_ids_recus)
 
 		//on récupère les ID
@@ -7532,6 +7544,7 @@ function ajouter_donnees_saisies(id_parametre){
 		
 		var la_matiere = nom_matiere
 		var id_de_la_matiere = get_valeur(les_ids_recus,la_matiere)
+		//return 0 //A COMMENTER!!!
 
 		if(id_parametre === "Classes"){
 		/******* POUR CLASSE ********/
@@ -7602,7 +7615,7 @@ function ajouter_donnees_saisies(id_parametre){
 	//console.log(nouvel_id)
 
 
-	//màj sur BDD
+	//màj sur BDD -> DECOMMENTER ICI !!!
 	ajouter_un_element(id_parametre,JSON.parse(mon_JSON),nouvel_id)
 	
 	//màj en JSON local	
