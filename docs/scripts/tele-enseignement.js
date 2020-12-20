@@ -1797,16 +1797,26 @@ function recuperer_logs(){
 // JSON à CSV
 function convertir_csv(arr, entetes_seulement){
 	
-	const array = [Object.keys(arr[0])].concat(arr);
+	//si c'est direct un string -> on joint
+	if(typeof(arr[0])==="string"){
+		return  arr.join(',')
 
-	if(entetes_seulement){
-		return array[0].join(',');
+
+
+	//si c'est encore un object -> on concat
+	}else{
+		const array = [Object.keys(arr[0])].concat(arr);		
+
+		if(entetes_seulement){
+			return array[0].join(',');
+		}
+
+
+		return array.map(it => {
+			return Object.values(it);
+		}).join('\r\n');	
 	}
-
-
-	return array.map(it => {
-		return Object.values(it);
-	}).join('\r\n');
+	
 
 
 }
@@ -6599,40 +6609,18 @@ function actualiser_details_parametre(id_parametre){
 		//console.log(identifiant_table)
 
 		//si le local existe déjà -> on récupère celui la
-		liste_deja_stockee_JSON = recuperer(id_parametre)
+		liste_deja_stockee_JSON = false//recuperer(id_parametre)
 		if(liste_deja_stockee_JSON){
-			liste_JSON = JSON.parse(liste_deja_stockee_JSON)
-			//console.log("local")
-			//console.log(liste_JSON)
 
-			
+			liste_JSON = JSON.parse(liste_deja_stockee_JSON)			
 			traiter_liste_JSON(id_parametre,liste_JSON, identifiant_table)
 
 		}else{
 			rechercher_tout(id_parametre).then(function(snapshot){
-				//console.log(snapshot)
-
-				/*
-				//si JSON -> transformation
-				if (typeof(snapshot) !== 'string'){
-					liste_JSON = snapshot
-				//si non JSON -> tel qu'il est { id_parametre : valeur }
-				}else{
-					liste_JSON = JSON.parse('[{"'+id_parametre+'" : "'+snapshot+'"}]')
-					identifiant_table = id_parametre;
-				}*/
 
 				liste_JSON = snapshot
 
-
-				//console.log("serveur")
-				//console.log(liste_JSON)
-				//console.log('on va stocker ' + JSON.stringify(liste_JSON ? liste_JSON : ""))
 				stocker(id_parametre, JSON.stringify(liste_JSON ? liste_JSON : ""))
-				//console.log("c'est stocké dans "+id_parametre)
-				//console.log(recuperer(id_parametre))
-
-				//console.log(identifiant_table)
 				traiter_liste_JSON(id_parametre,liste_JSON, identifiant_table)
 
 			});
@@ -6827,10 +6815,12 @@ function assigner_label_et_liste_parametres(etiquette_filtre, filtre_liste){
 	var bouton_ajouter = un_bouton_param("ajout_param", "ajouter_donnees_parametres", "Ajouter", "img_ajout.svg")
 	var bouton_supprimer = un_bouton_param("suppr_param", "supprimer_ligne_parameters", "Supprimer", "img_redtrash.png")
 	var bouton_dupliquer = un_bouton_param("dupliquer_param", "dupliquer_donnees_parametres", "Dupliquer", "img_dupliquer.png")
-	var bouton_telecharger = un_bouton_param("techarager_param", "telecharger_donnees_parametres", "Télécharger", "img_download.png")
-	var bouton_telecharger = un_bouton_param("reset_param", "init_donnees", "Initialiser", "img_reset.png")
+	var bouton_telecharger = un_bouton_param("telecharger_param", "telecharger_donnees_parametres", "Télécharger", "img_download.png")
+	var bouton_import = un_bouton_param("importer_param", "importer_parametres", "Importer", "img_import.png")
+	var bouton_init = un_bouton_param("reset_param", "init_donnees", "Initialiser", "img_reset.png")
 
-	$("#conteneur_filtre")[0].innerHTML	= $("#conteneur_filtre")[0].innerHTML + '<span id="boutons_params" style="cursor: pointer;"> ' +bouton_actualiser+bouton_ajouter+bouton_supprimer+bouton_dupliquer+bouton_telecharger+' </span>'
+
+	$("#conteneur_filtre")[0].innerHTML	= $("#conteneur_filtre")[0].innerHTML + '<span id="boutons_params" style="cursor: pointer;"> ' +bouton_actualiser+bouton_ajouter+bouton_supprimer+bouton_dupliquer+bouton_telecharger+bouton_import+bouton_init+' </span>'
 
 
 
@@ -6851,14 +6841,15 @@ function un_bouton_param(id_bouton_param, fonction_bouton_param, alt_bouton_para
 
 function json2Table(json, id_table) {
   	
-
+	/*
 	if(json[0] === undefined){
 		json = transformer_en_array_de_JSON(json);
-	}
+	}*/
 
-	let cols = Object.keys(json[0])
+	var id_parametre = $(".un_menu_orange")[0].id 
+	let cols = nom_des_champs(id_parametre) //Object.keys(json[0])
 
-
+	/*
 	if(json.length === undefined){
 		json = transformer_en_array_de_JSON(json);	
 	}
@@ -6933,16 +6924,47 @@ function rendre_td_modifiable(){
 		//sinon: saisie libre
 		
 		var ancienne_valeur = e.target.innerText;
-		if (ancienne_valeur.includes("|")){
+
+		var est_classe = $("#Classe")[0] ? e.target.cellIndex === $("#Classe")[0].cellIndex : false
+		var est_classe_principale = $("#Classe_principale")[0] ? e.target.cellIndex === $("#Classe_principale")[0].cellIndex : false
+		var est_classe_bis = $("#classe_bis")[0] ? e.target.cellIndex === $("#classe_bis")[0].cellIndex : false
+
+		if (est_classe || est_classe_principale || est_classe_bis){
 
 			//mini fenetre de checkbox
 			//avec ok (todo) et annuler
-			var nouvelle_valeur = null //annuler
+			var les_matieres = JSON.parse(recuperer('Matieres'))
+			var id_parametre = $(".un_menu_orange")[0].id 
+
+			var valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Classe_Matiere")
+			//si c'est un admin -> (Tous|un_cycle)
+			if(id_parametre === "Administration"){
+				valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Cycle")
+				valeurs_possibles = valeurs_possibles.map(e => '(Tous|'+e+')')
+			}
+			//si c'est une classe principale (profs) OU eleve avec 1 seule classe -> classe
+			if(id_parametre === "Eleves" || e.target.cellIndex === $("#Classe_principale")[0].cellIndex){
+				valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Classe")
+			}
+
+
+
+
+
+			formulaire_choix_checkbox(e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'))
 
 		}else{
 			var nouvelle_valeur = prompt("Indiquez la nouvelle valeur",ancienne_valeur);
+			suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur)
 		}
 		
+	})
+	
+}
+
+
+function suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur){
+
 
 		if(nouvelle_valeur===null) return -1;
 		chargement(true);
@@ -7021,9 +7043,54 @@ function rendre_td_modifiable(){
 
 		chargement(false);
 
-	})
-	
+
 }
+
+
+
+function formulaire_choix_checkbox(e, ancienne_valeur, identifiant, liste_en_array, liste_deja_cochés){
+	
+	$("#mini_popup").remove()
+
+	var entetes = '<div id="mini_popup" style="overflow: hidden auto;"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img src="images/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div>'
+	var titre_formulaire = '<div>Classe(s) pour <b>'+identifiant+'</b></div><div id="liste_classe_matieres" style="padding-top: 4%;padding-bottom: 4%;text-align: left;"><div>'
+	
+	//pour chaque element de la liste
+	var les_elements = ""
+	for (var i = 0; i <liste_en_array.length;i++) {
+		est_coché = liste_deja_cochés ? (liste_deja_cochés.indexOf(liste_en_array[i]) >=0 ? "checked" : "" ): ""
+		classe_initiale = est_coché === "checked" ? "en_gras" : ""
+		les_elements = les_elements+'<div class="'+classe_initiale+'"><input class="choix_liste_matiere" type="checkbox" id="'+liste_en_array[i]+'" name="choix_liste_matiere" '+est_coché+'><label>'+liste_en_array[i]+'</label></div>'
+
+	}
+
+	var bouton_assigner = '</div></div><button type="button" class="rendre" id="assigner">Assigner</button></div>'
+	var html_final = entetes + titre_formulaire + les_elements  + bouton_assigner
+
+	$("body").append(html_final)
+
+	$("#assigner").on("click",function(ceci){
+		suite_actualiser_double_clic(e, ancienne_valeur, retourner_les_cochés())
+		$("#mini_popup").remove()
+	})	
+
+	$(".choix_liste_matiere").on('change', function(e){
+		e.target.parentNode.className = e.target.checked ? "en_gras" : ""
+	})
+
+}
+
+function retourner_les_cochés(){
+
+	var resultat  = ""
+	Array.from($(".choix_liste_matiere:checked")).forEach(function(valeur,index){
+		resultat = resultat+ (resultat === "" ? "" : ";") + valeur.id 
+	})
+	//console.log(resultat)
+	
+	return resultat;
+}
+
 
 function actualiser_json_local_et_drive(nom_table, table, champ_actualise, ancienne_valeur, nouvelle_valeur, valeur_champ_reference){
 	table.some(function(valeur,index){
@@ -7081,7 +7148,7 @@ function ajouter_donnees_parametres(id_parametre){
 	creer_formulaire_ajout_donnee_html(id_parametre, liste_champs)
 }
 
-//(todo)
+
 function dupliquer_donnees_parametres(id_parametre){
 	if(!id_parametre) id_parametre = $(".un_menu_orange")[0].id
 	id_ligne_dupliquee = 0
@@ -7097,7 +7164,23 @@ function supprimer_ligne_parameters(id_parametre){
 	
 
 	if (!$(".selected")[0]){
-		alert("Sélectionnez d'abord la ligne à supprimer.")
+		confirmer_suppression = prompt("Vous êtes sur le point de vider TOUTE LA TABLE "+id_parametre+". Pour confirmer la suppression, merci d'écrire '"+ id_parametre+"', sinon cliquez sur Annuler.")
+		console.log(confirmer_suppression)
+		if(confirmer_suppression === id_parametre){
+			chargement(true)
+			supprimer_tout(id_parametre)
+
+			//apres 1.5 seconde
+			setTimeout(function(){			
+				actualiser_parametre()
+				chargement(false)
+			}, 1500);
+
+
+
+		}
+
+
 		return 0
 	}
 
@@ -7186,14 +7269,17 @@ function telecharger_parametre(id_parametre){
 
 	if(!id_parametre) id_parametre = $(".un_menu_orange")[0].id
 
-	var entetes_seulement = $("#choix_download_param")[0].value === "En-têtes" 
-	var contenu = convertir_csv(JSON.parse(recuperer(id_parametre)), entetes_seulement)
+	var entetes_seulement = $("#choix_download_param")[0].value === "En-têtes"
+	var contenu_recup =  recuperer(id_parametre) ? JSON.parse(recuperer(id_parametre)) : nom_des_champs(id_parametre)
+	console.log(contenu_recup)
+	var contenu = convertir_csv(contenu_recup, entetes_seulement)
+	console.log(contenu)
 	var suite_nom = entetes_seulement ? "-modele-" : ""
 	var nom_fichier =  id_parametre+suite_nom+maintenant_sans_caracteres_speciaux()+".csv";
 
 
 
-	enregistrer_donnees(contenu, nom_fichier);
+	enregistrer_donnees_en_csv(contenu, nom_fichier);
 
 
 
@@ -7205,11 +7291,12 @@ function telecharger_parametre(id_parametre){
 }
 
 
-function enregistrer_donnees(contenu,nom_fichier) {
+function enregistrer_donnees_en_csv(contenu,nom_fichier) {
     var a = document.createElement("a");
     document.body.appendChild(a);
     a.style = "display: none";
-    var blob = new Blob([contenu], { type: 'text/csv;charset=utf-8;' });
+    var universalBOM = "\uFEFF"
+    var blob = new Blob([(universalBOM+contenu)], { type: 'text/csv;charset=utf-8;' });
     url = window.URL.createObjectURL(blob);
     a.href = url;
     a.download = nom_fichier;
@@ -7219,13 +7306,89 @@ function enregistrer_donnees(contenu,nom_fichier) {
 }
 
 
+function importer_parametres(){
+	$('#fichier_import').remove()
+
+	//choisir un SEUL fichier pour le id_parametre
+	var id_parametre = $(".un_menu_orange")[0].id 
+	var champs_initiaux = nom_des_champs(id_parametre)//on recupere depuis la BDD directement
+	var fichier_html = '<input id="fichier_import" type="file" name="fichier_import" accept=".csv" style="display:none;">'
+	$('body').append(fichier_html)
+
+	$('#fichier_import').on('change',function(e){
+
+		var reader = new FileReader();
+		reader.onload = function () {
+			var contenu = reader.result
+			var json_final = csv_en_JSON(contenu)
+
+  			console.log(json_final)
+
+  			//tous les Keys importés sont reconnus
+  			//on s'arrete dès qu'une clé est non trouvée
+			var probleme = ""
+			var cle_problematique = Object.keys(json_final[0]).some(key => {
+				probleme = key
+				return champs_initiaux.indexOf(key) < 0 
+  			})
+  			if(cle_problematique){
+  				alert("Problème d'import: le champ '" + probleme + "' n'est pas reconnu dans la table '"+id_parametre+"'.")
+  				return 0
+  			}
+
+
+  			//tous les champs obligatoires sont renseignés (todo?)
+  			//aucun champ IDENTIFIANT déjà existant tenté d'être rajouté (todo?)
+  			//fenêtre de résumé: OK ou pas OK
+  			var nombre_lignes = Number(json_final.length) 
+  			var avec_s = nombre_lignes>1?'s':''
+  			confirmation = confirm('Nous avons détecté ' + nombre_lignes + ' ligne'+avec_s+' avec ' + champs_initiaux.length + ' champs. Voulez-vous importer ces données ?')
+  			if(confirmation){
+  				chargement(true)
+  				
+  				for (var i = 0; i< json_final.length; i++) {
+  					try{
+  						ajouter_un_element(id_parametre, json_final[i])
+  					}catch(error){
+  						console.error(error)
+  						alert(error)
+  					}
+  				}	
+
+
+				setTimeout(function(){
+					actualiser_parametre()
+  					chargement(false)
+				}, 2000);
+  			}
+
+			//import qu'une fois
+			$('#fichier_import').remove()
+		};
+
+		reader.readAsText(e.target.files[0]);
+
+		
+	})
+
+
+	$('#fichier_import').click()
+
+
+
+}
+
 function init_donnees(){
 
-	var confirmation = confirm("Êtes-vous sûr d'initialiser votre plateforme ? Cela remettra TOUS les mots de passe par défaut et ignorera toute consultation de notifications.")
-	if(confirmation){
+	var confirmation = prompt("Êtes-vous sûr d'initialiser votre plateforme ? Cela remettra TOUS les mots de passe par défaut et ignorera toute consultation de notifications. Pour continuer, taper 'reinitialiser'.")
+	if(confirmation === "reinitialiser"){
 		chargement(true)
 		reinitialiser_mdp_datenotif()
-		actualiser_parametre()
+		setTimeout(function(){
+			actualiser_parametre()
+		}, 2000);
+		
+
 		chargement(false)
 	}
 }
@@ -7250,7 +7413,7 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 
 	if (liste_champs.length > 0){
 		for (var i = 0; i < liste_champs.length; i++) {
-			//(todo) rendre les champs auto NON MODIFIABLES (id_url, id_agenda, ...)
+			//rendre les champs auto NON MODIFIABLES (id_url, id_agenda, ...)
 			disabled = parametres_automatiques.indexOf(liste_champs[i]) >= 0 ? 'disabled' : ""
 			donnee_dupliquee = avec_duplicata  ? ($(".selected") ? ' value="'+$(".selected")[0].children[i].innerText+'" ' : '' ) : ""
 			liste_champs_html = liste_champs_html + '<div class="une_donnee_saisie" id="'+liste_champs[i]+'"><label>'+liste_champs[i]+'</label><input class="donnee" '+donnee_dupliquee+' id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" '+disabled+'></div>'

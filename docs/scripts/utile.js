@@ -108,9 +108,17 @@ function supprimer(nom_table,nom_champ_reference,valeur_champ_reference){
   delete_resultat_asynchrone(url)
 }
 
+function supprimer_tout(nom_table){
+  url = racine_data + nom_table + "?"+apikey
+  delete_resultat_asynchrone(url)
+}
 
+function nom_des_champs(nom_table){
+  url = racine_data + "?"+apikey
+  var resultat = get_resultat(url)
+  return Object.keys(resultat['definitions'][nom_table]['properties'])
 
-
+}
 
 function renvoyer_resultat(snapshot){
   
@@ -371,4 +379,30 @@ function afficher_date(element, sans_heure){
 function transformer_en_array_de_JSON(json){
 
   return json === null ? [] : Object.keys(json).map(i => json[i])
+}
+
+
+function csv_en_JSON(contenu){
+  var toutes_les_lignes = contenu.split('\r\n')
+  var entete = toutes_les_lignes[0].split(',')
+  console.log(entete)
+
+  var json_final = []
+
+  //pour chaque ligne, on créer un seul et unique objet {} avec les clés et valeurs qu'il faut
+  for (var i = 1; i< toutes_les_lignes.length;i++){
+    //console.log(toutes_les_lignes[i].split(',')[0])
+    var nouvel_objet = {}
+
+    for (var numero_colonne = 0; numero_colonne < entete.length ; numero_colonne++){
+      //console.log(numero_colonne + " " + entete[numero_colonne])
+      nouvel_objet[entete[numero_colonne]] = toutes_les_lignes[i].split(',')[numero_colonne]
+    }
+    
+    //console.log(nouvel_objet)
+    if(nouvel_objet[entete[0]]) json_final.push(nouvel_objet)
+  }
+
+  return json_final
+
 }
