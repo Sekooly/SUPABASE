@@ -385,7 +385,7 @@ function transformer_en_array_de_JSON(json){
 function csv_en_JSON(contenu){
   var toutes_les_lignes = contenu.split('\r\n')
   var entete = toutes_les_lignes[0].split(',')
-  console.log(entete)
+  //console.log(entete)
 
   var json_final = []
 

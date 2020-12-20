@@ -7165,7 +7165,7 @@ function supprimer_ligne_parameters(id_parametre){
 
 	if (!$(".selected")[0]){
 		confirmer_suppression = prompt("Vous êtes sur le point de vider TOUTE LA TABLE "+id_parametre+". Pour confirmer la suppression, merci d'écrire '"+ id_parametre+"', sinon cliquez sur Annuler.")
-		console.log(confirmer_suppression)
+		//console.log(confirmer_suppression)
 		if(confirmer_suppression === id_parametre){
 			chargement(true)
 			supprimer_tout(id_parametre)
@@ -7271,9 +7271,9 @@ function telecharger_parametre(id_parametre){
 
 	var entetes_seulement = $("#choix_download_param")[0].value === "En-têtes"
 	var contenu_recup =  recuperer(id_parametre) ? JSON.parse(recuperer(id_parametre)) : nom_des_champs(id_parametre)
-	console.log(contenu_recup)
+	//console.log(contenu_recup)
 	var contenu = convertir_csv(contenu_recup, entetes_seulement)
-	console.log(contenu)
+	//console.log(contenu)
 	var suite_nom = entetes_seulement ? "-modele-" : ""
 	var nom_fichier =  id_parametre+suite_nom+maintenant_sans_caracteres_speciaux()+".csv";
 
@@ -7322,7 +7322,7 @@ function importer_parametres(){
 			var contenu = reader.result
 			var json_final = csv_en_JSON(contenu)
 
-  			console.log(json_final)
+  			//console.log(json_final)
 
   			//tous les Keys importés sont reconnus
   			//on s'arrete dès qu'une clé est non trouvée
