@@ -63,55 +63,72 @@ function se_connecter(){
     }else{
 
       //si maintenance -> erreur
-      if (est_en_maintenance() === "oui") {
-        actualiser_remarque("La plateforme SEKOOLY est actuellement en maintenance, veuillez réessayer plus tard.", recuperer_donnee(snapshot, 'Classe'), "")
-        return 0;
-      }
-
-      //essayer en tant que prof
-      me_chercher_dans_la_table("Profs").then( snapshot => {
-        //console.log("Profs?")
-
-
-        //si prof
-        if (snapshot !== null && snapshot.length > 0){
-
-          if (bon_mdp(snapshot)){
-            recuperer_mes_donnees(snapshot)
-          }else{
-            actualiser_remarque("Code d'accès erroné, veuillez réessayer. <br> Si vous avez perdu votre code d'accès, contactez l'Administration de votre établissement.", "Prof", "Profs")
-          }
-
+      est_en_maintenance().then(valeur => {
+        //console.log(valeur)
+        
+        if(valeur === "oui"){
+        
+          actualiser_remarque("La plateforme SEKOOLY est actuellement en maintenance, veuillez réessayer plus tard.", "introuvable", "")
+          return true;
+        
         }else{
 
-          //essayer en tant qu'élève
-          me_chercher_dans_la_table("Eleves").then( snapshot => {
-    
-            //si Eleves
+
+
+
+          //essayer en tant que prof
+          me_chercher_dans_la_table("Profs").then( snapshot => {
+            //console.log("Profs?")
+
+
+            //si prof
             if (snapshot !== null && snapshot.length > 0){
 
-              if (bon_ecolage(snapshot)){
-                if (bon_mdp(snapshot)){
-                  recuperer_mes_donnees(snapshot)
-                }else{
-                  actualiser_remarque("Code d'accès erroné, veuillez réessayer. <br> Si vous avez perdu votre code d'accès, contactez l'Administration de votre établissement.",recuperer_donnee(snapshot, 'Classe'), "Eleves")
-                }
+              if (bon_mdp(snapshot)){
+                recuperer_mes_donnees(snapshot)
               }else{
-
-                actualiser_remarque("Frais de scolarité non régularisés. <br> Veuillez contacter l'Économat ou de l'Administration de votre établissement.",recuperer_donnee(snapshot, 'Classe'), "Eleves")
-
+                actualiser_remarque("Code d'accès erroné, veuillez réessayer. <br> Si vous avez perdu votre code d'accès, contactez l'Administration de votre établissement.", "Prof", "Profs")
               }
 
-            //aucun des 3 -> introuvable
             }else{
-                actualiser_remarque("Identifiant '" + valeur_identifiant() + "' non reconnu, veuillez réessayer. <br> Si vous avez perdu votre identifiant, contactez l'Administration de votre établissement.","introuvable", "introuvable")
-            }    
-            
 
+              //essayer en tant qu'élève
+              me_chercher_dans_la_table("Eleves").then( snapshot => {
+        
+                //si Eleves
+                if (snapshot !== null && snapshot.length > 0){
+
+                  if (bon_ecolage(snapshot)){
+                    if (bon_mdp(snapshot)){
+                      recuperer_mes_donnees(snapshot)
+                    }else{
+                      actualiser_remarque("Code d'accès erroné, veuillez réessayer. <br> Si vous avez perdu votre code d'accès, contactez l'Administration de votre établissement.",recuperer_donnee(snapshot, 'Classe'), "Eleves")
+                    }
+                  }else{
+
+                    actualiser_remarque("Frais de scolarité non régularisés. <br> Veuillez contacter l'Économat ou de l'Administration de votre établissement.",recuperer_donnee(snapshot, 'Classe'), "Eleves")
+
+                  }
+
+                //aucun des 3 -> introuvable
+                }else{
+                    actualiser_remarque("Identifiant '" + valeur_identifiant() + "' non reconnu, veuillez réessayer. <br> Si vous avez perdu votre identifiant, contactez l'Administration de votre établissement.","introuvable", "introuvable")
+                }    
+                
+
+              })
+
+            }      
           })
 
-        }      
+
+
+        }
+
+
       })
+
+
       
     }      
   })
