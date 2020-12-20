@@ -406,3 +406,30 @@ function csv_en_JSON(contenu){
   return json_final
 
 }
+
+
+
+function identifiant_par_table(nom_table){
+  var resultat = get_resultat(racine_data+'?'+apikey)
+  var resultat_intermediaire = resultat['definitions'][nom_table] ? resultat['definitions'][nom_table]['properties'] : {}
+
+
+
+  //on recupere les keys (entetes)
+  var les_entetes = Object.keys(resultat_intermediaire)
+  //on recupere les values (valeurs)
+  var les_values = Object.values(resultat_intermediaire)
+  
+  if(les_entetes.length > 0 && les_entetes.length > 0){
+    //celui avec une value.key = 'description' est l'entete id_table
+    var index_du_champ = les_values.map(e=> e['description']).indexOf('Note:\nThis is a Primary Key.<pk/>')
+    var id_table = index_du_champ >=0 ? les_entetes[index_du_champ] : ""
+  }else{
+    var id_table = ""
+  }
+
+
+  return id_table;   
+
+
+}

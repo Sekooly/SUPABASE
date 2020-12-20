@@ -7,7 +7,7 @@ var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","UR
 								]
 
 var elements_menu_haut_avec_modifs = ["Classes","Matieres","Eleves","Profs","Administration"]
-
+var elements_menu_haut_avec_reset = ["Eleves","Profs","Administration"]
 
 
 
@@ -6547,6 +6547,16 @@ function un_menu_clic(id_parametre){
 	    }
 	}
 
+	//pas de reinit a faire
+    if($("#boutons_params")){
+	    if (elements_menu_haut_avec_reset.indexOf(id_parametre) === -1){
+	    	autoriser_le_reset(false)
+	    }else{
+	    	autoriser_le_reset(true)
+	    }
+	}
+
+
 
 }
 
@@ -6554,6 +6564,10 @@ function autoriser_les_modifs(oui){
 	$("#ajout_param")[0].style.display = oui ? "" : "none"
 	$("#suppr_param")[0].style.display = oui ? "" : "none"
 	$("#dupliquer_param")[0].style.display = oui ? "" : "none"
+}
+
+function autoriser_le_reset(oui){
+	$("#reset_param")[0].style.display = oui ? "" : "none"
 }
 
 
@@ -6646,19 +6660,6 @@ function traiter_liste_JSON(id_parametre,liste_JSON, identifiant_table){
 		effacer(id_parametre)
 	}
 
-}
-
-function identifiant_par_table(nom_table){
-	var id_table = nom_table === "Classes" ? "ID_URL" :
-			nom_table === "Matieres" ? "ID_URL" :
-			nom_table === "Eleves" ? "Identifiant" :
-			nom_table === "Profs" ? "Identifiant" :
-			nom_table === "Administration" ? "Identifiant" :
-			nom_table === "Logs" ? "Identifiant" :
-			nom_table === "Alerte" ? "Alerte" :
-			nom_table === "Topic" ? "Id_topic" :
-			"";	
-	return id_table;			
 }
 
 
@@ -7299,6 +7300,7 @@ function enregistrer_donnees_en_csv(contenu,nom_fichier) {
     var blob = new Blob([(universalBOM+contenu)], { type: 'text/csv;charset=utf-8;' });
     url = window.URL.createObjectURL(blob);
     a.href = url;
+    a.target = '_blank';
     a.download = nom_fichier;
     a.click();
     window.URL.revokeObjectURL(url);
@@ -7317,12 +7319,27 @@ function importer_parametres(){
 
 	$('#fichier_import').on('change',function(e){
 
+		//c'est forcément un .csv sinon on quitte
+		if(e.target.files[0].name.split('.').pop().trim().toLowerCase() !== "csv"){
+			alert("Veuillez choisir un fichier .csv valide.")
+			$('#fichier_import').remove()
+			return 0
+		}
+
 		var reader = new FileReader();
 		reader.onload = function () {
 			var contenu = reader.result
 			var json_final = csv_en_JSON(contenu)
 
   			//console.log(json_final)
+
+  			//au moins une donnée
+  			if(json_final.length === 0){
+  				alert("Ce fichier .csv ne contient aucune donnée à importer.")
+				//import qu'une fois
+				$('#fichier_import').remove()
+				return 0
+  			}
 
   			//tous les Keys importés sont reconnus
   			//on s'arrete dès qu'une clé est non trouvée
@@ -7333,6 +7350,8 @@ function importer_parametres(){
   			})
   			if(cle_problematique){
   				alert("Problème d'import: le champ '" + probleme + "' n'est pas reconnu dans la table '"+id_parametre+"'.")
+				//import qu'une fois
+				$('#fichier_import').remove()
   				return 0
   			}
 
@@ -7365,6 +7384,7 @@ function importer_parametres(){
 			//import qu'une fois
 			$('#fichier_import').remove()
 		};
+
 
 		reader.readAsText(e.target.files[0]);
 
