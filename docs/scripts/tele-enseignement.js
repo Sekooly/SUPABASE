@@ -3,7 +3,7 @@ var elements_menu_haut = ["Cycles", "Classes", "Matieres", "Eleves","Profs", "Ad
 var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL_Mapping","URL_agenda",
 								"id_googlecalendar","nb_avis_donnés", "nb_avis_max","nom_fiche","taux_conseil",
 								"Matiere_bis", "classe_id", "classe_bis", "type", "Derniere_consultation_notifs",
-								"id_formulaire_remediation", "id_fiche", "URL_Mapping","niveau"
+								"id_formulaire_remediation", "id_fiche", "URL_Mapping","niveau", "commun_au_cycle"
 								]
 
 var elements_menu_haut_avec_modifs = ["Classes","Matieres","Eleves","Profs","Administration"]
@@ -1794,32 +1794,7 @@ function recuperer_logs(){
 
 }
 
-// JSON à CSV
-function convertir_csv(arr, entetes_seulement){
-	
-	//si c'est direct un string -> on joint
-	if(typeof(arr[0])==="string"){
-		return  arr.join(',')
 
-
-
-	//si c'est encore un object -> on concat
-	}else{
-		const array = [Object.keys(arr[0])].concat(arr);		
-
-		if(entetes_seulement){
-			return array[0].join(',');
-		}
-
-
-		return array.map(it => {
-			return Object.values(it);
-		}).join('\r\n');	
-	}
-	
-
-
-}
 
 function telecharger(nom_fichier,contenu_fichier){
 
@@ -7330,7 +7305,7 @@ function importer_parametres(){
 
 		//c'est forcément un .csv sinon on quitte
 		if(e.target.files[0].name.split('.').pop().trim().toLowerCase() !== "csv"){
-			alert("Veuillez choisir un fichier .csv valide.")
+			alert("Erreur: merci de choisir un fichier d'extension .csv")
 			$('#fichier_import').remove()
 			return 0
 		}
@@ -7366,9 +7341,12 @@ function importer_parametres(){
 
 
   			//tous les champs obligatoires sont renseignés (todo?)
+  			//tous les champs automatiques renseignés automatiquement
   			//aucun champ IDENTIFIANT déjà existant tenté d'être rajouté (todo?)
   			//fenêtre de résumé: OK ou pas OK
   			var nombre_lignes = Number(json_final.length) 
+  			var liste_champs = Object.keys(json_final[0])
+  			
   			var avec_s = nombre_lignes>1?'s':''
   			confirmation = confirm('Nous avons détecté ' + nombre_lignes + ' ligne'+avec_s+' avec ' + champs_initiaux.length + ' champs. Voulez-vous importer ces données ?')
   			if(confirmation){
@@ -7376,18 +7354,25 @@ function importer_parametres(){
   				
   				for (var i = 0; i< json_final.length; i++) {
   					try{
-  						ajouter_un_element(id_parametre, json_final[i])
+  						//ajouter_un_element(id_parametre, json_final[i])
+  						//console.log(json_final[i])
+  						creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, false, json_final[i])
+						ajouter_donnees_saisies(id_parametre, i<(json_final.length-1)) //deuxieme parametre vaut FAUX -> on est sur le dernier
+  						
   					}catch(error){
   						console.error(error)
   						alert(error)
   					}
   				}	
 
-
+  				/*
 				setTimeout(function(){
 					actualiser_parametre()
   					chargement(false)
-				}, 2000);
+				}, 2000);*/
+
+
+
   			}
 
 			//import qu'une fois
@@ -7406,6 +7391,7 @@ function importer_parametres(){
 
 
 }
+
 
 function init_donnees(){
 
@@ -7436,15 +7422,22 @@ function recuperer_entetes_params(id_parametre){
 
 
 
-function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_duplicata){
+function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_duplicata, une_donnee){
 	var entete = '<div style="overflow:auto;" id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img src="images/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Nouvelle donnée dans ' +id_parametre+ '</div><form class="donnees_saisies" id="donnees_saisies" >'
 	var liste_champs_html = ""
+	
+	//console.log(une_donnee)
+	
 
 	if (liste_champs.length > 0){
 		for (var i = 0; i < liste_champs.length; i++) {
 			//rendre les champs auto NON MODIFIABLES (id_url, id_agenda, ...)
+
+			//console.log(une_donnee[liste_champs[i]])
+
 			disabled = parametres_automatiques.indexOf(liste_champs[i]) >= 0 ? 'disabled' : ""
-			donnee_dupliquee = avec_duplicata  ? ($(".selected") ? ' value="'+$(".selected")[0].children[i].innerText+'" ' : '' ) : ""
+			donnee_dupliquee = avec_duplicata  ? ($(".selected") ? ' value="'+$(".selected")[0].children[i].innerText+'" ' : '' ) : 
+								une_donnee ? ' value="' + une_donnee[liste_champs[i]] + '" ' : ""
 			liste_champs_html = liste_champs_html + '<div class="une_donnee_saisie" id="'+liste_champs[i]+'"><label>'+liste_champs[i]+'</label><input class="donnee" '+donnee_dupliquee+' id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" '+disabled+'></div>'
 		}
 	}
@@ -7460,7 +7453,7 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 }
 
 
-function ajouter_donnees_saisies(id_parametre){
+function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 	//console.log(id_parametre)
 
 	//nom_etablissement déjà ok
@@ -7516,6 +7509,10 @@ function ajouter_donnees_saisies(id_parametre){
 			return -1;
 
 		}
+
+
+		
+
 		var param_nom_etablissement = nom_etablissement ? "?nom_etablissement=" + nom_etablissement : ""
 		var param_nom_cycle = nom_cycle ? "&nom_cycle=" + nom_cycle : ""
 		var param_nom_classe = nom_classe ? "&nom_classe=" + nom_classe : ""
@@ -7545,6 +7542,9 @@ function ajouter_donnees_saisies(id_parametre){
 		var la_matiere = nom_matiere
 		var id_de_la_matiere = get_valeur(les_ids_recus,la_matiere)
 		//return 0 //A COMMENTER!!!
+
+
+		$("input[id='commun_au_cycle']")[0].value = $("input[id='commun_au_cycle']")[0].value ? "non" : $("input[id='commun_au_cycle']").value 
 
 		if(id_parametre === "Classes"){
 		/******* POUR CLASSE ********/
@@ -7582,6 +7582,9 @@ function ajouter_donnees_saisies(id_parametre){
 			
 
 		}
+
+
+
 
 				
 	}else if(id_parametre === "Eleves" || id_parametre === "Profs" || id_parametre === "Administration"){
@@ -7621,13 +7624,18 @@ function ajouter_donnees_saisies(id_parametre){
 	//màj en JSON local	
 	//màj en affichage
 	//TEMPORAIRE: actualiser
-	actualiser_parametre(id_parametre)
+	if(!ne_pas_actualiser) actualiser_parametre(id_parametre)
 
 	//vider le formulaire
 	vider_les_input()
 
 	chargement(false)
+
+
+	return 0
 }
+
+
 
 function get_valeur(liste_initiale,motif){
 	var index_motif = liste_initiale.findIndex((element) => element.includes(motif + ':'));

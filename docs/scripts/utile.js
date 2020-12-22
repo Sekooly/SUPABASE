@@ -382,9 +382,41 @@ function transformer_en_array_de_JSON(json){
 }
 
 
+
+var separateur = ','
+
+// JSON à CSV
+function convertir_csv(arr, entetes_seulement){
+
+  //si c'est direct un string -> on joint
+  if(typeof(arr[0])==="string"){
+    return  arr.join(separateur)
+
+
+
+  //si c'est encore un object -> on concat
+  }else{
+    const array = [Object.keys(arr[0])].concat(arr);
+
+    if(entetes_seulement){
+      return array[0].join(separateur);
+    }
+
+
+    return array.map(it => {
+
+      return Object.values(it).join(separateur);
+    }).join('\r\n');  
+  }
+  
+
+
+}
+
+
 function csv_en_JSON(contenu){
   var toutes_les_lignes = contenu.split('\r\n')
-  var entete = toutes_les_lignes[0].split(',')
+  var entete = toutes_les_lignes[0].split(separateur)
   //console.log(entete)
 
   var json_final = []
@@ -396,7 +428,7 @@ function csv_en_JSON(contenu){
 
     for (var numero_colonne = 0; numero_colonne < entete.length ; numero_colonne++){
       //console.log(numero_colonne + " " + entete[numero_colonne])
-      nouvel_objet[entete[numero_colonne]] = toutes_les_lignes[i].split(',')[numero_colonne]
+      nouvel_objet[entete[numero_colonne]] = toutes_les_lignes[i].split(separateur)[numero_colonne]
     }
     
     //console.log(nouvel_objet)
