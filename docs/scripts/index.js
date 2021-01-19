@@ -34,7 +34,7 @@ function se_connecter(){
 
             //sans droit_hors_maintenance  -> stopper
             if(renvoyer_resultat(snapshot)['droit_hors_maintenance'] === "non"){
-              actualiser_remarque("La plateforme SEKOOLY est actuellement en maintenance, veuillez réessayer plus tard.", recuperer_donnee(snapshot, 'Classe'), "")
+              actualiser_remarque("La plateforme SEKOOLY est actuellement en maintenance: veuillez réessayer plus tard.", recuperer_donnee(snapshot, 'Classe'), "")
               return 0;  
 
             //avec droit_hors_maintenance 
@@ -53,7 +53,7 @@ function se_connecter(){
         
 
       }else{
-        actualiser_remarque("Code d'accès erroné, veuillez réessayer. <br> Si vous avez perdu votre code d'accès, contactez l'Administration de votre établissement.", recuperer_donnee(snapshot, 'Role'), "Administration")
+        actualiser_remarque("Code d'accès erroné: veuillez réessayer. <br> Si vous avez perdu votre code d'accès merci de contacter l'Administration de votre établissement.", recuperer_donnee(snapshot, 'Role'), "Administration")
       }
 
 
@@ -68,7 +68,7 @@ function se_connecter(){
         
         if(valeur === "oui"){
         
-          actualiser_remarque("La plateforme SEKOOLY est actuellement en maintenance, veuillez réessayer plus tard.", "introuvable", "")
+          actualiser_remarque("La plateforme SEKOOLY est actuellement en maintenance: veuillez réessayer plus tard.", "introuvable", "")
           return true;
         
         }else{
@@ -87,7 +87,7 @@ function se_connecter(){
               if (bon_mdp(snapshot)){
                 recuperer_mes_donnees(snapshot)
               }else{
-                actualiser_remarque("Code d'accès erroné, veuillez réessayer. <br> Si vous avez perdu votre code d'accès, contactez l'Administration de votre établissement.", "Prof", "Profs")
+                actualiser_remarque("Code d'accès erroné: veuillez réessayer. <br> Si vous avez perdu votre code d'accès merci de contacter l'Administration de votre établissement.", "Prof", "Profs")
               }
 
             }else{
@@ -102,7 +102,7 @@ function se_connecter(){
                     if (bon_mdp(snapshot)){
                       recuperer_mes_donnees(snapshot)
                     }else{
-                      actualiser_remarque("Code d'accès erroné, veuillez réessayer. <br> Si vous avez perdu votre code d'accès, contactez l'Administration de votre établissement.",recuperer_donnee(snapshot, 'Classe'), "Eleves")
+                      actualiser_remarque("Code d'accès erroné: veuillez réessayer. <br> Si vous avez perdu votre code d'accès merci de contacter l'Administration de votre établissement.",recuperer_donnee(snapshot, 'Classe'), "Eleves")
                     }
                   }else{
 
@@ -112,7 +112,7 @@ function se_connecter(){
 
                 //aucun des 3 -> introuvable
                 }else{
-                    actualiser_remarque("Identifiant '" + valeur_identifiant() + "' non reconnu, veuillez réessayer. <br> Si vous avez perdu votre identifiant, contactez l'Administration de votre établissement.","introuvable", "introuvable")
+                    actualiser_remarque("Identifiant '" + valeur_identifiant() + "' non reconnu, veuillez réessayer. <br> Si vous avez perdu votre identifiant merci de contacter l'Administration de votre établissement.","introuvable", "introuvable")
                 }    
                 
 
