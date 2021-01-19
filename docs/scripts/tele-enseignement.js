@@ -1,5 +1,5 @@
 var mon_role = ""
-var elements_menu_haut = ["Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Alerte", "Logs", "Notifs", "Visio"]
+var elements_menu_haut = ["Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Alerte", "Logs", "Notifs", "Visio", "Fichiers", "Rendus", "Topic", "Coms"]
 var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL_Mapping","URL_agenda",
 								"id_googlecalendar","nb_avis_donnés", "nb_avis_max","nom_fiche","taux_conseil",
 								"Matiere_bis", "classe_id", "classe_bis", "type", "Derniere_consultation_notifs",
@@ -5936,7 +5936,8 @@ function afficher_bulle_notifs(){
 	nouvelles_notifs = mes_notifs.filter(function(valeur){
 
 		Date_derniere_modif = moment(valeur['Date_derniere_modif'], "DD/MM/YYYY HH:mm:ss")
-		Date_consultation = moment(ma_date_consultation, "DD/MM/YYYY HH:mm:ss");
+		//Date_consultation = moment(ma_date_consultation, "DD/MM/YYYY HH:mm:ss");
+		Date_consultation = moment(ma_date_consultation);
 		//console.log(Date_derniere_modif + " VS " + Date_consultation);
 
 		return Date_derniere_modif > Date_consultation;
@@ -6433,8 +6434,8 @@ function recuperer_parametres(){
 	for (var i =  0; i < elements_menu_haut.length; i++) {
 		contenu_menu_haut = contenu_menu_haut + '<span class="un_menu" id ="'+elements_menu_haut[i]+'">'+elements_menu_haut[i]+'</span>' 
 	}
-
-	var conteneur_menu_html = '<div id="conteneur_menu"><div id="menu_haut" class="menu_haut"> ' + contenu_menu_haut+ '</div><div id="menu_params" class="menu_params"><div id="conteneur_filtre"><span id="label_filtre_parametre"></span><select id="filtre_parametre" class="filtre_parametre"></select></div><div id="menu_details"></div></div></div>'
+	var nombre_elements = '<span style="font-weight: bold;"><span id="nombre_elements_param">'+0+'</span> éléments</span>'
+	var conteneur_menu_html = '<div id="conteneur_menu"><div id="menu_haut" class="menu_haut"> ' + contenu_menu_haut+ '</div><div id="menu_params" class="menu_params"><div id="conteneur_filtre"><span id="label_filtre_parametre"></span><select id="filtre_parametre" class="filtre_parametre"></select></div><div id="menu_details"></div>'+nombre_elements+'</div></div>'
 
 
 	$("#conteneur_menu_html").remove();
@@ -6533,6 +6534,7 @@ function un_menu_clic(id_parametre){
 
 
 
+
 }
 
 function autoriser_les_modifs(oui){
@@ -6577,11 +6579,14 @@ function actualiser_details_parametre(id_parametre){
 	//liste ARRAY (1 élement)
 	if (id_parametre === "Maintenance"){
 		mettre_details_maintenance()
+		$("#nombre_elements_param")[0].innerText = 1
 
+	/*
 	//liste ARRAY (nombre de cycles)
 	}else if (id_parametre === "Cycles"){
 		mettre_details_cycle()
-	
+		$("#nombre_elements_param")[0].innerText = 0
+	*/
 
 	//LISTE JSON
 	}else{
@@ -6603,17 +6608,21 @@ function actualiser_details_parametre(id_parametre){
 
 			liste_JSON = JSON.parse(liste_deja_stockee_JSON)			
 			traiter_liste_JSON(id_parametre,liste_JSON, identifiant_table)
-
+			$("#nombre_elements_param")[0].innerText = liste_JSON.length
+				
 		}else{
 			rechercher_tout(id_parametre).then(function(snapshot){
 
 				liste_JSON = snapshot
-
+				//liste_JSON = ordonner(id_parametre,liste_JSON)
 				stocker(id_parametre, JSON.stringify(liste_JSON ? liste_JSON : ""))
 				traiter_liste_JSON(id_parametre,liste_JSON, identifiant_table)
+				$("#nombre_elements_param")[0].innerText = liste_JSON.length
 
 			});
 		}
+
+
 
 
 	}
@@ -6621,6 +6630,8 @@ function actualiser_details_parametre(id_parametre){
 
 
 }
+
+
 
 function traiter_liste_JSON(id_parametre,liste_JSON, identifiant_table){
 	//console.log(liste_JSON)
@@ -6730,8 +6741,7 @@ function actualiser_filtre_onglet(id_parametre){
 
 
 			
-			filtre_liste = valeursUniquesDeCetteKey(mes_matieres, 'Classe');
-			
+			filtre_liste = valeursUniquesDeCetteKey(toutes_les_matieres, 'Classe');
 
 
 

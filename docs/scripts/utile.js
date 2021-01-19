@@ -13,13 +13,20 @@ window.onbeforeunload = function() {
 }
 
 
+//récupéré depuis le serveur
+//uniquement utilisé pour envoyer au serveur
 function maintenant(){
 	
 	try{    
-    var date_serveur = rechercher_tout('rpc/maintenant')
-    return moment(date_serveur['responseJSON']).format("DD/MM/YYYY HH:mm:ss")
+    //var date_serveur = rechercher_tout('rpc/maintenant')
+    var date_serveur = get_resultat(racine_data + "rpc/maintenant"+'?'+apikey)
+    //console.log(date_serveur)
+    return date_serveur
+
+    //return moment(date_serveur['responseJSON']).format("DD/MM/YYYY HH:mm:ss")
 
 	}catch(e){
+    console.error("erreur pour trouver la date et l'heure.")
 		return (new Date()).toLocaleDateString() + " " + (new Date()).toLocaleTimeString()		
 	}
 			
@@ -27,8 +34,11 @@ function maintenant(){
 }
 
 function maintenant_sans_caracteres_speciaux(){
-  var resultat = maintenant().replaceAll('/','-')
-  resultat = maintenant().replaceAll(':','-')
+  var resultat_maintenant = maintenant()
+  var resultat = new Date(moment(resultat_maintenant)._d)
+  resultat = resultat.toLocaleDateString() + " " + resultat.toLocaleTimeString() 
+  resultat = resultat.replaceAll('/','-')
+  resultat = resultat.replaceAll(':','-')
   return resultat
 }
 
@@ -52,11 +62,36 @@ function actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouv
 
 }
 
-//limité à 2000
+//limité à 5000
 function rechercher_tout(nom_table){
-  url = racine_data + nom_table + "?" + apikey + "&limit=2000"
+  url = racine_data + nom_table + "?" + apikey + "&limit=5000" + ordonner(nom_table)
+  //console.log(url)
   return get_resultat_asynchrone(url)
 }
+
+function ordonner(nom_table){
+  //ordre = "&order=age.desc,height.asc"
+
+
+  if(nom_table==="Classes"){
+    return "&order=cycle.desc,niveau.asc,Classe.asc"
+  } else if(nom_table==="Matieres"){
+    return "&order=Cycle.desc,Classe.asc,Matiere.asc" 
+  } else if(nom_table==="Eleves"){
+    return "&order=Cycle.desc,Classe.desc,Identifiant.asc"
+  } else if(nom_table==="Profs" || nom_table==="Administration"){
+    return "&order=Cycle.desc,Identifiant.asc"
+  } else if(nom_table==="Logs" || nom_table==="Visio"){
+    return "&order=id.desc"
+  }else{
+    return ""
+  
+  }
+
+
+}
+
+
 
 function reinitialiser_mdp_datenotif(){
   url = racine_data +  "rpc/initialiser" + "?" + apikey + "&limit=2000"
@@ -66,7 +101,7 @@ function reinitialiser_mdp_datenotif(){
 //on renvoie un array vide si non trouvé, la valeur sinon
 function rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher, nombrelimite){
 
-  url = racine_data + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+apikey
+  url = racine_data + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+apikey + ordonner(nom_table)
   url = nom_champ_a_chercher ? url+"&select="+nom_champ_a_chercher : url
   url = nombrelimite ? url+"&limit="+nombrelimite : url
   
@@ -282,7 +317,7 @@ async function switcher_le_champ(nom_champ, nouvelle_valeur){
 
 
 function extension_ok(extension){
-	return ",bmp,gif,jpeg,jpg,png,svg,pdf,bmp,xlsx,xls,xlsm,ppt,pptx,doc,docx,html,csv,js,rtf,mp4,mp3,wav,youtube,".includes(","+extension.toLowerCase()+",")
+	return ",txt,bmp,gif,jpeg,jpg,png,svg,pdf,bmp,xlsx,xls,xlsm,ppt,pptx,doc,docx,html,csv,js,rtf,mp4,mp3,wav,youtube,".includes(","+extension.toLowerCase()+",")
 }
 
 function element_DOM(nom_element){
@@ -360,8 +395,20 @@ function suite_notif(){
 	return "-"+recuperer('identifiant_courant').replace(".","")
 }
 
+function afficher_date(date_initiale,sans_heure){
+  var formatage = sans_heure ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm:ssZ';
+  var resultat = new Date(moment(date_initiale,formatage));
+  
+  var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+  //console.log(date_str)
 
-function afficher_date(element, sans_heure){
+  if(sans_heure) options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+
+  return resultat.toLocaleDateString('fr-FR', options)
+}
+
+
+function afficher_date_old(element, sans_heure){
 
   //console.log("\n"+ element + ":" + element.length)
 	var format_initial = element.includes("-") ? "YYYY-MM-DD" : "DD/MM/YYYY HH:mm:ss"
