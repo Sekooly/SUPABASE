@@ -6716,6 +6716,11 @@ function actualiser_details_parametre(id_parametre){
 
 	}
 
+	//changement de filtre -> actualisation du nombre d'elements
+	$("#filtre_parametre").on('change',function(e){
+		$("#nombre_elements_param")[0].innerText = $("tbody").find('.une_ligne_de_donnees:visible').length
+	})
+
 
 
 }
