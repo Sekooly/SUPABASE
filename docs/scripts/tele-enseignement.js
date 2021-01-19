@@ -5651,8 +5651,8 @@ function ajouter_la_notif(la_notif,index){
 function clic_de_notif(type_notif,id_notif,id_dossier){
 	
 	//commenter
-	envoyer_ma_date_de_consultation();
-
+	envoyer_ma_date_de_consultation()
+		
 	//on vire les notifs
 	virer_le_pannel_notifs();
 
@@ -5672,6 +5672,8 @@ function clic_de_notif(type_notif,id_notif,id_dossier){
 
 	//on affiche tous les fichiers avec le bon filtre
 	filtrer_date_effet();
+
+
 
 
 }
@@ -5946,6 +5948,10 @@ function stocker_mes_notifications(mes_notifs){
 
 function stocker_ma_date_de_consultation(ma_date_consultation){
 	stocker('ma_date_consultation',ma_date_consultation);
+	
+	mes_donnees = JSON.parse(recuperer('mes_donnees'));
+	mes_donnees['Derniere_consultation_notifs'] = ma_date_consultation;
+	stocker('mes_donnees',JSON.stringify(mes_donnees));
 }
 
 function recuperer_ma_date_de_consultation(){
@@ -5960,7 +5966,7 @@ function recuperer_ma_date_de_consultation(){
 	});
 }
 
-async function envoyer_ma_date_de_consultation(){
+function envoyer_ma_date_de_consultation(){
 
 
 
@@ -5969,12 +5975,15 @@ async function envoyer_ma_date_de_consultation(){
 
 	mon_type = recuperer("mon_type").includes("Admin") ? "Administration" : recuperer("mon_type")
 	
-	maintenant_valeur = await maintenant()
+	maintenant_valeur = maintenant()
+	//console.log(maintenant_valeur)
 	stocker_ma_date_de_consultation(maintenant_valeur);
 
-	nouveau_data = {"Derniere_consultation_notifs":maintenant_valeur}	
+	nouveau_data = {"Derniere_consultation_notifs":maintenant_valeur}
+	//console.log("actualisation...")
 	actualiser(mon_type, "Identifiant", recuperer("identifiant_courant"), nouveau_data)
 
+	//console.log("ça y est !")
 	masquer_bulle_notifs();
 
 
