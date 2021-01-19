@@ -81,6 +81,21 @@ function rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_
 
 }
 
+function rechercher_notifs_prof(liste_classes_matieres, nombrelimite){
+  liste_classes_matieres = liste_classes_matieres.replaceAll(';',',')
+  console.log(liste_classes_matieres)
+
+
+  //Notifs?Classe_matiere=in.("(Divers|Salle%20des%20profs)")
+
+  url = racine_data + "Notifs?Classe_matiere=in.(\""+liste_classes_matieres+ "\")&"+apikey
+  url = nombrelimite ? url+"&limit="+nombrelimite : url
+  
+  console.log(url)
+
+  return get_resultat_asynchrone(url)
+}
+
 
 
 function ordonner(nom_table){
@@ -97,6 +112,10 @@ function ordonner(nom_table){
     return "&order=Cycle.desc,Identifiant.asc"
   } else if(nom_table==="Logs" || nom_table==="Visio"){
     return "&order=id.desc"
+  } else if(nom_table==="Notifs" || nom_table==="Topic" || nom_table==="Coms"){
+    return "&order=Horodateur.desc"
+  }else if(nom_table==="Fichiers" || nom_table==="Rendus"){
+    return "&order=date_publication.desc"
   }else{
     return ""
   

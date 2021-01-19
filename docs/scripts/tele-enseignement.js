@@ -1,5 +1,5 @@
 var mon_role = ""
-var elements_menu_haut = ["Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Alerte", "Logs", "Notifs", "Visio", "Fichiers", "Rendus", "Topic", "Coms"]
+var elements_menu_haut = ["Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Alerte", "Logs", "Visio", "Notifs", "Fichiers", "Rendus", "Topic", "Coms"]
 var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL_Mapping","URL_agenda",
 								"id_googlecalendar","nb_avis_donnés", "nb_avis_max","nom_fiche","taux_conseil",
 								"Matiere_bis", "classe_id", "classe_bis", "type", "Derniere_consultation_notifs",
@@ -2102,6 +2102,8 @@ function chargement_a_larrivee(){
 	//console.log("on affiche la liste : " + affichage_liste);
 	afficher_liste_eleves(affichage_liste);
 
+	afficher_params_si_droits_et_admin()
+
 	//barre de scroll tout en haut
 	window.scrollTo(0,0);
 
@@ -2166,7 +2168,7 @@ function chargement_a_larrivee(){
 	}
 
 	afficher_alerte_etablissement()
-	afficher_params_si_droits_et_admin()	
+		
 
 
 	chargement(false);
@@ -2178,6 +2180,8 @@ function afficher_params_si_droits_et_admin(){
 		var mes_droits = JSON.parse(recuperer('mes_donnees'))['Droits_modifs'];
 		var est_admin_avec_droits = recuperer("mon_type").includes("Admin") && mes_droits==="oui"
 		afficher_parametres(est_admin_avec_droits)
+	}else{
+		afficher_parametres(false)
 	}
 
 }
@@ -4008,7 +4012,7 @@ function switch_affichage_youtube(){
 
 				date_heure_actuelle = maintenant()
 				mes_donnees = JSON.parse(recuperer('mes_donnees'))
-				la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : $("#accueil_utilisateur")[0].innerText.split(" ")[0]
+				la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
 				la_matiere = recuperer('mon_type') === "Eleves" ? $("#accueil_utilisateur")[0].innerText : $("#accueil_utilisateur")[0].innerText.replace(la_classe,"").trim()
 
 				//stocker la donnée dans la BDD
@@ -4423,7 +4427,7 @@ $(function charger_fichiers(e){
 					date_heure_actuelle = maintenant()
 					mes_donnees = JSON.parse(recuperer('mes_donnees'))
 					mon_role = recuperer('mon_type').includes("Administration") ? mes_donnees['Role'] : recuperer('mon_type').replace("s","")
-					la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : $("#accueil_utilisateur")[0].innerText.split(" ")[0]
+					la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
 					la_matiere = recuperer('mon_type') === "Eleves" ? $("#accueil_utilisateur")[0].innerText : $("#accueil_utilisateur")[0].innerText.replace(la_classe,"").trim()
 					est_telechargeable = $("#est_telechargeable")[0].checked ? "oui" : "non"
 
@@ -4783,7 +4787,7 @@ $(function charger_fichiers(e){
 
 				nom_table = "Notifs"
 				mes_donnees = JSON.parse(recuperer('mes_donnees'))
-				la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : $("#accueil_utilisateur")[0].innerText.split(" ")[0]
+				la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
 				la_matiere = recuperer('mon_type') === "Eleves" ? $("#accueil_utilisateur")[0].innerText : $("#accueil_utilisateur")[0].innerText.replace(la_classe,"").trim()
 				id_notif = id_topic
 
@@ -5862,26 +5866,48 @@ function recuperer_notifs(){
 	
 
 	nom_table = "Notifs"
-	nom_champ_reference = recuperer('mon_type').includes("Admin") ? "Cycle" : "Classe"
+	nom_champ_reference = mon_type.includes("Admin") ? "Cycle" : "Classe"
 	valeur_champ_reference = JSON.parse(recuperer("mes_donnees"))[nom_champ_reference]
 
-	rechercher(nom_table, nom_champ_reference, valeur_champ_reference, "").then(les_notifs => {
-		mes_notifs = les_notifs.filter(function(valeur,index){
-			return valeur['Identifiant_derniere_modif'] !== recuperer('identifiant_courant')
+	//TODO: si prof -> les notifs de ses matieres issues du champ Classe
+	if(mon_type.includes('Profs')){
+
+		rechercher_notifs_prof(valeur_champ_reference, 150).then(les_notifs => {
+			mes_notifs = les_notifs.filter(function(valeur,index){
+				return valeur['Identifiant_derniere_modif'] !== recuperer('identifiant_courant')
+			})
+
+			
+
+			//console.log(mes_notifs)
+			stocker_mes_notifications(mes_notifs);
+			
+			//affiche la bulle SSI nouvelles notifs stockées
+			afficher_bulle_notifs();		
 		})
 
-		
+	}else{
 
-		//console.log(mes_notifs)
-		stocker_mes_notifications(mes_notifs);
-		
-		//affiche la bulle SSI nouvelles notifs stockées
-		afficher_bulle_notifs();		
-	})
+		rechercher(nom_table, nom_champ_reference, valeur_champ_reference, "").then(les_notifs => {
+			mes_notifs = les_notifs.filter(function(valeur,index){
+				return valeur['Identifiant_derniere_modif'] !== recuperer('identifiant_courant')
+			})
+
+			
+
+			//console.log(mes_notifs)
+			stocker_mes_notifications(mes_notifs);
+			
+			//affiche la bulle SSI nouvelles notifs stockées
+			afficher_bulle_notifs();		
+		})
+
+
+
+	}
 
 
 }
-
 
 function stocker_mes_notifications(mes_notifs){
 	
@@ -6243,7 +6269,7 @@ function envoyer_mon_log_visio(mon_identifiant, ma_classe, mon_statut, mon_role)
 
 
 		nom_table = "Visio"
-		la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : $("#accueil_utilisateur")[0].innerText.split(" ")[0]
+		la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
 		la_matiere = recuperer('mon_type') === "Eleves" ? $("#accueil_utilisateur")[0].innerText : $("#accueil_utilisateur")[0].innerText.replace(la_classe,"").trim()
 
 		nouveau_visio = {
