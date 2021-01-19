@@ -7408,7 +7408,10 @@ function init_donnees(){
 	}
 }
 
+
 function recuperer_entetes_params(id_parametre){
+
+	/*
 	if(!id_parametre) id_parametre = $(".un_menu_orange")[0].id
 	var liste_champs = []
 
@@ -7416,7 +7419,9 @@ function recuperer_entetes_params(id_parametre){
 		liste_champs.push($(".header_table.entete_sticky")[i].innerText)
 	}
 
-	return liste_champs
+	return liste_champs*/
+
+	return nom_des_champs(id_parametre)
 
 }
 
@@ -7468,7 +7473,11 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 	//nom_matiere
 	nom_matiere = $("input#Matiere").length > 0 ? $("input#Matiere")[0].value : ""
 	
-	
+	/*
+	console.log(nom_cycle)
+	console.log(nom_classe)
+	console.log(nom_matiere)
+	*/
 
 	//interdire l'ajout si la classe OU la matière existe déjà
 	if(id_parametre === "Classes"){
@@ -7609,12 +7618,10 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 	}
 
 
-
-
 	var mon_JSON = convertir_saisie_en_JSON("donnees_saisies")
 	//console.log(id_parametre)
 	//console.log(mon_JSON)
-	var nouvel_id = JSON.parse(recuperer(id_parametre)).length
+	var nouvel_id = recuperer(id_parametre) ? JSON.parse(recuperer(id_parametre)).length : 1
 	//console.log(nouvel_id)
 
 
