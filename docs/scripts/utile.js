@@ -69,6 +69,20 @@ function rechercher_tout(nom_table){
   return get_resultat_asynchrone(url)
 }
 
+//on renvoie un array vide si non trouvé, la valeur sinon
+function rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher, nombrelimite){
+
+  url = racine_data + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+apikey + ordonner(nom_table)
+  url = nom_champ_a_chercher ? url+"&select="+nom_champ_a_chercher : url
+  url = nombrelimite ? url+"&limit="+nombrelimite : url
+  
+  return get_resultat_asynchrone(url)
+
+
+}
+
+
+
 function ordonner(nom_table){
   //ordre = "&order=age.desc,height.asc"
 
@@ -91,6 +105,18 @@ function ordonner(nom_table){
 
 }
 
+function convertir_en_date(date_str_initiale){
+
+  if(date_str_initiale === null) return moment("30/12/1899 00:00:00",'DD/MM/YYYY HH:mm:ss')
+
+  avec_format = !date_str_initiale.includes('+');
+
+  if (avec_format){
+    return moment(date_str_initiale, 'DD/MM/YYYY HH:mm:ss')
+  }else{
+    return moment(date_str_initiale, 'YYYY-MM-DD HH:mm:ss.SSSSZ')
+  }
+}
 
 
 function reinitialiser_mdp_datenotif(){
@@ -98,17 +124,6 @@ function reinitialiser_mdp_datenotif(){
   return post_resultat_asynchrone(url)
 }
 
-//on renvoie un array vide si non trouvé, la valeur sinon
-function rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher, nombrelimite){
-
-  url = racine_data + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+apikey + ordonner(nom_table)
-  url = nom_champ_a_chercher ? url+"&select="+nom_champ_a_chercher : url
-  url = nombrelimite ? url+"&limit="+nombrelimite : url
-  
-  return get_resultat_asynchrone(url)
-
-
-}
 
 //on renvoie un array vide si non trouvé, la valeur sinon
 function rechercher_contenant_motif(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher, nombrelimite){
@@ -396,7 +411,10 @@ function suite_notif(){
 }
 
 function afficher_date(date_initiale,sans_heure){
-  var formatage = sans_heure ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm:ssZ';
+  var formatage = sans_heure ? 'YYYY-MM-DD' :
+                  date_initiale.includes('+') ? 'YYYY-MM-DD HH:mm:ssZ' :
+                  "DD/MM/YYYY HH:mm:ss"
+
   var resultat = new Date(moment(date_initiale,formatage));
   
   var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };

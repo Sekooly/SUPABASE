@@ -2166,16 +2166,20 @@ function chargement_a_larrivee(){
 	}
 
 	afficher_alerte_etablissement()
-	
+	afficher_params_si_droits_et_admin()	
 
+
+	chargement(false);
+	
+}
+
+function afficher_params_si_droits_et_admin(){
 	if (recuperer('mes_donnees') && recuperer("mon_type")){
 		var mes_droits = JSON.parse(recuperer('mes_donnees'))['Droits_modifs'];
 		var est_admin_avec_droits = recuperer("mon_type").includes("Admin") && mes_droits==="oui"
 		afficher_parametres(est_admin_avec_droits)
 	}
 
-	chargement(false);
-	
 }
 
 function afficher_alerte_etablissement(){
@@ -2975,6 +2979,11 @@ function autoriser_clic_droit_supprimer_et_renommer(e,ceci){
 	if(recuperer('mon_type').includes("Administration")){
 		var mes_droits = JSON.parse(recuperer('mes_donnees'))['Droits_modifs'];
 		if (mes_droits!=="oui") return -1;
+	}
+
+	//si dossier vie scolaire et non admin: pas de clic droit
+	if(!recuperer('mon_type').includes('Admin') && element_DOM('accueil_utilisateur').innerText.includes('Vie scolaire') ){		
+		return -1;
 	}
 
 
@@ -3804,6 +3813,9 @@ function decharger_dossier_final(){
 
 	//masquer le bouton questions
 	afficher_discussions(false);
+
+	//avec ou sans le bouton des params
+	afficher_params_si_droits_et_admin();
 	
 	//retour aux dossiers initiaux
 	stocker("dossier_chargé",'');
@@ -5119,9 +5131,10 @@ $(function charger_fichiers(e){
 		    	rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher).then(les_topics => {
 		    		//console.log(les_topics)
 		    		les_topics.sort(function tri_ordre_chrono_decroissant(a, b) {
-						return moment(b.Horodateur, "DD/MM/YYYY HH:mm:ss")  - moment(a.Horodateur, "DD/MM/YYYY HH:mm:ss")
+						//return moment(b.Horodateur, "DD/MM/YYYY HH:mm:ss")  - moment(a.Horodateur, "DD/MM/YYYY HH:mm:ss")
+						return convertir_en_date(b.Horodateur) - convertir_en_date(a.Horodateur)
 					});
-
+		    		//console.log(les_topics)
 
 		    		stocker("les_topics",JSON.stringify(les_topics));
 		    		traitement();
@@ -5685,6 +5698,7 @@ function notif_discussion(id_notif,id_dossier){
 
 			if($('#'+id_notif+'.bloc_topic').length>0){
 				
+				console.log('on y est!!!')
 				//nouvelle couleur topic (temporaire)
 				changer_couleur_temporairement(id_notif,"bloc_topic","#b9e5de",1000);
 
@@ -5855,6 +5869,9 @@ function recuperer_notifs(){
 		mes_notifs = les_notifs.filter(function(valeur,index){
 			return valeur['Identifiant_derniere_modif'] !== recuperer('identifiant_courant')
 		})
+
+		
+
 		//console.log(mes_notifs)
 		stocker_mes_notifications(mes_notifs);
 		
@@ -5869,9 +5886,31 @@ function recuperer_notifs(){
 function stocker_mes_notifications(mes_notifs){
 	
 	//dans l'ordre chronologique DECROISSANT
+	//TODO ORDRE DECROISSANT
+	//console.log(mes_notifs)
 	mes_notifs.sort(function tri_ordre_chrono_decroissant(a, b) {
-		return moment(b.Date_derniere_modif, "DD/MM/YYYY HH:mm:ss")  - moment(a.Date_derniere_modif, "DD/MM/YYYY HH:mm:ss")
+		/*
+		avec_format = !b.Date_derniere_modif.includes('+')
+
+		if(avec_format){
+			return moment(b.Date_derniere_modif, "DD/MM/YYYY HH:mm:ss")  - moment(a.Date_derniere_modif, "DD/MM/YYYY HH:mm:ss")
+		}else{
+			return moment(b.Date_derniere_modif)  - moment(a.Date_derniere_modif)
+		}
+		*/
+
+		modifA = convertir_en_date(a.Date_derniere_modif)
+		modifB = convertir_en_date(b.Date_derniere_modif)
+		
+		/*
+		console.log(modifA)
+		console.log(" VS ")
+		console.log(modifB);
+		*/
+
+		return modifB - modifA
 	});
+	//console.log(mes_notifs)
 
 	//on stock
 	stocker('mes_notifs',JSON.stringify(mes_notifs));
@@ -5933,12 +5972,34 @@ function afficher_bulle_notifs(){
 	var ma_date_consultation = recuperer('ma_date_consultation');
 
 	//on filtre pour afficher dans la bulle que celles dont date modif > date dernière consultation
+	//console.log(mes_notifs)
 	nouvelles_notifs = mes_notifs.filter(function(valeur){
 
-		Date_derniere_modif = moment(valeur['Date_derniere_modif'], "DD/MM/YYYY HH:mm:ss")
-		//Date_consultation = moment(ma_date_consultation, "DD/MM/YYYY HH:mm:ss");
-		Date_consultation = moment(ma_date_consultation);
-		//console.log(Date_derniere_modif + " VS " + Date_consultation);
+
+		/*
+		avec_format = !valeur['Date_derniere_modif'].includes('+')
+		if(avec_format){
+			Date_derniere_modif = moment(valeur['Date_derniere_modif'], "DD/MM/YYYY HH:mm:ss")	
+		}else{
+			Date_derniere_modif = moment(valeur['Date_derniere_modif'])
+		}
+		
+		avec_format = !ma_date_consultation.includes('+')
+		if (avec_format){
+			Date_consultation = moment(ma_date_consultation, "DD/MM/YYYY HH:mm:ss");
+		}else{
+			Date_consultation = moment(ma_date_consultation);
+		} */
+		
+		Date_derniere_modif = convertir_en_date(valeur['Date_derniere_modif'])
+		Date_consultation = convertir_en_date(ma_date_consultation)
+
+		/*
+		console.log(Date_derniere_modif)
+		console.log(" VS ")
+		console.log(Date_consultation);
+		*/
+
 
 		return Date_derniere_modif > Date_consultation;
 		
@@ -6922,6 +6983,17 @@ function rendre_td_modifiable(){
 			//mini fenetre de checkbox
 			//avec ok (todo) et annuler
 			var les_matieres = JSON.parse(recuperer('Matieres'))
+			if (les_matieres.length === 0){
+				rechercher_tout('Matieres').then(function(snapshot){
+
+					liste_JSON = snapshot
+					//liste_JSON = ordonner(id_parametre,liste_JSON)
+					stocker('Matieres', JSON.stringify(liste_JSON ? liste_JSON : ""))
+					les_matieres = JSON.parse(recuperer('Matieres'))
+				})
+
+				
+			}
 			
 			var valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Classe_Matiere")
 			//si c'est un admin -> (Tous|un_cycle)

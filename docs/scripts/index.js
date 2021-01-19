@@ -202,7 +202,7 @@ function recuperer_mes_donnees(snapshot){
       if (typeof(lignes_matieres) === "object") lignes_matieres = Object.values(lignes_matieres)
     }
 
-    
+
 
     //stocker identifiant + les 3 données
     stocker("identifiant_courant",valeur_identifiant())
