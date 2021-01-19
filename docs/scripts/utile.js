@@ -281,17 +281,22 @@ function fin_envoi_log(partir, mon_identifiant, ma_classe, mon_statut,
       Ville: ma_ville
     }
 
-    ajouter_un_element("Logs",nouveau_data)
+    ajouter_un_element("Logs",nouveau_data).then(valeur => {
+      if (partir){
 
-    if (partir){
+        if(recuperer('mes_donnees').length>0){
+          //partir sur la page tele-enseignement au bout de 1.2 seconde
+          setTimeout(function(){
+            window.location.href="tele-enseignement"
+          },1200);
+          
+        }
+        
 
-      if(recuperer('mes_donnees').length>0){
-        //partir sur la page tele-enseignement
-        window.location.href="tele-enseignement"
-      }
-      
+      }  
+    })
 
-    }
+    
 }
 
 function chargement(oui){

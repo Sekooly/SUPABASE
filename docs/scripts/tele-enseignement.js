@@ -5862,7 +5862,9 @@ function recuperer_notifs(){
 
 	var mes_notifs= [];
 	var ma_date_consultation = JSON.parse(recuperer("mes_donnees"))['Derniere_consultation_notifs'];
+	stocker_ma_date_de_consultation(ma_date_consultation)
 	//console.log(mes_notifs);
+
 	
 
 	nom_table = "Notifs"
