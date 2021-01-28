@@ -3411,7 +3411,7 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 
 		//TODO: si PAS youtube ET SANS téléchargement -> on cache le côté haut-droit en cas de PAS DE TELECHARGEMENT
 		if (pas_de_telechargement && est_youtube(extension)===false){
-			var le_inner_html = '<iframe src="'+lien_de_visu+'"    frameborder="0" scrolling="no" seamless=""></iframe><div style="width: 80px; height: 80px; position: absolute; opacity: 0; right: 0px; top: 0px;"> </div>'
+			var le_inner_html = '<iframe id="viz_frame" src="'+lien_de_visu+'"    frameborder="0" scrolling="no" seamless=""></iframe><div style="width: 80px; height: 80px; position: absolute; opacity: 0; right: 0px; top: 0px;"> </div>'
 			element_DOM('previsualisation').innerHTML = le_inner_html
 			chargement(false);
 		
@@ -3429,6 +3429,11 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 			chargement(false);
 
 		});
+
+		$('#viz_frame').on('load', function(e){			
+			chargement(false);
+		});
+
 
 		//quand c'est un fichier non visualisable et que le téléchargement est automatique:
 		//on attend 10 secondes puis on masque 
@@ -5667,27 +5672,31 @@ function clic_de_notif(type_notif,id_notif,id_dossier){
 	//commenter
 	envoyer_ma_date_de_consultation()
 		
-	//on vire les notifs
-	virer_le_pannel_notifs();
 
-	//virer toute fenetre ouverte
-	afficher_fenetre_rendudevoir(false);
-	quitter_previsualisation();
+	//on attend 0.5 seconde avant de passer a la suite
+	setTimeout(function(){	
+		chargement(true)
+		//on vire les notifs
+		virer_le_pannel_notifs();
 
-
-	if(type_notif === "fichier"){
-		notif_fichier(id_notif,id_dossier);
-	}else if(type_notif === "discussion"){
-		notif_discussion(id_notif,id_dossier);
-	}else if(type_notif === "devoir"){
-		notif_devoir(id_notif,id_dossier);
-	};
+		//virer toute fenetre ouverte
+		afficher_fenetre_rendudevoir(false);
+		quitter_previsualisation();
 
 
-	//on affiche tous les fichiers avec le bon filtre
-	filtrer_date_effet();
+		if(type_notif === "fichier"){
+			notif_fichier(id_notif,id_dossier);
+		}else if(type_notif === "discussion"){
+			notif_discussion(id_notif,id_dossier);
+		}else if(type_notif === "devoir"){
+			notif_devoir(id_notif,id_dossier);
+		};
 
 
+		//on affiche tous les fichiers avec le bon filtre
+		filtrer_date_effet();
+		chargement(false)
+	},500)
 
 
 }
