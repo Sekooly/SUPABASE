@@ -190,6 +190,7 @@ function dupliquer_visualisation(identifiant_eleve){
 	//on ajuste tous les boutons MODE BIS
 	ajuster_boutons_fenetre(true);
 	initialisation_bouton(true);
+	choisir_height_viz_si_pdf();
 
 
 }
@@ -1738,6 +1739,7 @@ function recuperer_logs(){
 		//ajuster le bouton
 		ajuster_boutons_fenetre();
 		ajuster_boutons_fenetre(true);
+		choisir_height_viz_si_pdf();
 
 
 
@@ -3110,6 +3112,7 @@ function creer_mini_popup(titre,elements_html,nom_bouton,fonction_bouton,valeur_
 
 	ajuster_boutons_fenetre();
 	ajuster_boutons_fenetre(true);
+	choisir_height_viz_si_pdf();
 }
 
 function mettre_a_jour_categorie(id_fichier_valeur){
@@ -3361,6 +3364,8 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 	if(est_youtube(extension)) $("#telechargement").remove()
 
 
+
+
 	//TODO: si PAS téléchargement -> on cache le côté haut-droit en cas de PAS DE TELECHARGEMENT
 	//console.log(pas_de_telechargement)
 	//console.log(est_youtube(extension))
@@ -3398,6 +3403,11 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 
 	//si c'est PAS une image
 	}else{
+
+
+		//si c'est un pdf -> ajustement du height
+		choisir_height_viz_si_pdf()
+			
 
 		//TODO: si PAS youtube ET SANS téléchargement -> on cache le côté haut-droit en cas de PAS DE TELECHARGEMENT
 		if (pas_de_telechargement && est_youtube(extension)===false){
@@ -3440,6 +3450,7 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 	//on ajuste les boutons
 	ajuster_boutons_fenetre();
 	ajuster_boutons_fenetre(true);
+	choisir_height_viz_si_pdf();
 
 }
 
@@ -3572,6 +3583,7 @@ function switch_mode(forcing){
 
 	//on ajuste tous les boutons
 	ajuster_boutons_fenetre();
+	choisir_height_viz_si_pdf();
 
 
 }
@@ -3613,6 +3625,7 @@ function switch_mode_bis(forcing){
 	//on ajuste tous les boutons MODE BIS
 	ajuster_boutons_fenetre(true);
 	initialisation_bouton(true);
+	choisir_height_viz_si_pdf();
 
 
 }
@@ -3684,6 +3697,7 @@ window.addEventListener("resize", function(){
 	if (element_DOM('conteneur_plein_ecran') || element_DOM('mini_popup')){
 		ajuster_boutons_fenetre();
 		ajuster_boutons_fenetre(true);
+		choisir_height_viz_si_pdf();
 	}
 });
 
@@ -6054,6 +6068,46 @@ function afficher_bulle_notifs(){
 	chargement(false);
 
 
+}
+
+function choisir_height_viz_si_pdf(){
+
+	if($("#previsualisation")[0]){
+		var nom_fichier = $("#titre_fenetre")[0].innerText.toLowerCase();
+		var extension = nom_fichier.split(".").pop();
+		if(extension === "pdf"){
+			var rapport_L_H = $(window).width() / $(window).height() 
+
+
+			//si entre 0 et 0.4 exclus -> rien
+			var height_final = rapport_L_H > 0 && rapport_L_H < 0.4 ? "" : 
+								
+								//sinon et vers 0.475 -> 140%
+								rapport_L_H <= 0.475 ? "140%" : 
+								
+								//sinon et vers 0.75 -> 125%
+								rapport_L_H <= 0.75 ? "125%" :
+								
+								//sinon et vers 1.77 -> (-0.5x*100 + 1.7667)
+								rapport_L_H <= 1.77 ? Number(-0.5*rapport_L_H*100 + 1.7667) +"%" :
+
+								//sinon et vers 2.055 -> 25%
+								rapport_L_H <= 2.055 ? "25%" :
+
+								//sinon et vers 2.1666 -> 40%
+								rapport_L_H <= 2.17 ? "40%" :
+
+								//sinon -> rien
+								""
+
+
+
+			//console.log("AVANT: " + $("#previsualisation")[0].style.height )
+			$("#previsualisation")[0].style.height = height_final
+			//console.log("APRES: " + $("#previsualisation")[0].style.height )
+		}
+	}
+	
 }
 
 function positionner_bulle_notif(){
