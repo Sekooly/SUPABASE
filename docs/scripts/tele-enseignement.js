@@ -7097,18 +7097,20 @@ function rendre_td_modifiable(){
 					les_matieres = JSON.parse(recuperer('Matieres'))
 
 					valeurs_possibles = valeurs_possibles_modification_classes(e, id_parametre, les_matieres)
+					formulaire_choix_checkbox(e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'))
+
 				})
 
 				
 			}else{
 				valeurs_possibles = valeurs_possibles_modification_classes(e, id_parametre, les_matieres)
+				formulaire_choix_checkbox(e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'))
 
 			}
 			
 
 
-			formulaire_choix_checkbox(e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'))
-
+			
 		}else{
 			var nouvelle_valeur = prompt("Indiquez la nouvelle valeur",ancienne_valeur);
 			suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur)
