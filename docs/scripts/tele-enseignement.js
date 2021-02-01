@@ -1,4 +1,3 @@
-var mon_role = ""
 var elements_menu_haut = ["Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Alerte", "Logs", "Visio", "Notifs", "Fichiers", "Rendus", "Topic", "Coms"]
 var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL_Mapping","URL_agenda",
 								"id_googlecalendar","nb_avis_donnés", "nb_avis_max","nom_fiche","taux_conseil",
@@ -1995,7 +1994,7 @@ function initialisation(){
 	}else{
 		afficher_discussions(false);
 		configurer_profil();
-		init_mon_role();
+		//init_mon_role();
 
 		if (recuperer('dossier_chargé') !== "" && recuperer('dossier_chargé') !== null) afficher_discussions(true);
 		
@@ -2004,16 +2003,6 @@ function initialisation(){
 
 	}
 	chargement(false);
-}
-
-function init_mon_role(){
-	mon_role = recuperer('mon_type');
-	//on enleve le S à la fin pour eleves et professeurs
-	mon_role = mon_role.substring(0, mon_role.length - 1);
-
-	//si administration alors on envoie l'intitulé de son rôle:
-	if (mon_role.includes('Admin')) mon_role = JSON.parse(recuperer('mes_donnees'))['Role'];
-
 }
 
 
@@ -4445,7 +4434,7 @@ $(function charger_fichiers(e){
 
 					date_heure_actuelle = maintenant()
 					mes_donnees = JSON.parse(recuperer('mes_donnees'))
-					mon_role = recuperer('mon_type').includes("Administration") ? mes_donnees['Role'] : recuperer('mon_type').replace("s","")
+					//mon_role = recuperer('mon_type').includes("Administration") ? mes_donnees['Role'] : recuperer('mon_type').replace("s","")
 					la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
 					la_matiere = recuperer('mon_type') === "Eleves" ? $("#accueil_utilisateur")[0].innerText : $("#accueil_utilisateur")[0].innerText.replace(la_classe,"").trim()
 					est_telechargeable = $("#est_telechargeable")[0].checked ? "oui" : "non"

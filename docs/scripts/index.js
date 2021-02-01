@@ -112,7 +112,7 @@ function se_connecter(){
 
                 //aucun des 3 -> introuvable
                 }else{
-                    actualiser_remarque("Identifiant '" + valeur_identifiant() + "' non reconnu, veuillez réessayer. <br> Si vous avez perdu votre identifiant merci de contacter l'Administration de votre établissement.","introuvable", "introuvable")
+                    actualiser_remarque("Identifiant '" + valeur_identifiant() + "' non reconnu: veuillez réessayer. <br> Si vous avez perdu votre identifiant merci de contacter l'Administration de votre établissement.","introuvable", "introuvable")
                 }    
                 
 
