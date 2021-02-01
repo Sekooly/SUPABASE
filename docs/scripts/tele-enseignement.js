@@ -7095,24 +7095,16 @@ function rendre_td_modifiable(){
 					//liste_JSON = ordonner(id_parametre,liste_JSON)
 					stocker('Matieres', JSON.stringify(liste_JSON ? liste_JSON : ""))
 					les_matieres = JSON.parse(recuperer('Matieres'))
+
+					valeurs_possibles = valeurs_possibles_modification_classes(e, id_parametre, les_matieres)
 				})
 
 				
+			}else{
+				valeurs_possibles = valeurs_possibles_modification_classes(e, id_parametre, les_matieres)
+
 			}
 			
-			var valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Classe_Matiere")
-			//si c'est un admin -> (Tous|un_cycle)
-			if(id_parametre === "Administration"){
-				valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Cycle")
-				valeurs_possibles = valeurs_possibles.map(e => '(Tous|'+e+')')
-			}
-			//si c'est une classe principale (profs) OU eleve avec 1 seule classe -> classe
-			if(id_parametre === "Eleves" || e.target.cellIndex === $("#Classe_principale")[0].cellIndex){
-				valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Classe")
-			}
-
-
-
 
 
 			formulaire_choix_checkbox(e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'))
@@ -7124,6 +7116,30 @@ function rendre_td_modifiable(){
 		
 	})
 	
+}
+
+function valeurs_possibles_modification_classes(e, id_parametre, les_matieres){
+	console.log(e.target)
+
+	var valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Classe_Matiere")
+	
+
+	//si c'est un admin -> (Tous|un_cycle)
+	if(id_parametre === "Administration"){
+		valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Cycle")
+		valeurs_possibles = valeurs_possibles.map(e => '(Tous|'+e+')')
+	}else{
+
+		//si c'est une classe principale (profs) OU eleve avec 1 seule classe -> classe
+		if(id_parametre === "Eleves" || e.target.cellIndex === $("#Classe_principale")[0].cellIndex){
+			valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Classe")
+		}
+
+	}
+
+
+
+	return valeurs_possibles
 }
 
 
