@@ -1605,7 +1605,7 @@ function deconnexion(){
 
 	//je préviens que je vais me deconnecter puis je me deco (sous 1 seconde)
 	setTimeout(function(){
-		//location.href= "/";
+		location.href= "/";
 	}, 1000);
 	envoyer_log(recuperer('identifiant_courant'), "Deconnexion", ma_classe, mon_role)
 	
