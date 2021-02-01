@@ -231,7 +231,6 @@ function ajouter_un_element(nom_table, nouveau_data){
 
 function envoyer_log(mon_identifiant, mon_statut, ma_classe, mon_type, partir){
 
-  mon_type = init_mon_role()
 
   try{
     var data = get_resultat('https://ipapi.co/json/')
@@ -564,11 +563,16 @@ function identifiant_par_table(nom_table){
 
 function init_mon_role(){
   mon_role = recuperer('mon_type');
-  //on enleve le S à la fin pour eleves et professeurs
-  mon_role = mon_role.substring(0, mon_role.length - 1);
 
-  //si administration alors on envoie l'intitulé de son rôle:
-  if (mon_role.includes('Admin')) mon_role = JSON.parse(recuperer('mes_donnees'))['Role'];
+  if (mon_role !== null){
+    //on enleve le S à la fin pour eleves et professeurs
+    mon_role = mon_role.substring(0, mon_role.length - 1);
+
+    //si administration alors on envoie l'intitulé de son rôle:
+    if (mon_role.includes('Admin')) mon_role = JSON.parse(recuperer('mes_donnees'))['Role'];
+  }
+
   return mon_role
+  
 }
 

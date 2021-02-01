@@ -245,7 +245,8 @@ function recuperer_mes_donnees(snapshot){
 
 
       //envoyer mon log et partir
-      envoyer_log(le_resultat['Identifiant'], "Connexion valide", ma_classe, mon_type, true)
+      mon_role = init_mon_role()
+      envoyer_log(le_resultat['Identifiant'], "Connexion valide", ma_classe, mon_role, true)
       
     
 
@@ -285,7 +286,8 @@ function actualiser_remarque(valeur_remarque, ma_classe, mon_type){
   $("#remarque")[0].innerHTML = valeur_remarque
   
   if (valeur_remarque !=="" ){
-    envoyer_log(valeur_identifiant(), valeur_remarque, ma_classe, mon_type)
+    mon_role = init_mon_role()
+    envoyer_log(valeur_identifiant(), valeur_remarque, ma_classe, mon_role)
   }
 
 
