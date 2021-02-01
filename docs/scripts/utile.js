@@ -231,9 +231,8 @@ function ajouter_un_element(nom_table, nouveau_data){
 
 function envoyer_log(mon_identifiant, mon_statut, ma_classe, mon_type, partir){
 
-  init_mon_role()
-  mon_type = mon_role
-  
+  mon_type = init_mon_role()
+
   try{
     var data = get_resultat('https://ipapi.co/json/')
     //console.log(data);
@@ -570,6 +569,6 @@ function init_mon_role(){
 
   //si administration alors on envoie l'intitulé de son rôle:
   if (mon_role.includes('Admin')) mon_role = JSON.parse(recuperer('mes_donnees'))['Role'];
-
+  return mon_role
 }
 

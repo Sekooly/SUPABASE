@@ -11,6 +11,7 @@ var elements_menu_haut_avec_reset = ["Eleves","Profs","Administration"]
 
 
 
+
 /*********************** CONSEIL DE CLASSE ***********************************/
 function afficher_conseil_de_classe(oui){
 
