@@ -7088,7 +7088,7 @@ function rendre_td_modifiable(){
 			//mini fenetre de checkbox
 			//avec ok (todo) et annuler
 			var les_matieres = JSON.parse(recuperer('Matieres'))
-			if (les_matieres.length === 0){
+			if (les_matieres === null){
 				rechercher_tout('Matieres').then(function(snapshot){
 
 					liste_JSON = snapshot
