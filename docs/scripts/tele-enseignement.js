@@ -6991,56 +6991,58 @@ function chercher(){
 
 
 
-	// pour chaque ligne de la table
-	for (i = 1; i < tr.length; i++) {
-
-		//console.log(tr[i].textContent + " ********************* " + tr[i].innerText)
-		texte_ligne = tr[i].textContent.toUpperCase()
-
-		/*
-		console.log(texte_ligne)
-		console.log("VS")
-		console.log(mon_filtre)
-		*/
-
-		if (mon_filtre){
-			tr[i].style.display = texte_ligne.includes(mon_filtre) ? "" : "none"
+	if (mon_filtre){
 
 
-			if (texte_ligne.includes(mon_filtre) && mon_filtre){
+		// pour chaque ligne de la table
+		for (i = 1; i < tr.length; i++) {
 
-				//surligner l'élément trouvé
-				for (j = 0; j < tr[i].children.length ; j++) {
+			//console.log(tr[i].textContent + " ********************* " + tr[i].innerText)
+			texte_ligne = tr[i].textContent.toUpperCase()
 
-					cellule = tr[i].cells[j]
-					valeur_cellule = cellule.textContent.toUpperCase()
-					/*
-					console.log(cellule.innerText.toUpperCase())
-					console.log("VS")
-					console.log(mon_filtre)
+			/*
+			console.log(texte_ligne)
+			console.log("VS")
+			console.log(mon_filtre)
+			*/
+
+				tr[i].style.display = texte_ligne.includes(mon_filtre) ? "" : "none"
 
 
-					console.log("\n\n")
-					*/
+				if (texte_ligne.includes(mon_filtre) && mon_filtre){
 
-					if (valeur_cellule.includes(mon_filtre)){
-						//console.log(texte_ligne + " inclus dans " + valeur_cellule)
-						cellule.className = "trouvee"
-					}else{
-						cellule.className = ""
+					//surligner l'élément trouvé
+					for (j = 0; j < tr[i].children.length ; j++) {
+
+						cellule = tr[i].cells[j]
+						valeur_cellule = cellule.textContent.toUpperCase()
+						/*
+						console.log(cellule.innerText.toUpperCase())
+						console.log("VS")
+						console.log(mon_filtre)
+
+
+						console.log("\n\n")
+						*/
+
+						if (valeur_cellule.includes(mon_filtre)){
+							//console.log(texte_ligne + " inclus dans " + valeur_cellule)
+							cellule.className = "trouvee"
+						}else{
+							cellule.className = ""
+						}
 					}
 				}
-			}
 
 
-
-		}else{
-			tr[i].style.display = ""
-			$("td").removeClass()
 		}
 
-	}
 
+
+	}else{
+		$("tr").show()
+		$("td").removeClass()
+	}
 
 	compter_nombre_de_lignes()
 
