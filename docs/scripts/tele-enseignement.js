@@ -1602,7 +1602,6 @@ function deconnexion(){
 
 	supprimer_tous_les_parametres()
 
-
 	//je préviens que je vais me deconnecter puis je me deco (sous 1 seconde)
 	setTimeout(function(){
 		location.href= "/";
@@ -1996,7 +1995,7 @@ function initialisation(){
 	}else{
 		afficher_discussions(false);
 		configurer_profil();
-		//init_mon_role();
+		mon_role = init_mon_role();
 
 		if (recuperer('dossier_chargé') !== "" && recuperer('dossier_chargé') !== null) afficher_discussions(true);
 		
@@ -5718,7 +5717,7 @@ function notif_discussion(id_notif,id_dossier){
 
 			if($('#'+id_notif+'.bloc_topic').length>0){
 				
-				console.log('on y est!!!')
+				//console.log('on y est!!!')
 				//nouvelle couleur topic (temporaire)
 				changer_couleur_temporairement(id_notif,"bloc_topic","#b9e5de",1000);
 
@@ -6781,12 +6780,17 @@ function actualiser_details_parametre(id_parametre){
 
 	//changement de filtre -> actualisation du nombre d'elements
 	$("#filtre_parametre").on('change',function(e){
-		$("#nombre_elements_param")[0].innerText = $("tbody").find('.une_ligne_de_donnees:visible').length
+		compter_nombre_de_lignes()
 	})
 
 
 
 }
+
+function compter_nombre_de_lignes(){
+	$("#nombre_elements_param")[0].innerText = $("tbody").find('.une_ligne_de_donnees:visible').length
+}
+
 
 
 
@@ -6930,7 +6934,7 @@ function actualiser_filtre_onglet(id_parametre){
 
 
 	assigner_label_et_liste_parametres(etiquette_filtre, filtre_liste)
-
+	mettre_barre_recherche()
 
 
 
@@ -6965,12 +6969,80 @@ function assigner_label_et_liste_parametres(etiquette_filtre, filtre_liste){
 
 	$("#conteneur_filtre")[0].innerHTML	= $("#conteneur_filtre")[0].innerHTML + '<span id="boutons_params" style="cursor: pointer;"> ' +bouton_actualiser+bouton_ajouter+bouton_supprimer+bouton_dupliquer+bouton_telecharger+bouton_import+bouton_init+' </span>'
 
-
-
     //quand on update le filtre -> on met à jour
     $("#filtre_parametre").on('change',function(e){
     	appliquer_filtre_choisi();
     })
+}
+
+function mettre_barre_recherche(){
+	$("#zone_recherche").remove()
+	var zone_recherche = '<input id="zone_recherche" type="text" onkeyup="chercher()" placeholder="Rechercher...">'
+	$("#conteneur_filtre").append(zone_recherche)
+
+}
+
+function chercher(){
+
+	// Declarer les variables
+	table = element_DOM("table_affichee");
+	tr = table.getElementsByTagName("tr");
+	mon_filtre = element_DOM("zone_recherche").value.toUpperCase().replaceAll(" ","");
+
+
+
+	// pour chaque ligne de la table
+	for (i = 1; i < tr.length; i++) {
+
+		//console.log(tr[i].textContent + " ********************* " + tr[i].innerText)
+		texte_ligne = tr[i].textContent.toUpperCase()
+
+		/*
+		console.log(texte_ligne)
+		console.log("VS")
+		console.log(mon_filtre)
+		*/
+
+		if (mon_filtre){
+			tr[i].style.display = texte_ligne.includes(mon_filtre) ? "" : "none"
+
+
+			if (texte_ligne.includes(mon_filtre) && mon_filtre){
+
+				//surligner l'élément trouvé
+				for (j = 0; j < tr[i].children.length ; j++) {
+
+					cellule = tr[i].cells[j]
+					valeur_cellule = cellule.textContent.toUpperCase()
+					/*
+					console.log(cellule.innerText.toUpperCase())
+					console.log("VS")
+					console.log(mon_filtre)
+
+
+					console.log("\n\n")
+					*/
+
+					if (valeur_cellule.includes(mon_filtre)){
+						//console.log(texte_ligne + " inclus dans " + valeur_cellule)
+						cellule.className = "trouvee"
+					}else{
+						cellule.className = ""
+					}
+				}
+			}
+
+
+
+		}else{
+			tr[i].style.display = ""
+			$("td").removeClass()
+		}
+
+	}
+
+
+	compter_nombre_de_lignes()
 
 }
 
@@ -7023,14 +7095,14 @@ function json2Table(json, id_table) {
 
   //build the table
   const table = `
-	<table >
+	<table id="table_affichee">
 		<thead class="">
 			<tr class= "border_bottom">${headerRow}</tr>
-		<thead>
+		</thead>
 		<tbody>
 			${rows}
-		<tbody>
-	<table>`;
+		</tbody>
+	</table>`;
 
   
   return table;
