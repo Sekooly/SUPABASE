@@ -2917,29 +2917,31 @@ function ouvrir_fichier(ceci){
 		//console.log(drive_parent);
 		
 		//todo: decommenter aux prochaines périodes d'examens
-		/*
+		
 		if(bool_examen_terminé(drive_parent, le_span_un_fichier)){
 			alert("Ce sujet d'examen n'est plus disponible.");
 		}else{
-			alert("Ce fichier n'est pas disponible avant "+afficher_date(ceci.attributes['ma_date_effet'].value+" " + lheure_effet));
+			alert("Ce fichier n'est pas disponible avant "+ afficher_date_old(ceci.attributes['ma_date_effet'].value+" " + lheure_effet,true) + '.');
 		}
 		return -1;
-		*/
+		
 
 
 
+	}else{
+
+		stocker('fichier_ouvert',id_fichier);
+
+		//on ajoute le nom du fichier (TEXTE DANS LE SPAN)
+		var nom_fichier = $("span#"+id_fichier+".span_un_fichier").contents().filter(function(){ 
+		  return this.nodeType == 3; 
+		})[0].nodeValue;
+
+		nom_fichier = rfc3986EncodeURIComponent(nom_fichier);
+		//visualiser(nom_fichier,id_fichier);
+		visualiser(nom_fichier,id_fichier, "", "", le_span_un_fichier.getAttribute('est_telechargeable')!=="oui")
 	}
 
-	stocker('fichier_ouvert',id_fichier);
-
-	//on ajoute le nom du fichier (TEXTE DANS LE SPAN)
-	var nom_fichier = $("span#"+id_fichier+".span_un_fichier").contents().filter(function(){ 
-	  return this.nodeType == 3; 
-	})[0].nodeValue;
-
-	nom_fichier = rfc3986EncodeURIComponent(nom_fichier);
-	//visualiser(nom_fichier,id_fichier);
-	visualiser(nom_fichier,id_fichier, "", "", le_span_un_fichier.getAttribute('est_telechargeable')!=="oui")
 }
 
 /********************* DOWNLOAD UN FICHIER ****************************/
