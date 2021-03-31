@@ -2861,13 +2861,15 @@ function fichier_ouvrable(id_fichier,bouton_telecharger,ceci_bouton_telecharger)
 	var drive_parent = le_span_un_fichier.parentNode.id;
 
 	var lheure_effet = le_span_un_fichier.getAttribute('mon_heure_effet') ? le_span_un_fichier.getAttribute('mon_heure_effet') : "07:30"
-	var la_date_effet = new Date(le_span_un_fichier.getAttribute('ma_date_effet') + ' ' + lheure_effet); 
-
+	//var la_date_effet = new Date(le_span_un_fichier.getAttribute('ma_date_effet') + ' ' + lheure_effet); 
+	var la_date_effet = moment(le_span_un_fichier.getAttribute('ma_date_effet') + ' ' + lheure_effet); 
+	//console.log(la_date_effet)
+	var date_heure_aujourdhui = moment(maintenant())
 
 	//si drive_corrections ET fichier futur ET élève
 	if(drive_parent === "drive_corrections"
 		&& (!mon_type.includes("Admin") && !mon_type.includes("Prof"))
-		&& la_date_effet > new Date(moment())){
+		&& la_date_effet > date_heure_aujourdhui){
 
 		//console.log("ouvrable: " + false);
 		return false;
@@ -2889,7 +2891,7 @@ function fichier_ouvrable(id_fichier,bouton_telecharger,ceci_bouton_telecharger)
 	//si drive_examens ET fichier (passé y a 3 jours ou futur) ET sans droits
 	if(drive_parent === "drive_examens"
 		&& (!Droit_acces_anticipe_examen)
-		&& (la_date_effet > new Date(moment()) || examen_terminé)
+		&& (la_date_effet > date_heure_aujourdhui || examen_terminé)
 	){
 
 		//console.log("ouvrable: " + false);
@@ -2911,7 +2913,7 @@ function ouvrir_fichier(ceci){
 	if(!fichier_ouvrable(id_fichier)){
 
 		var lheure_effet = le_span_un_fichier.getAttribute('mon_heure_effet') ? le_span_un_fichier.getAttribute('mon_heure_effet') : "07:30";
-
+		//console.log(lheure_effet)
 
 		var drive_parent = le_span_un_fichier.parentNode.id;
 		//console.log(drive_parent);
@@ -2921,7 +2923,8 @@ function ouvrir_fichier(ceci){
 		if(bool_examen_terminé(drive_parent, le_span_un_fichier)){
 			alert("Ce sujet d'examen n'est plus disponible.");
 		}else{
-			alert("Ce fichier n'est pas disponible avant "+ afficher_date_old(ceci.attributes['ma_date_effet'].value+" " + lheure_effet,true) + '.');
+			date_heure_fichier = ceci.attributes['ma_date_effet'].value+" " + lheure_effet
+			alert("Ce fichier n'est pas disponible avant "+ afficher_date_old( moment(date_heure_fichier).format("DD/MM/YYYY HH:mm"))   + '.');
 		}
 		return -1;
 		
