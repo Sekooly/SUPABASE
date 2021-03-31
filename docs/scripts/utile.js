@@ -140,6 +140,18 @@ function convertir_en_date(date_str_initiale){
 }
 
 
+
+function reinitialiser_unseul_mdp_datenotif(id_parametre, identifiant_a_init){
+  id_parametre = id_parametre === "Profs" ? "prof" : id_parametre.substring(0,5).toLowerCase()
+  lien = "rpc/initialiser_" + id_parametre 
+
+  url = racine_data + lien + "?" + apikey + "&limit=2000"
+  //console.log(url)
+  return post_resultat_asynchrone(url, {["identifiant_" + id_parametre]:identifiant_a_init})
+}
+
+
+
 function reinitialiser_mdp_datenotif(){
   url = racine_data +  "rpc/initialiser" + "?" + apikey + "&limit=2000"
   return post_resultat_asynchrone(url)

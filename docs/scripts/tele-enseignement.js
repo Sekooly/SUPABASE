@@ -5667,7 +5667,7 @@ function clic_de_notif(type_notif,id_notif,id_dossier){
 	//commenter
 	envoyer_ma_date_de_consultation()
 		
-
+	
 	//on attend 0.5 seconde avant de passer a la suite
 	setTimeout(function(){	
 		chargement(true)
@@ -7670,17 +7670,42 @@ function importer_parametres(){
 
 function init_donnees(){
 
-	var confirmation = prompt("Êtes-vous sûr d'initialiser votre plateforme ? Cela remettra TOUS les mots de passe par défaut et ignorera toute consultation de notifications. Pour continuer, taper 'reinitialiser'.")
-	if(confirmation === "reinitialiser"){
-		chargement(true)
-		reinitialiser_mdp_datenotif()
+	id_parametre = $(".un_menu_orange")[0].id
+
+	//1 seul séléctionné
+	if ($(".selected")[0]){
+		identifiant_a_init = $(".selected")[0].getAttribute('suppression_id')
+		var confirmation = confirm("Êtes-vous sûr de réinitialiser '"+identifiant_a_init+"' ? Cela remettra son mot de passe par défaut, et ignorera toute consultation de notifications.")
+
+		if(!confirmation) return -1;
+
+
+		chargement(true);
+
+		reinitialiser_unseul_mdp_datenotif(id_parametre, identifiant_a_init)
 		setTimeout(function(){
 			actualiser_parametre()
-		}, 2000);
-		
+		}, 2000);		
 
 		chargement(false)
+
+
+	}else{
+
+
+		var confirmation = prompt("Êtes-vous sûr d'initialiser votre plateforme ? Cela remettra TOUS les mots de passe par défaut et ignorera toute consultation de notifications. Pour continuer, taper 'reinitialiser'.")
+		if(confirmation === "reinitialiser"){
+			chargement(true)
+			reinitialiser_mdp_datenotif()
+			setTimeout(function(){
+				actualiser_parametre()
+			}, 2000);
+			
+
+			chargement(false)
+		}	
 	}
+
 }
 
 
