@@ -7431,8 +7431,8 @@ function valeurs_possibles_modification_classes(e, id_parametre, les_matieres){
 		valeurs_possibles = valeurs_possibles.map(e => '(Tous|'+e+')')
 	}else{
 
-		//si c'est une classe principale (profs) OU eleve avec 1 seule classe -> classe
-		if(id_parametre === "Eleves" || e.target.cellIndex === $("#Classe_principale")[0].cellIndex){
+		//si c'est une classe principale (profs) OU matieres OU eleve avec 1 seule classe -> classe
+		if(id_parametre === "Eleves" || id_parametre === "Matieres" || e.target.cellIndex === $("#Classe_principale")[0].cellIndex){
 			valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Classe")
 		}
 
