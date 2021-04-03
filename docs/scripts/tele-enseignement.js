@@ -6100,10 +6100,10 @@ function choisir_height_viz_si_pdf(){
 									rapport_L_H <= 1.77 ? Number(-0.5*rapport_L_H*100 + 1.7667) +"%" :
 
 									//sinon et vers 2.055 -> 25%
-									rapport_L_H <= 2.055 ? "25%" :
+									//rapport_L_H <= 2.055 ? "25%" :
 
 									//sinon et vers 2.1666 -> 40%
-									rapport_L_H <= 2.17 ? "40%" :
+									//rapport_L_H <= 2.17 ? "40%" :
 
 									//sinon -> rien
 									""
@@ -6114,7 +6114,7 @@ function choisir_height_viz_si_pdf(){
 				$("#previsualisation")[0].style.height = height_final
 				//console.log("APRES: " + $("#previsualisation")[0].style.height )
 
-				
+
 			}
 
 		}
