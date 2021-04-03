@@ -6704,10 +6704,9 @@ function un_menu_clic(id_parametre){
 	}
 
 	//pas de "tout voir" à faire
+	
 	if($("#boutons_params")){
 		elements_menu_haut_avec_tout_voir = recuperer("liste_params_colonnes_masquees")
-
-
 
 	    elements_menu_haut_avec_tout_voir = elements_menu_haut_avec_tout_voir ?  elements_menu_haut_avec_tout_voir.split(",") : []
 		if(elements_menu_haut_avec_tout_voir.indexOf(id_parametre + ":") === -1){
