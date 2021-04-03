@@ -6103,7 +6103,7 @@ function choisir_height_viz_si_pdf(){
 									//rapport_L_H <= 2.055 ? "25%" :
 
 									//sinon et vers 2.1666 -> 40%
-									//rapport_L_H <= 2.17 ? "40%" :
+									rapport_L_H <= 2.17 ? "45%" :
 
 									//sinon -> rien
 									""
