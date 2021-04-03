@@ -733,3 +733,54 @@ function masquer_colonne(id_colonne,non_plutot_afficher){
   $("#clic_droit_titres_param").remove()
 }
 
+
+function somme(nom_json_initial, nom_champ){
+
+  json_initial_str = recuperer(nom_json_initial)
+
+  if (json_initial_str){
+    return eval(JSON.parse(json_initial_str).map(e=>e['octets_utilises']).join('+'))  
+  }else{
+    return 0
+  }
+  
+}
+
+function actualiser_octets(){
+  lien_script = "https://script.google.com/macros/s/AKfycbyenqGECCqdKfpvI_y6Anq2_rWmYdIaY9WjT33pUhiA591vpFkmPyJYgDC8gJqVSv8y_w/exec?"
+  espace = JSON.parse(recuperer("Espace etablissement restant"))
+
+
+
+  for (var i = 0; i<espace.length-1;i++) {
+    id_fichier = espace[i]['ID_FICHIER']
+    taille_fichier = espace[i]['octets_utilises']
+
+    //uniquement un fichier pas actualisé (0 octets)
+    if(id_fichier && taille_fichier === 0){
+      console.log((i+1) +' ' + id_fichier)  
+
+      taille_fichier = get_resultat_brut(lien_script+"id_fichier=" + id_fichier)
+      
+      if(!taille_fichier.includes('ERREUR')){
+
+        //on modifie dans la bdd 
+        nom_table = espace[i]["SOURCE"]
+        nom_champ_reference = "id_fichier"
+        valeur_champ_reference = id_fichier
+        nouveau_data = {
+          'taille_fichier' : taille_fichier
+        }
+        console.log(taille_fichier + "\n")
+
+        actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouveau_data)
+
+
+      }
+
+    }else{
+      console.log("probleme sur le " + i)
+    }
+    
+  }
+}

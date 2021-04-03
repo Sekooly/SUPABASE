@@ -28,6 +28,17 @@
 
 	<style>
 
+
+		progress::-moz-progress-bar { background: #f9aa71; }
+		progress::-webkit-progress-value { background: #f9aa71; }
+		progress { color: #f9aa71; }
+
+
+		.coef_rendu{
+		    width: inherit;
+		    font-size: 12px;
+		}
+
 		.clic_droit_titre_param {
 		    cursor: pointer;
 		    position: fixed;
@@ -1215,11 +1226,6 @@
 			<img id="recup_params" position="50px" alt="EDT" class="icone_navbar" style="display: none;width: 37px;" id="params" onclick="recuperer_parametres()" src="images/img_parametres.png">
 		</span>
 
-
-		<span>
-			<img id="recup_logs" position="50px" alt="LOGS" src="images/img_logs.png" class="icone_navbar" onclick="recuperer_logs()">
-		</span>
-
 		<span class="retourner_en_arriere" id="logo" onclick="retourner_site()"><img alt="SEKOOLY" src="images/logo-no-background-128x128.png" width="25" height="35"></span>
 		<span class="retourner_en_arriere" id="bouton_precedent" >  </span>
 		
@@ -1390,6 +1396,8 @@
 			<input type="date" id="la_date_limite" class="la_date_limite">
 			<input id="lheure_limite" class="la_date_limite" type="time">
 		</div>
+
+		<div id="coef_rendu" class="coef_rendu">Coefficient du rendu: <input id="coef" value="0" style="width: 30px;text-align: right;" class="element_yt"><img id="mini-image" src="images/img_help.png" onclick="alert('Si ce rendu est noté et compte dans le bulletin scolaire, merci de mettre un coefficient > 0.')"></div>
 		
 		<button type="button" class="rendre" onclick="" id="mettre_fichier_en_ligne" >Mettre en ligne</button>
 		<div style="font-size: 10px;" id="telechargeable">

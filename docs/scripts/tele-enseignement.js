@@ -1,4 +1,4 @@
-var elements_menu_haut = ["Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Alerte", "Logs", "Visio", "Notifs", "Fichiers", "Rendus", "Topic", "Coms"]
+var elements_menu_haut = ["Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Alerte", "Logs", "Visio", "Notifs", "Fichiers", "Rendus", "Topic", "Coms","Espace etablissement restant"]
 var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL_Mapping","URL_agenda",
 								"id_googlecalendar","nb_avis_donnés", "nb_avis_max","nom_fiche","taux_conseil",
 								"Matiere_bis", "classe_id", "classe_bis", "type", "Derniere_consultation_notifs",
@@ -1493,12 +1493,26 @@ function afficher_visio(oui){
 	element_DOM('visioconference').style.display = oui ? "block" : "none";
 }
 
+
+
 function afficher_choix_date(oui){
 	if (oui){
 		element_DOM('choix_date').style.display="grid";
 		
 	}else{
 		element_DOM('choix_date').style.display="none";
+	}
+	
+	
+
+}
+
+function afficher_choix_coef(oui){
+	if (oui){
+		element_DOM('coef_rendu').style.display="";
+		
+	}else{
+		element_DOM('coef_rendu').style.display="none";
 	}
 }
 
@@ -1519,7 +1533,10 @@ function afficher_ou_non_choix_fichier(oui,forcing){
 		//console.log("on va masquer");
 		element_DOM('choix_popup').style.visibility = "hidden";
 		
-		if(!forcing) afficher_choix_date(false);
+		if(!forcing){
+			afficher_choix_date(false);
+			afficher_choix_coef(false);
+		} 
 	
 	//pas encore affiché, pas de forcing de masquage
 	}else{
@@ -1551,9 +1568,13 @@ function afficher_ou_non_choix_fichier(oui,forcing){
 		
 		//par défaut: choix fichier et non youtube
 		element_DOM('est_video_youtube').checked = false;		
-		element_DOM('est_telechargeable').checked = true;		
+		element_DOM('est_telechargeable').checked = true;	
+
+		//par défaut: coefficient = 0
+		element_DOM('coef') = 0	
 
 		afficher_choix_date(false);
+		afficher_choix_coef(false);
 
 	}
 
@@ -2020,8 +2041,11 @@ function afficher_fenetre(oui){
 
 function afficher_logs(oui){				
 	//tout masquer
-	if (oui) element_DOM('recup_logs').style.visibility = 'hidden' //"visible";
-	if (!oui) element_DOM('recup_logs').style.visibility ="hidden";
+	if( element_DOM('recup_logs')){
+		if (oui) element_DOM('recup_logs').style.visibility = 'hidden' //"visible";
+		if (!oui) element_DOM('recup_logs').style.visibility ="hidden";	
+	}
+	
 }
 
 
@@ -4045,7 +4069,9 @@ function switch_affichage_youtube(){
 					"lheure_limite": lheure_limite,
 					"date_effet": date_effet_fichier,
 					"heure_effet": heure_effet,
-					"est_telechargeable" : "non"
+					"est_telechargeable" : "non",
+					"coefficient_rendu" : $("#coef").value,
+					"taille_fichier" : 0
 				}
 				ajouter_un_element("Fichiers",nouveau_fichier, id_fichier)
 
@@ -4305,8 +4331,10 @@ $(function charger_fichiers(e){
             	//console.log("on load");
                 params.file = e.target.result.replace(/^.*,/, '');
                 nom_fichier = file.name;
+
+
 				extension = nom_fichier.split(".").pop().toUpperCase();
-                envoyer_le_fichier(categorie_fichier,la_date_limite,lheure_limite,date_effet_fichier,heure_effet);               
+                envoyer_le_fichier(categorie_fichier,la_date_limite,lheure_limite,date_effet_fichier,heure_effet,$("#coef").value,file.size);               
 
             }
 
@@ -4324,10 +4352,21 @@ $(function charger_fichiers(e){
 
 		//si c'est un devoir alors ajouter un délai
 		if($('#categorie_choisie')[0].value === "Devoirs"){
-			afficher_choix_date(true);
+			afficher_choix_date(true);			
 		}else{
 			afficher_choix_date(false);
 		}
+
+
+		//si c'est un devoir ou un examen -> coefficient
+		if($('#categorie_choisie')[0].value === "Devoirs" || $('#categorie_choisie')[0].value === "Examens"){
+			afficher_choix_coef(true);
+		}else{
+			afficher_choix_coef(false);
+		}
+
+
+
 		
 		//si c'est un manuel alors on passe au mode livres
 		if($('#categorie_choisie')[0].value === "Manuels"){			
@@ -4380,7 +4419,7 @@ $(function charger_fichiers(e){
     	}
     }
 
-    function envoyer_le_fichier(categorie_fichier,la_date_limite,lheure_limite,date_effet_fichier,heure_effet){
+    function envoyer_le_fichier(categorie_fichier,la_date_limite,lheure_limite,date_effet_fichier,heure_effet,coefficient_rendu,taille_fichier){
 
 	
 
@@ -4399,6 +4438,9 @@ $(function charger_fichiers(e){
     	html += '<input type="hidden" name="date_effet_fichier" value="'+ date_effet_fichier +'" >';
 
 		html += '<input type="hidden" name="heure_effet" value="'+ heure_effet +'" >';
+
+		html += '<input type="hidden" name="coefficient_rendu" value="'+ coefficient_rendu +'" >';
+		html += '<input type="hidden" name="taille_fichier" value="'+ taille_fichier +'" >';
 
         html += '</form>';	                
         
@@ -4461,7 +4503,10 @@ $(function charger_fichiers(e){
 						"lheure_limite": lheure_limite,
 						"date_effet": date_effet_fichier,
 						"heure_effet": heure_effet,
-						"est_telechargeable" : est_telechargeable
+						"est_telechargeable" : est_telechargeable,
+
+						"coefficient_rendu" : coefficient_rendu,
+						"taille_fichier" : taille_fichier
 					}
 					ajouter_un_element("Fichiers",nouveau_fichier, data)
 
@@ -6688,7 +6733,7 @@ function un_menu_clic(id_parametre){
     mettre_en_forme_onglet_clicked(id_parametre);
     actualiser_filtre_onglet(id_parametre);
     actualiser_details_parametre(id_parametre);
-
+	mettre_etat_espace(id_parametre)
     
     //pas de modifs à faire
     if($("#boutons_params")){
@@ -6790,10 +6835,10 @@ function mettre_en_forme_onglet_clicked(id_onglet){
 		//on met en orange l'onglet choisi
 		if(id_onglet_courant===id_onglet){
 			//console.log(id_onglet_courant + " = id_onglet")
-			$('#' + id_onglet_courant)[0].className = "un_menu un_menu_orange"
+			$('[id="' + id_onglet_courant + '"]')[0].className = "un_menu un_menu_orange"
 		}else{
 			//console.log("id_onglet_courant <> id_onglet")
-			$('#' + id_onglet_courant)[0].className = "un_menu"
+			$('[id="' + id_onglet_courant + '"]')[0].className = "un_menu"
 		}
 
 		
@@ -6817,6 +6862,13 @@ function actualiser_details_parametre(id_parametre){
 		mettre_details_cycle()
 		$("#nombre_elements_param")[0].innerText = 0
 	*/
+
+
+
+	//si octets pris
+	}else if(id_parametre === "OCTETS_PRIS"){
+
+		//<progress max="50000000000" value=""></progress>
 
 	//LISTE JSON
 	}else{
@@ -7061,8 +7113,35 @@ function assigner_label_et_liste_parametres(etiquette_filtre, filtre_liste){
 
 function mettre_barre_recherche(){
 	$("#zone_recherche").remove()
+	$("#stockage").remove()
+
 	var zone_recherche = '<input id="zone_recherche" type="text" onkeyup="chercher()" placeholder="Rechercher...">'
+
+	
 	$("#conteneur_filtre").append(zone_recherche)
+}
+
+function mettre_etat_espace(id_parametre){
+
+	resultat = ""
+
+	if(id_parametre === "Espace etablissement restant") {
+		
+		$('label_filtre_parametre').remove()
+		$('filtre_parametre').remove()
+
+		setTimeout(function(){		
+			la_somme = somme('Espace etablissement restant','octets_utilises')
+			valeur_max = 50e9
+			pourcentage = 100*(la_somme/valeur_max).toFixed(4)
+			resultat='<div id="stockage" style="color: #b7b2aa;"><i style="margin-left: 50px;"><label>Stockage utilisé:<progress style="width: 60px;" value="'+la_somme+'" max="'+valeur_max+'"></progress> '+pourcentage+'% ('+(la_somme/1E9).toFixed(2)+'/50 Go)</i></span></div>'
+
+
+			$("#conteneur_filtre").append(resultat)
+		}, 300);
+
+
+	}
 
 }
 
@@ -7471,7 +7550,10 @@ function actualiser_parametre(id_parametre){
 
 	//console.log(id_parametre)
 	effacer(id_parametre)
-	$('#'+id_parametre).click()
+	//$('[id="'+id_parametre+'"]').click()
+	un_menu_clic(id_parametre)
+
+
 }
 
 function ajouter_donnees_parametres(id_parametre){
