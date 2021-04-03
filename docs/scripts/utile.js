@@ -588,3 +588,148 @@ function init_mon_role(){
   
 }
 
+
+function afficher_clic_droit_param(ceci){
+  event.preventDefault();
+  event.stopPropagation(); 
+  id_parametre = $(".un_menu_orange")[0].id
+
+  $("#clic_droit_titres_param").remove()
+  $("thead").append('<div id="clic_droit_titres_param" style="z-index: 50;position: fixed;"></div>')
+  
+
+  //autoriser le masquage SI ET SEULEMENT SI nb elements visibles >1
+  if($(".header_table.entete_sticky:visible").length > 1){
+    ajouter_fonction_clic_droit(event,element_DOM("clic_droit_titres_param"),0,"masquer_colonne","Masquer la colonne <b>"+ceci.id+"</b>",ceci.id,"clic_droit_titre_param")  
+  }
+  
+
+
+  liste_params_colonnes_masquees = recuperer("liste_params_colonnes_masquees")
+  liste_params_colonnes_masquees = liste_params_colonnes_masquees ?  liste_params_colonnes_masquees.split(",") : []
+  //console.log("LA LISTE POUR MASQUER 1: " + liste_params_colonnes_masquees)
+  liste_params_colonnes_masquees = liste_params_colonnes_masquees.filter(e => e.includes(id_parametre + ':'))
+  //console.log("LA LISTE POUR MASQUER 2: " + liste_params_colonnes_masquees)
+
+
+  if (liste_params_colonnes_masquees.length > 0){
+
+    for (var i = 0; i < liste_params_colonnes_masquees.length ; i++) {
+      parametre = liste_params_colonnes_masquees[i].split(":")[0]
+      id_colonne = liste_params_colonnes_masquees[i].split(":")[1]
+      ajouter_fonction_clic_droit(event,element_DOM("clic_droit_titres_param"),i+1,"afficher_colonne","Afficher la colonne <b>"+id_colonne+"</b>",id_colonne,"clic_droit_titre_param")  
+    }
+
+    ajouter_fonction_clic_droit(event,element_DOM("clic_droit_titres_param"),i+1,"afficher_colonnes","<b>Afficher toutes les colonnes</b>",ceci.id,"clic_droit_titre_param")  
+
+  }
+  
+
+
+
+  //au clic de n'importe où : ça enleve le clic droit
+  $(document).click(function() {
+    $('.clic_droit').remove();  
+    $('#clic_droit_titres_param').remove();           
+  });
+
+}
+
+function afficher_colonnes(id_parametre, titre){
+
+  $("th").css("display","")
+  $("td").css("display","")
+
+  id_parametre = $(".un_menu_orange")[0].id
+
+  if(titre !== ""){
+
+    //virer tous elements du parametre
+    liste = recuperer('liste_params_colonnes_masquees')
+    //console.log("on a initialement " + liste)
+
+    if(liste.length > 0){
+      //console.log(liste)
+      liste = liste.split(",")
+      //console.log(liste)
+      liste = liste.filter(function(e){
+        //console.log(e.split(":")[0] + " VS " + id_parametre )
+        return e.split(":")[0] !== id_parametre
+      })
+
+    }
+
+
+
+    autoriser_tout_voir(false)
+
+    //console.log("on va stocker " + liste)
+    stocker('liste_params_colonnes_masquees',liste)
+
+
+  }
+
+
+  $("#clic_droit_titres_param").remove()
+
+}
+
+function afficher_colonne(id_colonne,vide){
+  masquer_colonne(id_colonne,true)
+}
+
+function masquer_colonne(id_colonne,non_plutot_afficher){
+
+  if(id_colonne !== ""){
+
+
+    //event.stopPropagation();
+
+    visibilite =  non_plutot_afficher ? "" : "none"    
+
+    numero_colonne = $("[id='"+id_colonne+"'].header_table.entete_sticky")[0].cellIndex
+
+    $("[id='"+id_colonne+"'].header_table.entete_sticky")[0].style.display = visibilite
+    
+
+    //si non visible -> l'enregistrer dans les préfs de l'user
+    param_actualisé = $(".un_menu_orange")[0].id + ":" + id_colonne
+    liste_params_colonnes_masquees = recuperer("liste_params_colonnes_masquees")
+
+
+
+    liste_params_colonnes_masquees = liste_params_colonnes_masquees ?  liste_params_colonnes_masquees.split(",") : []
+    position_param_actualisé = $.inArray(param_actualisé,liste_params_colonnes_masquees)
+    
+    /*
+    console.log(visibilite)
+    console.log(param_actualisé)
+    console.log(position_param_actualisé)
+    */
+
+    if (visibilite === "none"){
+      autoriser_tout_voir(true)
+      if(position_param_actualisé === -1) liste_params_colonnes_masquees.push(param_actualisé)
+    }else{
+      if(position_param_actualisé !== -1) liste_params_colonnes_masquees.splice(position_param_actualisé, 1)
+    }
+    
+    stocker('liste_params_colonnes_masquees',liste_params_colonnes_masquees)
+    //console.log(liste_params_colonnes_masquees)
+    //console.log(recuperer('liste_params_colonnes_masquees'))
+
+
+    //pour chaque ligne, on masque la numero_colonne-ème colonne
+    for (numero_ligne = 1 ; numero_ligne < $("tr").length ; numero_ligne++){
+
+      //console.log('$("tr")['+numero_ligne+'].children['+numero_colonne+'] à masquer: ' + visibilite)
+      $("tr")[numero_ligne].children[numero_colonne].style.display = visibilite
+
+    }
+
+    
+  }
+
+  $("#clic_droit_titres_param").remove()
+}
+

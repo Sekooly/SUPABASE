@@ -10,8 +10,6 @@ var elements_menu_haut_avec_reset = ["Eleves","Profs","Administration"]
 
 
 
-
-
 /*********************** CONSEIL DE CLASSE ***********************************/
 function afficher_conseil_de_classe(oui){
 
@@ -1600,6 +1598,9 @@ function deconnexion(){
 	effacer('fichier_ouvert');
 	effacer('dossier_rendus_cycle')
 
+
+	effacer('liste_params_colonnes_masquees')
+
 	supprimer_tous_les_parametres()
 
 	//je préviens que je vais me deconnecter puis je me deco (sous 1 seconde)
@@ -3013,17 +3014,21 @@ function autoriser_clic_droit_supprimer_et_renommer(e,ceci){
 
 	//au clic de n'importe où : ça enleve le clic droit
 	$(document).click(function() {
-		$('.clic_droit').remove();					
+		$('.clic_droit').remove();	
+		$('#clic_droit_titres_param').remove();    		
 	});
 
 }
 
-function ajouter_fonction_clic_droit(e,ceci,position,fonction,affichage_nom_fonction,id_fichier){
+function ajouter_fonction_clic_droit(e,ceci,position,fonction,affichage_nom_fonction,id_fichier, nom_class_clic_droit){
 
 	var nom_fichier = decodeURI(encodeURIComponent(ceci.innerText).split('%0A')[0]);
 
 	var span_clic_droit = document.createElement('span');
-	span_clic_droit.setAttribute('class','clic_droit');
+
+	if(!nom_class_clic_droit) nom_class_clic_droit = "clic_droit"
+	span_clic_droit.setAttribute('class',nom_class_clic_droit);
+
 	span_clic_droit.setAttribute('id',fonction);
 	span_clic_droit.setAttribute('onclick','event.stopPropagation();'+fonction+'("' + id_fichier +'","'+ nom_fichier+'")');
 
@@ -6588,10 +6593,10 @@ function afficher_parametres(oui){
 
 function recuperer_parametres(){
 	
-
+	if(recuperer('liste_params_colonnes_masquees') === null) stocker('liste_params_colonnes_masquees','')
 
 	vider_fenetre("Paramètres");
-
+	
 
 	var contenu_menu_haut = ""
 	
@@ -6609,9 +6614,10 @@ function recuperer_parametres(){
 	//clic -> mise en forme + actualisation de menu_details
 	$('.un_menu').click(function(e) {
 		chargement(true)
-		un_menu_clic(e.target.id)
+		un_menu_clic(e.target.id)			
         chargement(false)
     });
+
 
 
 
@@ -6620,6 +6626,7 @@ function recuperer_parametres(){
     $("#Alerte").click();
 
 	afficher_fenetre(true)
+
 }
 
 function appliquer_filtre_choisi(nom_champ_reference, valeur_champ_reference){
@@ -6696,8 +6703,60 @@ function un_menu_clic(id_parametre){
 	    }
 	}
 
+	//pas de "tout voir" à faire
+	if($("#boutons_params")){
+		elements_menu_haut_avec_tout_voir = recuperer("liste_params_colonnes_masquees")
 
 
+
+	    elements_menu_haut_avec_tout_voir = elements_menu_haut_avec_tout_voir ?  elements_menu_haut_avec_tout_voir.split(",") : []
+		if(elements_menu_haut_avec_tout_voir.indexOf(id_parametre + ":") === -1){
+			autoriser_tout_voir(false)
+		}else{
+			autoriser_tout_voir(true)
+		}
+	}
+    
+	
+
+
+
+}
+
+function affichage_par_defaut(id_parametre){
+	//console.log("POUR LE PARAMETRE " + id_parametre)
+	liste_params_colonnes_masquees_str = recuperer("liste_params_colonnes_masquees")
+	if(liste_params_colonnes_masquees_str){
+
+
+		liste_params_colonnes_masquees = liste_params_colonnes_masquees_str.split(",")
+		//console.log(liste_params_colonnes_masquees)
+
+
+		//sans 1er élément vide
+		liste_params_colonnes_masquees = liste_params_colonnes_masquees.filter(e => e !== "")
+		//console.log(liste_params_colonnes_masquees)
+
+
+		//uniquement les champs du paramètre
+		liste_params_colonnes_masquees = liste_params_colonnes_masquees.filter(e => e.split(":")[0].includes(id_parametre))
+		//console.log(liste_params_colonnes_masquees)
+
+		liste_colonnes_masquees = liste_params_colonnes_masquees.map(e => e.split(':')[1])	
+		//console.log(liste_colonnes_masquees)
+
+		//tout afficher les colonnes du parametre
+		afficher_colonnes(id_parametre, "")
+
+		liste_colonnes_masquees.forEach(function(e){
+			//console.log(e)
+			//masquer toutes les donnees de la colonne
+			masquer_colonne(e)
+		})
+
+	}
+
+	//console.log("\n")
 
 }
 
@@ -6711,6 +6770,9 @@ function autoriser_le_reset(oui){
 	$("#reset_param")[0].style.display = oui ? "" : "none"
 }
 
+function autoriser_tout_voir(oui){
+	$("#tout_voir")[0].style.display = oui ? "" : "none"
+}
 
 function mettre_en_forme_onglet_clicked(id_onglet){
 
@@ -6773,6 +6835,7 @@ function actualiser_details_parametre(id_parametre){
 			liste_JSON = JSON.parse(liste_deja_stockee_JSON)			
 			traiter_liste_JSON(id_parametre,liste_JSON, identifiant_table)
 			$("#nombre_elements_param")[0].innerText = liste_JSON.length
+			affichage_par_defaut(id_parametre);
 				
 		}else{
 			rechercher_tout(id_parametre).then(function(snapshot){
@@ -6782,6 +6845,7 @@ function actualiser_details_parametre(id_parametre){
 				stocker(id_parametre, JSON.stringify(liste_JSON ? liste_JSON : ""))
 				traiter_liste_JSON(id_parametre,liste_JSON, identifiant_table)
 				$("#nombre_elements_param")[0].innerText = liste_JSON.length
+				affichage_par_defaut(id_parametre);
 
 			});
 		}
@@ -6978,9 +7042,12 @@ function assigner_label_et_liste_parametres(etiquette_filtre, filtre_liste){
 	var bouton_telecharger = un_bouton_param("telecharger_param", "telecharger_donnees_parametres", "Télécharger", "img_download.png")
 	var bouton_import = un_bouton_param("importer_param", "importer_parametres", "Importer", "img_import.png")
 	var bouton_init = un_bouton_param("reset_param", "init_donnees", "Initialiser", "img_reset.png")
+	
+
+	var bouton_tout_voir = un_bouton_param("tout_voir", "afficher_colonnes", "Afficher toutes les colonnes", "img_previz.png")
 
 
-	$("#conteneur_filtre")[0].innerHTML	= $("#conteneur_filtre")[0].innerHTML + '<span id="boutons_params" style="cursor: pointer;"> ' +bouton_actualiser+bouton_ajouter+bouton_supprimer+bouton_dupliquer+bouton_telecharger+bouton_import+bouton_init+' </span>'
+	$("#conteneur_filtre")[0].innerHTML	= $("#conteneur_filtre")[0].innerHTML + '<span id="boutons_params" style="cursor: pointer;"> ' +bouton_actualiser+bouton_ajouter+bouton_supprimer+bouton_dupliquer+bouton_telecharger+bouton_import+bouton_init+bouton_tout_voir+' </span>'
 
     //quand on update le filtre -> on met à jour
     $("#filtre_parametre").on('change',function(e){
@@ -7091,7 +7158,7 @@ function json2Table(json, id_table) {
 
   //Map over columns, make headers,join into string
   let headerRow = cols
-    .map(col => `<th id="${col}" class="header_table entete_sticky">${col}</th>`)
+    .map(col => `<th id="${col}" oncontextmenu="afficher_clic_droit_param(this)" class="header_table entete_sticky">${col}</th>`)
     .join("");
 
   //map over array of json objs, for each row(obj) map over column values,
@@ -7120,6 +7187,8 @@ function json2Table(json, id_table) {
 	</table>`;
 
   
+  
+
   return table;
 
 
