@@ -6080,35 +6080,43 @@ function choisir_height_viz_si_pdf(){
 		var nom_fichier = $("#titre_fenetre")[0].innerText.toLowerCase();
 		var extension = nom_fichier.split(".").pop();
 		if(extension === "pdf"){
-			var rapport_L_H = $(window).width() / $(window).height() 
+
+			//si NON chrome
+			if (!navigator.userAgent.includes("Chrome")){
+
+				var rapport_L_H = $(window).width() / $(window).height() 
 
 
-			//si entre 0 et 0.4 exclus -> rien
-			var height_final = rapport_L_H > 0 && rapport_L_H < 0.4 ? "" : 
-								
-								//sinon et vers 0.475 -> 140%
-								rapport_L_H <= 0.475 ? "140%" : 
-								
-								//sinon et vers 0.75 -> 125%
-								rapport_L_H <= 0.75 ? "125%" :
-								
-								//sinon et vers 1.77 -> (-0.5x*100 + 1.7667)
-								rapport_L_H <= 1.77 ? Number(-0.5*rapport_L_H*100 + 1.7667) +"%" :
+				//si entre 0 et 0.4 exclus -> rien
+				var height_final = rapport_L_H > 0 && rapport_L_H < 0.4 ? "" : 
+									
+									//sinon et vers 0.475 -> 140%
+									rapport_L_H <= 0.475 ? "140%" : 
+									
+									//sinon et vers 0.75 -> 125%
+									rapport_L_H <= 0.75 ? "125%" :
+									
+									//sinon et vers 1.77 -> (-0.5x*100 + 1.7667)
+									rapport_L_H <= 1.77 ? Number(-0.5*rapport_L_H*100 + 1.7667) +"%" :
 
-								//sinon et vers 2.055 -> 25%
-								rapport_L_H <= 2.055 ? "25%" :
+									//sinon et vers 2.055 -> 25%
+									rapport_L_H <= 2.055 ? "25%" :
 
-								//sinon et vers 2.1666 -> 40%
-								rapport_L_H <= 2.17 ? "40%" :
+									//sinon et vers 2.1666 -> 40%
+									rapport_L_H <= 2.17 ? "40%" :
 
-								//sinon -> rien
-								""
+									//sinon -> rien
+									""
 
 
 
-			//console.log("AVANT: " + $("#previsualisation")[0].style.height )
-			$("#previsualisation")[0].style.height = height_final
-			//console.log("APRES: " + $("#previsualisation")[0].style.height )
+				//console.log("AVANT: " + $("#previsualisation")[0].style.height )
+				$("#previsualisation")[0].style.height = height_final
+				//console.log("APRES: " + $("#previsualisation")[0].style.height )
+
+				
+			}
+
 		}
 	}
 	
