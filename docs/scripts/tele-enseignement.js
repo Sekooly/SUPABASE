@@ -7987,7 +7987,7 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 		if (id_parametre.includes("Admin")) $("input[id='Classe']")[0].value = '(Tous|' + $("input[id='Cycle']")[0].value +")" 
 		
 		$("input[id='Derniere_consultation_notifs']")[0].value = "30/12/1899 00:00:00"
-		$("input[id='type']")[0].value = id_parametre.includes("Admin") ? "Administration" : id_parametre.slice(0, -1)
+		$("input[id='type']")[0].value = id_parametre.includes("Admin") ? "Administration" : id_parametre
 		$("input[id='Droit_acces_anticipe_examen']")[0].value = id_parametre.includes("Eleves") ? "non" : "oui"
 		if($("input[id='Droit_changer_ecolage']")[0]) $("input[id='Droit_changer_ecolage']")[0].value = "non"
 		if($("input[id='Droits_modifs']")[0]) $("input[id='Droits_modifs']")[0].value = "non"
