@@ -414,8 +414,8 @@ function recuperer_MA_fiche_conseil(){
 
 function aide_devoirs(){
 	alerte = "CONSIGNES POUR METTRE EN LIGNE UN DEVOIR: \n"
-	alerte = alerte + '• Vous pouvez rendre uniquement un devoir lorsque le professeur a catégorisé un fichier de "Devoir".\n'
-	alerte = alerte + '• Pour rendre un devoir, allez sur la bulle de droite "Rendus de devoir", puis choisissez le sujet que le professeur aura mis en ligne.\n'
+	alerte = alerte + '• Vous pouvez rendre uniquement un devoir lorsque le professeur a catégorisé un fichier de "Devoir" ou "Examen".\n'
+	alerte = alerte + '• Pour rendre un devoir, choisissez le sujet que le professeur aura mis en ligne.\n'
  	alerte = alerte + "• Pour un même devoir, si vous avez plusieurs images, convertissez l'ensemble en pdf (via ce lien par exemple : https://jpg2pdf.com/fr/)\n"
  	alerte = alerte + "• Vérifiez bien l'ordre des images car cela sera pris en compte dans le fichier pdf généré. Vous pourrez ensuite mettre en ligne le seul fichier pdf.\n"
  	alerte = alerte + "• Si vous êtes sur ordinateur, vous pouvez également créer un fichier word et y coller toutes vos images. Les fichiers word (doc / docx) sont également supportés par SEKOOLY."
@@ -843,7 +843,7 @@ function supprimer_devoir(moi, id_fichier_donné, id_devoir_donné){
 	}else{
 		var id_fichier = moi.parentNode.id;	
 	}	
-	console.log("le fichier sur drive: "+id_fichier)
+	//console.log("le fichier sur drive: "+id_fichier)
 
 
 
@@ -853,7 +853,7 @@ function supprimer_devoir(moi, id_fichier_donné, id_devoir_donné){
 	var id_devoir = $("#devoir_choisi")[0].value + suite_notif()
 	if(id_devoir_donné) id_devoir = id_devoir_donné
 
-	console.log("le id_devoir:"+id_devoir)
+	//console.log("le id_devoir:"+id_devoir)
 
 
 
@@ -980,6 +980,10 @@ function rendre_devoir(){
         	var params = {};
             params.file = e.target.result.replace(/^.*,/, '');
             nom_fichier = file.name;
+
+            coefficient_rendu = Number($("#"+le_devoir_choisi)[0].getAttribute('coefficient_rendu'))
+            taille_fichier = file.size;
+
 			extension = nom_fichier.split(".").pop().toUpperCase();
 
 
@@ -988,7 +992,7 @@ function rendre_devoir(){
 			proprietaire = recuperer('identifiant_courant');
 
 
-            mettre_devoir_en_ligne(lien_script,params, nom_fichier, extension,id_dossier_sujetdevoir,id_fichier_sujetdevoir,proprietaire);
+            mettre_devoir_en_ligne(lien_script,params, nom_fichier, extension,id_dossier_sujetdevoir,id_fichier_sujetdevoir,proprietaire,coefficient_rendu,taille_fichier);
 
         }
 
@@ -998,7 +1002,7 @@ function rendre_devoir(){
 }
 
 
-function mettre_devoir_en_ligne(lien_script,params, nom_fichier, extension,id_dossier_sujetdevoir,id_fichier_sujetdevoir,proprietaire){
+function mettre_devoir_en_ligne(lien_script,params, nom_fichier, extension,id_dossier_sujetdevoir,id_fichier_sujetdevoir,proprietaire,coefficient_rendu,taille_fichier){
 
 
 
@@ -1012,6 +1016,11 @@ function mettre_devoir_en_ligne(lien_script,params, nom_fichier, extension,id_do
 	html += '<input type="hidden" name="file" value="'+params.file+'" >';
 	html += '<input type="hidden" name="dossier_rendus_cycle" value="' + recuperer('dossier_rendus_cycle') + '" >';
 	html += '<input type="hidden" name="proprietaire" value="' + proprietaire + '" >';
+
+
+	html += '<input type="hidden" name="coefficient_rendu" value="' + coefficient_rendu + '" >';
+	html += '<input type="hidden" name="taille_fichier" value="' + taille_fichier + '" >';
+
 	html += '</form>';	                
     
     //console.log("\n" + html + "\n");
@@ -1052,6 +1061,10 @@ function mettre_devoir_en_ligne(lien_script,params, nom_fichier, extension,id_do
 				nom_table = "Rendus"
 				id_devoir = id_fichier_sujetdevoir+suite_notif()
 				la_matiere = $("#accueil_utilisateur")[0].innerText.trim()
+				//coefficient_rendu = post_resultat_asynchrone(racine_data + 'rpc/maj_coef_rendu?' + apikey,{"valeur_id_devoir":id_devoir})
+
+				//console.log(coefficient_rendu)
+
 				nouveau_devoir  = {
 					"id_devoir": id_devoir,
 					"date_publication" : date_heure_actuelle,
@@ -1061,15 +1074,17 @@ function mettre_devoir_en_ligne(lien_script,params, nom_fichier, extension,id_do
 					"nom_fichier": nom_fichier,
 					"proprietaire": recuperer('identifiant_courant'),
 					"remarque" : "",
-					"matiere_rendue" : la_matiere
+					"matiere_rendue" : la_matiere,
+					"coefficient_rendu" : coefficient_rendu,
+					"taille_fichier" : taille_fichier
 
 				}
-				console.log(nouveau_devoir)
+				//console.log(nouveau_devoir)
 				ajouter_un_element(nom_table, nouveau_devoir, id_devoir)
-				
+				/*
 				console.log()
 				console.log()
-
+				*/
 
 				nom_table = "Notifs"
 				mes_donnees = JSON.parse(recuperer("mes_donnees"))
@@ -2725,15 +2740,16 @@ function traitement_fichiers_recus(){
 				//console.log("au " + la_date_limite + lheure_limite);
 			}
 
-
-			if(ma_categorie ==="devoirs" || ma_categorie ==="examens") nom_fichier = valeur['nom_fichier'] + '<rouge><i>(à rendre avant le ' + la_date_limite + lheure_limite +')</i></rouge>';
+			//on n'affiche le coef que si > 0
+			valeur_coef = valeur['coefficient_rendu'] > 0 ? "<b>Coeff. "+valeur['coefficient_rendu']+"</b>" : ''
+			if(ma_categorie ==="devoirs" || ma_categorie ==="examens") nom_fichier = valeur['nom_fichier'] + '<rouge><i>(à rendre avant le ' + la_date_limite + lheure_limite +')<br>'+valeur_coef+'</i></rouge>';
 
 			
 			var nom_drive = 'drive_' + ma_categorie;
 
 
 			//console.log(valeur['heure_effet']);
-			ajouter_un_fichier(valeur['id_fichier'],nom_fichier,nom_drive,extension_fichier, valeur['date_effet'], valeur['heure_effet'], valeur['est_telechargeable']);
+			ajouter_un_fichier(valeur['id_fichier'],nom_fichier,nom_drive,extension_fichier, valeur['date_effet'], valeur['heure_effet'], valeur['est_telechargeable'], valeur['coefficient_rendu']);
 
 		});
 
@@ -2809,7 +2825,7 @@ function masquer_drive_vide(){
 }
 
 
-function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,date_effet,heure_effet,est_telechargeable){
+function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,date_effet,heure_effet,est_telechargeable,coefficient_rendu){
 
 
 
@@ -2826,7 +2842,7 @@ function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,d
 	//todo: sans téléchargement EN PLUS DE YOUTUBE
 	var padding_yt = est_telechargeable === "oui" ?  "" : ' style="padding-top: 25%;" ' 
 	var telecharger_le_fichier = est_telechargeable === "oui" ? '<img src="images/img_download.png" onclick="telecharger_fichier(event,this)" id="telecharger" class="download_fichier">' : ""
-	var code_html = '<span oncontextmenu="autoriser_clic_droit_supprimer_et_renommer(event,this)" onclick="ouvrir_fichier(this)" class="span_un_fichier" id="' + id_fichier + '" ma_date_effet="'+ la_date_yyyy_mm_dd(date_effet)+'" mon_heure_effet="'+ heure_effet +'" est_telechargeable="'+est_telechargeable+'" >' + telecharger_le_fichier + '<img id="' + id_fichier + '" src="'+ image_fichier +'" class="un_fichier" '+padding_yt+'>' + nom_fichier +'</span>';
+	var code_html = '<span oncontextmenu="autoriser_clic_droit_supprimer_et_renommer(event,this)" onclick="ouvrir_fichier(this)" class="span_un_fichier" id="' + id_fichier + '" ma_date_effet="'+ la_date_yyyy_mm_dd(date_effet)+'" mon_heure_effet="'+ heure_effet +'" est_telechargeable="'+est_telechargeable+'"    coefficient_rendu='+coefficient_rendu+'    >' + telecharger_le_fichier + '<img id="' + id_fichier + '" src="'+ image_fichier +'" class="un_fichier" '+padding_yt+'>' + nom_fichier +'</span>';
 
 	//alert(code_html);
 
@@ -3034,7 +3050,8 @@ function autoriser_clic_droit_supprimer_et_renommer(e,ceci){
 	ajouter_fonction_clic_droit(e,ceci,0,"renommer_fichier","Renommer",id_fichier);
 	ajouter_fonction_clic_droit(e,ceci,1,"recategoriser_fichier","Recatégoriser",id_fichier);
 	ajouter_fonction_clic_droit(e,ceci,2,"changer_date_effet","Date d\'effet",id_fichier);
-	ajouter_fonction_clic_droit(e,ceci,3,"supprimer_fichier","Supprimer",id_fichier);
+	ajouter_fonction_clic_droit(e,ceci,3,"changer_coef","Coefficient",id_fichier,null,$("#"+id_fichier)[0].getAttribute("coefficient_rendu"));
+	ajouter_fonction_clic_droit(e,ceci,4,"supprimer_fichier","Supprimer",id_fichier);
 
 	//au clic de n'importe où : ça enleve le clic droit
 	$(document).click(function() {
@@ -3044,9 +3061,55 @@ function autoriser_clic_droit_supprimer_et_renommer(e,ceci){
 
 }
 
-function ajouter_fonction_clic_droit(e,ceci,position,fonction,affichage_nom_fonction,id_fichier, nom_class_clic_droit){
+function changer_coef(id_fichier,ancien_coef){
 
-	var nom_fichier = decodeURI(encodeURIComponent(ceci.innerText).split('%0A')[0]);
+	//console.log(id_fichier);
+	var categorie_actuelle = $("[id="+id_fichier+'].span_un_fichier')[0].parentNode.id.split("_")[1];
+
+	if(!categorie_actuelle.includes("devoirs") && !categorie_actuelle.includes("examens")){
+		alert("Impossible de changer le coefficient d'un fichier différent d'un sujet de devoir/examen.");
+		return -1;
+	}
+
+
+
+
+	var nouveau_coef = Number(prompt("Indiquez le nouveau coefficient du rendu:",ancien_coef))
+	/*console.log(nouveau_coef)
+	console.log(nouveau_coef >= 0 )*/
+	
+	if(!(nouveau_coef >= 0)){
+		alert("Impossible de changer le coefficient : merci de saisir un coefficient valide (>0).")
+		return -1;
+	}
+
+	if(nouveau_coef === ancien_coef) return -1;
+
+
+	chargement(true);
+
+	//on modifie dans la bdd 
+	nom_table = "Fichiers"
+	nom_champ_reference = "id_fichier"
+	valeur_champ_reference = id_fichier
+	nouveau_data = {
+		'coefficient_rendu' : nouveau_coef
+	}
+	actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouveau_data)
+	
+	setTimeout(function(){
+		location.reload();
+	}, 1000);
+
+	chargement(false);
+
+}
+
+
+
+function ajouter_fonction_clic_droit(e,ceci,position,fonction,affichage_nom_fonction,id_fichier, nom_class_clic_droit, nom_fichier){
+
+	if(!nom_fichier) nom_fichier= decodeURI(encodeURIComponent(ceci.innerText).split('%0A')[0]);
 
 	var span_clic_droit = document.createElement('span');
 
@@ -5965,7 +6028,13 @@ function recuperer_notifs(){
 				return valeur['Identifiant_derniere_modif'] !== recuperer('identifiant_courant')
 			})
 
-			
+			//si eleve -> on vire les autres devoirs des eleves
+			if(mon_role === "Eleve"){
+				mes_notifs = mes_notifs.filter(function(valeur,index){
+					//si je ne suis pas originaire ET c'est un devoir -> on ne garde pas
+					return !(valeur['Identifiant_originaire'] !== recuperer('identifiant_courant') && valeur['Type_notif'] ==='devoir' )
+				})	
+			}
 
 			//console.log(mes_notifs)
 			stocker_mes_notifications(mes_notifs);
@@ -6153,7 +6222,7 @@ function choisir_height_viz_si_pdf(){
 									//rapport_L_H <= 2.055 ? "25%" :
 
 									//sinon et vers 2.1666 -> 40%
-									rapport_L_H <= 2.17 ? "45%" :
+									//rapport_L_H <= 2.17 ? "45%" :
 
 									//sinon -> rien
 									""
@@ -7011,7 +7080,7 @@ function actualiser_filtre_onglet(id_parametre){
 	//maintenance: filtre = etablissement
 	//alerte:  filtre = etablissement
 	//un seul établissement
-	if(id_parametre === "Cycles" || id_parametre === "Maintenance" || id_parametre === "Alerte" || id_parametre === "Logs"){
+	if(id_parametre === "Cycles" || id_parametre === "Maintenance" || id_parametre === "Alerte" || id_parametre === "Logs"  || id_parametre === "Espace etablissement restant"){
 
 		etiquette_filtre = "Etablissement"
 		filtre_liste = [nom_etablissement];
