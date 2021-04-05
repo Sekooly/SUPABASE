@@ -1017,9 +1017,10 @@ function mettre_devoir_en_ligne(lien_script,params, nom_fichier, extension,id_do
 	html += '<input type="hidden" name="dossier_rendus_cycle" value="' + recuperer('dossier_rendus_cycle') + '" >';
 	html += '<input type="hidden" name="proprietaire" value="' + proprietaire + '" >';
 
-
+	/*
 	html += '<input type="hidden" name="coefficient_rendu" value="' + coefficient_rendu + '" >';
 	html += '<input type="hidden" name="taille_fichier" value="' + taille_fichier + '" >';
+	*/
 
 	html += '</form>';	                
     
@@ -4121,6 +4122,9 @@ function switch_affichage_youtube(){
 				la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
 				la_matiere = recuperer('mon_type') === "Eleves" ? $("#accueil_utilisateur")[0].innerText : $("#accueil_utilisateur")[0].innerText.replace(la_classe,"").trim()
 
+				le_coef =  Number($("#coef")[0].value)
+				console.log("le_coef: " + le_coef)
+
 				//stocker la donnée dans la BDD
 				nouveau_fichier = {"date_publication": date_heure_actuelle,
 					"id_fichier": id_fichier,
@@ -4133,7 +4137,7 @@ function switch_affichage_youtube(){
 					"date_effet": date_effet_fichier,
 					"heure_effet": heure_effet,
 					"est_telechargeable" : "non",
-					"coefficient_rendu" : $("#coef").value,
+					"coefficient_rendu" : le_coef,
 					"taille_fichier" : 0
 				}
 				ajouter_un_element("Fichiers",nouveau_fichier, id_fichier)
@@ -4397,7 +4401,12 @@ $(function charger_fichiers(e){
 
 
 				extension = nom_fichier.split(".").pop().toUpperCase();
-                envoyer_le_fichier(categorie_fichier,la_date_limite,lheure_limite,date_effet_fichier,heure_effet,$("#coef").value,file.size);               
+
+				le_coef =  Number($("#coef")[0].value)
+				//console.log("le_coef: " + le_coef)
+				
+
+                envoyer_le_fichier(categorie_fichier,la_date_limite,lheure_limite,date_effet_fichier,heure_effet,le_coef,file.size);               
 
             }
 
@@ -7644,7 +7653,8 @@ function dupliquer_donnees_parametres(id_parametre){
 
 function supprimer_ligne_parameters(id_parametre){
 	if(!id_parametre) id_parametre = $(".un_menu_orange")[0].id
-	id_ligne_supprimee = 0
+
+
 	
 
 	if (!$(".selected")[0]){
@@ -7687,8 +7697,70 @@ function supprimer_ligne_parameters(id_parametre){
 				var id_dossier = $(".selected")[0].children[$('#ID_URL')[0].cellIndex].innerText 	
 				//console.log("on va supprimer " + id_dossier)
 				supprimer_dossier(id_dossier, id_googlecalendar)
+
+
+				//SUPPRIMER LE PARENT SI JE VIENS DE SUPPRIMER LE DERNIER FILS (TODO)
+				nom_champ_parent = id_parametre === "Classes" ? 'cycle' : 'classe_id'
+				valeur_champ_parent = $(".selected")[0].children[$('[id="'+nom_champ_parent+'"]')[0].cellIndex].innerText
+				//console.log(valeur_champ_parent)
+				elements_similaires = donnees_parametres.filter(e => e[nom_champ_parent] === valeur_champ_parent)
+				//console.log(elements_similaires)
+				est_le_dernier_dossier = elements_similaires.length === 1
+				//console.log(est_le_dernier_dossier)
+				
+				if(est_le_dernier_dossier){
+					titre_parent_visible_user = id_parametre === "Classes" ? 'cycle' : 'Classe'
+					nom_parent_visible_user = $(".selected")[0].children[$('#' + titre_parent_visible_user)[0].cellIndex].innerText
+					valeur_ligne_visible_user = $(".selected")[0].children[$('#' + id_parametre.slice(0,-1))[0].cellIndex].innerText
+					confirmation = confirm("'" + valeur_ligne_visible_user + "' était la seule "+ id_parametre.slice(0,-1).toLowerCase() +" dans '"+ nom_parent_visible_user +"' (" + titre_parent_visible_user + "). Voulez-vous également supprimer "+nom_parent_visible_user+" ? ("+titre_parent_visible_user+")")
+
+
+					if(confirmation){
+
+						donnees_cycle =  id_parametre === "Classes" ?  get_resultat(racine_data + "Cycles?" + apikey + "&cycle=eq." +valeur_champ_parent) : ""
+						id_dossier_parent =  id_parametre === "Classes" ? (donnees_cycle[0] !== undefined ? donnees_cycle[0]['id_dossier_cycle'] : "") : valeur_champ_parent
+						console.log("le parent à supprimer: " + id_dossier_parent)
+
+						if(id_dossier_parent) {
+							supprimer_dossier(id_dossier_parent, id_googlecalendar)
+
+							//supprimer dans la BDD
+							nom_table_parent = id_parametre === "Classes" ? "ID_RENDUS" : "Classes"
+							
+
+							nom_table = nom_table_parent
+							nom_champ_reference = identifiant_par_table(nom_table_parent)
+							valeur_champ_reference = valeur_champ_parent
+							
+							//console.log(nom_table)
+							//console.log(nom_champ_reference)
+							//console.log(valeur_champ_reference)
+							
+
+
+							// on va supprimer le cycle dans la base -> on supprime le cycle sur le stockage
+							if(nom_table_parent === "ID_RENDUS"){
+								id_dossier_cycle = get_resultat(racine_data + "ID_RENDUS?Cycle=eq.Cycle_Test&" +apikey)[0]['id_dossier_cycle']
+								console.log("on va supprimer le cycle: " + id_dossier_cycle)
+								if(id_dossier_cycle) supprimer_dossier(id_dossier_cycle)
+							}
+
+
+							supprimer(nom_table,nom_champ_reference,valeur_champ_reference)
+
+
+						}
+
+					}
+				}
+
+
+				
 			}
-			
+
+
+
+			//return 0 //à commenter
 		}
 
 		//supprimer dans la BDD
@@ -7735,12 +7807,14 @@ function supprimer_dossier(id_dossier, id_googlecalendar){
 		alert("Erreur survenue pendant la suppression sur le serveur: " + error);
 	}
 
+
+
+
 }
 
 
 function telecharger_donnees_parametres(id_parametre){
 	if(!id_parametre) id_parametre = $(".un_menu_orange")[0].id
-	id_ligne_supprimee = 0
 
 	//alert("Téléchargement ici.")
 	var choix_entete_ou_tout_html = '<div id="mini_popup">'
@@ -8058,8 +8132,12 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 		var param_nom_cycle = nom_cycle ? "&nom_cycle=" + nom_cycle : ""
 		var param_nom_classe = nom_classe ? "&nom_classe=" + nom_classe : ""
 		var param_nom_matiere = nom_matiere ? "&nom_matiere=" + nom_matiere : ""
-		var param_commun_au_cycle = $('input#commun_au_cycle')[0] ? "&commun_au_cycle=" + $('input#commun_au_cycle')[0].value : ""
-				
+		var param_commun_au_cycle = $('input#commun_au_cycle')[0] ? "&commun_au_cycle=" + $('input#commun_au_cycle')[0].value : "non"
+		
+		//initier SI ET SEULEMENT SI le cycle n'a pas encore de rendus
+		id_rendu_actuel = get_resultat(racine_data + "ID_RENDUS?" + apikey + '&Cycle=eq.' + nom_cycle)
+		var initier = id_rendu_actuel.length === 0
+		var param_initier =  "&initier=" + initier 
 
 		var lien_script = "https://script.google.com/macros/s/AKfycbyGEGpbPE0WniCcBMbLCar_zGTNwKyABrnmfOE-zfb8TOUH4AY/exec"
 		lien_script = lien_script +  param_nom_etablissement
@@ -8067,25 +8145,35 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 		lien_script = lien_script +  param_nom_classe
 		lien_script = lien_script +  param_nom_matiere
 		lien_script = lien_script +  param_commun_au_cycle
+		lien_script = lien_script +  param_initier
 
 
 		//console.log(lien_script)
 		chargement(true)
 		var les_ids_recus= get_resultat(lien_script)
 		
-		//console.log(les_ids_recus)
+		console.log(les_ids_recus)
 
 		//on récupère les ID
 		var la_classe = nom_classe
 		var id_de_la_classe = get_valeur(les_ids_recus,la_classe)
+		var id_du_cycle = get_valeur(les_ids_recus,nom_cycle)
 		var id_googlecalendar = get_valeur(les_ids_recus,"id_googlecalendar")
 		
 		var la_matiere = nom_matiere
 		var id_de_la_matiere = get_valeur(les_ids_recus,la_matiere)
-		//return 0 //A COMMENTER!!!
+		var id_dossier_rendus = get_valeur(les_ids_recus,"Rendus de devoirs")
 
 
-		$("input[id='commun_au_cycle']")[0].value = $("input[id='commun_au_cycle']")[0].value ? "non" : $("input[id='commun_au_cycle']").value 
+		//envoyer via POST le nouveau dossier_rendus_cycle si initier = vrai
+		if(initier){
+			nouveau_data = {"Cycle":nom_cycle,"dossier_rendus_cycle":id_dossier_rendus,"id_dossier_cycle":id_du_cycle}
+			post_resultat_asynchrone(racine_data + "ID_RENDUS?" + apikey, nouveau_data)
+		}
+		
+		//en mode matière ET matiere = cycle -> commun
+		//sinon, non 
+		$("input[id='commun_au_cycle']")[0].value = id_parametre === "Matieres" && $("input#Cycle")[0].value === $("input#Matiere")[0].value ? "oui" : "non"
 
 		if(id_parametre === "Classes"){
 		/******* POUR CLASSE ********/
@@ -8120,7 +8208,6 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 			$("input[id='URL_Mapping']")[0].value = id_de_la_matiere
 			//classe_id
 			$("input[id='classe_id']")[0].value = id_de_la_classe
-			
 
 		}
 
@@ -8177,6 +8264,7 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 
 
 function get_valeur(liste_initiale,motif){
+
 	var index_motif = liste_initiale.findIndex((element) => element.includes(motif + ':'));
 	//console.log("index_motif: " + index_motif)
 	return liste_initiale[index_motif].split(motif + ':')[1]
