@@ -4,7 +4,7 @@ var api_initial = CryptoJS.AES.decrypt("U2FsdGVkX19+C33B2kOwfoYtDZ+ZKPTmOByBFIxi
 
 
 
-var site_actuel = window.location.href.split(".")[0]
+var site_actuel = window.location.href.split(".")[0].split('https://')[1]
 var nom_etablissement = site_actuel.includes("localhost") ? "hibiscus" : site_actuel
 console.log(nom_etablissement)
 var url = racine_initiale + "Etablissements?nom_etablissement=eq." + nom_etablissement + "&" + api_initial
