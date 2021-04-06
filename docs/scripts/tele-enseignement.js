@@ -6188,7 +6188,10 @@ function recuperer_notifs(){
 
 
 	var mes_notifs= [];
-	var ma_date_consultation = JSON.parse(recuperer("mes_donnees"))['Derniere_consultation_notifs'];
+	var url = racine_data + mon_type + "?Identifiant=eq."+ identifiant + "&" + apikey
+	var ma_date_consultation = get_resultat(url)[0] ['Derniere_consultation_notifs'];
+	//console.log(url)
+	//console.log(ma_date_consultation)
 	stocker_ma_date_de_consultation(ma_date_consultation)
 	//console.log(mes_notifs);
 
