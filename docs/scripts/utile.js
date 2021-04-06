@@ -389,6 +389,14 @@ function get_resultat(url){
 }
 
 
+function get_resultat_initial(url){
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", url, false ); // false for synchronous request
+    xmlHttp.send();
+    return xmlHttp.response;  
+}
+
+
 function get_resultat_brut(url){
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.open( "GET", url, false ); // false for synchronous request

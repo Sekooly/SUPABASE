@@ -19,7 +19,16 @@
 		<script src="openseadragon/openseadragon.min.js"></script>
 		<!--visio-->
 		<script src='https://meet.jit.si/external_api.js'></script>
+		
 
+
+
+		<!--compter le nombre de pages dans un pdf-->
+	  	<script src="scripts/pdf.js"></script>
+	  	<script src="scripts/pdf.worker.js"></script>
+
+
+  	
 
 	</head> 
 
@@ -740,6 +749,7 @@
 			border-radius: 6px;
 			box-shadow: 1px 0px 10px 1px;
 			z-index: 1; /*utile pour pas se superposer avec les fichiers*/
+			max-height: 400px
 		}
 
 
@@ -1276,6 +1286,9 @@
 		<b class="titre_drive" id="titre_drive_autres">Autres</b>
 		<div class="ma_liste" id="drive_autres"  > </div>
 
+		<b class="titre_drive" id="titre_drive_bulletins">Bulletins</b>
+		<div class="ma_liste" id="drive_bulletins"  > </div>
+
 
 	</div>
 
@@ -1298,6 +1311,11 @@
 		<li>
 			<span class="indication">Visioconférence</span>
 			<img class="bulle" id="visioconference" alt="visio" src="images/img_visio.png" onclick="rejoindre_visio()" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)">
+		</li>
+
+		<li>
+			<span class="indication">Bulletin scolaire</span>
+			<img class="bulle" id="bulletin" alt="bulletin" src="images/img_bulletin.png" onclick="clic_bulletin()" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)">
 		</li>
 
 		<!--
@@ -1365,6 +1383,9 @@
 			
 
 			<option value="Autres">Autres</option>
+
+
+			<option value="Bulletins">Bulletins</option>
 		</select>
 
 

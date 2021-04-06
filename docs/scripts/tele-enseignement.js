@@ -1570,6 +1570,9 @@ function afficher_ou_non_choix_fichier(oui,forcing){
 		afficher_fenetre(false);
 		afficher_ou_non_choix_fichier(false);
 
+		//pas de mode bulletin par défaut
+		mode_bulletin(false)
+
 		//on affiche la fenêtre de choix de fichier
 		element_DOM('choix_popup').style.visibility = "visible";
 		
@@ -1587,7 +1590,7 @@ function afficher_ou_non_choix_fichier(oui,forcing){
 		element_DOM('est_telechargeable').checked = true;	
 
 		//par défaut: coefficient = 0
-		element_DOM('coef') = 0	
+		element_DOM('coef').value = 0	
 
 		afficher_choix_date(false);
 		afficher_choix_coef(false);
@@ -2115,7 +2118,7 @@ function chargement_a_larrivee(){
 		//console.log(je_peux)
 	    //console.log(data)
 	    //on déconnecte si maintenance, sur site, sans droits
-	    if (data === "oui" && !window.location.href.includes("file:///") && je_peux !=="oui"){
+	    if (data === "oui" && (!window.location.href.includes("file:///") && !window.location.href.includes("http://localhost:8000")) && je_peux !=="oui"){
 	    	deconnexion()
 	    }
 	})
@@ -2134,6 +2137,11 @@ function chargement_a_larrivee(){
 	affichage_liste = recuperer('mon_type').includes('Administration') || (recuperer('mon_type') === "Profs" && recuperer('dossier_chargé')!==null && recuperer('dossier_chargé')!=="");
 	//console.log("on affiche la liste : " + affichage_liste);
 	afficher_liste_eleves(affichage_liste);
+
+
+	afficher_bulletins(false)
+	if(recuperer('mon_type').includes('Eleve')) afficher_bulletins(true)
+	
 
 	afficher_params_si_droits_et_admin()
 
@@ -2229,8 +2237,10 @@ function afficher_alerte_etablissement(){
 function calcul_grid_gap_barre_verticale(){
 	la_barre = element_DOM('barre_verticale');
 
-	if(la_barre)
+	if(la_barre){
+		//la_barre.style.gridGap = ($(window).height() / (element_DOM('barre_verticale').childElementCount+1)) + "px";
 		la_barre.style.gridGap = ($(window).height() / (element_DOM('barre_verticale').childElementCount+1)) + "px";
+	}
 	
 
 }
@@ -2539,7 +2549,7 @@ function charger_dossier(id_dossier,final_booleen,titre){
 		if (recuperer('mon_type')=== 'Profs'){
 			afficher_ajout(true);
 			afficher_liste_eleves(true);
-
+			afficher_bulletins(false);
 
 		//afficher le bouton ajout pour admins S'IL A LES DROITS
 		}else if(recuperer('mon_type').includes('Administration')) {
@@ -2550,11 +2560,13 @@ function charger_dossier(id_dossier,final_booleen,titre){
 			afficher_ajout(mes_droits==="oui");
 			//on affiche aussi les logs de la classe
 			afficher_liste_eleves(true);
+			afficher_bulletins(true);
 
 		//les élèves n'ont pas le droit d'ajouter des fichiers, ni de voir les logs
 		}else{
 			afficher_ajout(false);
 			afficher_liste_eleves(false);
+			afficher_bulletins(true);
 		}
 
 		//on montre qu'on charge le dossier final
@@ -2692,6 +2704,11 @@ function traitement_fichiers_recus(){
 	var les_fichiers = 	JSON.parse(les_fichiers_str);
 	initialisation_date_tri(les_fichiers);
 
+
+	//si NON admin -> on enlève les bulletins
+	if(!recuperer('mon_type').includes('Administration')){
+		les_fichiers = les_fichiers.filter(e => e['categorie_fichier'] !== "Bulletins")
+	}
 
 	//console.log(les_fichiers.length)
 	//si pas de fichier: on affiche un message de vide
@@ -2845,10 +2862,11 @@ function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,d
 	var telecharger_le_fichier = est_telechargeable === "oui" ? '<img src="images/img_download.png" onclick="telecharger_fichier(event,this)" id="telecharger" class="download_fichier">' : ""
 	var code_html = '<span oncontextmenu="autoriser_clic_droit_supprimer_et_renommer(event,this)" onclick="ouvrir_fichier(this)" class="span_un_fichier" id="' + id_fichier + '" ma_date_effet="'+ la_date_yyyy_mm_dd(date_effet)+'" mon_heure_effet="'+ heure_effet +'" est_telechargeable="'+est_telechargeable+'"    coefficient_rendu='+coefficient_rendu+'    >' + telecharger_le_fichier + '<img id="' + id_fichier + '" src="'+ image_fichier +'" class="un_fichier" '+padding_yt+'>' + nom_fichier +'</span>';
 
-	//alert(code_html);
+	//console.log(code_html);
 
 	var mon_fichier = document.createElement('div');
 	mon_fichier.innerHTML = code_html;
+	//console.log(mon_fichier);
 	while(mon_fichier.firstChild) {
 	    element_DOM(nom_drive).appendChild(mon_fichier.firstChild);
 	}
@@ -3418,7 +3436,7 @@ function renommer_fichier(id_fichier,ancien_nom){
 
 
 
-function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, pas_de_telechargement){
+function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, pas_de_telechargement, mode_extrait_png){
 
 	chargement(true);
 	nom_fichier = decodeURIComponent(nom_fichier);
@@ -3488,6 +3506,14 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 	    viewer.addHandler('open', function(){
 			chargement(false);
 		});
+
+	//une page de pdf
+	}else if(mode_extrait_png){
+
+		//console.log("ici")
+		var le_inner_html = '<canvas id="vizcanva"> </canvas>'
+		element_DOM('previsualisation').innerHTML = le_inner_html
+		chargement(false);
 
 	//si c'est PAS une image
 	}else{
@@ -3627,6 +3653,7 @@ function quitter_previsualisation(){
 
 	stocker('fichier_ouvert','');
 	element_DOM('fenetre').style.overflowY = "";
+	if (element_DOM('previsualisation')) element_DOM('previsualisation').setAttribute('style','')
 	afficher_fenetre(false);
 }
 
@@ -3921,6 +3948,8 @@ function decharger_dossier_final(){
 
 	//masquer la liste d'élèves si on n'est pas admin
 	afficher_liste_eleves(recuperer('mon_type').includes("Administration"));
+
+	afficher_bulletins(recuperer('mon_type').includes("Eleves"))
 
 	//masquer le bouton questions
 	afficher_discussions(false);
@@ -4360,6 +4389,25 @@ $(function charger_fichiers(e){
     	//console.log($('#categorie_choisie')[0].value);
     	
     	var les_fichiers = this.files;
+    	var la_date_limite = element_DOM("la_date_limite").value;
+    	var lheure_limite =  element_DOM("lheure_limite").value;
+    	var categorie_fichier = $('#categorie_choisie')[0].value;
+    	var date_effet_fichier = $('#date_effet_fichier')[0].value;
+    	var heure_effet = $('#heure_effet')[0].value;
+
+    	var nb_fichiers = les_fichiers.length;
+        	                
+		var file = les_fichiers[0];
+
+
+        nom_fichier = file.name;
+        //console.log(nom_fichier)
+
+		extension = nom_fichier.split(".").pop().toUpperCase();
+        //console.log(extension)
+
+		le_coef =  Number($("#coef")[0].value)
+
     	$('#mettre_fichier_en_ligne').on("click", function(e) {
 
 
@@ -4373,15 +4421,6 @@ $(function charger_fichiers(e){
 			}
 
 
-        	var la_date_limite = element_DOM("la_date_limite").value;
-        	var lheure_limite =  element_DOM("lheure_limite").value;
-        	var categorie_fichier = $('#categorie_choisie')[0].value;
-        	var date_effet_fichier = $('#date_effet_fichier')[0].value;
-        	var heure_effet = $('#heure_effet')[0].value;
-
-        	var nb_fichiers = les_fichiers.length;
-            	                
-			var file = les_fichiers[0];
 			//pas plus de 25 MO par fichier
 			if (file.size > 25000000){
 				afficher_alerte("Votre fichier excède 25 MO: impossible de le mettre en ligne.")
@@ -4397,25 +4436,102 @@ $(function charger_fichiers(e){
             fr.onload = function(e) {
             	//console.log("on load");
                 params.file = e.target.result.replace(/^.*,/, '');
-                nom_fichier = file.name;
-
-
-				extension = nom_fichier.split(".").pop().toUpperCase();
-
-				le_coef =  Number($("#coef")[0].value)
 				//console.log("le_coef: " + le_coef)
-				
 
-                envoyer_le_fichier(categorie_fichier,la_date_limite,lheure_limite,date_effet_fichier,heure_effet,le_coef,file.size);               
+				//n'accepter que les pdf pour les bulletins (todo)
+				if(categorie_fichier === "Bulletins"){ 
+					if(extension.toLowerCase() !== "pdf"){
+						afficher_alerte("Le fichier de bulletins doit être un fichier pdf.")
+						chargement(false)
+						//ne_rien_rendre()
+						return -1;
+					}
+
+					liste_destinataires = $("#attribution").serialize().split("&")
+					destinataire_par_page = {}
+					liste_destinataires.forEach(function(valeur,index){
+						numero_page = valeur.split("=")[0]
+						id_eleve = decodeURIComponent(valeur.split("=")[1])
+						if(destinataire_par_page[id_eleve]){
+							destinataire_par_page[id_eleve] = destinataire_par_page[id_eleve] +','+ numero_page
+						}else{
+							destinataire_par_page[id_eleve] = numero_page
+						}
+					})
+					destinataire_par_page = JSON.stringify(destinataire_par_page)
+					
+
+					periode_bulletin = $("[name='periode_bulletin']")[0].value
+
+					//console.log(destinataire_par_page)
+					//console.log(periode_bulletin)
+					envoyer_le_fichier(categorie_fichier,la_date_limite,lheure_limite,date_effet_fichier,heure_effet,le_coef,file.size, destinataire_par_page, periode_bulletin);               
+				//non bulletin
+				}else{
+					envoyer_le_fichier(categorie_fichier,la_date_limite,lheure_limite,date_effet_fichier,heure_effet,le_coef,file.size);               
+				}
+
+				
+                
 
             }
+
+
 
             fr.readAsDataURL(file);
 
 
         });
 
-        
+
+		$("#attribution").remove()
+		$("#trimestre").remove()
+
+        //au changement du fichier -> si bulletin -> on met la liste
+    	if(categorie_fichier === "Bulletins"){ 
+
+    		
+			if(extension.toLowerCase() !== "pdf"){
+				afficher_alerte("Le fichier de bulletins doit être un fichier pdf.")
+				chargement(false)
+				//ne_rien_rendre()
+				return -1;
+
+			
+			//un bulletin pdf	
+			}else{
+
+				nombre_de_pages_pdf = -1
+
+				//compter le nombre de pages du pdf -> créer les input utiles
+				var fr2 = new FileReader();
+	            fr2.onload = function(e) {
+
+	            	nombre_de_pages_pdf = 0
+	            	pdf = new Uint8Array(e.target.result)
+	            	try{
+	            		//nombre_de_pages_pdf = fr2.result.match(/\/Type[\s]*\/Page[^s]/g).length;
+	            		PDFJS.getDocument({data: pdf}).then(function(pdf) {
+				    		nombre_de_pages_pdf = pdf.pdfInfo.numPages
+				    		//console.log(nombre_de_pages_pdf)
+
+
+							//pour chaque page -> créer une liste
+							creer_attribution_page_eleve(nombre_de_pages_pdf,$("#mettre_fichier_en_ligne"))
+				    	})
+
+	            	}catch(e){
+	            		console.error(e)
+	            		alert("Impossible de détecter le nombre de pages du pdf : merci de réessayer avec un autre fichier.")
+	            		return 0
+	            	}
+	            }
+
+	            fr2.readAsArrayBuffer(file);
+
+			}
+		}
+
     });
 
 
@@ -4480,6 +4596,60 @@ $(function charger_fichiers(e){
 
 
 
+    function creer_attribution_page_eleve(nombre_pages, bouton_ok){
+
+
+    	
+
+
+    	toutes_les_classes = JSON.parse(recuperer('mes_matieres'))
+    	classe_chargee = toutes_les_classes.filter(e => e['ID_URL'] === recuperer('dossier_chargé'))[0]['Classe']
+    	url = racine_data + "Eleves?Classe=eq." + classe_chargee + "&" + apikey
+    	//console.log(url)
+    	liste_eleves = get_resultat(url)
+
+		//trier par order alphabetique du Identifiant
+		liste_eleves = liste_eleves.sort(function(a, b){
+		    if(a.Identifiant < b.Identifiant) { return -1; }
+		    if(a.Identifiant > b.Identifiant) { return 1; }
+		    return 0;
+		});
+
+
+    	//console.log(liste_eleves)
+
+
+    	select_liste_eleves = '<select style="width: 80%;" name="numero_page" id="numero_page">'
+    	select_liste_eleves = select_liste_eleves + creer_liste_eleves("--","--")
+    	liste_eleves.forEach(function(valeur,index){
+    		select_liste_eleves = select_liste_eleves + creer_liste_eleves(valeur['Identifiant'], valeur['Nom'] + " " + valeur['Prénom(s)'])
+    	})
+    	select_liste_eleves = select_liste_eleves + '</select>'
+    	//console.log(select_liste_eleves)
+
+
+    	attribution = '<form id="trimestre" style="text-align: end;"><b><label for="periode_bulletin">Trimestre:<select style="width: 80%;" name="periode_bulletin"><option value="PREMIER TRIMESTRE">PREMIER TRIMESTRE</option><option value="DEUXIEME TRIMESTRE">DEUXIEME TRIMESTRE</option><option value="TROISIEME TRIMESTRE">TROISIEME TRIMESTRE</option><option value="ANNUEL">ANNUEL</option></select></label></b></form>'
+    	attribution = attribution + '<form id="attribution" style="text-align: end;">'
+    	for (numero_page = 1 ; numero_page <= nombre_pages ; numero_page++){
+    		attribution = attribution + '<label for="'+numero_page+'">Page n°'+numero_page+':' + select_liste_eleves.replace(/"numero_page"/g,numero_page) + '</label>'
+    	}
+		attribution = attribution + '</form>'
+    	
+    	
+    	$(attribution).insertBefore(bouton_ok)
+
+    	//valeurs par défaut: numero_page-ème -> liste_eleves['Identifiant']
+    	for (numero_page = 1 ; numero_page <= nombre_pages ; numero_page++){
+    		$("#" + numero_page)[0].value = liste_eleves[numero_page-1]['Identifiant']
+    	}
+
+    	//console.log(attribution)
+
+    }
+
+    function creer_liste_eleves(identifiant_eleve,nom_complet_eleve){
+    	return '<option value="'+identifiant_eleve+'">'+nom_complet_eleve+'</option>'
+    }
 
 
     function afficher_choix_date(oui){
@@ -4491,7 +4661,7 @@ $(function charger_fichiers(e){
     	}
     }
 
-    function envoyer_le_fichier(categorie_fichier,la_date_limite,lheure_limite,date_effet_fichier,heure_effet,coefficient_rendu,taille_fichier){
+    function envoyer_le_fichier(categorie_fichier,la_date_limite,lheure_limite,date_effet_fichier,heure_effet,coefficient_rendu,taille_fichier,destinataire_par_page,periode_bulletin){
 
 	
 
@@ -4513,6 +4683,13 @@ $(function charger_fichiers(e){
 
 		html += '<input type="hidden" name="coefficient_rendu" value="'+ coefficient_rendu +'" >';
 		html += '<input type="hidden" name="taille_fichier" value="'+ taille_fichier +'" >';
+
+		console.log(destinataire_par_page)
+		console.log(periode_bulletin)
+		
+		html += '<input type="hidden" name="destinataire_par_page" value="'+ destinataire_par_page ? destinataire_par_page : "" +'" >';
+		html += '<input type="hidden" name="periode_bulletin" value="'+ periode_bulletin ? periode_bulletin : "" +'" >';
+
 
         html += '</form>';	                
         
@@ -4578,7 +4755,12 @@ $(function charger_fichiers(e){
 						"est_telechargeable" : est_telechargeable,
 
 						"coefficient_rendu" : coefficient_rendu,
-						"taille_fichier" : taille_fichier
+						"taille_fichier" : taille_fichier,
+
+
+						"destinataire_par_page" : destinataire_par_page,
+						"periode_bulletin" : periode_bulletin
+
 					}
 					ajouter_un_element("Fichiers",nouveau_fichier, data)
 
@@ -7394,7 +7576,7 @@ function rendre_td_modifiable(){
 		if (nest_pas_onglet_classes && (est_classe || est_classe_principale || est_classe_bis)){
 
 			//mini fenetre de checkbox
-			//avec ok (todo) et annuler
+			//avec ok et annuler
 			var les_matieres = JSON.parse(recuperer('Matieres'))
 			if (les_matieres === null){
 				rechercher_tout('Matieres').then(function(snapshot){
@@ -7699,7 +7881,7 @@ function supprimer_ligne_parameters(id_parametre){
 				supprimer_dossier(id_dossier, id_googlecalendar)
 
 
-				//SUPPRIMER LE PARENT SI JE VIENS DE SUPPRIMER LE DERNIER FILS (TODO)
+				//SUPPRIMER LE PARENT SI JE VIENS DE SUPPRIMER LE DERNIER FILS
 				nom_champ_parent = id_parametre === "Classes" ? 'cycle' : 'classe_id'
 				valeur_champ_parent = $(".selected")[0].children[$('[id="'+nom_champ_parent+'"]')[0].cellIndex].innerText
 				//console.log(valeur_champ_parent)
@@ -8308,3 +8490,207 @@ function vider_les_input(){
 }
 
 rendre_td_modifiable();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/********************************* GESTION BULLETINS ********************************/
+function afficher_bulletins(oui){
+	if(element_DOM('bulletin')) element_DOM('bulletin').style.display = oui ? "" : "none"
+	
+}
+
+function supprimer_bulle_bulletins(){
+	$("#bulletin")[0].parentNode.remove()
+	masquer_les_bulletins()
+}
+
+function masquer_les_bulletins(){
+	$("#titre_drive_bulletins")[0].style.display = "none"
+	$("#drive_bulletins")[0].style.display = "none"
+}
+
+
+function clic_bulletin(){
+
+
+	chargement(true)
+	if(recuperer('mon_type').includes('Administration')){
+		
+		afficher_ou_non_choix_fichier(true)
+		mode_bulletin(true)
+		chargement(false)
+
+
+	}else if(recuperer('mon_type').includes('Eleves')){
+		consulter_mon_bulletin(recuperer('identifiant_courant'))
+	}
+
+	/*
+
+	*/
+}
+
+
+/*NON UTILE*/
+function choisir_clic_bulletin(){
+
+	popup_choix = '<div id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img src="images/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Que voulez-vous faire?</div><select style="width: 80%;" id="choix_bulletin"><option value="upload">Mettre en ligne les bulletins</option><option value="voir">Voir les bulletins en ligne</option></select><button type="button" class="rendre" onclick="choix_bulletin_ok()">Valider</button></div>'
+	$('body').append(popup_choix) 
+}
+
+
+/*NON UTILE*/
+function choix_bulletin_ok(){
+	if($("#choix_bulletin")[0].value === "upload"){
+		afficher_ou_non_choix_fichier(true)
+		mode_bulletin(true)
+	}else if($("#choix_bulletin")[0].value === "voir"){
+		consulter_mon_bulletin()
+
+	}
+
+	$('#mini_popup').remove()
+
+}
+
+
+
+function consulter_mon_bulletin(identifiant_eleve){
+
+	motif = '*"'+identifiant_eleve+'"*'
+	if(!identifiant_eleve) motif = "*"
+
+	url = racine_data + 'Fichiers?categorie_fichier=eq.Bulletins&destinataire_par_page=like.'+motif + "&" +apikey
+	resultat_bulletins = get_resultat(url)
+	console.log(resultat_bulletins)
+
+	if(resultat_bulletins.length === 0){
+		alert("Aucun bulletin disponible à votre nom pour l'instant.")
+		chargement(false)
+	}else{
+
+
+		for (numero_bulletin = 0;numero_bulletin < resultat_bulletins.length ; numero_bulletin++){
+			id_fichier_bulletin = resultat_bulletins[numero_bulletin]['id_fichier']
+			mon_numero_page = Number(JSON.parse(resultat_bulletins[numero_bulletin]['destinataire_par_page'])[identifiant_eleve])
+
+			console.log(id_fichier_bulletin + ' à la page ' + mon_numero_page)
+			if(identifiant_eleve){
+				afficher_mon_bulletin(id_fichier_bulletin,mon_numero_page,identifiant_eleve)
+			}else{
+				afficher_mon_bulletin(id_fichier_bulletin,1)
+
+			}
+		}
+			
+
+
+		console.log(url)
+
+	}
+
+
+	return "Consultation terminée."
+}
+
+
+function mode_bulletin(oui){
+	if(oui){
+		$("#categorie_choisie")[0].value = "Bulletins"	
+		element_DOM("categorie_choisie").disabled = true;
+		element_DOM("choix_youtube").style.display = "none"
+		element_DOM("choix_date_effet").style.display = "none"
+		element_DOM("telechargeable").style.display = "none"
+		element_DOM("est_telechargeable").checked = true
+		element_DOM('file').setAttribute('accept','application/pdf')
+		element_DOM('choix_popup').setAttribute('style','visibility: visible;overflow-y: scroll;width: 500px;overflow-x: hidden;')
+		element_DOM("file").value = "";
+	}else{
+		$("#attribution").remove()
+		$("#trimestre").remove()
+
+		element_DOM("categorie_choisie").disabled = false; 	
+		element_DOM("choix_youtube").style.display = ""
+		element_DOM("choix_date_effet").style.display = ""
+		element_DOM("telechargeable").style.display = ""
+		element_DOM('file').removeAttribute("accept");
+		element_DOM('choix_popup').setAttribute('style','visibility: visible')
+
+	}
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+function afficher_mon_bulletin(id_fichier, numero_page,identifiant_eleve){
+	var url = 'https://www.googleapis.com/drive/v2/files/'+id_fichier+'?key=AIzaSyCeKD82BY1LHYdj-vRf1s79L7qlDH7lwgg&alt=media&source=downloadUrl'
+	PDFJS.getDocument(url).then(function(pdf){ 
+		//console.log(pdf)
+		//console.log(numero_page)
+
+		visualiser("nom_fichier", "", "",  "Bulletin " + identifiant_eleve||" ",true,true)
+		pdf.getPage(numero_page).then(function recuperer_page_utile(page) {
+			//console.log(page)
+			var scale = 2.5;
+			var viewport = page.getViewport(scale);
+
+			//
+			// Prepare canvas using PDF page dimensions
+			//
+			var canvas = document.getElementById('vizcanva');
+			var context = canvas.getContext('2d');
+			canvas.height = viewport.height;
+			canvas.width = viewport.width;
+
+			//
+			// Render PDF page into canvas context
+			//
+			var task = page.render({canvasContext: context, viewport: viewport})
+			task.promise.then(function(){
+				//console.log(canvas.toDataURL('image/png'));
+
+				element_DOM('previsualisation').setAttribute('style','overflow-y: scroll;height:0')
+				chargement(false)
+			}).catch(e=>console.error(e))
+	});
+	})
+
+
+}
+
+
+
+
+
+
