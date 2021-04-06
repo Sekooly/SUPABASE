@@ -150,6 +150,31 @@ function reinitialiser_unseul_mdp_datenotif(id_parametre, identifiant_a_init){
   return post_resultat_asynchrone(url, {["identifiant_" + id_parametre]:identifiant_a_init})
 }
 
+function nb_coms(id_topic){
+  lien = "rpc/nb_coms"
+
+  url = racine_data + lien + "?" + apikey + "&limit=2000"
+
+  //https://kqvbwkftfpyajpskbxsj.supabase.co/rest/v1/rpc/nb_coms?apikey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYwODE5ODc5MywiZXhwIjoxOTIzNzc0NzkzfQ.Dy91qut0tsSISyiWYlRh3UguSo3lzPYYQ12O_Txpbio&limit=2000
+  //console.log(url)
+  data = '{"valeur_id_topic":'+id_topic+'}'
+  //console.log(data)
+  resultat = post_resultat_synchrone(url,data)
+  return Number(resultat.slice(resultat.indexOf('[') +1,resultat.indexOf(']')));
+}
+
+
+function post_resultat_synchrone(url,data){
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "POST", url, false ); // false for synchronous request
+    data_json = data
+    xmlHttp.setRequestHeader("Content-Type","application/json") 
+    xmlHttp.send( data_json );
+    
+    return xmlHttp.response;  
+
+}
+
 
 
 function reinitialiser_mdp_datenotif(){
@@ -403,6 +428,8 @@ function get_resultat_brut(url){
     xmlHttp.send( null );
     return xmlHttp.responseText;  
 }
+
+
 
 
 function get_resultat_asynchrone(url){

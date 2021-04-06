@@ -4988,7 +4988,7 @@ $(function charger_fichiers(e){
 
 
 			nom_table = "Topic"
-			nb_com = Number(recuperer("nb_com_actuel")) +1
+			nb_com = nb_coms(id_topic) // Number(recuperer("nb_com_actuel")) +1
 			stocker("nb_com_actuel",nb_com)
 			date_heure_actuelle = maintenant()
 			nouveau_com = {
@@ -5376,6 +5376,13 @@ $(function charger_fichiers(e){
 			les_coms = Object.keys(les_coms).map(i => les_coms[i])
 			/*/console.log('Il y a '  + les_coms.length + ' commentaires');
 			console.log(les_coms);*/
+
+			//on trie dans l'ordre croissant de Horodateur
+			les_coms = les_coms.sort(function tri_ordre_chrono_croissant(a, b) {
+				//return moment(b.Horodateur, "DD/MM/YYYY HH:mm:ss")  - moment(a.Horodateur, "DD/MM/YYYY HH:mm:ss")
+				return convertir_en_date(a.Horodateur) - convertir_en_date(b.Horodateur)
+			});
+			//console.log(les_coms)
 
 
 			les_coms.forEach(function(valeur){
