@@ -155,7 +155,6 @@ function nb_coms(id_topic){
 
   url = racine_data + lien + "?" + apikey + "&limit=2000"
 
-  //https://kqvbwkftfpyajpskbxsj.supabase.co/rest/v1/rpc/nb_coms?apikey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYwODE5ODc5MywiZXhwIjoxOTIzNzc0NzkzfQ.Dy91qut0tsSISyiWYlRh3UguSo3lzPYYQ12O_Txpbio&limit=2000
   //console.log(url)
   data = '{"valeur_id_topic":'+id_topic+'}'
   //console.log(data)
