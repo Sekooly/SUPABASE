@@ -1,7 +1,7 @@
-const identifiant = document.getElementById('Identifiant')
-const code = document.getElementById('Code')
-const remarque = document.getElementById('remarque')
-const connect = document.getElementById('connect')
+var identifiant = document.getElementById('Identifiant')
+var code = document.getElementById('Code')
+var remarque = document.getElementById('remarque')
+var connect = document.getElementById('connect')
 
 
 
