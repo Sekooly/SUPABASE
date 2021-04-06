@@ -2332,7 +2332,7 @@ function ajout_dossiers_matieres(mes_matieres){
 
 			var ma_classe = arrayItem.Classe;
 		    var ma_matiere = arrayItem.Matiere;
-		    var couleur_matiere = "images/img_dossier_" + arrayItem.Couleur_matiere.replace(/ /g,"") + ".png" 
+		    var couleur_matiere = "https://sekooly.github.io/SUPABASE/images/img_dossier_" + arrayItem.Couleur_matiere.replace(/ /g,"") + ".png" 
 
 		    if (ma_classe !==undefined && ma_matiere !== undefined){
 				
@@ -2467,7 +2467,7 @@ function creer_span_div(mon_div,URL_classe_matiere,la_classe,la_matiere,couleur_
 	if(recuperer('mon_type') !== "Administration"){
 		var icone = couleur_dossier;
 	}else{
-		var icone = "images/dossier_drive.png";
+		var icone = "https://sekooly.github.io/SUPABASE/images/dossier_drive.png";
 	}
 
 
@@ -2848,7 +2848,7 @@ function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,d
 
 
 
-	var image_fichier = "images/img_icone_" + extension_fichier + ".png";
+	var image_fichier = "https://sekooly.github.io/SUPABASE/images/img_icone_" + extension_fichier + ".png";
 	
 	//console.log("on va ajouter " + nom_fichier + " dans " + nom_drive);
 
@@ -2875,7 +2875,7 @@ function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,d
 	$('#' + id_fichier + ' .un_fichier').on("error",function(e){
 
 		console.log("on a une erreur " + JSON.stringify(e));
-		$('#' + id_fichier + ' .un_fichier').attr("src","images/img_fichier.png");
+		$('#' + id_fichier + ' .un_fichier').attr("src","https://sekooly.github.io/SUPABASE/images/img_fichier.png");
 		//console.log("on a changé sa source");
 	});
 
@@ -3663,10 +3663,10 @@ function quitter_previsualisation(){
 
 function initialisation_bouton(bis){
 	
-	element_DOM('pleinecran' + (bis ? "_bis" : "")).src ="images/img_pleinecran.png";
+	element_DOM('pleinecran' + (bis ? "_bis" : "")).src ="https://sekooly.github.io/SUPABASE/images/img_pleinecran.png";
 
 	//si déjà plein écran alors on change l'icône
-	if (element_DOM('fenetre' + (bis ? "_bis" : "")).style.width=== "99%") element_DOM('pleinecran' + (bis ? "_bis" : "")).src ="images/img_petitecran.png";
+	if (element_DOM('fenetre' + (bis ? "_bis" : "")).style.width=== "99%") element_DOM('pleinecran' + (bis ? "_bis" : "")).src ="https://sekooly.github.io/SUPABASE/images/img_petitecran.png";
 	
 
 }
@@ -3676,13 +3676,13 @@ function switch_mode(forcing){
 
 	if(!element_DOM('pleinecran')) return -1;
 
-	var est_plein_ecran = (element_DOM('pleinecran').src.includes("images/img_pleinecran.png"));
+	var est_plein_ecran = (element_DOM('pleinecran').src.includes("https://sekooly.github.io/SUPABASE/images/img_pleinecran.png"));
 
 	//console.log('est_plein_ecran: ' + est_plein_ecran);
 	
 	if (est_plein_ecran || forcing){
 
-		element_DOM('pleinecran').src ="images/img_petitecran.png";
+		element_DOM('pleinecran').src ="https://sekooly.github.io/SUPABASE/images/img_petitecran.png";
 
 		//bcp + de top et de left
 		element_DOM('fenetre').style.top = 0;
@@ -3694,7 +3694,7 @@ function switch_mode(forcing){
 
 	}else{
 
-		element_DOM('pleinecran').src ="images/img_pleinecran.png";
+		element_DOM('pleinecran').src ="https://sekooly.github.io/SUPABASE/images/img_pleinecran.png";
 		
 		//on reset tout le style
 		element_DOM('fenetre').style.top ="";
@@ -3717,13 +3717,13 @@ function switch_mode_bis(forcing){
 
 	if(!element_DOM('pleinecran_bis')) return -1;
 
-	var est_plein_ecran = (element_DOM('pleinecran_bis').src.includes("images/img_pleinecran.png"));
+	var est_plein_ecran = (element_DOM('pleinecran_bis').src.includes("https://sekooly.github.io/SUPABASE/images/img_pleinecran.png"));
 
 	//console.log('est_plein_ecran: ' + est_plein_ecran);
 	
 	if (est_plein_ecran || forcing){
 
-		element_DOM('pleinecran_bis').src ="images/img_petitecran.png";
+		element_DOM('pleinecran_bis').src ="https://sekooly.github.io/SUPABASE/images/img_petitecran.png";
 
 		//bcp + de top et de left
 		element_DOM('fenetre_bis').style.top = 0;
@@ -3735,7 +3735,7 @@ function switch_mode_bis(forcing){
 
 	}else{
 
-		element_DOM('pleinecran_bis').src ="images/img_pleinecran.png";
+		element_DOM('pleinecran_bis').src ="https://sekooly.github.io/SUPABASE/images/img_pleinecran.png";
 		
 		//on reset tout le style
 		element_DOM('fenetre_bis').style.top ="";
@@ -6105,9 +6105,9 @@ function changer_couleur_temporairement(id_element,class_element,couleur_clignot
 
 
 function choix_image(type_notif){
-	return type_notif==="fichier" ? "images/img_ajout.svg"
-	: type_notif==="discussion" || type_notif==="commentaire" ? "images/question.png"
-	: type_notif==="devoir" ? "images/img_devoirs.svg" : "";
+	return type_notif==="fichier" ? "https://sekooly.github.io/SUPABASE/images/img_ajout.svg"
+	: type_notif==="discussion" || type_notif==="commentaire" ? "https://sekooly.github.io/SUPABASE/images/question.png"
+	: type_notif==="devoir" ? "https://sekooly.github.io/SUPABASE/images/img_devoirs.svg" : "";
 }
 
 function contenu_notification(type_notif,la_matiere_concernee,la_classe_concernee,Identifiant_originaire,Identifiant_derniere_modif){
