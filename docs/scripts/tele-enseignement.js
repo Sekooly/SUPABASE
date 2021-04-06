@@ -2141,7 +2141,7 @@ function chargement_a_larrivee(){
 
 	afficher_bulletins(false)
 	if(recuperer('mon_type').includes('Eleve')) afficher_bulletins(true)
-	
+	if(recuperer('mon_type').includes('Prof')) supprimer_bulle_bulletins()
 
 	afficher_params_si_droits_et_admin()
 
@@ -8522,7 +8522,7 @@ function afficher_bulletins(oui){
 }
 
 function supprimer_bulle_bulletins(){
-	$("#bulletin")[0].parentNode.remove()
+	if($("#bulletin")[0]) $("#bulletin")[0].parentNode.remove()
 	masquer_les_bulletins()
 }
 
