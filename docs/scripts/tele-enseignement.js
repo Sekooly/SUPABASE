@@ -3445,13 +3445,13 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 		
 	afficher_fenetre(true);
 
-	console.log(mode_extrait_png)
+	//console.log(mode_extrait_png)
 	//on ajoute le bouton télécharger sauf en cas de PAS DE TELECHARGENEMTN
 	var bouton_télécharger = mode_extrait_png ? '<a id="telechargement" style="position: fixed;z-index:3;" download="Bulletin.png" onclick="telecharger_canvas()"><img style="width: 30px; cursor: pointer;position:fixed;" id="'+ id_fichier+ '" src="images/img_download.png"></a>' :
 							pas_de_telechargement ? '' :
 							'<a id="telechargement" style="position: fixed;z-index:3;" href = "https://drive.google.com/uc?export=download&id=' + id_fichier +'"><img style="width: 30px; cursor: pointer;position:fixed;" id="'+ id_fichier+ '" src="images/img_download.png"></a>';
 
-	console.log(bouton_télécharger)
+	//console.log(bouton_télécharger)
 	//on le met dans l'en-tête
 	var a_ajouter = document.createElement('div');
 	a_ajouter.innerHTML = bouton_télécharger;
@@ -8585,9 +8585,11 @@ function consulter_mon_bulletin(identifiant_eleve){
 	motif = '*"'+identifiant_eleve+'"*'
 	if(!identifiant_eleve) motif = "*"
 
+
 	url = racine_data + 'Fichiers?categorie_fichier=eq.Bulletins&destinataire_par_page=like.'+motif + "&" +apikey
+	//console.log(url)
 	resultat_bulletins = get_resultat(url)
-	console.log(resultat_bulletins)
+	//console.log(resultat_bulletins)
 
 	if(resultat_bulletins.length === 0){
 		alert("Aucun bulletin disponible à votre nom pour l'instant.")
@@ -8599,7 +8601,7 @@ function consulter_mon_bulletin(identifiant_eleve){
 			id_fichier_bulletin = resultat_bulletins[numero_bulletin]['id_fichier']
 			mon_numero_page = Number(JSON.parse(resultat_bulletins[numero_bulletin]['destinataire_par_page'])[identifiant_eleve])
 
-			console.log(id_fichier_bulletin + ' à la page ' + mon_numero_page)
+			//console.log(id_fichier_bulletin + ' à la page ' + mon_numero_page)
 			if(identifiant_eleve){
 				afficher_mon_bulletin(id_fichier_bulletin,mon_numero_page,identifiant_eleve)
 			}else{
@@ -8610,9 +8612,9 @@ function consulter_mon_bulletin(identifiant_eleve){
 			
 
 
-		console.log(url)
-
+		//console.log(url)	
 	}
+
 
 
 	return "Consultation terminée."
@@ -8626,10 +8628,13 @@ function mode_bulletin(oui){
 		element_DOM("choix_youtube").style.display = "none"
 		element_DOM("choix_date_effet").style.display = "none"
 		element_DOM("telechargeable").style.display = "none"
-		element_DOM("est_telechargeable").checked = true
+		element_DOM("est_telechargeable").checked = false
 		element_DOM('file').setAttribute('accept','application/pdf')
 		element_DOM('choix_popup').setAttribute('style','visibility: visible;overflow-y: scroll;width: 500px;overflow-x: hidden;')
 		element_DOM("file").value = "";
+		$("[value='Bulletins']")[0].style.display = ""
+
+
 	}else{
 		$("#attribution").remove()
 		$("#trimestre").remove()
@@ -8638,9 +8643,10 @@ function mode_bulletin(oui){
 		element_DOM("choix_youtube").style.display = ""
 		element_DOM("choix_date_effet").style.display = ""
 		element_DOM("telechargeable").style.display = ""
+		element_DOM("est_telechargeable").checked = true
 		element_DOM('file').removeAttribute("accept");
 		element_DOM('choix_popup').setAttribute('style','visibility: visible')
-
+		$("[value='Bulletins']")[0].style.display = "none"
 	}
 	
 }
@@ -8676,6 +8682,9 @@ function afficher_mon_bulletin(id_fichier, numero_page,identifiant_eleve){
 			canvas.height = viewport.height;
 			canvas.width = viewport.width;
 
+			//no right click
+			$("#vizcanva"). on("contextmenu",function(e){ return false; })
+
 			//
 			// Render PDF page into canvas context
 			//
@@ -8698,9 +8707,22 @@ function afficher_mon_bulletin(id_fichier, numero_page,identifiant_eleve){
 
 
 function telecharger_canvas(){
-  var link = document.createElement('a');
-  link.download = 'Bulletin.png';
-  link.href = document.getElementById('vizcanva').toDataURL()
-  link.click();
-  link.remove()
+	identifiant_eleve = recuperer("identifiant_courant")
+	url = racine_data + "Eleves" + "?Identifiant=eq." + identifiant_eleve + "&" +apikey
+	//console.log(url)
+	mon_ecolage_ok = get_resultat(url)[0]["Ecolage_OK"] === "oui"
+
+	
+
+	if(mon_ecolage_ok){
+		var link = document.createElement('a');
+		link.download = 'Bulletin-'+ identifiant_eleve+'.png';
+		link.href = document.getElementById('vizcanva').toDataURL()
+		link.click();
+		link.remove()
+	}else{
+		alert("Vous devez régulariser vos frais de scolarité pour accéder à votre bulletin complet.")
+	}
+
+
 }

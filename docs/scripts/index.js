@@ -165,7 +165,8 @@ function bon_mdp(snapshot){
 
 function bon_ecolage(snapshot){
   var le_resultat = renvoyer_resultat(snapshot)
-  return le_resultat["Ecolage_OK"] === "oui"
+  ///return le_resultat["Ecolage_OK"] === "oui"
+  return true
 }
 
 function recuperer_donnee(snapshot, nom_donnee){
