@@ -3445,10 +3445,13 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 		
 	afficher_fenetre(true);
 
-
+	console.log(mode_extrait_png)
 	//on ajoute le bouton télécharger sauf en cas de PAS DE TELECHARGENEMTN
-	var bouton_télécharger = pas_de_telechargement ? '' : '<a id="telechargement" style="position: fixed;z-index:3;" href = "https://drive.google.com/uc?export=download&id=' + id_fichier +'"><img style="width: 30px; cursor: pointer;position:fixed;" id="'+ id_fichier+ '" src="images/img_download.png"></a>';
+	var bouton_télécharger = mode_extrait_png ? '<a id="telechargement" style="position: fixed;z-index:3;" download="Bulletin.png" onclick="telecharger_canvas()"><img style="width: 30px; cursor: pointer;position:fixed;" id="'+ id_fichier+ '" src="images/img_download.png"></a>' :
+							pas_de_telechargement ? '' :
+							'<a id="telechargement" style="position: fixed;z-index:3;" href = "https://drive.google.com/uc?export=download&id=' + id_fichier +'"><img style="width: 30px; cursor: pointer;position:fixed;" id="'+ id_fichier+ '" src="images/img_download.png"></a>';
 
+	console.log(bouton_télécharger)
 	//on le met dans l'en-tête
 	var a_ajouter = document.createElement('div');
 	a_ajouter.innerHTML = bouton_télécharger;
@@ -8694,3 +8697,10 @@ function afficher_mon_bulletin(id_fichier, numero_page,identifiant_eleve){
 
 
 
+function telecharger_canvas(){
+  var link = document.createElement('a');
+  link.download = 'Bulletin.png';
+  link.href = document.getElementById('vizcanva').toDataURL()
+  link.click();
+  link.remove()
+}
