@@ -3512,7 +3512,7 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 
 	//une page de pdf
 	}else if(mode_extrait_png){
-		
+
 		//console.log("ici")
 		var le_inner_html = '<canvas id="vizcanva"> </canvas>'
 		element_DOM('previsualisation').innerHTML = le_inner_html
@@ -8701,8 +8701,7 @@ function afficher_mon_bulletin(id_fichier, numero_page,identifiant_eleve){
 			var task = page.render({canvasContext: context, viewport: viewport})
 			task.promise.then(function(){
 				//console.log(canvas.toDataURL('image/png'));
-
-				element_DOM('previsualisation').setAttribute('style','overflow-y: scroll;height:0')
+				element_DOM('previsualisation').setAttribute('style','overflow: scroll;height:60%')
 				chargement(false)
 			}).catch(e=>console.error(e))
 	});
