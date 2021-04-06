@@ -332,18 +332,6 @@ function actualiser_remarque(valeur_remarque, ma_classe, mon_type){
 }
 
 
-
-function recuperer_contact_etablissement(){
-  /*const requete = firebase.database().ref(nom_etablissement+"/Contact")
-  return retour_promise(requete)*/
-  hey = function(){
-    return ""
-  }
-  return new Promise(hey)
-}
-
-
-
 function initialisation(){
   chargement(false)
   actualiser_remarque("")
@@ -373,22 +361,14 @@ function sur_valider_se_connecter(){
 }
 
 function mettre_le_contact_etablissement(){
-  var le_contact = recuperer('contact_etablissement')
-
-  if (le_contact === null || le_contact === "null" || le_contact === undefined || le_contact === ""){
-    recuperer_contact_etablissement().then(snapshot => {
-      le_contact = snapshot      
-      $("#contact_etablissement")[0].href = "mailto:"+le_contact
-      $("#contact_etablissement")[0].innerText = le_contact
-      stocker('contact_etablissement',le_contact)
-    })
-  }
-
-
+  var le_contact = contact_etablissement
+  
   $("#contact_etablissement")[0].href = "mailto:"+le_contact
   $("#contact_etablissement")[0].innerText = le_contact
   stocker('contact_etablissement',le_contact)
 
+  $("#logo_etablissement")[0].src = "images/" + nom_fichier_logo
+  $("#site_etablissement")[0].href = site_etablissement
 }
 
 

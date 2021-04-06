@@ -17,6 +17,9 @@ if(data_etablissement) data_etablissement = data_etablissement[0]
 var racine_data = data_etablissement["racine_data"] 
 //console.log(racine_data)
 var apikey = "apikey=" + data_etablissement["apikey"]
+var contact_etablissement = data_etablissement["contact_etablissement"]
+var nom_fichier_logo =  data_etablissement["nom_fichier_logo"]
+var site_etablissement =  data_etablissement["site_etablissement"]
 //console.log(apikey)
 
 
