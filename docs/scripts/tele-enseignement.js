@@ -2107,6 +2107,7 @@ function check_maintenance(){
 function chargement_a_larrivee(){
 	
 	chargement(true);
+	mettre_le_contact_etablissement()
 
 	//todo : pas de lien sur l'alerte pour les primaires
 	var mon_cycle = JSON.parse(recuperer('mes_donnees'))['Cycle'];

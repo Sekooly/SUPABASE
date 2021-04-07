@@ -360,16 +360,6 @@ function sur_valider_se_connecter(){
 
 }
 
-function mettre_le_contact_etablissement(){
-  var le_contact = contact_etablissement
-  
-  $("#contact_etablissement")[0].href = "mailto:"+le_contact
-  $("#contact_etablissement")[0].innerText = le_contact
-  stocker('contact_etablissement',le_contact)
-
-  $("#logo_etablissement")[0].src = "https://sekooly.github.io/SUPABASE/images/" + nom_fichier_logo
-  $("#site_etablissement")[0].href = site_etablissement
-}
 
 
 

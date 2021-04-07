@@ -8,6 +8,24 @@ function se_deconnecter(){
   */
 }
 
+function mettre_le_contact_etablissement(){
+  var le_contact = contact_etablissement
+  
+  if($("#contact_etablissement")[0]){
+
+
+    $("#contact_etablissement")[0].href = "mailto:"+le_contact
+    $("#contact_etablissement")[0].innerText = le_contact
+    stocker('contact_etablissement',le_contact)
+  }
+
+
+  if($("#logo_etablissement")[0]) $("#logo_etablissement")[0].src = "https://sekooly.github.io/SUPABASE/images/" + nom_fichier_logo
+  if($("#site_etablissement")[0]) $("#site_etablissement")[0].href = site_etablissement
+}
+
+
+
 
 window.onbeforeunload = function() {
    se_deconnecter()
