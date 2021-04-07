@@ -7956,7 +7956,7 @@ function supprimer_ligne_parameters(id_parametre){
 
 							// on va supprimer le cycle dans la base -> on supprime le cycle sur le stockage
 							if(nom_table_parent === "ID_RENDUS"){
-								id_dossier_cycle = get_resultat(racine_data + "ID_RENDUS?Cycle=eq.Cycle_Test&" +apikey)[0]['id_dossier_cycle']
+								id_dossier_cycle = get_resultat(racine_data + "ID_RENDUS?Cycle=eq."+valeur_champ_parent+"&" +apikey)[0]['id_dossier_cycle']
 								console.log("on va supprimer le cycle: " + id_dossier_cycle)
 								if(id_dossier_cycle) supprimer_dossier(id_dossier_cycle)
 							}
