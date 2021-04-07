@@ -7,7 +7,7 @@ var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","UR
 
 var elements_menu_haut_avec_modifs = ["Classes","Matieres","Eleves","Profs","Administration"]
 var elements_menu_haut_avec_reset = ["Eleves","Profs","Administration"]
-
+nom_etablissement = data_etablissement['nom_etablissement']
 
 
 /*********************** CONSEIL DE CLASSE ***********************************/
@@ -8343,8 +8343,7 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 
 
 		
-
-		var param_nom_etablissement = data_etablissement['nom_etablissement'] ? "?nom_etablissement=" + data_etablissement['nom_etablissement'] : ""
+		var param_nom_etablissement = nom_etablissement ? "?nom_etablissement=" + nom_etablissement : ""
 		var param_nom_cycle = nom_cycle ? "&nom_cycle=" + nom_cycle : ""
 		var param_nom_classe = nom_classe ? "&nom_classe=" + nom_classe : ""
 		var param_nom_matiere = nom_matiere ? "&nom_matiere=" + nom_matiere : ""
