@@ -8370,7 +8370,8 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 		lien_script = lien_script +  param_initier
 
 
-		//console.log(lien_script)
+		console.log(lien_script)
+		//return 0
 		chargement(true)
 		var les_ids_recus= get_resultat(lien_script)
 		
