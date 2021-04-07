@@ -8304,24 +8304,31 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 	//interdire l'ajout si la classe OU la matière existe déjà
 	if(id_parametre === "Classes"){
 		var donnees_classes = JSON.parse(recuperer('Classes'))
-		var existence_classe = donnees_classes.some(e => {
-			if (e) return e['Classe'] === nom_classe && e['cycle'] === nom_cycle
-		})
-		
-		if(existence_classe ){
-			alert("Cette classe existe déjà dans ce cycle.")
-			return -1;
+		if(donnees_classes  !== null){
+
+			var existence_classe = donnees_classes.some(e => {
+				if (e) return e['Classe'] === nom_classe && e['cycle'] === nom_cycle
+			})	
+
+			if(existence_classe ){
+				alert("Cette classe existe déjà dans ce cycle.")
+				return -1;
+			}
 		}
 
 	}else if(id_parametre === "Matieres"){
 		var donnees_matieres = JSON.parse(recuperer('Matieres'))
-		var existence_matiere = donnees_matieres.some(e => {
-			if(e) return e['Classe'] === nom_classe && e['Matiere'] === nom_matiere+')'
-		})
-		
-		if(existence_matiere ){
-			alert("Cette matière existe déjà.")
-			return -1;
+
+		if(donnees_matieres !== null){
+			var existence_matiere = donnees_matieres.some(e => {
+				if(e) return e['Classe'] === nom_classe && e['Matiere'] === nom_matiere+')'
+			})
+			
+			if(existence_matiere ){
+				alert("Cette matière existe déjà.")
+				return -1;
+			}
+
 		}
 
 	}
@@ -8342,7 +8349,7 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 		}
 
 
-		
+
 		var param_nom_etablissement = nom_etablissement ? "?nom_etablissement=" + nom_etablissement : ""
 		var param_nom_cycle = nom_cycle ? "&nom_cycle=" + nom_cycle : ""
 		var param_nom_classe = nom_classe ? "&nom_classe=" + nom_classe : ""
