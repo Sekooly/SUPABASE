@@ -177,6 +177,19 @@ function recuperer_donnee(snapshot, nom_donnee){
 }
 
 
+function rechercher_dans_gestionnaire(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher, nombrelimite){
+
+  url = racine_initiale + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+api_initial + ordonner(nom_table)
+  url = nom_champ_a_chercher ? url+"&select="+nom_champ_a_chercher : url
+  url = nombrelimite ? url+"&limit="+nombrelimite : url
+  
+  return get_resultat_asynchrone(url)
+
+
+}
+
+
+
 function recuperer_mes_donnees(snapshot){
 
   var le_resultat = renvoyer_resultat(snapshot)
