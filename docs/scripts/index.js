@@ -215,7 +215,7 @@ function recuperer_mes_donnees(snapshot){
 
 
     //API UTILES
-    rechercher("API", "id", "1").then(snap => {
+    rechercher_dans_gestionnaire("API", "id", "1").then(snap => {
       les_API = renvoyer_resultat(snap)
 
       //console.log(les_API['API_KEY_DEVOIR'])
