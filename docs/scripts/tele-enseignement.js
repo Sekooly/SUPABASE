@@ -641,6 +641,22 @@ function recuperer_mon_devoir(id_fichier_sujetdevoir,proprietaire,examen_termin�
 				element_DOM('rendu_devoir').appendChild(mon_devoir_rendu.firstChild);
 
 
+
+				//récupérer la note si coef > 0
+				note_rendu = donnees_initiales['note_rendu']
+				console.log(note_rendu)
+				if(note_rendu !== null){
+
+					$("#note_rendu").remove();
+					remarque = decodeURIComponent(remarque)
+
+					var remarque_innerHTML ='<div id="note_rendu" style="text-align: justify;padding: 2%;"><b style="color: #cc3a22;">Note attribuée:</b><br>'+note_rendu+'</div>';
+					var remarque_div = document.createElement('div');
+					remarque_div.innerHTML = remarque_innerHTML;
+					element_DOM('rendu_devoir').appendChild(remarque_div.firstChild);
+
+				}
+
 				//récupérer la remarque du prof
 				if(remarque.length>0){
 
@@ -755,10 +771,13 @@ function afficher_rendus_devoirs(resultats){
 
 		var titre = rfc3986EncodeURIComponent(resultats[i]["nom_fichier"].trim());
 		var nom_proprio_devoir = ' (' + resultats[i]["proprietaire"].trim().toUpperCase() + ')';
-
+		console.log(resultats[i])
+		var coefficient_rendu = resultats[i]["coefficient_rendu"]
+		var note_rendu = resultats[i]["note_rendu"]
+		
 		un_devoir_rendu.innerHTML += '<img id="mini-image" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" onclick="visualiser(\''+ titre + '\',\'' + un_devoir_rendu.id +'\', \'' + nom_proprio_devoir + '\')">';
 
-		un_devoir_rendu.innerHTML += '<img id="mini-image" class="envoi_remarque" onclick="mettre_remarque_devoir(this,\'' + remarque +'\');" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png">';
+		un_devoir_rendu.innerHTML += '<img id="mini-image" class="envoi_remarque" onclick="mettre_remarque_devoir(this,\'' + remarque +'\',' + coefficient_rendu +','+ note_rendu + ');" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png">';
 
 		un_devoir_rendu.innerHTML += '<a id="telechargement" href = "https://drive.google.com/uc?export=download&id=' + un_devoir_rendu.id +'" download="mon_fichier.txt"><img id="mini-image" src="https://sekooly.github.io/SUPABASE/images/img_download.png"></a>';
 		
@@ -783,54 +802,109 @@ function afficher_rendus_devoirs(resultats){
 }
 
 
-function mettre_remarque_devoir(ceci,remarque){
+function mettre_remarque_et_note(id_fichier, remarque,coefficient_rendu,note_rendu){
+	/*
+	console.log(remarque)
+	console.log(coefficient_rendu)
+	console.log(note_rendu)*/
+	
+
+
+	$("#remarque_et_note").remove()
+	html_a_ajouter = fenetre_remarque_note(id_fichier, note_rendu ? note_rendu : 0, remarque)
+
+	//console.log(html_a_ajouter)
+	$("body").append(html_a_ajouter)
+
+
+	//si pas de coefficient, on enleve note
+	if(Number(coefficient_rendu) === 0){
+		$("#champ_note").remove()		
+	}
+
+
+	//au clic de envoyer -> on poursuit
+	$("#envoyer_note").on('click',function(e){
+
+		if(Number(coefficient_rendu) > 0) note_rendu = $("#note_rendu")[0].value
+		remarque_prof = $("#remarque")[0].value
+
+		//alert("on a cliqué!" + note_rendu + " et "  + remarque_prof)
+		$('#remarque_et_note').remove()
+
+		//si pas de note -> on met null
+		chargement(true);
+
+		
+		remarque_prof = encodeURIComponent(remarque_prof);
+		nom_table = "Rendus"
+		nom_champ_reference = "id_fichier"
+		valeur_champ_reference = id_fichier
+
+		if(Number(coefficient_rendu) > 0){
+			nouvelle_remarque = {
+				"note_rendu": note_rendu,
+				"remarque": remarque_prof
+			}
+
+		}else{
+
+		}
+
+		actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouvelle_remarque)
+
+
+		if (remarque_prof.length > 0){
+			
+			nouvelles_donnees_notif = {
+				"Date_derniere_modif": maintenant(),
+				"Identifiant_derniere_modif": recuperer('identifiant_courant'),
+				"Role_derniere_modif": mon_role,
+			}
+
+			var valeur_proprio_devoir = $("#proprietaire"+id_fichier)[0].innerText
+			var id_notif = $("#devoir_choisi")[0].value+"-"+ valeur_proprio_devoir.trim().toLowerCase().replace(".","")
+			console.log(nouvelles_donnees_notif)
+			console.log(id_notif)
+			actualiser("Notifs", "id_notif", id_notif, nouvelles_donnees_notif)
+		}
+			
+
+
+		//au bout de 2 secondes
+		setTimeout(function(){
+			recuperer_mon_devoir(element_DOM('devoir_choisi').value);
+		}, 2000);
+		
+		
+		chargement(false)
+
+
+
+	})
+
+
+	
+}
+
+
+function fenetre_remarque_note(id_fichier, note_rendu, remarque){
+	nom_proprio_devoir = $("#proprietaire" + id_fichier)[0].innerText
+	
+
+	return '<div class="ma_fenetre" id="remarque_et_note" style="visibility: visible;height: 33%;width: 280px;height: 300px;top: 35%;left: 10%;"><b style="text-align: center;"><div id="titre_fenetre" class="">Note et remarque de ELEVE </div></b><span style=""><form id="mon_formulaire" autocomplete="off" style="padding: 0% 3% 0% 3%;height:82%;overflow-y: auto;">	<div id="champ_note"><label id="label" for="note_rendu">Note (sur 20)</label><input type="text" id="note_rendu" maxlength="2" style="width: 100%;" value="'+note_rendu+'"></div><br><label id="label" for="remarque">Votre remarque</label><textarea id="remarque" maxlength="300" style="width: 100%;resize: none;font-size: 13px;height: 50%;">'+remarque+'</textarea><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button type="button" id="Annuler" onclick="$(\'#remarque_et_note\').remove()"> Annuler </button><button type="button" id="envoyer_note">Valider</button></div></form></span></div>'
+	//return '<div></div>'
+}
+
+function mettre_remarque_devoir(ceci,remarque,coefficient_rendu, note_rendu){
 
 	var remarque_decoodee = remarque.replace(/&quot;/g, "\"");	
 	remarque_decoodee = decodeURIComponent(remarque_decoodee);			
 
 	var id_fichier = ceci.parentNode.id;
 	var id_prof =recuperer('identifiant_courant');
-	var remarque_prof = prompt("Votre remarque pour ce devoir: ",remarque_decoodee);
+	var remarque_note_prof= mettre_remarque_et_note(id_fichier,remarque_decoodee,coefficient_rendu,note_rendu) //prompt("Votre remarque pour ce devoir: ",remarque_decoodee);
 	
-	if(remarque_prof===null) return -1;
-
-	chargement(true);
-
-	remarque_prof = encodeURIComponent(remarque_prof);
-	nom_table = "Rendus"
-	nom_champ_reference = "id_fichier"
-	valeur_champ_reference = id_fichier
-	nouvelle_remarque = {
-		"remarque": remarque_prof
-	}
-	actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouvelle_remarque)
-
-
-	if (remarque_prof.length > 0){
-		
-		nouvelles_donnees_notif = {
-			"Date_derniere_modif": maintenant(),
-			"Identifiant_derniere_modif": recuperer('identifiant_courant'),
-			"Role_derniere_modif": mon_role,
-		}
-
-		var valeur_proprio_devoir = $("#proprietaire"+id_fichier)[0].innerText
-		var id_notif = $("#devoir_choisi")[0].value+"-"+ valeur_proprio_devoir.trim().toLowerCase().replace(".","")
-		console.log(nouvelles_donnees_notif)
-		console.log(id_notif)
-		actualiser("Notifs", "id_notif", id_notif, nouvelles_donnees_notif)
-	}
-		
-
-
-	//au bout de 2 secondes
-	setTimeout(function(){
-		recuperer_mon_devoir(element_DOM('devoir_choisi').value);
-	}, 2000);
-	
-	
-	chargement(false)
-
 
 
 }
