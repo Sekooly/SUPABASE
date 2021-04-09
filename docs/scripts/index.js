@@ -346,6 +346,13 @@ function actualiser_remarque(valeur_remarque, ma_classe, mon_type){
 
 
 function initialisation(){
+
+  plateforme_prete = get_resultat_brut(racine_data)
+
+  //si plateforme_prete = faux -> initialisation
+  
+  //sinon -> normal
+
   chargement(false)
   actualiser_remarque("")
   sans_donnees_initiales()
