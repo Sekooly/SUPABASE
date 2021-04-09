@@ -7710,6 +7710,12 @@ function suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur){
 		}
 
 
+		if(valeur_champ_reference === 'admin'){
+			alert("Impossible de modifier l'admin car cet utilisateur est utile pour administrer votre plateforme sekooly.")
+			chargement(false)
+			return 0
+		}
+
 
 		try{
 
@@ -7900,6 +7906,13 @@ function supprimer_ligne_parameters(id_parametre){
 	var validation = confirm("Voulez-vous supprimer cette ligne ? Cette action est irréversible. (" + id_ligne +")")
 	if(validation){
 
+
+		if(id_ligne === 'admin'){
+			alert("Impossible de supprimer l'admin car cet utilisateur est utile pour administrer votre plateforme sekooly.")
+			chargement(false)
+			return 0
+		}
+
 		chargement(true)
 		//si besoin (classe ou matière): supprimer sur le drive
 		if (id_parametre === "Classes" || id_parametre === "Matieres"){
@@ -8005,6 +8018,8 @@ function supprimer_ligne_parameters(id_parametre){
 	}
 
 }
+
+
 
 function supprimer_dossier(id_dossier, id_googlecalendar){
 	var lien_script = "https://script.google.com/macros/s/AKfycbyGEGpbPE0WniCcBMbLCar_zGTNwKyABrnmfOE-zfb8TOUH4AY/exec"
@@ -8371,12 +8386,12 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 		lien_script = lien_script +  param_initier
 
 
-		console.log(lien_script)
+		//console.log(lien_script)
 		//return 0
 		chargement(true)
 		var les_ids_recus= get_resultat(lien_script)
 		
-		console.log(les_ids_recus)
+		//console.log(les_ids_recus)
 
 		//on récupère les ID
 		var la_classe = nom_classe
