@@ -528,6 +528,7 @@ function initialisation_choix_devoir(){
 		afficher_soumettre_devoir(false);
 		changer_couleur_devoir("");
 		$("#remarque_prof").remove();
+		$("#note_rendu").remove();
 
 		//pour les eleves
 		if(recuperer('mon_type') === "Eleves"){
@@ -595,6 +596,7 @@ function recuperer_mon_devoir(id_fichier_sujetdevoir,proprietaire,examen_terminÃ
 	afficher_soumettre_devoir(false);
 	changer_couleur_devoir("");
 	$("#remarque_prof").remove();
+	$("#note_rendu").remove();
 	
 
 
@@ -662,6 +664,8 @@ function recuperer_mon_devoir(id_fichier_sujetdevoir,proprietaire,examen_terminÃ
 				if(remarque.length>0){
 
 					$("#remarque_prof").remove();
+					$("#note_rendu").remove();
+					
 					remarque = decodeURIComponent(remarque)
 
 					var remarque_innerHTML ='<div id="remarque_prof" style="text-align: justify;padding: 2%;"><b style="color: #cc3a22;">Remarque du professeur:</b><br>'+remarque+'</div>';
