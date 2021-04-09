@@ -2786,7 +2786,7 @@ function traitement_fichiers_recus(){
 
 			
 			var nom_drive = 'drive_' + ma_categorie;
-
+			//console.log(nom_drive)
 
 			//console.log(valeur['heure_effet']);
 			ajouter_un_fichier(valeur['id_fichier'],nom_fichier,nom_drive,extension_fichier, valeur['date_effet'], valeur['heure_effet'], valeur['est_telechargeable'], valeur['coefficient_rendu']);
@@ -8683,7 +8683,7 @@ function mode_bulletin(oui){
 		element_DOM("choix_date_effet").style.display = ""
 		element_DOM("telechargeable").style.display = ""
 		element_DOM("est_telechargeable").checked = true
-		element_DOM('file').removeAttribute("accept");
+		element_DOM('file').setAttribute('accept',".txt,.bmp,.gif,.jpeg,.jpg,.png,.svg,.pdf,.bmp,.xlsx,.xls,.xlsm,.ppt,.pptx,.doc,.docx,.html,.csv,.js,.rtf,.mp4,.mp3,.wav")
 		element_DOM('choix_popup').setAttribute('style','visibility: visible')
 		$("[value='Bulletins']")[0].style.display = "none"
 	}
