@@ -474,6 +474,7 @@ function initialisation_choix_devoir(){
 
 	//pas de remarque de prof
 	$("#remarque_prof").remove();
+	$("#note_rendu").remove();
 
 	les_devoirs = element_DOM('drive_devoirs').childNodes;
 	les_examens = element_DOM('drive_examens').childNodes;
@@ -2835,8 +2836,8 @@ function traitement_fichiers_recus(){
 			var la_date_limite = afficher_date(valeur['la_date_limite'],true); // SANS l'heure
 			var lheure_limite = valeur["lheure_limite"] ? " à " + valeur["lheure_limite"] : "";
 
-			//la bonne date limite pour les examens
-			if(ma_categorie==="examens"){
+			//la bonne date limite pour les examens (si 2 jours)
+			if(ma_categorie==="examens" && valeur['la_date_limite'].length === 0){
 				date_debut = la_date_yyyy_mm_dd(valeur['date_effet']);
 				date_debut = moment(new Date(date_debut), "yyyy-MM-DD")
 
@@ -2863,7 +2864,7 @@ function traitement_fichiers_recus(){
 			//console.log(nom_drive)
 
 			//console.log(valeur['heure_effet']);
-			ajouter_un_fichier(valeur['id_fichier'],nom_fichier,nom_drive,extension_fichier, valeur['date_effet'], valeur['heure_effet'], valeur['est_telechargeable'], valeur['coefficient_rendu']);
+			ajouter_un_fichier(valeur['id_fichier'],nom_fichier,nom_drive,extension_fichier, valeur['date_effet'], valeur['heure_effet'], valeur['est_telechargeable'], valeur['coefficient_rendu'], valeur['la_date_limite'], valeur['lheure_limite']);
 
 		});
 
@@ -2939,7 +2940,7 @@ function masquer_drive_vide(){
 }
 
 
-function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,date_effet,heure_effet,est_telechargeable,coefficient_rendu){
+function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,date_effet,heure_effet,est_telechargeable,coefficient_rendu, date_limite, heure_limite){
 
 
 
@@ -2956,7 +2957,7 @@ function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,d
 	//todo: sans téléchargement EN PLUS DE YOUTUBE
 	var padding_yt = est_telechargeable === "oui" ?  "" : ' style="padding-top: 25%;" ' 
 	var telecharger_le_fichier = est_telechargeable === "oui" ? '<img src="https://sekooly.github.io/SUPABASE/images/img_download.png" onclick="telecharger_fichier(event,this)" id="telecharger" class="download_fichier">' : ""
-	var code_html = '<span oncontextmenu="autoriser_clic_droit_supprimer_et_renommer(event,this)" onclick="ouvrir_fichier(this)" class="span_un_fichier" id="' + id_fichier + '" ma_date_effet="'+ la_date_yyyy_mm_dd(date_effet)+'" mon_heure_effet="'+ heure_effet +'" est_telechargeable="'+est_telechargeable+'"    coefficient_rendu='+coefficient_rendu+'    >' + telecharger_le_fichier + '<img id="' + id_fichier + '" src="'+ image_fichier +'" class="un_fichier" '+padding_yt+'>' + nom_fichier +'</span>';
+	var code_html = '<span oncontextmenu="autoriser_clic_droit_supprimer_et_renommer(event,this)" onclick="ouvrir_fichier(this)" class="span_un_fichier" id="' + id_fichier + '" ma_date_effet="'+ la_date_yyyy_mm_dd(date_effet)+'" mon_heure_effet="'+ heure_effet + '" ma_date_limite="'+ la_date_yyyy_mm_dd(date_limite)+'" mon_heure_limite="'+ heure_limite +'" est_telechargeable="'+est_telechargeable+'"    coefficient_rendu='+coefficient_rendu+'    >' + telecharger_le_fichier + '<img id="' + id_fichier + '" src="'+ image_fichier +'" class="un_fichier" '+padding_yt+'>' + nom_fichier +'</span>';
 
 	//console.log(code_html);
 
@@ -3165,8 +3166,19 @@ function autoriser_clic_droit_supprimer_et_renommer(e,ceci){
 	ajouter_fonction_clic_droit(e,ceci,0,"renommer_fichier","Renommer",id_fichier);
 	ajouter_fonction_clic_droit(e,ceci,1,"recategoriser_fichier","Recatégoriser",id_fichier);
 	ajouter_fonction_clic_droit(e,ceci,2,"changer_date_effet","Date d\'effet",id_fichier);
-	ajouter_fonction_clic_droit(e,ceci,3,"changer_coef","Coefficient",id_fichier,null,$("#"+id_fichier)[0].getAttribute("coefficient_rendu"));
-	ajouter_fonction_clic_droit(e,ceci,4,"supprimer_fichier","Supprimer",id_fichier);
+
+	//si devoir/examen -> on peut changer la date limite aussi -> offset = 1, sinon 0
+	if($("#"+ceci.id)[0].parentNode.id === "drive_devoirs" || $("#"+ceci.id)[0].parentNode.id === "drive_examens"){
+		ajouter_fonction_clic_droit(e,ceci,3,"changer_date_limite_rendu","Date limite de rendu",id_fichier);
+		mon_offset = 1	
+	}else{
+		mon_offset = 0
+	}
+	
+	//ajouter l'offset
+
+	ajouter_fonction_clic_droit(e,ceci,3+mon_offset,"changer_coef","Coefficient",id_fichier,null,$("#"+id_fichier)[0].getAttribute("coefficient_rendu"));
+	ajouter_fonction_clic_droit(e,ceci,4+mon_offset,"supprimer_fichier","Supprimer",id_fichier);
 
 	//au clic de n'importe où : ça enleve le clic droit
 	$(document).click(function() {
@@ -3347,6 +3359,46 @@ function mettre_a_jour_categorie(id_fichier_valeur){
 
 }
 
+
+function changer_date_limite_rendu(id_fichier,nom_fichier){
+
+
+	var nouvelle_date_effet = '<input type="date" id="nouvelle_date_effet" class="date_effet_fichier">';
+
+	var nouvelle_heure_effet = '<input type="time" id="nouvelle_heure_effet" class="la_date_limite">';
+
+
+
+
+	var ancienne_date_effet = $("[id="+id_fichier+'].span_un_fichier')[0].attributes['ma_date_limite'].value;
+
+	var ancienne_heure_effet = $("[id="+id_fichier+'].span_un_fichier')[0].attributes['mon_heure_limite'].value ? $("[id="+id_fichier+'].span_un_fichier')[0].attributes['mon_heure_limite'].value : "07:30";
+
+
+
+
+	creer_mini_popup(nom_fichier,nouvelle_date_effet+nouvelle_heure_effet,"Appliquer date limite de rendu","mettre_a_jour_date_limite_rendu('"+id_fichier+"')",ancienne_date_effet,"nouvelle_date_effet", ancienne_heure_effet, "nouvelle_heure_effet");
+
+	//si la personne le vide: on garde l'ancienne valeur
+    $('#nouvelle_date_effet').on("change", function() {
+		//si c'est un devoir alors ajouter un délai
+		if($('#nouvelle_date_effet')[0].value === "")
+			$('#nouvelle_date_effet')[0].value = ancienne_date_effet;
+    });
+
+
+    $('#nouvelle_heure_effet').on("change", function() {
+		//si c'est un devoir alors ajouter un délai
+		if($('#nouvelle_heure_effet')[0].value === "")
+			$('#nouvelle_heure_effet')[0].value = ancienne_heure_effet;
+    });
+
+    
+
+
+}
+
+
 function changer_date_effet(id_fichier,nom_fichier){
 
 
@@ -3385,6 +3437,35 @@ function changer_date_effet(id_fichier,nom_fichier){
 
 }
 
+function mettre_a_jour_date_limite_rendu(id_fichier_valeur){
+	var nouvelle_date_effet = $("#nouvelle_date_effet")[0].value;
+	var nouvelle_heure_effet = $("#nouvelle_heure_effet")[0] ? $("#nouvelle_heure_effet")[0].value : "";
+	
+	if(impossible_de_cliquer()) return -1;
+	if(nouvelle_date_effet === "") return -1;
+
+	chargement(true);
+
+	//envoyer la nouvelle date effet dans la bdd
+	nom_table = "Fichiers"
+	nom_champ_reference = "id_fichier"
+	valeur_champ_reference = id_fichier_valeur
+	nouveau_data = {
+		'la_date_limite': nouvelle_date_effet,
+		'lheure_limite': nouvelle_heure_effet,
+		
+	}
+	
+	actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouveau_data)
+	setTimeout(function(){
+		location.reload();
+	}, 1000);
+
+
+	
+}
+
+
 function mettre_a_jour_date_effet(id_fichier_valeur){
 	var nouvelle_date_effet = $("#nouvelle_date_effet")[0].value;
 	var nouvelle_heure_effet = $("#nouvelle_heure_effet")[0] ? $("#nouvelle_heure_effet")[0].value : "";
@@ -3410,34 +3491,6 @@ function mettre_a_jour_date_effet(id_fichier_valeur){
 	}, 1000);
 
 
-
-	/*
-	var lien_script = "https://script.google.com/macros/s/AKfycbzQ9LX9LFgfJKZFrZLYKupouixTNppye7W00TApNq3mPNIEG38/exec";
-
-
-
-	var id_fichier = "?id_fichier=" + id_fichier_valeur;
-	var date_effet = "&date_effet=" + nouvelle_date_effet;
-	var heure_effet = "&heure_effet=" + nouvelle_heure_effet;
-
-	var url = lien_script + id_fichier + date_effet + heure_effet;
-	//console.log(url);
-
-	
-	$.ajax({
-		type: "POST",
-		url: url,
-		success: function(data) {						
-			console.log(data);
-			afficher_alerte(data,true);
-		},
-
-		error: function(data){
-			console.log('erreur! ' + data);
-			alert('Vérifiez que vous êtes toujours connecté à internet.');
-		}
-
-	});*/
 	
 }
 
