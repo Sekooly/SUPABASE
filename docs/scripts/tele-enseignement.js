@@ -776,7 +776,7 @@ function afficher_rendus_devoirs(resultats){
 
 		var titre = rfc3986EncodeURIComponent(resultats[i]["nom_fichier"].trim());
 		var nom_proprio_devoir = ' (' + resultats[i]["proprietaire"].trim().toUpperCase() + ')';
-		console.log(resultats[i])
+		//console.log(resultats[i])
 		var coefficient_rendu = resultats[i]["coefficient_rendu"]
 		var note_rendu = resultats[i]["note_rendu"]
 		
@@ -869,8 +869,8 @@ function mettre_remarque_et_note(id_fichier, remarque,coefficient_rendu,note_ren
 
 			var valeur_proprio_devoir = $("#proprietaire"+id_fichier)[0].innerText
 			var id_notif = $("#devoir_choisi")[0].value+"-"+ valeur_proprio_devoir.trim().toLowerCase().replace(".","")
-			console.log(nouvelles_donnees_notif)
-			console.log(id_notif)
+			//console.log(nouvelles_donnees_notif)
+			//console.log(id_notif)
 			actualiser("Notifs", "id_notif", id_notif, nouvelles_donnees_notif)
 		}
 			
