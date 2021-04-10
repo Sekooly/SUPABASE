@@ -2269,6 +2269,7 @@ function chargement_a_larrivee(){
 		if (recuperer('mon_type').includes('Administration')) stocker('mon_type','Administration');
 
 		ajouter_les_dossiers_dynamiques();
+		afficher_alerte_etablissement()
 
 
 	//à l'arrivée sur la page: on ouvre tout dossier déjà chargé
@@ -2288,6 +2289,7 @@ function chargement_a_larrivee(){
 
 		//console.log("chargeons " + id_matiere + " de titre " + titre);
 
+		afficher_alerte_etablissement()
 
 		return charger_dossier(id_matiere,true, titre).then(function(){
 
@@ -2306,7 +2308,6 @@ function chargement_a_larrivee(){
 		
 	}
 
-	afficher_alerte_etablissement()
 		
 
 
@@ -2325,7 +2326,12 @@ function afficher_params_si_droits_et_admin(){
 
 }
 
+
 function afficher_alerte_etablissement(){
+	$("#texte_alerte")[0].innerText = recuperer_alerte_etablissement()
+}
+
+function afficher_alerte_etablissement_old(){
 	alerte_etablissement().then(snap => {
 		$("#texte_alerte")[0].innerText = snap
 	})

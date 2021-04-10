@@ -398,6 +398,10 @@ async function alerte_etablissement(){
   return get_resultat_asynchrone(racine_data+"/Alerte"+"?id=eq.1&"+apikey).then(e => {return e[0]['Alerte']}) 
 }
 
+function recuperer_alerte_etablissement(){
+  return get_resultat(racine_data+"/Alerte"+"?id=eq.1&"+apikey)[0]['Alerte'] 
+}
+
 
 async function switcher_le_champ(nom_champ, nouvelle_valeur){
   /*
