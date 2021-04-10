@@ -897,7 +897,7 @@ function fenetre_remarque_note(id_fichier, note_rendu, remarque){
 	nom_proprio_devoir = $("#proprietaire" + id_fichier)[0].innerText
 	
 
-	return '<div class="ma_fenetre" id="remarque_et_note" style="visibility: visible;height: 33%;width: 280px;height: 300px;top: 35%;left: 10%;"><b style="text-align: center;"><div id="titre_fenetre" class="">Note et remarque de ELEVE </div></b><span style=""><form id="mon_formulaire" autocomplete="off" style="padding: 0% 3% 0% 3%;height:82%;overflow-y: auto;">	<div id="champ_note"><label id="label" for="note_rendu">Note (sur 20)</label><input type="text" id="note_rendu" maxlength="2" style="width: 100%;" value="'+note_rendu+'"></div><br><label id="label" for="remarque">Votre remarque</label><textarea id="remarque" maxlength="300" style="width: 100%;resize: none;font-size: 13px;height: 50%;">'+remarque+'</textarea><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button type="button" id="Annuler" onclick="$(\'#remarque_et_note\').remove()"> Annuler </button><button type="button" id="envoyer_note">Valider</button></div></form></span></div>'
+	return '<div class="ma_fenetre" id="remarque_et_note" style="visibility: visible;height: 33%;width: 280px;height: 300px;top: 35%;left: 10%;"><b style="text-align: center;"><div id="titre_fenetre" class="">Note et remarque de ELEVE </div></b><span style=""><form id="mon_formulaire" autocomplete="off" style="padding: 0% 3% 0% 3%;height:82%;overflow-y: auto;">	<div id="champ_note"><label id="label" for="note_rendu">Note (sur 20)</label><input type="number" min=0 max=20 step=0.125 id="note_rendu" maxlength="2" style="width: 100%;" value="'+note_rendu+'"></div><br><label id="label" for="remarque">Votre remarque</label><textarea id="remarque" maxlength="300" style="width: 100%;resize: none;font-size: 13px;height: 50%;">'+remarque+'</textarea><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button type="button" id="Annuler" onclick="$(\'#remarque_et_note\').remove()"> Annuler </button><button type="button" id="envoyer_note">Valider</button></div></form></span></div>'
 	//return '<div></div>'
 }
 
@@ -3684,7 +3684,7 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 		//si c'est un pdf -> ajustement du height
 		choisir_height_viz_si_pdf()
 		
-		
+
 
 		//TODO: si PAS youtube ET SANS téléchargement -> on cache le côté haut-droit en cas de PAS DE TELECHARGEMENT
 		if (pas_de_telechargement && est_youtube(extension)===false){
