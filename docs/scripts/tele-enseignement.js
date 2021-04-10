@@ -3654,7 +3654,7 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 	if (est_image(extension)){
 		var viewer = OpenSeadragon({
 	        id: "previsualisation",
-	        prefixUrl: "openseadragon/images/",
+	        prefixUrl: "https://sekooly.github.io/SUPABASE/openseadragon/images/",
 	        tileSources: {
 	            type: 'image',
 	            url: lien_de_visu 
@@ -3683,7 +3683,8 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 
 		//si c'est un pdf -> ajustement du height
 		choisir_height_viz_si_pdf()
-			
+		
+		
 
 		//TODO: si PAS youtube ET SANS téléchargement -> on cache le côté haut-droit en cas de PAS DE TELECHARGEMENT
 		if (pas_de_telechargement && est_youtube(extension)===false){
