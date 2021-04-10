@@ -4806,10 +4806,10 @@ $(function charger_fichiers(e){
     	//console.log(select_liste_eleves)
 
 
-    	attribution = '<form id="trimestre" style="text-align: end;"><b><label for="periode_bulletin">Trimestre:<select style="width: 80%;" name="periode_bulletin"><option value="PREMIER TRIMESTRE">PREMIER TRIMESTRE</option><option value="DEUXIEME TRIMESTRE">DEUXIEME TRIMESTRE</option><option value="TROISIEME TRIMESTRE">TROISIEME TRIMESTRE</option><option value="ANNUEL">ANNUEL</option></select></label></b></form>'
-    	attribution = attribution + '<form id="attribution" style="text-align: end;">'
+    	attribution = '<form id="trimestre" style=""><b><label for="periode_bulletin">Trimestre:<select style="width: 60%;" name="periode_bulletin"><option value="PREMIER TRIMESTRE">PREMIER TRIMESTRE</option><option value="DEUXIEME TRIMESTRE">DEUXIEME TRIMESTRE</option><option value="TROISIEME TRIMESTRE">TROISIEME TRIMESTRE</option><option value="ANNUEL">ANNUEL</option></select></label></b></form>'
+    	attribution = attribution + '<form id="attribution" style="margin-top: 20px;">'
     	for (numero_page = 1 ; numero_page <= nombre_pages ; numero_page++){
-    		attribution = attribution + '<label for="'+numero_page+'">Page n°'+numero_page+':' + select_liste_eleves.replace(/"numero_page"/g,numero_page) + '</label>'
+    		attribution = attribution + '<div><label for="'+numero_page+'">Page n°'+numero_page+':' + select_liste_eleves.replace(/"numero_page"/g,numero_page) + '</label></div>'
     	}
 		attribution = attribution + '</form>'
     	
@@ -8846,7 +8846,7 @@ function mode_bulletin(oui){
 		element_DOM("telechargeable").style.display = "none"
 		element_DOM("est_telechargeable").checked = false
 		element_DOM('file').setAttribute('accept','application/pdf')
-		element_DOM('choix_popup').setAttribute('style','visibility: visible;overflow-y: scroll;width: 500px;overflow-x: hidden;')
+		element_DOM('choix_popup').setAttribute('style','visibility: visible;overflow-y: scroll;width: 450px;max-width: 95%;overflow-x: hidden;')
 		element_DOM("file").value = "";
 		$("[value='Bulletins']")[0].style.display = ""
 
