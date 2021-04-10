@@ -664,7 +664,7 @@ function recuperer_mon_devoir(id_fichier_sujetdevoir,proprietaire,examen_terminÃ
 				if(remarque.length>0){
 
 					$("#remarque_prof").remove();
-					$("#note_rendu").remove();
+					
 					
 					remarque = decodeURIComponent(remarque)
 
@@ -4948,7 +4948,7 @@ $(function charger_fichiers(e){
 
 					}
 
-					console.log(nouveau_fichier)
+					//console.log(nouveau_fichier)
 					ajouter_un_element("Fichiers",nouveau_fichier, data)
 
 
@@ -4969,7 +4969,7 @@ $(function charger_fichiers(e){
 						'Date_derniere_modif' : date_heure_actuelle,
 						'Cycle' : mes_donnees['Cycle']
 					}
-					console.log(nouvelle_notif)
+					//console.log(nouvelle_notif)
 					ajouter_un_element("Notifs",nouvelle_notif, id_notif)
 
 
