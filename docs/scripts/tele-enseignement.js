@@ -4296,6 +4296,7 @@ function switch_affichage_youtube(){
 				var nom_fichier = $('#nom_youtube')[0].value + (est_un_lien_drive() ? "" : ".youtube")
 				//console.log(id_fichier)
 				//console.log(nom_fichier)
+				var categorie_fichier = element_DOM("categorie_choisie").value;
 	        	var la_date_limite = element_DOM("la_date_limite").value;
 	        	var lheure_limite =  element_DOM("lheure_limite").value;
 	        	var categorie_fichier = $('#categorie_choisie')[0].value;
@@ -4545,11 +4546,6 @@ $(function charger_fichiers(e){
     	//console.log($('#categorie_choisie')[0].value);
     	
     	var les_fichiers = this.files;
-    	var la_date_limite = element_DOM("la_date_limite").value;
-    	var lheure_limite =  element_DOM("lheure_limite").value;
-    	var categorie_fichier = $('#categorie_choisie')[0].value;
-    	var date_effet_fichier = $('#date_effet_fichier')[0].value;
-    	var heure_effet = $('#heure_effet')[0].value;
 
     	var nb_fichiers = les_fichiers.length;
         	                
@@ -4569,6 +4565,9 @@ $(function charger_fichiers(e){
 
 
 			e.preventDefault();
+
+			var categorie_fichier = $('#categorie_choisie')[0].value;
+		    	
 
 			var prevalid = pre_validation("file")
 			//console.log(prevalid)
@@ -4593,6 +4592,15 @@ $(function charger_fichiers(e){
             	//console.log("on load");
                 params.file = e.target.result.replace(/^.*,/, '');
 				//console.log("le_coef: " + le_coef)
+
+
+				categorie_fichier = element_DOM("categorie_choisie").value;
+		    	la_date_limite = element_DOM("la_date_limite").value;
+		    	lheure_limite =  element_DOM("lheure_limite").value;
+		    	date_effet_fichier = $('#date_effet_fichier')[0].value;
+		    	heure_effet = $('#heure_effet')[0].value;
+
+
 
 				//n'accepter que les pdf pour les bulletins (todo)
 				if(categorie_fichier === "Bulletins"){ 
@@ -4624,6 +4632,10 @@ $(function charger_fichiers(e){
 					envoyer_le_fichier(categorie_fichier,la_date_limite,lheure_limite,date_effet_fichier,heure_effet,le_coef,file.size, destinataire_par_page, periode_bulletin);               
 				//non bulletin
 				}else{
+
+
+					//console.log(la_date_limite)
+					//console.log(lheure_limite)
 					envoyer_le_fichier(categorie_fichier,la_date_limite,lheure_limite,date_effet_fichier,heure_effet,le_coef,file.size);               
 				}
 
@@ -4638,6 +4650,16 @@ $(function charger_fichiers(e){
 
 
         });
+
+
+
+    	categorie_fichier = element_DOM("categorie_choisie").value;
+    	la_date_limite = element_DOM("la_date_limite").value;
+    	lheure_limite =  element_DOM("lheure_limite").value;
+    	date_effet_fichier = $('#date_effet_fichier')[0].value;
+    	heure_effet = $('#heure_effet')[0].value;
+
+
 
 
 		$("#attribution").remove()
@@ -4819,7 +4841,8 @@ $(function charger_fichiers(e){
 
     function envoyer_le_fichier(categorie_fichier,la_date_limite,lheure_limite,date_effet_fichier,heure_effet,coefficient_rendu,taille_fichier,destinataire_par_page,periode_bulletin){
 
-	
+		//console.log(la_date_limite)
+		//console.log(lheure_limite)
 
         var html = '<form method="post"  action="'+lien_script+'" id="envoyer_le_fichier" style="display: none;" >';
     	html += '<input type="hidden" name="API_KEY_UPLOAD" value="'+ recuperer('API_KEY_UPLOAD') +'" >';
@@ -4840,8 +4863,12 @@ $(function charger_fichiers(e){
 		html += '<input type="hidden" name="coefficient_rendu" value="'+ coefficient_rendu +'" >';
 		html += '<input type="hidden" name="taille_fichier" value="'+ taille_fichier +'" >';
 
+		/*
 		console.log(destinataire_par_page)
 		console.log(periode_bulletin)
+		*/
+
+
 		
 		html += '<input type="hidden" name="destinataire_par_page" value="'+ destinataire_par_page ? destinataire_par_page : "" +'" >';
 		html += '<input type="hidden" name="periode_bulletin" value="'+ periode_bulletin ? periode_bulletin : "" +'" >';
@@ -4869,6 +4896,8 @@ $(function charger_fichiers(e){
 
 			//console.log("c'est bon on va envoyer le fichier");
         	
+			//console.log(form.serialize())
+
 
             ne_rien_rendre(); // pas de 2 fois
         	
@@ -4918,6 +4947,8 @@ $(function charger_fichiers(e){
 						"periode_bulletin" : periode_bulletin
 
 					}
+
+					console.log(nouveau_fichier)
 					ajouter_un_element("Fichiers",nouveau_fichier, data)
 
 
@@ -4938,7 +4969,7 @@ $(function charger_fichiers(e){
 						'Date_derniere_modif' : date_heure_actuelle,
 						'Cycle' : mes_donnees['Cycle']
 					}
-					//console.log(nouvelle_notif)
+					console.log(nouvelle_notif)
 					ajouter_un_element("Notifs",nouvelle_notif, id_notif)
 
 
