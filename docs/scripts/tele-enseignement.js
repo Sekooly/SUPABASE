@@ -10,6 +10,12 @@ var elements_menu_haut_avec_reset = ["Eleves","Profs","Administration"]
 nom_etablissement = data_etablissement['nom_etablissement']
 
 
+var champs_avec_listes_dynamiques = ['Classe','classe_bis','Classe_principale','Cycle','cycle','Matiere','Matiere_bis']
+var champs_oui_ou_non = ['Est_délégué','code_hash','Reponse_sondage','Ecolage_OK','Droits_modifs', 'Droit_acces_anticipe_examen','Droit_changer_ecolage','commun_au_cycle','droit_hors_maintenance']
+var liste_couleurs = ['blanc','bleu ciel', 'bleu foncé', 'gris','jaune','marron','noir','orange','rose','rouge','vert clair','vert foncé', 'violet']
+
+
+
 /*********************** CONSEIL DE CLASSE ***********************************/
 function afficher_conseil_de_classe(oui){
 
@@ -5181,7 +5187,7 @@ $(function charger_fichiers(e){
 
 
 			nom_table = "Topic"
-			nb_com = nb_coms(id_topic) // Number(recuperer("nb_com_actuel")) +1
+			nb_com = nb_coms(id_topic)+1 // Number(recuperer("nb_com_actuel")) +1
 			stocker("nb_com_actuel",nb_com)
 			date_heure_actuelle = maintenant()
 			nouveau_com = {
@@ -7767,54 +7773,61 @@ function supprimer_tous_les_parametres(){
 function rendre_td_modifiable(){
 	$(document).on('dblclick','tbody', function(e){
 
-
-		//si double clic sur un champ contenant ";" -> on fait une liste des Cycles (admin) OU Matieres (profs) en check box
-		//sinon: saisie libre
-		
-		var ancienne_valeur = e.target.innerText;
-		var id_parametre = $(".un_menu_orange")[0].id 
-
-		var est_classe = $("#Classe")[0] ? e.target.cellIndex === $("#Classe")[0].cellIndex : false
-		var est_classe_principale = $("#Classe_principale")[0] ? e.target.cellIndex === $("#Classe_principale")[0].cellIndex : false
-		var est_classe_bis = $("#classe_bis")[0] ? e.target.cellIndex === $("#classe_bis")[0].cellIndex : false
-		var nest_pas_onglet_classes = id_parametre !== "Classes"
-
-		if (nest_pas_onglet_classes && (est_classe || est_classe_principale || est_classe_bis)){
-
-			//mini fenetre de checkbox
-			//avec ok et annuler
-			var les_matieres = JSON.parse(recuperer('Matieres'))
-			if (les_matieres === null){
-				rechercher_tout('Matieres').then(function(snapshot){
-
-					liste_JSON = snapshot
-					//liste_JSON = ordonner(id_parametre,liste_JSON)
-					stocker('Matieres', JSON.stringify(liste_JSON ? liste_JSON : ""))
-					les_matieres = JSON.parse(recuperer('Matieres'))
-
-					valeurs_possibles = valeurs_possibles_modification_classes(e, id_parametre, les_matieres)
-					formulaire_choix_checkbox(e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'))
-
-				})
-
-				
-			}else{
-				valeurs_possibles = valeurs_possibles_modification_classes(e, id_parametre, les_matieres)
-				formulaire_choix_checkbox(e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'))
-
-			}
-			
-
-
-			
-		}else{
-			var nouvelle_valeur = prompt("Indiquez la nouvelle valeur",ancienne_valeur);
-			suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur)
-		}
+		fonction_td_modifiable(e)
 		
 	})
 	
 }
+
+
+function fonction_td_modifiable(e, sans_suite){
+
+	//si double clic sur un champ contenant ";" -> on fait une liste des Cycles (admin) OU Matieres (profs) en check box
+	//sinon: saisie libre
+	
+	var ancienne_valeur = e.target.innerText;
+	var id_parametre = $(".un_menu_orange")[0].id 
+
+	var est_classe = $("#Classe")[0] ? e.target.cellIndex === $("#Classe")[0].cellIndex : false
+	var est_classe_principale = $("#Classe_principale")[0] ? e.target.cellIndex === $("#Classe_principale")[0].cellIndex : false
+	var est_classe_bis = $("#classe_bis")[0] ? e.target.cellIndex === $("#classe_bis")[0].cellIndex : false
+	var nest_pas_onglet_classes = id_parametre !== "Classes"
+
+	if (nest_pas_onglet_classes && (est_classe || est_classe_principale || est_classe_bis)){
+
+		//mini fenetre de checkbox
+		//avec ok et annuler
+		var les_matieres = JSON.parse(recuperer('Matieres'))
+		if (les_matieres === null){
+			rechercher_tout('Matieres').then(function(snapshot){
+
+				liste_JSON = snapshot
+				//liste_JSON = ordonner(id_parametre,liste_JSON)
+				stocker('Matieres', JSON.stringify(liste_JSON ? liste_JSON : ""))
+				les_matieres = JSON.parse(recuperer('Matieres'))
+
+				valeurs_possibles = valeurs_possibles_modification_classes(e, id_parametre, les_matieres)
+				formulaire_choix_checkbox(e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'))
+
+			})
+
+			
+		}else{
+			valeurs_possibles = valeurs_possibles_modification_classes(e, id_parametre, les_matieres)
+			formulaire_choix_checkbox(e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'))
+
+		}
+		
+
+
+		
+	}else{
+		var nouvelle_valeur = prompt("Indiquez la nouvelle valeur",ancienne_valeur);
+		suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur)
+	}
+}
+
+
 
 function valeurs_possibles_modification_classes(e, id_parametre, les_matieres){
 	console.log(e.target)
@@ -8444,6 +8457,7 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 	
 
 	if (liste_champs.length > 0){
+		chargement(true)
 		for (var i = 0; i < liste_champs.length; i++) {
 			//rendre les champs auto NON MODIFIABLES (id_url, id_agenda, ...)
 
@@ -8452,7 +8466,72 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 			disabled = parametres_automatiques.indexOf(liste_champs[i]) >= 0 ? 'disabled' : ""
 			donnee_dupliquee = avec_duplicata  ? ($(".selected") ? ' value="'+$(".selected")[0].children[i].innerText+'" ' : '' ) : 
 								une_donnee ? ' value="' + une_donnee[liste_champs[i]] + '" ' : ""
-			liste_champs_html = liste_champs_html + '<div class="une_donnee_saisie" id="'+liste_champs[i]+'"><label>'+liste_champs[i]+'</label><input class="donnee" '+donnee_dupliquee+' id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" '+disabled+'></div>'
+
+
+			html_du_input = '<input class="donnee" '+donnee_dupliquee+' id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" '+disabled+'>'
+			
+
+			//SI SANS DUPLICATION
+			if(!une_donnee){
+
+
+				//si c'est Couleur_matiere
+				if(liste_champs[i] === "Couleur_matiere"){
+
+					html_du_input = '<select class="donnee" id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" >'
+					
+					for (j = 0; j<liste_couleurs.length ; j ++){
+						html_du_input = html_du_input + '<option value ="'+liste_couleurs[j]+'">'+liste_couleurs[j]+'</option>'
+					}
+
+					html_du_input = html_du_input + '</select>'
+
+
+
+				//si c'est une liste dynamique
+				}else if (champs_avec_listes_dynamiques.indexOf(liste_champs[i]) >= 0){
+
+					
+					toutes_les_matieres = get_resultat(racine_data + 'Matieres' +'?' + apikey)
+
+					choix_classe_dun_admin = (liste_champs[i] === "Classe" || liste_champs[i] === "classe_bis") && $(".un_menu_orange")[0].innerText === "Administration"
+					choix_classe_dun_prof = (liste_champs[i] === "Classe" || liste_champs[i] === "classe_bis") && $(".un_menu_orange")[0].innerText === "Profs"
+					//console.log(liste_champs[i])
+					//console.log(choix_classe_dun_admin)
+					
+					nom_du_champ_clé = liste_champs[i] === "cycle" ? "Cycle"  :
+										(liste_champs[i] === "classe_bis" || liste_champs[i] === "Classe_principale") ? "Classe"  : 
+										choix_classe_dun_admin ? "Cycle"  :
+										choix_classe_dun_prof ? "Classe_Matiere" : liste_champs[i]
+
+					//console.log(nom_du_champ_clé)			
+					valeurs_possibles = valeursUniquesDeCetteKey(toutes_les_matieres,nom_du_champ_clé)
+					if(choix_classe_dun_admin) valeurs_possibles = valeurs_possibles.map(e => '(Tous|' +e+ ')')
+					multiple_choix_classes = choix_classe_dun_prof ? 'multiple' : ""
+
+
+					html_du_input = '<select class="donnee" id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" '+multiple_choix_classes+'>'
+
+					for (j = 0; j<valeurs_possibles.length ; j ++){
+						html_du_input =  html_du_input + '<option value ="'+valeurs_possibles[j]+'">'+valeurs_possibles[j]+'</option>'
+					}
+
+					html_du_input = html_du_input + '<option value="nouveau" style="font-style: oblique;" onclick="transformer_en_simple_input(\''+liste_champs[i]+'\',this)">Nouvelle valeur</option>' + '</select>'
+
+
+				//si c'est oui ou non
+				}else if(champs_oui_ou_non.indexOf(liste_champs[i]) > 0){
+					html_du_input = '<select class="donnee" value="non" id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" ><option value="non">non</option><option value="oui">oui</option></select>'
+				}
+
+
+			}
+			
+			
+
+			//console.log(html_du_input)
+
+			liste_champs_html = liste_champs_html + '<div class="une_donnee_saisie" id="'+liste_champs[i]+'"><label>'+liste_champs[i]+'</label>'+html_du_input+'</div>'
 		}
 	}
 
@@ -8463,24 +8542,33 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 
 	$("#mini_popup").remove()
 	$("body").append(entete+liste_champs_html+boutons_ajouter_annuler)
-
+	chargement(false)
 }
 
+function transformer_en_simple_input(nom_champ,ceci){
+
+	nouvelle_valeur = prompt("Indiquez la nouvelle valeur de " + nom_champ +": ")
+	if (nouvelle_valeur !== null){
+		$("[id='"+nom_champ+"'].donnee")[0].outerHTML = '<input class="donnee" value="'+nouvelle_valeur+'" id="'+nom_champ+'" name="'+nom_champ+'">'
+	}else{
+		$("[id='"+nom_champ+"'].donnee")[0].value = ""
+	}
+}
 
 function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 	//console.log(id_parametre)
 
 	//nom_etablissement déjà ok
 	//nom_cycle
-	nom_cycle = $("input#cycle").length > 0 ? $("input#cycle")[0].value :
-				$("input#Cycle").length > 0 ? $("input#Cycle")[0].value : ""
+	nom_cycle = $(".donnee#cycle").length > 0 ? $(".donnee#cycle")[0].value :
+				$(".donnee#Cycle").length > 0 ? $(".donnee#Cycle")[0].value : ""
 	
 	//nom_classe
 	//si c'est un identifiant Profs/Admin -> on zappe
-	nom_classe = $("input#Classe").length > 0 ? ($("input#Classe")[0].value.includes("|") ? "" : $("input#Classe")[0].value) : ""
+	nom_classe = $(".donnee#Classe").length > 0 ? ($(".donnee#Classe")[0].value.includes("|") ? "" : $(".donnee#Classe")[0].value) : ""
 	
 	//nom_matiere
-	nom_matiere = $("input#Matiere").length > 0 ? $("input#Matiere")[0].value : ""
+	nom_matiere = $(".donnee#Matiere").length > 0 ? $(".donnee#Matiere")[0].value : ""
 	
 	/*
 	console.log(nom_cycle)
@@ -8541,7 +8629,7 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 		var param_nom_cycle = nom_cycle ? "&nom_cycle=" + nom_cycle : ""
 		var param_nom_classe = nom_classe ? "&nom_classe=" + nom_classe : ""
 		var param_nom_matiere = nom_matiere ? "&nom_matiere=" + nom_matiere : ""
-		var param_commun_au_cycle = $('input#commun_au_cycle')[0] ? "&commun_au_cycle=" + $('input#commun_au_cycle')[0].value : "non"
+		var param_commun_au_cycle = $('.donnee#commun_au_cycle')[0] ? "&commun_au_cycle=" + $('.donnee#commun_au_cycle')[0].value : "non"
 		
 		//initier SI ET SEULEMENT SI le cycle n'a pas encore de rendus
 		id_rendu_actuel = get_resultat(racine_data + "ID_RENDUS?" + apikey + '&Cycle=eq.' + nom_cycle)
@@ -8559,6 +8647,8 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 
 		//console.log(lien_script)
 		//return 0
+
+
 		chargement(true)
 		var les_ids_recus= get_resultat(lien_script)
 		
@@ -8583,41 +8673,41 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 		
 		//en mode matière ET matiere = cycle -> commun
 		//sinon, non 
-		$("input[id='commun_au_cycle']")[0].value = id_parametre === "Matieres" && $("input#Cycle")[0].value === $("input#Matiere")[0].value ? "oui" : "non"
+		$(".donnee[id='commun_au_cycle']")[0].value = id_parametre === "Matieres" && $(".donnee#Cycle")[0].value === $(".donnee#Matiere")[0].value ? "oui" : "non"
 
 		if(id_parametre === "Classes"){
 		/******* POUR CLASSE ********/
 
 
 			//Classe_bis
-			$("input[id='Classe_bis']")[0].value = la_classe
+			$(".donnee[id='Classe_bis']")[0].value = la_classe
 			//ID_URL
-			$("input[id='ID_URL']")[0].value = id_de_la_classe
+			$(".donnee[id='ID_URL']")[0].value = id_de_la_classe
 			//URL 
-			$("input[id='URL']")[0].value  = "https://drive.google.com/drive/folders/" + id_de_la_classe
+			$(".donnee[id='URL']")[0].value  = "https://drive.google.com/drive/folders/" + id_de_la_classe
 			//URL_Mapping
-			$("input[id='URL_Mapping']")[0].value  = id_de_la_classe
+			$(".donnee[id='URL_Mapping']")[0].value  = id_de_la_classe
 			//id_google_calendar
-			$("input[id='id_googlecalendar']")[0].value  = id_googlecalendar
+			$(".donnee[id='id_googlecalendar']")[0].value  = id_googlecalendar
 			//URL_agenda
-			$("input[id='URL_agenda']")[0].value  = "https://calendar.google.com/calendar/embed?src="+id_googlecalendar+"&ctz=Africa%2FNairobi"
+			$(".donnee[id='URL_agenda']")[0].value  = "https://calendar.google.com/calendar/embed?src="+id_googlecalendar+"&ctz=Africa%2FNairobi"
 			
 		}else if(id_parametre === "Matieres"){
 		/******* POUR MATIERE *******/
 
 
 			//Classe_Matiere
-			$("input[id='Classe_Matiere']")[0].value = '('+ la_classe+'|'+ la_matiere +')'
+			$(".donnee[id='Classe_Matiere']")[0].value = '('+ la_classe+'|'+ la_matiere +')'
 			//ID_URL
-			$("input[id='ID_URL']")[0].value = id_de_la_matiere		
+			$(".donnee[id='ID_URL']")[0].value = id_de_la_matiere		
 			//Matiere_bis
-			$("input[id='Matiere_bis']")[0].value = la_matiere		
+			$(".donnee[id='Matiere_bis']")[0].value = la_matiere		
 			//URL
-			$("input[id='URL']")[0].value = "https://drive.google.com/drive/folders/" + id_de_la_matiere		
+			$(".donnee[id='URL']")[0].value = "https://drive.google.com/drive/folders/" + id_de_la_matiere		
 			//URL_Mapping
-			$("input[id='URL_Mapping']")[0].value = id_de_la_matiere
+			$(".donnee[id='URL_Mapping']")[0].value = id_de_la_matiere
 			//classe_id
-			$("input[id='classe_id']")[0].value = id_de_la_classe
+			$(".donnee[id='classe_id']")[0].value = id_de_la_classe
 
 		}
 
@@ -8632,17 +8722,17 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 
 		/*********** POUR LES IDENTIFIANTS *************/
 
-		if (id_parametre.includes("Admin")) $("input[id='Classe']")[0].value = '(Tous|' + $("input[id='Cycle']")[0].value +")" 
+		if (id_parametre.includes("Admin")) $(".donnee[id='Classe']")[0].value = '(Tous|' + $(".donnee[id='Cycle']")[0].value +")" 
 		
-		$("input[id='Derniere_consultation_notifs']")[0].value = "30/12/1899 00:00:00"
-		$("input[id='type']")[0].value = id_parametre.includes("Admin") ? "Administration" : id_parametre
-		$("input[id='Droit_acces_anticipe_examen']")[0].value = id_parametre.includes("Eleves") ? "non" : "oui"
-		if($("input[id='Droit_changer_ecolage']")[0]) $("input[id='Droit_changer_ecolage']")[0].value = "non"
-		if($("input[id='Droits_modifs']")[0]) $("input[id='Droits_modifs']")[0].value = "non"
-		$("input[id='Ecolage_OK']")[0].value = "oui"
-		$("input[id='code_hash']")[0].value = "nok"
-		$("input[id='Reponse_sondage']")[0].value = "non"
-		$("input[id='droit_hors_maintenance']")[0].value = "non"
+		$(".donnee[id='Derniere_consultation_notifs']")[0].value = "30/12/1899 00:00:00"
+		$(".donnee[id='type']")[0].value = id_parametre.includes("Admin") ? "Administration" : id_parametre
+		$(".donnee[id='Droit_acces_anticipe_examen']")[0].value = id_parametre.includes("Eleves") ? "non" : "oui"
+		if($(".donnee[id='Droit_changer_ecolage']")[0]) $(".donnee[id='Droit_changer_ecolage']")[0].value = "non"
+		if($(".donnee[id='Droits_modifs']")[0]) $(".donnee[id='Droits_modifs']")[0].value = "non"
+		$(".donnee[id='Ecolage_OK']")[0].value = "oui"
+		$(".donnee[id='code_hash']")[0].value = "nok"
+		$(".donnee[id='Reponse_sondage']")[0].value = "non"
+		$(".donnee[id='droit_hors_maintenance']")[0].value = "non"
 			
 	}
 
@@ -8674,8 +8764,11 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 
 
 function get_valeur(liste_initiale,motif){
-
+	//console.log(liste_initiale)
+	//console.log(motif)
+	
 	var index_motif = liste_initiale.findIndex((element) => element.includes(motif + ':'));
+	//console.log(index_motif)
 	//console.log("index_motif: " + index_motif)
 	return liste_initiale[index_motif].split(motif + ':')[1]
 
@@ -8685,8 +8778,11 @@ function convertir_saisie_en_JSON(id_form){
 	var saisie = "{"
 	var liste_champs_saisie = $("#" + id_form)[0].children
 	for (var i = 0; i < liste_champs_saisie.length ; i++){
-		nom_champ = $("#"+id_form)[0].children[i]['innerText']
-		saisie = saisie + '"' + [nom_champ]  + '"' + ":"+ '"' +   $("input[id='"+nom_champ+"']")[0].value  +'"'
+		nom_champ = $("#"+id_form)[0].children[i].children[0].innerText
+
+		//si c'est une classe pour prof -> récupérer $('#Classe.donnee').val().join(";");
+		valeur_saisie = (nom_champ === "Classe" && $('.un_menu_orange')[0].innerText ==="Profs" && $("#Classe.donnee")[0].nodeName !== "INPUT") ?  $('#Classe.donnee').val().join(";") : $(".donnee[id='"+nom_champ+"']")[0].value
+		saisie = saisie + '"' + [nom_champ]  + '"' + ":"+ '"' +   valeur_saisie  +'"'
 		virgule = i===liste_champs_saisie.length-1 ? "" : ","
 		saisie = saisie + virgule
 	}
@@ -8701,8 +8797,9 @@ function formulaire_rempli(nom_formulaire){
 
 
 	return !Array.from($("#"+nom_formulaire)[0].children).some(function(valeur, index, array) {
-		est_actif = !$("input[id='"+valeur.id+"']")[0].disabled
-		est_vide = $("input[id='"+valeur.id+"']")[0].value === ""
+		//console.log(valeur.id)
+		est_actif = !$(".donnee[id='"+valeur.id+"']")[0].disabled
+		est_vide = $(".donnee[id='"+valeur.id+"']")[0].value === ""
 		
 		//console.log(valeur.id + " : " + (est_actif && est_vide))
 
@@ -8714,7 +8811,7 @@ function formulaire_rempli(nom_formulaire){
 
 
 function vider_les_input(){
-	Array.from($("input.donnee")).forEach(e => e.value = "")
+	Array.from($(".donnee.donnee")).forEach(e => e.value = "")
 }
 
 
