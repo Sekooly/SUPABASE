@@ -769,8 +769,10 @@ function afficher_rendus_devoirs(resultats){
 
 
 		if(remarque.length > 0){
+
+			note_si_existante = resultats[i]["note_rendu"] ?  resultats[i]["note_rendu"] + "\n\n" : ""
 			//CORRIGE avec au survol on affiche la remarque
-			un_devoir_rendu.innerHTML += '<span id="correction_ok"><span class="correction_ok" style="font-size: 8px;color: #5ac55a;font-weight: bold;font-style: italic;" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)">Corrigé</span><span class="indication" style="margin-top:5%;">'+remarque+'</span></span>';
+			un_devoir_rendu.innerHTML += '<span id="correction_ok"><span class="correction_ok" style="font-size: 8px;color: #5ac55a;font-weight: bold;font-style: italic;" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)">Corrigé</span><span class="indication" style="margin-top:5%;">'+note_si_existante+remarque+'</span></span>';
 
 		}
 
