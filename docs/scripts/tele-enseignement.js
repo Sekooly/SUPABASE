@@ -8549,7 +8549,7 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 							html_du_input =  html_du_input + '<option value ="'+valeurs_possibles[j]+'">'+valeurs_possibles[j]+'</option>'
 						}
 
-						html_du_input = html_du_input + '<option value="nouveau" style="font-style: oblique;" onclick="transformer_en_simple_input(\''+liste_champs[i]+'\')">Nouvelle valeur</option>' + '</select>'
+						html_du_input = html_du_input + '<option value="nouveau" style="font-style: oblique;" >Nouvelle valeur</option>' + '</select>'
 
 					}
 
