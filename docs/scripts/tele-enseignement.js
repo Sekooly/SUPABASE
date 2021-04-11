@@ -864,7 +864,9 @@ function mettre_remarque_et_note(id_fichier, remarque,coefficient_rendu,note_ren
 			}
 
 		}else{
-
+			nouvelle_remarque = {
+				"remarque": remarque_prof
+			}
 		}
 
 		actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouvelle_remarque)
