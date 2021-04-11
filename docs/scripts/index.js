@@ -360,7 +360,12 @@ function initialisation(){
   mettre_le_contact_etablissement()
   sur_valider_se_connecter()
   aucun_API()
+  sans_logo_vide()
 
+}
+
+function sans_logo_vide(){
+  if($('#logo_etablissement')[0].src.split("/").pop() === "null") $('#logo_etablissement').remove()
 }
 
 function aucun_API(){

@@ -9352,7 +9352,7 @@ function proceder_a_linitialisation(){
 
 	//mettre plateforme_prete à vrai
 	//actualiser
-	nouveau_data = {"plateforme_prete":true}
+	nouveau_data = {"plateforme_prete":true,"date_premier_abonnement":moment().format('DD/MM/YYYY')}
 	patch_resultat_asynchrone(racine_initiale + "Etablissements?nom_etablissement=eq."+nom_etablissement+ "&"+api_initial,nouveau_data).then(function(data){
 		console.log(data)
 
