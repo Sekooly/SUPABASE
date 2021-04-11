@@ -8576,6 +8576,16 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 
 	$("#mini_popup").remove()
 	$("body").append(entete+liste_champs_html+boutons_ajouter_annuler)
+
+
+	//au changement des select -> si nouvelle valeur alors on force l'affichage
+	$('select.donnee').on('change', function(e){
+		//console.log(e.target.value)
+		if(e.target.value === "nouveau"){
+			transformer_en_simple_input(e.target.id)
+		}
+	})
+
 	chargement(false)
 }
 
