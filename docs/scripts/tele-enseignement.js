@@ -15,7 +15,10 @@ var champs_oui_ou_non = ['Est_délégué','code_hash','Reponse_sondage','Ecolage
 var liste_couleurs = ['blanc','bleu ciel', 'bleu foncé', 'gris','jaune','marron','noir','orange','rose','rouge','vert clair','vert foncé', 'violet']
 
 
-
+	
+var numero_etape = recuperer("numero_etape") ? Number(recuperer("numero_etape")) : 0
+var nb_etapes = 8
+var nouveau_prof = []
 /*********************** CONSEIL DE CLASSE ***********************************/
 function afficher_conseil_de_classe(oui){
 
@@ -135,7 +138,7 @@ function lister_les_eleves(liste_eleves){
 		var identifiant_eleve = valeur['Identifiant'].toUpperCase();
 
 		//on ajoute l'identifiant 
-		$("#liste_eleves").append('<b style="color: #3C99DC;margin-bottom: 5px;" id="'+identifiant_eleve+'">' + identifiant_eleve + " </b>")
+		$("#liste_eleves").append('<b style="color: #FF6C00;margin-bottom: 5px;" id="'+identifiant_eleve+'">' + identifiant_eleve + " </b>")
 
 		var identifiant_eleve_bloc = element_DOM(identifiant_eleve);
 
@@ -363,7 +366,7 @@ function afficher_toutes_les_observations(les_observations,identifiant_eleve){
 		var signe_avis_passage = valeur["avis_passage"] === "Favorable" ? "✅" : "❌"
 		var vient_de_moi = valeur['identifiant_remarque'].toUpperCase() === recuperer('identifiant_courant').toUpperCase() ? " (Vous)"
 							: valeur['matiere'] ? " ("+valeur['matiere']+")" : "" ;
-		une_observation= '<div style="color:black;font-size:10px;padding:5px;">'+signe_avis_passage +'<b style="color:#3C99DC;">'+valeur['identifiant_remarque'].toUpperCase()+ vient_de_moi+': </b>'+valeur['observation']+'<i style="color: #bfbfbf;"> ' + afficher_date(valeur['horodateur']) + '  </i></div>';	
+		une_observation= '<div style="color:black;font-size:10px;padding:5px;">'+signe_avis_passage +'<b style="color:#FF6C00;">'+valeur['identifiant_remarque'].toUpperCase()+ vient_de_moi+': </b>'+valeur['observation']+'<i style="color: #bfbfbf;"> ' + afficher_date(valeur['horodateur']) + '  </i></div>';	
 		$("#ensemble_observations").append(une_observation);
 	})
 	
@@ -381,7 +384,7 @@ function recuperer_MA_fiche_conseil(){
 	//créer une mini fenêtre de l'identifiant
 	element_DOM('fenetre').style.overflowY = "auto";
 	vider_fenetre("Vos résultats");
-	$("#fenetre").append('<div style="text-align:center;margin-top: 20px;margin-left: 20px;"><b style="color: #3C99DC;margin-bottom: 5px;" id="'+identifiant_eleve+'">' + identifiant_eleve + " </b></div>")
+	$("#fenetre").append('<div style="text-align:center;margin-top: 20px;margin-left: 20px;"><b style="color: #FF6C00;margin-bottom: 5px;" id="'+identifiant_eleve+'">' + identifiant_eleve + " </b></div>")
 
 	//oeil -> tableau
 	var identifiant_eleve_bloc = element_DOM(identifiant_eleve);
@@ -765,7 +768,7 @@ function afficher_rendus_devoirs(resultats){
 		un_devoir_rendu.id = resultats[i]["id_fichier"];
 		un_devoir_rendu.style = 'padding: 0.5%;';
 		un_devoir_rendu.innerHTML = "Devoir de "
-		un_devoir_rendu.innerHTML += '<b style="color: #3C99DC;" id="proprietaire'+resultats[i]["id_fichier"]+'">' + resultats[i]["proprietaire"].toUpperCase() + " </b>";
+		un_devoir_rendu.innerHTML += '<b style="color: #FF6C00;" id="proprietaire'+resultats[i]["id_fichier"]+'">' + resultats[i]["proprietaire"].toUpperCase() + " </b>";
 
 		//si il y a une remarque -> corrigé
 		var remarque = decodeURIComponent(resultats[i]["remarque"]);
@@ -1322,7 +1325,7 @@ function retourner_site(){
 	vider_fenetre("Sekooly")
 	afficher_fenetre(true)
 
-	contenu = "Bonjour <span style='font-weight: bold;color: #3C99DC;'> "+recuperer('identifiant_courant').toUpperCase()+ "</span>, bienvenue sur la plateforme de télé-enseignement Sekooly !<br><br>Sur cette page, vous trouverez bientôt des tutoriels d'utilisation de Sekooly, en fonction de votre rôle au sein de votre établissement.<br><br>Cette section est en cours de construction, merci infiniment de votre patience !"
+	contenu = "Bonjour <span style='font-weight: bold;color: #FF6C00;'> "+recuperer('identifiant_courant').toUpperCase()+ "</span>, bienvenue sur la plateforme de télé-enseignement Sekooly !<br><br>Sur cette page, vous trouverez bientôt des tutoriels d'utilisation de Sekooly, en fonction de votre rôle au sein de votre établissement.<br><br>Cette section est en cours de construction, merci infiniment de votre patience !"
 	conteneur_texte_html = '<div style="overflow: hidden auto;height: 90%;padding: 2%;"><div>'+contenu+'</div></div>'
 	conteneur_texte = document.createElement('div')
 	conteneur_texte.innerHTML = conteneur_texte_html
@@ -1542,7 +1545,7 @@ function changer_element(id_element,type_element,est_mdp){
 function mon_detail(nom_detail,valeur_detail,mdp){
 
 	if(mdp) valeur_detail = "•".repeat(valeur_detail.length);
-	var resultat = '<div class="un_detail"><b style="color:#3C99DC">'+nom_detail+': </b><br><span id="' + nom_detail.split(" ")[0] +'">'+valeur_detail+'</span></div>';
+	var resultat = '<div class="un_detail"><b style="color:#FF6C00">'+nom_detail+': </b><br><span id="' + nom_detail.split(" ")[0] +'">'+valeur_detail+'</span></div>';
 	return resultat;
 }
 
@@ -2114,7 +2117,7 @@ divContainer.appendChild(table);
 
 function initialisation(){
 	chargement(true);
-	document.title = "Sekooly";
+	document.title = "Sekooly | " + nom_etablissement.toUpperCase();
 
 	if (recuperer('mes_donnees') === "" || recuperer('mon_type') === "" || recuperer('mes_donnees') === null || recuperer('mon_type') === null){
 
@@ -2229,10 +2232,23 @@ function chargement_a_larrivee(){
 	    }
 	})
 
+
+	if(!plateforme_prete()){
+		return initialisation_de_la_plateforme()
+
+	}
+
+	mettre_en_place_les_notifications();
+
 	//affichage de logs SSI avec les droits
 	var mes_droits = JSON.parse(recuperer('mes_donnees'))['Droits_modifs'];
 	//console.log("mes_droits: " + mes_droits);
 	afficher_logs(mes_droits==="oui");
+
+	if(recuperer('mon_type').includes('Administration') && mes_droits === "oui"){
+		mes_matieres = get_resultat(racine_data + '/Matieres?Cycle=eq.'+ mon_cycle + '&' + apikey)
+		stocker("mes_matieres",JSON.stringify(mes_matieres))
+	}
 
 	//affichage si dossier chargé OU admin_bis OU eleves
 	var affichage_icone_edt = (recuperer('dossier_chargé')) || (recuperer('mon_type') === "Eleves");
@@ -2256,6 +2272,7 @@ function chargement_a_larrivee(){
 
 	//calcul du grid gap entre les elements de la barre verticale
 	calcul_grid_gap_barre_verticale();
+
 
 
 	//accueil principal
@@ -2285,7 +2302,7 @@ function chargement_a_larrivee(){
 
 		var id_matiere = recuperer('dossier_chargé');
 		var mes_matieres = JSON.parse(recuperer('mes_matieres'));
-		
+
 		var la_matiere = mes_matieres.filter(function(element) {
 			if (element !== null) return element['ID_URL'] === id_matiere;
 		});
@@ -5521,7 +5538,7 @@ $(function charger_fichiers(e){
 			entete.innerHTML = entete_poste;
 			element_DOM('fenetre').appendChild(entete);
 
-			var bloc_poste = '<div id="bloc_poste" style="padding: 2%;display: block;overflow-wrap: anywhere;border-bottom-style: solid;"><div id="auteur_du_poste" style="font-weight: bold;color: #3C99DC;">' + auteur_poste +' (' + role_auteur_poste + ')</div><h id="contenu_poste" style=""> '+ contenu_poste+'</h><h style="color: #B5B3B8;" id="date_poste"> ' + date + '</h></div>';
+			var bloc_poste = '<div id="bloc_poste" style="padding: 2%;display: block;overflow-wrap: anywhere;border-bottom-style: solid;"><div id="auteur_du_poste" style="font-weight: bold;color: #FF6C00;">' + auteur_poste +' (' + role_auteur_poste + ')</div><h id="contenu_poste" style=""> '+ contenu_poste+'</h><h style="color: #B5B3B8;" id="date_poste"> ' + date + '</h></div>';
 
 
 
@@ -5549,7 +5566,7 @@ $(function charger_fichiers(e){
 
 			if (oui){
 
-				var bloc_commenter = '<div id="bloc_commenter" style="padding: 2%;display: flex;"><textarea id="mon_com" style="display:inline-block; width:100%; resize: unset; min-height:200px; overflow-y:hidden;" placeholder="Votre commentaire..." maxlength="1500"></textarea><button id="envoicommentaire" onclick=ajouter_mon_com() style="height:30px;background-color: #3C99DC;color: white; ">Commenter</button></div>';
+				var bloc_commenter = '<div id="bloc_commenter" style="padding: 2%;display: flex;"><textarea id="mon_com" style="display:inline-block; width:100%; resize: unset; min-height:200px; overflow-y:hidden;" placeholder="Votre commentaire..." maxlength="1500"></textarea><button id="envoicommentaire" onclick=ajouter_mon_com() style="height:30px;background-color: #FF6C00;color: white; ">Commenter</button></div>';
 
 				//ajouter le bloc COMMENTER dans le DOM
 				var le_bloc = document.createElement('div');
@@ -5603,7 +5620,7 @@ $(function charger_fichiers(e){
 
 			contenu_poste = decodage(contenu_poste);
 
-			var un_com = '<div id="un_commentaire" style="display: block;overflow-wrap: anywhere;border-bottom-style:inset;border-width:1px; padding:1%;"><div id="auteur_du_poste" style="font-weight: bold;color: #3C99DC;">'+ auteur_poste + ' ('+  role_auteur_poste  +')</div><h id="contenu_poste" style=""> ' + contenu_poste + '</h><h style="color: #B5B3B8;" id="date_poste"> '+ date + '</h></div>';
+			var un_com = '<div id="un_commentaire" style="display: block;overflow-wrap: anywhere;border-bottom-style:inset;border-width:1px; padding:1%;"><div id="auteur_du_poste" style="font-weight: bold;color: #FF6C00;">'+ auteur_poste + ' ('+  role_auteur_poste  +')</div><h id="contenu_poste" style=""> ' + contenu_poste + '</h><h style="color: #B5B3B8;" id="date_poste"> '+ date + '</h></div>';
 
 			//ajouter le commentaire au DOM
 			var nouveau_com = document.createElement('div');
@@ -6161,7 +6178,7 @@ function ajouter_la_notif(la_notif,index){
 
 
 
-	var identifiant_notif = '<b style="color: #3C99DC;">' + Identifiant_derniere_modif + ' ('+Role_derniere_modif+') </b>';
+	var identifiant_notif = '<b style="color: #FF6C00;">' + Identifiant_derniere_modif + ' ('+Role_derniere_modif+') </b>';
 	var contenu_notif = contenu_notification(Type_notif,la_matiere_concernee,la_classe_concernee,Identifiant_originaire,Identifiant_derniere_modif);
 	var intitule = ' - <i><b style="color:#c65e46">'+intitule_notif  +'</b></i>'
 	var icone_notif = '<span> <img src=' +  choix_image(Type_notif)  + ' class="icone_notif"> </span>'
@@ -6395,7 +6412,13 @@ function recuperer_notifs(){
 
 	var mes_notifs= [];
 	var url = racine_data + mon_type + "?Identifiant=eq."+ identifiant + "&" + apikey
-	var ma_date_consultation = get_resultat(url)[0] ['Derniere_consultation_notifs'];
+
+	try{
+		var ma_date_consultation = get_resultat(url)[0]['Derniere_consultation_notifs'];
+	}catch(e){
+		var ma_date_consultation = "30/12/1899 00:00:00"
+	}
+	
 	//console.log(url)
 	//console.log(ma_date_consultation)
 	stocker_ma_date_de_consultation(ma_date_consultation)
@@ -6671,7 +6694,7 @@ function mettre_en_place_les_notifications(){
 	});
 }
 
-mettre_en_place_les_notifications();
+
 
 
 	
@@ -8353,7 +8376,7 @@ function importer_parametres(){
   					try{
   						//ajouter_un_element(id_parametre, json_final[i])
   						//console.log(json_final[i])
-  						creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, false, json_final[i])
+  						creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, false, json_final[i] ? json_final[i] : "")
 						ajouter_donnees_saisies(id_parametre, i<(json_final.length-1)) //deuxieme parametre vaut FAUX -> on est sur le dernier
   						
   					}catch(error){
@@ -8465,7 +8488,7 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 
 			disabled = parametres_automatiques.indexOf(liste_champs[i]) >= 0 ? 'disabled' : ""
 			donnee_dupliquee = avec_duplicata  ? ($(".selected") ? ' value="'+$(".selected")[0].children[i].innerText+'" ' : '' ) : 
-								une_donnee ? ' value="' + une_donnee[liste_champs[i]] + '" ' : ""
+								une_donnee ? ' value="' + (une_donnee[liste_champs[i]] ? une_donnee[liste_champs[i]] : "") + '" ' : ""
 
 
 			html_du_input = '<input class="donnee" '+donnee_dupliquee+' id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" '+disabled+'>'
@@ -8510,14 +8533,23 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 					multiple_choix_classes = choix_classe_dun_prof ? 'multiple' : ""
 
 
-					html_du_input = '<select class="donnee" id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" '+multiple_choix_classes+'>'
+					
+					//il y a des valeurs déja existantes
+					if(valeurs_possibles.length === 0){
+						html_du_input = '<input class="donnee" '+donnee_dupliquee+' id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" '+disabled+'>'
+					
+					//aucune valeur déja existante
+					}else{
 
-					for (j = 0; j<valeurs_possibles.length ; j ++){
-						html_du_input =  html_du_input + '<option value ="'+valeurs_possibles[j]+'">'+valeurs_possibles[j]+'</option>'
+						html_du_input = '<select class="donnee" id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" '+multiple_choix_classes+'>'
+					
+						for (j = 0; j<valeurs_possibles.length ; j ++){
+							html_du_input =  html_du_input + '<option value ="'+valeurs_possibles[j]+'">'+valeurs_possibles[j]+'</option>'
+						}
+
+						html_du_input = html_du_input + '<option value="nouveau" style="font-style: oblique;" onclick="transformer_en_simple_input(\''+liste_champs[i]+'\')">Nouvelle valeur</option>' + '</select>'
+
 					}
-
-					html_du_input = html_du_input + '<option value="nouveau" style="font-style: oblique;" onclick="transformer_en_simple_input(\''+liste_champs[i]+'\',this)">Nouvelle valeur</option>' + '</select>'
-
 
 				//si c'est oui ou non
 				}else if(champs_oui_ou_non.indexOf(liste_champs[i]) > 0){
@@ -8545,7 +8577,7 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 	chargement(false)
 }
 
-function transformer_en_simple_input(nom_champ,ceci){
+function transformer_en_simple_input(nom_champ){
 
 	nouvelle_valeur = prompt("Indiquez la nouvelle valeur de " + nom_champ +": ")
 	if (nouvelle_valeur !== null){
@@ -8557,6 +8589,9 @@ function transformer_en_simple_input(nom_champ,ceci){
 
 function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 	//console.log(id_parametre)
+
+
+
 
 	//nom_etablissement déjà ok
 	//nom_cycle
@@ -8575,6 +8610,8 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 	console.log(nom_classe)
 	console.log(nom_matiere)
 	*/
+
+
 
 	//interdire l'ajout si la classe OU la matière existe déjà
 	if(id_parametre === "Classes"){
@@ -8737,7 +8774,7 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 	}
 
 
-	var mon_JSON = convertir_saisie_en_JSON("donnees_saisies")
+	var mon_JSON = convertir_saisie_en_JSON("donnees_saisies", id_parametre)
 	//console.log(id_parametre)
 	//console.log(mon_JSON)
 	var nouvel_id = recuperer(id_parametre) ? JSON.parse(recuperer(id_parametre)).length : 1
@@ -8774,14 +8811,17 @@ function get_valeur(liste_initiale,motif){
 
 }
 
-function convertir_saisie_en_JSON(id_form){
+function convertir_saisie_en_JSON(id_form,id_parametre){
 	var saisie = "{"
 	var liste_champs_saisie = $("#" + id_form)[0].children
+
+	id_parametre = id_parametre ? id_parametre :
+					$('.un_menu_orange')[0] ? $('.un_menu_orange')[0].innerText : ""
 	for (var i = 0; i < liste_champs_saisie.length ; i++){
 		nom_champ = $("#"+id_form)[0].children[i].children[0].innerText
 
 		//si c'est une classe pour prof -> récupérer $('#Classe.donnee').val().join(";");
-		valeur_saisie = (nom_champ === "Classe" && $('.un_menu_orange')[0].innerText ==="Profs" && $("#Classe.donnee")[0].nodeName !== "INPUT") ?  $('#Classe.donnee').val().join(";") : $(".donnee[id='"+nom_champ+"']")[0].value
+		valeur_saisie = (nom_champ === "Classe" && id_parametre ==="Profs" && $("#Classe.donnee")[0].nodeName !== "INPUT") ?  $('#Classe.donnee').val().join(";") : $(".donnee[id='"+nom_champ+"']")[0].value
 		saisie = saisie + '"' + [nom_champ]  + '"' + ":"+ '"' +   valeur_saisie  +'"'
 		virgule = i===liste_champs_saisie.length-1 ? "" : ","
 		saisie = saisie + virgule
@@ -9047,3 +9087,368 @@ function telecharger_canvas(){
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/********************************* GESTION DES PREPARATIONS DE LA PLATEFORME *********************************/
+a_stocker = recuperer("a_stocker") ? JSON.parse(recuperer("a_stocker")) : {}
+function plateforme_prete(){
+	return get_resultat(racine_initiale + '/Etablissements?nom_etablissement=eq.' + nom_etablissement +'&'+ api_initial)[0]['plateforme_prete']	
+}
+
+
+function initialisation_de_la_plateforme(){
+	
+	vider_fenetre(progression_initialisation())
+	$("#bye_prev").remove()
+	$("#barre_verticale").remove()
+	$("#mynavbar").remove()
+	$("#span_date_effet").remove()
+
+
+
+	afficher_fenetre(true)	
+
+	contenu = "Bonjour <span style='font-weight: bold;color: #FF6C00;'> "+recuperer('identifiant_courant').toUpperCase()+ "</span>, et bienvenue sur la plateforme de télé-enseignement Sekooly!<br><br>"
+	contenu += "Pour mettre en route la plateforme de l'établissement <b>" + nom_etablissement.toUpperCase() + "</b>, nous aurons besoin de quelques informations supplémentaires.<br><br><rouge>Toutes les informations que vous allez saisir seront modifiables plus tard.</rouge><br>"
+	bouton = "<button onclick='suivant()' id='bouton_suivant' class='mon_bouton' style='height: 50px;font-size: inherit;'>C'est parti!</button>"
+	
+	conteneur_texte_html = '<div class="init" style="overflow: hidden auto;height: 90%;padding: 2%;text-align: center;font-size: 150%;"><div id="contenu_etape">'+contenu+'</div>'+bouton+'</div>'
+	conteneur_texte = document.createElement('div')
+	conteneur_texte.innerHTML = conteneur_texte_html
+	$("#fenetre")[0].appendChild(conteneur_texte.firstChild)
+
+
+	if(numero_etape > 0){
+		//numero_etape = numero_etape-1
+		suivant()
+	}else{
+		chargement(false)
+	}
+
+
+}
+
+function suivant(){
+
+	if(enregistrer_la_saisie()){
+
+		numero_etape = numero_etape+1
+		//console.log(numero_etape)
+
+		if(numero_etape < nb_etapes){
+
+			resultat = get_resultat(racine_initiale + "Etapes?id=eq."+numero_etape+"&" + api_initial)[0]
+			
+			changer_contenu_etape(resultat["contenu_etape"])
+			changer_texte_bouton(resultat["bouton_suivant"])
+			$("#titre_fenetre")[0].innerHTML = progression_initialisation()
+		}else{
+
+			chargement(true)
+			changer_contenu_etape("Merci de patienter sans actualiser l'onglet, nous créons vos données!")
+			$("#bouton_suivant").remove()		
+			$("#titre_fenetre")[0].innerHTML = progression_initialisation()	
+			proceder_a_linitialisation()
+		}
+
+	}else{
+		alert("Vous devez saisir l'information pour continuer.")
+	}
+	
+	chargement(false)
+}
+
+function proceder_a_linitialisation(){
+
+	a_stocker = JSON.parse(recuperer("a_stocker"))
+
+	//changer le role, la classe, le cycle et le numéro de téléphone de identifiant_courant
+	var nouveau_data = {
+		"Role" : a_stocker["Role"],		
+		"Telephone" : a_stocker["Telephone"],
+		"Cycle" : a_stocker["Cycle"],
+		"Classe" : '(Tous|' + a_stocker["Cycle"] + ')'
+	}
+	url = racine_data + "Administration?Identifiant=eq." + recuperer("identifiant_courant") + "&"+ apikey
+	//console.log(url)
+	patch_resultat_asynchrone(url,nouveau_data)
+
+
+
+
+
+
+	chargement(true)
+
+
+
+
+
+	//créer la classe
+	nouvelle_classe = {
+		"Classe" : a_stocker["Classe"],
+		"Cycle" : a_stocker["Cycle"],
+		"cycle" : a_stocker["Cycle"]
+	}
+	try{
+		creer_formulaire_ajout_donnee_html("Classes", recuperer_entetes_params("Classes"), false, nouvelle_classe)
+		$("#mini_popup")[0].style.display = 'none'
+		ajouter_donnees_saisies("Classes", true)
+
+	}catch(error){
+		console.error(error)
+		alert(error)
+	}
+
+
+
+
+
+	chargement(true)
+
+
+
+
+
+	//créer la matière
+	nouvelle_matiere = {
+		"Classe" : a_stocker["Classe"],
+		"Cycle" : a_stocker["Cycle"],
+		"cycle" : a_stocker["Cycle"],
+		"Matiere" : a_stocker["Matiere"],
+		"coefficient_matiere" : a_stocker["coefficient_matiere"],
+		"Couleur_matiere" : "noir",
+		"commun_au_cycle" : "non"
+	}
+	try{
+		creer_formulaire_ajout_donnee_html("Matieres", recuperer_entetes_params("Matieres"), false, nouvelle_matiere)
+		$("#mini_popup")[0].style.display = 'none'
+		ajouter_donnees_saisies("Matieres", true)
+
+	}catch(error){
+		console.error(error)
+		alert(error)
+	}
+
+
+
+
+
+
+
+
+	chargement(true)
+
+
+
+
+
+
+
+
+	//créer le prof avec un mdp random (123456)
+	nouveau_prof = {
+		"Nom": a_stocker["Nom_prof"],
+		"Prénom(s)": a_stocker["Prénoms_prof"],		
+		"Identifiant" : a_stocker["Nom_prof"].trim().toLowerCase() + "." + a_stocker["Prénoms_prof"].trim().toLowerCase(),
+		"Code": "123456",
+		"Cycle": a_stocker["Cycle"],
+		"Classe": '(' + a_stocker["Classe"] + '|' + a_stocker["Matiere"] + ')',
+		"Nom_complet": a_stocker["Nom_prof"] + ' ' + a_stocker["Prénoms_prof"]
+
+	}
+	//console.log(nouveau_prof)
+	ajouter_un_element("Profs", nouveau_prof)
+
+
+
+
+
+
+	chargement(true)
+
+
+
+
+
+
+
+
+	//créer l'élève
+	nouveau_eleve = {
+		"Nom": a_stocker["Nom"],
+		"Prénom(s)": a_stocker["Prénom(s)"],		
+		"Identifiant" : a_stocker["Nom"].trim().toLowerCase() + "." + a_stocker["Prénom(s)"].trim().toLowerCase(),
+		"Code": a_stocker["Code"],
+		"Cycle": a_stocker["Cycle"],
+		"Classe": a_stocker["Classe"],
+
+	}
+	//console.log(nouveau_eleve)
+	ajouter_un_element("Eleves", nouveau_eleve)
+
+
+
+
+
+
+
+
+
+	chargement(true)
+
+
+
+
+
+		
+	//supprimer les variables temporaires
+	//effacer('numero_etape')
+	//effacer('a_stocker')
+
+
+
+
+
+	//mettre plateforme_prete à vrai
+	//actualiser
+	nouveau_data = {"plateforme_prete":true}
+	patch_resultat_asynchrone(racine_initiale + "Etablissements?nom_etablissement=eq."+nom_etablissement+ "&"+api_initial,nouveau_data).then(function(data){
+		console.log(data)
+
+		// on affiche l'alerte
+		var msg_alerte = element_DOM("snackbar");
+		msg_alerte.innerText = "Votre plateforme est prête.";
+		msg_alerte.className = "show";
+		
+		//dans 3 secondes, on masque l'alerte
+		setTimeout(function(){
+			msg_alerte.className = "";
+			window.location.href = window.location.href
+		}, 3000);
+
+
+
+
+	})
+
+
+
+
+
+
+
+
+
+
+
+}
+
+function enregistrer_la_saisie(){
+
+	if(numero_etape > 0){
+		tout_est_ok = $("#contenu_etape :input")[0] ? $("#contenu_etape :input")[0].value.trim() !== "" : true
+		if(tout_est_ok && $("#contenu_etape :input")[0]){
+
+
+			for (i = 0 ; i<$("#contenu_etape :input").length;i++){					
+				id = $("#contenu_etape :input")[i].id
+				a_stocker[id] = $("#contenu_etape :input")[i].value.trim()
+			}
+
+
+
+			stocker("a_stocker",JSON.stringify(a_stocker))			
+			stocker("numero_etape",numero_etape)
+
+
+
+
+		}
+	}else{
+		tout_est_ok = true
+	}
+	return tout_est_ok
+}
+
+function progression_initialisation(){
+	reinit_init = numero_etape > 0 ? '<img id="reset_param" onclick="reinitialiser_init()" alt="Recommencer" src="https://sekooly.github.io/SUPABASE/images/img_reset.png" class="icone_param">' : ''
+	return 'Bienvenue sur Sekooly <i><progress style="width: 60px;" value="'+numero_etape+'" max="'+nb_etapes+'"></progress>'+numero_etape+'/'+nb_etapes +'</i>' + reinit_init
+}
+
+
+function changer_contenu_etape(nouveau_texte){
+	$("#contenu_etape")[0].innerHTML = nouveau_texte
+}
+
+function changer_texte_bouton(nouveau_texte){
+	$("#bouton_suivant")[0].innerText = nouveau_texte
+}
+
+function reinitialiser_init(){
+	confirmation = confirm("Êtes-vous sûr de réinitialiser toutes vos saisies et de revenir à l'étape 0 ?")
+	if(confirmation){
+
+		effacer('numero_etape')
+		effacer('a_stocker')
+		window.location.href = window.location.href
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
