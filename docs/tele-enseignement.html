@@ -30,6 +30,10 @@
 	  	<script src="scripts/pdf.js"></script>
 	  	<script src="scripts/pdf.worker.js"></script>
 
+	  	<!-- éditer du texte riche -->
+	  	<script src="https://cdn.ckeditor.com/ckeditor5/27.0.0/classic/ckeditor.js"></script>
+	  	<script src="https://cdn.ckeditor.com/ckeditor5/27.0.0/classic/translations/fr.js"></script>
+	  	
 
   	
 
@@ -45,6 +49,24 @@
 		progress::-webkit-progress-value { background: #f9aa71; }
 		progress { color: #f9aa71; }
 
+
+		.ck.ck-editor {
+		    position: relative;
+		    max-width: 100%;
+		}
+
+		blockquote{
+			cursor: pointer;
+			font-style: italic;
+			color: #717171;
+			border-left-style: groove;
+			padding: 0.01px;
+			    padding-left: 0.01px;
+			padding-left: 10px;
+			margin: 0;
+			background-color: #d9d9d9;
+
+		}
 
 		.coef_rendu{
 		    width: inherit;
@@ -367,6 +389,7 @@
 		A {
 			text-decoration: none;
 			color: black;
+			font-weight: bold;
 		}
 
 		/*Dossier de matière*/

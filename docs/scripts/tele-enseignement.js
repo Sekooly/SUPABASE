@@ -5096,9 +5096,12 @@ $(function charger_fichiers(e){
 			if (e.target.id === "" && e.target.onclick ===null && e.target.classeName ==="") {quitter_previsualisation();
 			}
 
-			if(e.target.id!=="bulle_notif" && e.target.id!=="recup_notifs" && !e.target.className.includes("notif")){
-				
-				virer_le_pannel_notifs();
+			if(typeof(e.target.className)==="string"){
+				//console.log(e.target.className)
+				if(e.target.id!=="bulle_notif" && e.target.id!=="recup_notifs" && !e.target.className.includes("notif")){
+					
+					virer_le_pannel_notifs();
+				}
 			}
 
 			if(!e.target.id.toLowerCase().includes("devoir") && !e.target) afficher_fenetre_rendudevoir(false);
@@ -5155,7 +5158,7 @@ $(function charger_fichiers(e){
 			vider_fenetre("Nouvelle discussion");
 			element_DOM('maquestion').src="";
 
-			var nouveau_message = '<form id="mon_formulaire" autocomplete="off" style="padding: 0% 3% 0% 3%;height:82%;overflow-y: auto;"><label id="label" for="titre_question">Titre: </label><input type="text" id="titre_question" maxlength="50" style="width: 100%;">	<br><br><label id="label" for="contenu_question">Votre message: </label><textarea id="contenu_question" maxlength="1700" style="width: 100%;height: 70%;resize: none;font-size: 13px;"></textarea><div id="nb_max_div" style="margin-left: 90%;margin-top: 0%;font-size: 10px;"> <font id="nb_max"> 0 / 1700</font> </div><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button type="button" id="Annuler" onclick="recuperer_les_topics(false)"> Annuler </button><button type="button" id="envoi" onclick="envoyer_le_topic()"> Poster </button></div><div id="msg_erreur" style="text-align: center;padding: 1%;color: green;"> </div></form>';
+			var nouveau_message = '<form id="mon_formulaire" autocomplete="off" style="padding: 0% 3% 0% 3%;height:82%;overflow-y: auto;"><label id="label" for="titre_question">Titre: </label><input type="text" id="titre_question" maxlength="50" style="width: 100%;">	<br><br><label id="label" for="contenu_question">Votre message: </label><textarea id="contenu_question" maxlength="1700" style="width: 100%;height: 70%;resize: none;font-size: 13px;"></textarea><div id="nb_max_div" style="margin-left: 90%;margin-top: 0%;font-size: 10px; display:none;"> <font id="nb_max"> 0 / 1700</font> </div><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button type="button" id="Annuler" onclick="recuperer_les_topics(false)"> Annuler </button><button type="button" id="envoi" onclick="envoyer_le_topic()"> Poster </button></div><div id="msg_erreur" style="text-align: center;padding: 1%;color: green;"> </div></form>';
 
 
 			//sans anonymisation pour l'instant
@@ -5170,10 +5173,15 @@ $(function charger_fichiers(e){
 
 			element_DOM('fenetre').appendChild(mon_message);
 
+
+			rendre_riche("contenu_question")
+
+
 			//à chaque modif du contenu: on mà le nb de carac
+			/*
 			$("#contenu_question").on('change keydown paste input', function(){
 			      changer_nb_caracteres();
-			});
+			});*/
 
 			//focus direct sur le titre
 			element_DOM('titre_question').focus();
@@ -5194,7 +5202,7 @@ $(function charger_fichiers(e){
 
 		function envoyer_le_com(id_topic, mon_identifiant,mon_role,contenu_poste_bis,date){
 			
-			var contenu_poste = encodeURIComponent(contenu_poste_bis);
+			var contenu_poste = contenu_poste_bis//encodeURIComponent(contenu_poste_bis);
 
 
 			//on n'envoie qu'une fois le message
@@ -5212,7 +5220,7 @@ $(function charger_fichiers(e){
 			nouveau_com = {
 				'Horodateur':date_heure_actuelle,
 				'Id_topic': id_topic,
-				'Votre_commentaire': $("#mon_com")[0].value,
+				'Votre_commentaire': recuperer_html_saisie_riche(), //$("#mon_com")[0].value,
 				'Identifiant': recuperer('identifiant_courant'),
 				'Role': mon_role
 			}
@@ -5269,13 +5277,13 @@ $(function charger_fichiers(e){
 		function envoyer_le_topic(){
 
 			var mon_titre = encodeURIComponent(element_DOM('titre_question').value.trim());
-			var mon_contenu =  encodeURIComponent(element_DOM('contenu_question').value.trim());
+			var mon_contenu = recuperer_html_saisie_riche() // encodeURIComponent(element_DOM('contenu_question').value.trim());
 			var mon_identifiant = recuperer('identifiant_courant');
 			
 			//if( element_DOM('anonymisation').checked === true) mon_identifiant = "Anonyme";
 
 			if(mon_contenu.toLowerCase().includes("facebook") || mon_contenu.toLowerCase().includes("fb") || mon_contenu.toLowerCase().includes("messenger")){
-				alert("Vous n'avez pas le droit d'utiliser d'autres plateformes que celle-ci dans le cadre des cours à Hibiscus.")
+				alert("Vous n'avez pas le droit d'utiliser d'autres plateformes que celle-ci dans le cadre des cours à "+nom_etablissement+".")
 				return -1;
 			}
 			
@@ -5310,7 +5318,7 @@ $(function charger_fichiers(e){
 					'Id_topic':id_topic,
 					'Horodateur': date_heure_actuelle,
 					'Titre': $("#titre_question")[0].value,
-					'Votre_message': $("#contenu_question")[0].value,
+					'Votre_message': recuperer_html_saisie_riche(), //$("#contenu_question")[0].value,
 					'Identifiant': recuperer('identifiant_courant'),
 					'Id_classe_matiere': recuperer('dossier_chargé'),
 					'Role': mon_role,
@@ -5568,7 +5576,7 @@ $(function charger_fichiers(e){
 
 			if (oui){
 
-				var bloc_commenter = '<div id="bloc_commenter" style="padding: 2%;display: flex;"><textarea id="mon_com" style="display:inline-block; width:100%; resize: unset; min-height:200px; overflow-y:hidden;" placeholder="Votre commentaire..." maxlength="1500"></textarea><button id="envoicommentaire" onclick=ajouter_mon_com() style="height:30px;background-color: #FF6C00;color: white; ">Commenter</button></div>';
+				var bloc_commenter = '<div id="bloc_commenter" style="padding: 2%;display: block;text-align: end;"><textarea id="mon_com" style="display:inline-block; width:100%; resize: unset; min-height:200px; overflow-y:hidden;" placeholder="Votre commentaire..." maxlength="1500"></textarea><button id="envoicommentaire" onclick=ajouter_mon_com() style="height: 30px;background-color: #FF6C00;">Commenter</button></div>';
 
 				//ajouter le bloc COMMENTER dans le DOM
 				var le_bloc = document.createElement('div');
@@ -5576,6 +5584,8 @@ $(function charger_fichiers(e){
 				while(le_bloc.firstChild) {
 				    element_DOM('liste_des_coms').appendChild(le_bloc.firstChild);
 				}
+
+				rendre_riche("mon_com")
 
 			}else{
 				if (element_DOM('bloc_commenter') !== null) element_DOM('bloc_commenter').remove();
@@ -5638,7 +5648,7 @@ $(function charger_fichiers(e){
 		function ajouter_mon_com(){
 
 			chargement(true);
-			var contenu_poste = element_DOM('mon_com').value.trim();
+			var contenu_poste = recuperer_html_saisie_riche() //element_DOM('mon_com').value.trim();
 
 			//on continue ssi contenu poste NON VIDE
 			if (contenu_poste!==""){
@@ -5651,6 +5661,7 @@ $(function charger_fichiers(e){
 				//envoyer le commentaire sur le serveur
 				id_topic = recuperer('topic_chargé');
 				//console.log(id_topic)
+				//console.log(contenu_poste)
 				envoyer_le_com(id_topic,mon_identifiant,mon_role,contenu_poste,date);
 			}
 			chargement(false);
@@ -5742,7 +5753,9 @@ $(function charger_fichiers(e){
 
 
 					var titre = valeur['Titre'];
-					var contenu = valeur['Votre_message'];
+					element_contenu = document.createElement('div')
+					element_contenu.innerHTML = valeur['Votre_message'];
+					var contenu = element_contenu.innerText
 					
 					var date = afficher_date(valeur['Horodateur']);
 					var auteur =  valeur['Identifiant'] + " (" + valeur['Role'] + ")";
@@ -5769,6 +5782,8 @@ $(function charger_fichiers(e){
 					var un_topic = document.createElement('div');
 					un_topic.innerHTML += dans_fenetre_str;
 					while(un_topic.firstChild) ma_liste.appendChild(un_topic.firstChild);
+
+
 
 				});
 				
@@ -9463,4 +9478,48 @@ function reinitialiser_init(){
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**************************************** textes riches *****************************************/
+function rendre_riche(id_text_area ){
+	ClassicEditor
+		.create( document.querySelector( '[id="'+id_text_area+'"]' )   , config_editor() )
+        .then( editor => {
+            console.log( editor )
+        } )
+	    .catch( error => {
+	        console.error( error );
+	    });
+}
+
+
+function recuperer_html_saisie_riche(){
+	return $(".ck.ck-content.ck-editor__editable.ck-rounded-corners.ck-editor__editable_inline.ck-blurred")[0].innerHTML
+}
 

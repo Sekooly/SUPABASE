@@ -843,3 +843,18 @@ function actualiser_octets(){
     
   }
 }
+
+
+
+function config_editor(){
+  config = {
+    language: {
+      content: "fr",
+      ui: "fr"
+    },
+    toolbar: {items : ["heading","|", 'bold', 'italic','fontBackgroundColor',"|", "bulletedList","numberedList","|","blockQuote"]}
+
+  }
+
+  return config;
+}
