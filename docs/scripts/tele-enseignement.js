@@ -1,4 +1,4 @@
-var elements_menu_haut = ["Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Alerte", "Logs", "Visio", "Notifs", "Fichiers", "Rendus", "Topic", "Coms","Espace etablissement restant"]
+var elements_menu_haut = ["Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Alerte", "Logs", "Visio", "Notifs", "Fichiers", "Rendus", "Topic", "Coms","Espace etablissement restant","Analyses des connexions"]
 var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL_Mapping","URL_agenda",
 								"id_googlecalendar","nb_avis_donnés", "nb_avis_max","nom_fiche","taux_conseil",
 								"Matiere_bis", "classe_id", "classe_bis", "type", "Derniere_consultation_notifs",
@@ -7241,44 +7241,55 @@ function appliquer_filtre_choisi(nom_champ_reference, valeur_champ_reference){
 
 
 function un_menu_clic(id_parametre){
-	$("#mini_popup").remove()
-    mettre_en_forme_onglet_clicked(id_parametre);
-    actualiser_filtre_onglet(id_parametre);
-    actualiser_details_parametre(id_parametre);
-	mettre_etat_espace(id_parametre)
-    
-    //pas de modifs à faire
-    if($("#boutons_params")){
-	    if (elements_menu_haut_avec_modifs.indexOf(id_parametre) === -1){
-	    	autoriser_les_modifs(false)
-	    }else{
-	    	autoriser_les_modifs(true)
-	    }
-	}
 
-	//pas de reinit a faire
-    if($("#boutons_params")){
-	    if (elements_menu_haut_avec_reset.indexOf(id_parametre) === -1){
-	    	autoriser_le_reset(false)
-	    }else{
-	    	autoriser_le_reset(true)
-	    }
-	}
+	//si c'est une analyse -> on va direct dans le nouvel onglet
+	if(id_parametre.includes("Analyses")){
 
-	//pas de "tout voir" à faire
+		window.open("analyses/"+id_parametre.split(" ").pop() +".html", '_blank').focus();
 
-	if($("#boutons_params")){
-		elements_menu_haut_avec_tout_voir = recuperer("liste_params_colonnes_masquees")
+	}else{
 
-	    elements_menu_haut_avec_tout_voir = elements_menu_haut_avec_tout_voir ?  elements_menu_haut_avec_tout_voir.split(",") : []
-		if(elements_menu_haut_avec_tout_voir.indexOf(id_parametre + ":") === -1){
-			autoriser_tout_voir(false)
-		}else{
-			autoriser_tout_voir(true)
+
+
+		$("#mini_popup").remove()
+	    mettre_en_forme_onglet_clicked(id_parametre);
+	    actualiser_filtre_onglet(id_parametre);
+	    actualiser_details_parametre(id_parametre);
+		mettre_etat_espace(id_parametre)
+	    
+	    //pas de modifs à faire
+	    if($("#boutons_params")){
+		    if (elements_menu_haut_avec_modifs.indexOf(id_parametre) === -1){
+		    	autoriser_les_modifs(false)
+		    }else{
+		    	autoriser_les_modifs(true)
+		    }
 		}
+
+		//pas de reinit a faire
+	    if($("#boutons_params")){
+		    if (elements_menu_haut_avec_reset.indexOf(id_parametre) === -1){
+		    	autoriser_le_reset(false)
+		    }else{
+		    	autoriser_le_reset(true)
+		    }
+		}
+
+		//pas de "tout voir" à faire
+
+		if($("#boutons_params")){
+			elements_menu_haut_avec_tout_voir = recuperer("liste_params_colonnes_masquees")
+
+		    elements_menu_haut_avec_tout_voir = elements_menu_haut_avec_tout_voir ?  elements_menu_haut_avec_tout_voir.split(",") : []
+			if(elements_menu_haut_avec_tout_voir.indexOf(id_parametre + ":") === -1){
+				autoriser_tout_voir(false)
+			}else{
+				autoriser_tout_voir(true)
+			}
+		}
+	    
+		
 	}
-    
-	
 
 
 
