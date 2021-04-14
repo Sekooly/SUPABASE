@@ -1325,13 +1325,15 @@ function mettre_devoir_en_ligne(lien_script,params, nom_fichier, extension,id_do
 function retourner_site(){
 
 	vider_fenetre("Sekooly")
+	
+	visualiser("Tutoriels d'utilisation.docx","1HnsoX5_NQGhJ34WZ68p9SPvZ30jn4gKpf_cQjz2ZyUo",false,"Tutoriels d'utilisation")
 	afficher_fenetre(true)
-
-	contenu = "Bonjour <span style='font-weight: bold;color: #FF6C00;'> "+recuperer('identifiant_courant').toUpperCase()+ "</span>, bienvenue sur la plateforme de télé-enseignement Sekooly !<br><br>Sur cette page, vous trouverez bientôt des tutoriels d'utilisation de Sekooly, en fonction de votre rôle au sein de votre établissement.<br><br>Cette section est en cours de construction, merci infiniment de votre patience !"
-	conteneur_texte_html = '<div style="overflow: hidden auto;height: 90%;padding: 2%;"><div>'+contenu+'</div></div>'
+	/*contenu = "Bonjour <span style='font-weight: bold;color: #FF6C00;'> "+recuperer('identifiant_courant').toUpperCase()+ "</span>, bienvenue sur la plateforme de télé-enseignement Sekooly !<br><br>Sur cette page, vous trouverez bientôt des tutoriels d'utilisation de Sekooly, en fonction de votre rôle au sein de votre établissement.<br><br>Cette section est en cours de construction, merci infiniment de votre patience !"
+	conteneur_texte_html = '<div style="overflow: hidden auto;height: 90%;padding: 2%;"><div id="redaction" >'+contenu+'</div></div>'
 	conteneur_texte = document.createElement('div')
 	conteneur_texte.innerHTML = conteneur_texte_html
-	$("#fenetre")[0].appendChild(conteneur_texte.firstChild)
+	$("#fenetre")[0].appendChild(conteneur_texte.firstChild)*/
+	
 
 }
 
@@ -9533,4 +9535,51 @@ function rendre_riche(id_text_area ){
 function recuperer_html_saisie_riche(){
 	return $(".ck.ck-content.ck-editor__editable.ck-rounded-corners.ck-editor__editable_inline.ck-blurred")[0].innerHTML
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/********************************************* REDACTION DE TUTORIEL *********************************************/
+//si est déjà dans la liste de rédacteurs -> OK
+//sinon
+
 
