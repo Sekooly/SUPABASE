@@ -870,7 +870,8 @@ function mettre_remarque_et_note(id_fichier, remarque,coefficient_rendu,note_ren
 		}
 
 		actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouvelle_remarque)
-
+		
+		
 
 		if (remarque_prof.length > 0){
 			
@@ -891,6 +892,8 @@ function mettre_remarque_et_note(id_fichier, remarque,coefficient_rendu,note_ren
 
 		//au bout de 2 secondes
 		setTimeout(function(){
+			quitter_previsualisation()
+			quitter_previsualisation_bis()
 			recuperer_mon_devoir(element_DOM('devoir_choisi').value);
 		}, 2000);
 		
@@ -907,6 +910,7 @@ function mettre_remarque_et_note(id_fichier, remarque,coefficient_rendu,note_ren
 
 
 function fenetre_remarque_note(id_fichier, note_rendu, remarque){
+	//console.log(id_fichier)
 	nom_proprio_devoir = $("#proprietaire" + id_fichier)[0].innerText.trim().toUpperCase()
 	/*
 	alert(nom_proprio_devoir)
@@ -3640,10 +3644,26 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 							pas_de_telechargement ? '' :
 							'<a id="telechargement" style="position: fixed;z-index:3;" href = "https://drive.google.com/uc?export=download&id=' + id_fichier +'"><img style="width: 30px; cursor: pointer;position:fixed;" id="'+ id_fichier+ '" src="https://sekooly.github.io/SUPABASE/images/img_download.png"></a>';
 
+
+	if(nom_proprio_devoir){
+		url = racine_data +"Rendus?id_fichier=eq."+ id_fichier+"&"+ apikey
+		//console.log(url)
+		donnees_devoir_a_corriger = get_resultat(url)
+		remarque = donnees_devoir_a_corriger[0]['remarque']
+		coefficient_rendu = donnees_devoir_a_corriger[0]['coefficient_rendu']
+		note_rendu = donnees_devoir_a_corriger[0]['note_rendu']
+		var bouton_corriger = '<span id="'+id_fichier+'"><img id="corriger" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png" style="width: 30px; height: 30px; cursor: pointer; position: fixed; z-index: 3; top: 141px; left: 913px;" onclick="mettre_remarque_devoir(this,\'' + remarque +'\',' + coefficient_rendu +','+ note_rendu + ')"></span>'
+
+
+	}else{
+		var bouton_corriger = ""
+	}
+
+
 	//console.log(bouton_télécharger)
 	//on le met dans l'en-tête
 	var a_ajouter = document.createElement('div');
-	a_ajouter.innerHTML = bouton_télécharger;
+	a_ajouter.innerHTML = bouton_corriger + bouton_télécharger;
 	while(a_ajouter.firstChild)
 		element_DOM('entete-fenetre').appendChild(a_ajouter.firstChild);
 
@@ -3963,6 +3983,7 @@ function ajuster_boutons_fenetre(bis){
 	la_fenetre = element_DOM(nom_fenetre);
 	le_bouton_quittter = element_DOM(nom_bouton_quittter);
 	le_bouton_telecharger = element_DOM(nom_bouton_telecharger);
+	le_bouton_corriger = element_DOM("corriger");
 
 	if(la_fenetre){
 
@@ -3994,7 +4015,18 @@ function ajuster_boutons_fenetre(bis){
 			//console.log("bouton télécharger OK: " + le_bouton_telecharger.style.top + " et " + le_bouton_telecharger.style.left);
 		}
 		
+		if (le_bouton_corriger){
+			var le_top = (la_fenetre.offsetTop) + "px";
+			var le_left = (la_fenetre.offsetLeft + la_fenetre.offsetWidth - 90) + "px";
+			//console.log(le_left);
 
+			le_bouton_corriger.style.top = le_top;
+			le_bouton_corriger.style.left= le_left;
+			//console.log("bouton corriger OK: " + le_bouton_corriger.style.top + " et " + le_bouton_corriger.style.left);
+
+
+			//<img id="corriger" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png" style="width: 30px; height: 30px; cursor: pointer; position: fixed; z-index: 3; top: 141px; left: 913px;" onclick="">
+		}
 
 	}
 
