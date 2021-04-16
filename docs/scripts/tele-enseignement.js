@@ -6482,7 +6482,8 @@ function recuperer_notifs(){
 	nom_champ_reference = mon_type.includes("Admin") ? "Cycle" : "Classe"
 	valeur_champ_reference = JSON.parse(recuperer("mes_donnees"))[nom_champ_reference]
 
-	//TODO: si prof -> les notifs de ses matieres issues du champ Classe
+	//si prof -> les notifs de ses matieres issues du champ Classe
+	//limité à 150
 	if(mon_type.includes('Profs')){
 
 		rechercher_notifs_prof(valeur_champ_reference, 150).then(les_notifs => {
@@ -6501,7 +6502,8 @@ function recuperer_notifs(){
 
 	}else{
 
-		rechercher(nom_table, nom_champ_reference, valeur_champ_reference, "").then(les_notifs => {
+		//limité à 150
+		rechercher(nom_table, nom_champ_reference, valeur_champ_reference, "",150).then(les_notifs => {
 			mes_notifs = les_notifs.filter(function(valeur,index){
 				return valeur['Identifiant_derniere_modif'] !== recuperer('identifiant_courant')
 			})
