@@ -858,3 +858,13 @@ function config_editor(){
 
   return config;
 }
+
+
+
+function ordonner_elements(selector, attrName) {
+    return $($(selector).toArray().sort(function(a, b){
+        var aVal = parseInt(a.getAttribute(attrName)),
+            bVal = parseInt(b.getAttribute(attrName));
+        return aVal - bVal;
+    }));
+}

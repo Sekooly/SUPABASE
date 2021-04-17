@@ -9700,10 +9700,263 @@ function voir_edt_classe_choisie(){
 }
 
 
+
+
+
+/********************************** MA JOURNEE (se baser sur les notifs sans limites) **********************************/
+
 function ma_journee(){
-	en_cours()
+	//en_cours()
+	vider_fenetre("Ma journée")
+
+	//sections
+	//pas de Fichiers si non Eleves
+	var je_suis_eleve = recuperer("mon_type") === "Eleves"
+	var sections_a_ajouter = je_suis_eleve ? section_journee("Fichiers") : ""
+	var sections_a_ajouter = section_journee("Fichiers","Les fichiers affichés ont pour <b>date d'effet</b> (donc de consultation) la date de la journée choisie.") // A COMMENTER TODO
+	sections_a_ajouter += section_journee("Devoirs","Les devoirs affichés ont pour <b>date limite de rendu</b> la date de la journée choisie.")
+	sections_a_ajouter += section_journee("Discussions","Les discussions affichées ont pour <b>date de publication</b> la date de la journée choisie.")
+
+	var menu_journee_html = '<div id="menu_journee_haut" style="text-align: center;" class="menu_haut">Date de la journée: <input type="date" id="date_journee" class="date_effet_fichier"></div><div class="section_journee">'+sections_a_ajouter+'</div>'
+	$("#menu_journee_haut").remove();
+	$(".section_journee").remove();
+
+
+
+	$("#fenetre").append(menu_journee_html);
+
+	// à l'actualisation de la date journée
+	$("#date_journee").on('change', maj_date_journee)
+
+	//par défaut: aujourd'hui
+	$("#date_journee")[0].value = moment().format('YYYY-MM-DD')
+	maj_date_journee()
+	
+	
+
+	afficher_fenetre(true)
+}
+
+
+function section_journee(nom_section, remarque_section){
+	return '<div id="section_'+nom_section+'" class="titre_section_journee bloc_topic"><span style="font-size: x-large;padding: 5px;">'+nom_section+'<div style="color: gray;font-size: 15px;background: white;font-style: italic;">'+remarque_section+'</div></span></div>'
+}
+
+function maj_date_journee(){
+
+	//console.log("maj_date_journee")
+	// si vide alors on met la date actuelle
+	if($("#date_journee")[0].value === "") $("#date_journee")[0].value = moment().format("YYYY-MM-DD")
+
+	chargement(true)
+	
+	
+	$('.alerte_section_journee').remove()
+	$('.contenu_section_journee').remove()
+
+
+	
+	/************************************* fichiers HORS devoirs ******************************************/
+	mes_matieres = JSON.parse(recuperer("mes_matieres"))
+	
+	//prof ou eleve
+	if(!recuperer('mon_type').includes('Admin')){
+		les_id_dossier_classe = '("'+mes_matieres.map(e => e['ID_URL']).join('","') + '")'
+		url = racine_data + 'Fichiers?' +apikey 
+		url += '&categorie_fichier=neq.Devoirs'
+		url += '&date_effet=eq.' + $("#date_journee")[0].value 
+		url += '&id_dossier=in.' + les_id_dossier_classe
+	
+	//admin
+	}else{
+		url = racine_data + 'Fichiers?' +apikey 
+		url += '&categorie_fichier=neq.Devoirs'
+		url += '&date_effet=eq.' + $("#date_journee")[0].value 
+	}
+
+
+
+
+	url += '&order=date_effet.asc,heure_effet.asc,id_dossier.asc'
+
+	//console.log(les_id_dossier_classe)
+	//console.log(url)
+	resultats = get_resultat(url)
+	//console.log(resultats)
+	traiter_section(mes_matieres,"Fichiers",resultats,"date_effet","heure_effet","id_dossier","nom_fichier","id_fichier","fichier")
+
+
+
+
+	//todo
+	/************************************* fichiers de devoirs ******************************************/
+	//prof ou eleve
+	if(!recuperer('mon_type').includes('Admin')){
+		les_id_dossier_classe = '("'+mes_matieres.map(e => e['ID_URL']).join('","') + '")'
+		url = racine_data + 'Fichiers?' +apikey 
+		url += '&categorie_fichier=eq.Devoirs'
+		url += '&la_date_limite=eq.' + $("#date_journee")[0].value 
+		url += '&id_dossier=in.' + les_id_dossier_classe
+	
+	//admin
+	}else{
+		url = racine_data + 'Fichiers?' +apikey 
+		url += '&categorie_fichier=eq.Devoirs'
+		url += '&la_date_limite=eq.' + $("#date_journee")[0].value 
+	}
+	url += '&order=la_date_limite.asc,lheure_limite.asc,id_dossier.asc'
+	//console.log(url)
+	resultats = get_resultat(url)
+	//console.log(resultats)
+	traiter_section(mes_matieres,"Devoirs",resultats,"la_date_limite","lheure_limite","id_dossier","nom_fichier","id_fichier","devoir",true)
+
+
+
+
+	/************************************* discussions ******************************************/
+	
+	if(!recuperer('mon_type').includes('Admin')){
+		url = racine_data + 'Topic?' +apikey 
+		url += '&Horodateur=like.' + $("#date_journee")[0].value  +'*'
+		url += '&Id_classe_matiere=in.' + les_id_dossier_classe
+		//console.log(url)
+	}else{
+		url = racine_data + 'Topic?' +apikey 
+		url += '&Horodateur=like.' + $("#date_journee")[0].value  +'*'
+		//console.log(url)
+
+	}
+	url += '&order=Horodateur.asc'
+	//console.log(url)
+	resultats = get_resultat(url)
+	//console.log(resultats)
+	traiter_section(mes_matieres,"Discussions",resultats,"Horodateur","Horodateur","Id_classe_matiere","Titre","Id_topic","discussion")
+
+
+	chargement(false)
+	
+}
+
+function traiter_section(mes_matieres,nom_section,resultats,nom_champ_date_reference,nom_champ_heure_reference,nom_champ_id_classe_matiere,intitulé_nom_fichier,nom_champ_id_voir,type_notif,est_devoir){
+	if(resultats.length ===0){
+		$("#section_"+nom_section).append(aucun_element_section())
+	}else{
+
+		$("#section_"+nom_section).innerHTML = ""
+
+
+		//si admin -> ne pas garder les classes-matières méconuues
+		//console.log(resultats)
+		//console.log(JSON.stringify(mes_matieres))
+		if(recuperer('mon_type').includes("Admin")){
+			resultats = resultats.filter(e => JSON.stringify(mes_matieres).includes(e[nom_champ_id_classe_matiere]))
+		}
+		//console.log(resultats)
+
+		for (var numero_fichier = 0; numero_fichier < resultats.length; numero_fichier++) {
+
+			id_classe_matiere = resultats[numero_fichier][nom_champ_id_classe_matiere]
+			nom_classe = mes_matieres.filter(e => e['ID_URL'] === id_classe_matiere)[0]['Classe']
+			nom_matiere = mes_matieres.filter(e => e['ID_URL'] === id_classe_matiere)[0]['Matiere']
+			nom_fichier = resultats[numero_fichier][intitulé_nom_fichier]
+
+			//si c'est un non eleve -> on ajoute nom_classe
+			if(!recuperer('mon_type').includes('Eleves')) nom_matiere = nom_classe + ' - ' + nom_matiere
+
+			//console.log(nom_champ_date_reference)
+			date_reference =  resultats[numero_fichier][nom_champ_date_reference]
+			
+			//console.log(nom_champ_heure_reference)
+			heure_reference =  resultats[numero_fichier][nom_champ_heure_reference]
+			
+
+			//console.log(date_reference)
+			//console.log(heure_reference)
+
+			if(date_reference===heure_reference && date_reference.length > 0 ){
+				date_reference = date_reference.split(" ")[0]
+				heure_reference = heure_reference.split(" ")[1].split(".")[0]
+			}
+
+			champ_id = resultats[numero_fichier][nom_champ_id_voir]
+
+			if(est_devoir){
+				deja_rendu = false
+				deja_corrigé = false
+				
+				//pour les élèves : regarder si on a des rendus à mon nom
+				if(recuperer('mon_type') === 'Eleves'){
+					url = racine_data + 'Rendus?proprietaire=eq.' +recuperer('identifiant_courant').toLowerCase() 
+					url += '&id_fichier_sujetdevoir=eq.' + champ_id
+					url += '&' + apikey
+					//console.log(url)
+					deja_rendu = get_resultat(url).length > 0
+
+				//pour les profs/admin : regarder si on a des rendus -> si oui, mettre une coche SSI tout est corrigé
+				}else if(recuperer('mon_type') === 'Profs' || recuperer('mon_type').includes('Admin')){
+					url = racine_data + 'Rendus?id_fichier_sujetdevoir=eq.' + champ_id
+					url += '&' + apikey
+					//console.log(url)
+					rendus_recus = get_resultat(url)
+					nb_corrigés = rendus_recus.filter(e => e['remarque'] !== "").length
+					deja_corrigé = rendus_recus.length > 0 ? '<progress style="width: 60px;" value="'+nb_corrigés+'" max="'+rendus_recus.length+'"></progress> <b><rouge>' + nb_corrigés + "/"+rendus_recus.length + '</rouge></b>' : false
+					//console.log(deja_corrigé)
+				}
+
+				dejà_traité = deja_rendu || deja_corrigé
+
+			}else{
+				dejà_traité = false
+			}
+
+			element_journee = creer_element_journee(nom_matiere,nom_fichier,date_reference,heure_reference,champ_id,id_classe_matiere,type_notif,dejà_traité)
+			$("#section_"+nom_section).append(element_journee)
+		}
+	}
+
+	//console.log('\n\n')
+
+	//sort la section via le premier mot inner text
+	ordonner_elements(".contenu_section_journee",'innerText')
 
 }
+
+
+function creer_element_journee(nom_matiere,nom_fichier,date_reference,heure_reference,champ_id,id_classe_matiere,type_notif,dejà_traité){
+	/*
+	console.log(champ_id)
+	console.log(id_classe_matiere)
+	console.log(type_notif)
+	*/
+
+	if(heure_reference.length !== 0) heure_reference = ' à ' +heure_reference
+
+	//si prof/admin -> pourcentage de correction
+	//sinon -> coche
+	if(recuperer("mon_type").includes('Eleves')){
+		coche_traitement = dejà_traité ? '✅<i style="color: green;">Rendu</i>' : '❌<i><rouge>Pas encore rendu</rouge></i>'
+	}else{
+		coche_traitement = dejà_traité ? dejà_traité : ""
+	}
+
+	return '<div class="contenu_section_journee"><div><b class="nom_matiere_journee">'+nom_matiere+"</b> "+nom_fichier+'<i style="color: #bfbfbf;"> '+afficher_date(date_reference,true) + heure_reference+' </i><span class="mini-image deja_traite">'+coche_traitement+'</span> <img id="'+champ_id+'" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" alt="voir" onclick="clic_de_notif(\''+type_notif+'\',\''+champ_id+'\',\''+id_classe_matiere+'\');" class="mini-image"> <div></div>'
+}
+
+
+function aucun_element_section(){
+	return '<div class="alerte_section_journee">Aucun élément n\'a été trouvé pour la date choisie.</div>'
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
