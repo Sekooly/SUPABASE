@@ -2428,7 +2428,7 @@ function ajouter_les_dossiers_dynamiques(){
 		var lien_classes = valeursUniquesDeCetteKey(mes_matieres, 'classe_id');
 
 
-		les_classes.sort()
+		//les_classes.sort()
 
 		/*
 		console.log(les_classes);
