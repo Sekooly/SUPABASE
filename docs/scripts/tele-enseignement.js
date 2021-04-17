@@ -3367,7 +3367,7 @@ function creer_mini_popup(titre,elements_html,nom_bouton,fonction_bouton,valeur_
 	mini_popup.innerHTML = mini_popup_html;
 	document.body.appendChild(mini_popup.firstChild);
 
-	$("#"+id_element_valeur_actuelle)[0].value=valeur_actuelle;
+	if ($("#"+id_element_valeur_actuelle)[0]) $("#"+id_element_valeur_actuelle)[0].value=valeur_actuelle;
 	
 	if($("#"+id_element_valeur_actuelle_bis)[0])
 		$("#"+id_element_valeur_actuelle_bis)[0].value=valeur_actuelle_bis;
@@ -6074,7 +6074,7 @@ function ajouter_iframe_edt(){
 }
 
 
-function recuperer_edt(){
+function recuperer_edt(nom_classe_fournie){
 	chargement(true);
 
 	vider_fenetre("Emploi du temps");
@@ -6088,6 +6088,9 @@ function recuperer_edt(){
 
 	if(recuperer('mon_type') === "Eleves")
 		nom_classe = JSON.parse(recuperer('mes_donnees'))['Classe'];
+
+	if(nom_classe_fournie)
+		nom_classe = nom_classe_fournie
 
 	//console.log("la classe: "+ nom_classe);
 
@@ -9649,6 +9652,53 @@ function en_cours(){
 }
 
 
+function edt(){
+	mon_type = recuperer('mon_type')
+	//si eleves -> direct ok
+	if(mon_type === 'Eleves'){
+		recuperer_edt()
+
+	//si prof/admin
+	}else{
+
+		//dossier chargé ou mode bis -> ok
+		if(recuperer("dossier_chargé") !== "" || mon_type.includes('bis')){
+			recuperer_edt()
+		
+		//sinon -> choisir la classe à consulter
+		}else{
+			choix_classe_edt()
+		}
+		
+	}
+}
+
+function choix_classe_edt(){
+	les_matieres = JSON.parse(recuperer("mes_matieres"))
+	les_classes = valeursUniquesDeCetteKey(les_matieres,'Classe')
+	les_classes.sort()
+	//console.log(les_classes) 
+
+	if(les_classes.length === 1){
+		recuperer_edt()
+	}else{
+		elements_html = "Classe:<select id='classe_edt'>"
+		for (i = 0; i< les_classes.length;i++){
+			elements_html += '<option value="'+les_classes[i]+'">'+les_classes[i]+'</option>'
+		}
+		elements_html += "</select>"
+		
+		creer_mini_popup("Choisissez la classe à consulter",elements_html, "Voir l'emploi du temps","voir_edt_classe_choisie()")
+	}
+}
+
+
+function voir_edt_classe_choisie(){
+	recuperer_edt($("#classe_edt")[0].value)
+	$("#mini_popup").remove()
+
+}
+
 
 function ma_journee(){
 	en_cours()
@@ -9686,6 +9736,9 @@ function langues(){
 	en_cours()
 
 }
+
+
+
 
 
 //au clic d'un élément du side bar -> le side bar disparait
