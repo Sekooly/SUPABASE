@@ -5585,7 +5585,7 @@ $(function charger_fichiers(e){
 			var date = afficher_date(le_topic['Horodateur']);
 
 			//afficher le poste principal
-			var entete_poste = '	<div id="entete_poste" style="display: flex;overflow-wrap: anywhere;"><img id="retour" src="https://sekooly.github.io/SUPABASE/images/img_retour.png" style="width: 30px;margin-left: 2%;cursor:pointer;"  onclick="recuperer_les_topics(false)"> <div id="titre_du_poste" style="font-weight: bold;margin: 2%;font-size: 25px;">' + titre_poste + '</div></div>';
+			var entete_poste = '	<div id="entete_poste" style="display: flex;overflow-wrap: anywhere;"><img id="retour" src="https://sekooly.github.io/SUPABASE/images/img_retour.png" style="width: 30px;margin: 2%;cursor:pointer;height: 30px;"  onclick="recuperer_les_topics(false)"> <div id="titre_du_poste" style="font-weight: bold;margin: 2%;font-size: 25px;">' + titre_poste + '</div></div>';
 
 			var entete = document.createElement('div');
 			entete.innerHTML = entete_poste;
