@@ -9679,17 +9679,14 @@ function choix_classe_edt(){
 	les_classes.sort()
 	//console.log(les_classes) 
 
-	if(les_classes.length === 1){
-		recuperer_edt()
-	}else{
-		elements_html = "Classe:<select id='classe_edt'>"
-		for (i = 0; i< les_classes.length;i++){
-			elements_html += '<option value="'+les_classes[i]+'">'+les_classes[i]+'</option>'
-		}
-		elements_html += "</select>"
-		
-		creer_mini_popup("Choisissez la classe à consulter",elements_html, "Voir l'emploi du temps","voir_edt_classe_choisie()")
+	elements_html = "Classe:<select id='classe_edt'>"
+	for (i = 0; i< les_classes.length;i++){
+		elements_html += '<option value="'+les_classes[i]+'">'+les_classes[i]+'</option>'
 	}
+	elements_html += "</select>"
+	
+	creer_mini_popup("Choisissez la classe à consulter",elements_html, "Voir l'emploi du temps","voir_edt_classe_choisie()")
+
 }
 
 
