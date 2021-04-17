@@ -561,8 +561,8 @@ function initialisation_choix_devoir(){
 				//alerte: trop tôt pour rendre
 				if(est_examen==="oui" && fichier_ouvrable(e.target.value,false)===false && examen_terminé===false){
 
-
-					alert("Vous ne pouvez pas encore rendre cet examen dont la date d'effet est le " + afficher_date(date_debut + " 07:30"));
+					//alert(date_debut)
+					alert("Vous ne pouvez pas encore rendre cet examen dont la date d'effet est le " + afficher_date_old(date_debut,true));
 					e.target.value = "--";
 
 				//devoirs classique
@@ -9807,9 +9807,9 @@ function maj_date_journee(){
 		url += '&la_date_limite=eq.' + $("#date_journee")[0].value 
 	}
 	url += '&order=la_date_limite.asc,lheure_limite.asc,id_dossier.asc'
-	console.log(url)
+	//console.log(url)
 	resultats = get_resultat(url)
-	console.log(resultats)
+	//console.log(resultats)
 	traiter_section(mes_matieres,"Devoirs",resultats,"la_date_limite","lheure_limite","id_dossier","nom_fichier","id_fichier","devoir",true)
 
 
