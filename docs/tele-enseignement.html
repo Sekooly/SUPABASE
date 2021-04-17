@@ -34,8 +34,8 @@
 	  	<script src="https://cdn.ckeditor.com/ckeditor5/27.0.0/classic/ckeditor.js"></script>
 	  	<script src="https://cdn.ckeditor.com/ckeditor5/27.0.0/classic/translations/fr.js"></script>
 	  	
-
-  	
+	  	<!-- SIDE BAR -->
+	  	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sidebar/3.3.2/jquery.sidebar.min.js"></script>
 
 	</head> 
 
@@ -48,6 +48,44 @@
 		progress::-moz-progress-bar { background: #f9aa71; }
 		progress::-webkit-progress-value { background: #f9aa71; }
 		progress { color: #f9aa71; }
+
+		.sidebar.left {
+		    position: fixed;
+		    top: 0;
+		    left: 0;
+		    bottom: 0;
+		    width: 270px;
+		    background: #333;
+		    color: white;
+		    z-index: 4;
+		    margin-top: 5%;
+		    max-width: 35%;
+		    opacity: 90%;
+		    overflow: auto;
+		    margin-top: 5.2vh;
+		}
+
+		.sidebar.left > div{
+			font-size: 25px;
+			font-family: Arial;
+			text-align: center;
+			padding: 10%;
+		    cursor: pointer;
+		}
+
+		.sidebar.left > div:hover{
+			font-weight: bold;
+		}
+
+
+
+
+
+
+
+
+
+
 
 
 		.ck.ck-editor {
@@ -342,6 +380,11 @@
 		    font-size: 150%;
 		    max-width: 70%;
 		  }
+		    
+
+		  .sidebar.left > div{
+		    font-size: 150%;
+		  }
 
 		  .bas_de_page{
 			font-size: 15px;
@@ -353,6 +396,10 @@
 		  .navbar > font {
 		    font-size: 15px;
 		    max-width: 50%;
+		  }
+		    
+  		  .sidebar.left > div{
+	        font-size: 15px;
 		  }
 
 		  .bas_de_page{
@@ -1239,6 +1286,7 @@
 	<iframe class="maquestion" src="" id="maquestion"></iframe>
 
 
+
 	<div class="navbar" id="mynavbar">
 			
 		<span onclick="deconnexion()">
@@ -1261,7 +1309,9 @@
 			<img id="recup_params" position="50px" alt="EDT" class="icone_navbar" style="display: none;width: 37px;" id="params" onclick="recuperer_parametres()" src="images/img_parametres.png">
 		</span>
 
-		<span class="retourner_en_arriere" id="logo" onclick="retourner_site()"><img alt="SEKOOLY" src="images/logo-no-background-128x128.png" width="25" height="35"></span>
+		<span class="retourner_en_arriere" id="logo" onclick="switch_side_bar()"><img alt="SEKOOLY" src="images/img_side_bar.svg" width="25" height="35"></span>
+		
+
 		<span class="retourner_en_arriere" id="bouton_precedent" >  </span>
 		
 
@@ -1271,6 +1321,21 @@
 
 
 	</div>
+
+
+
+	<div class="sidebar left" onclick="fermer_side_bar()">
+		<div onclick="afficher_modif_profil()">Mon profil</div>
+		<div onclick="ma_journee()">Ma journée</div>
+		<div onclick="a_faire()">A faire</div>
+		<div onclick="conseils_de_classe()">Conseil de classe</div>
+		<div onclick="remediations()">Remédiations</div>
+		<div onclick="clic_bulletin()">Bulletins</div>
+		<div onclick="retourner_site()">Aide (tutoriels)</div>
+		<div onclick="langues()">Langue</div>
+		<div><a style="color:white;" href="https://sekooly.com" target="_blank">Site de Sekooly</a></div>
+	</div>
+
 		
 		
 	<span id="span_date_effet" class="span_date_effet">

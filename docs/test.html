@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+
+		<title>TEST SIDEBAR</title>
+		<link rel="shortcut icon" href="images/logo-no-background-128x128.png" type="image/x-icon">
+		<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+		
+
+		<script src="scripts/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sidebar/3.3.2/jquery.sidebar.min.js"></script>
+	</head>
+
+	<style type="text/css">
+
+		.sidebar.left {
+		    position: fixed;
+		    top: 0;
+		    left: 0;
+		    bottom: 0;
+		    width: 270px;
+		    background: #333;
+		    color: white;
+		}
+
+		.sidebar.left > div{
+			font-size: 25px;
+			font-family: Arial;
+			text-align: center;
+			padding: 10%;
+		    cursor: pointer;
+		}
+
+		.sidebar.left > div:hover{
+			font-weight: bold;
+		}
+
+	</style>
+
+	<body>
+
+		<div class="sidebar left">
+			<div>Mon profil</div>
+			<div>Ma journée</div>
+			<div>A faire</div>
+			<div>Conseil de classe</div>
+			<div>Remédiations</div>
+			<div>Bulletins</div>
+			<div>Aide (tuto)</div>
+			<div>Langue</div>
+		</div>
+		<script type="text/javascript">
+			//$(".sidebar.left").sidebar({"Mon profil","Ma journée","A faire","Conseil de classe","Remédiations","Bulletins","Aide (tuto)", "Langue"});
+			function go(){
+				$('.sidebar.left').sidebar().trigger('sidebar:open');	
+			}
+
+			function ungo(){
+				$('.sidebar.left').sidebar().trigger('sidebar:close');		
+			}
+
+			//ungo()
+			
+		</script>
+
+	</body>
+
+
+</html>
+
+

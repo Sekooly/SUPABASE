@@ -1332,6 +1332,7 @@ function retourner_site(){
 	vider_fenetre("Sekooly")
 	
 	visualiser("Tutoriels d'utilisation.docx","1HnsoX5_NQGhJ34WZ68p9SPvZ30jn4gKpf_cQjz2ZyUo",false,"Tutoriels d'utilisation")
+	$("#telechargement").remove()
 	afficher_fenetre(true)
 	/*contenu = "Bonjour <span style='font-weight: bold;color: #FF6C00;'> "+recuperer('identifiant_courant').toUpperCase()+ "</span>, bienvenue sur la plateforme de télé-enseignement Sekooly !<br><br>Sur cette page, vous trouverez bientôt des tutoriels d'utilisation de Sekooly, en fonction de votre rôle au sein de votre établissement.<br><br>Cette section est en cours de construction, merci infiniment de votre patience !"
 	conteneur_texte_html = '<div style="overflow: hidden auto;height: 90%;padding: 2%;"><div id="redaction" >'+contenu+'</div></div>'
@@ -2223,6 +2224,7 @@ function mettre_le_contact_etablissement(){
 function chargement_a_larrivee(){
 	
 	chargement(true);
+	fermer_side_bar()
 	mettre_le_contact_etablissement()
 	rendre_td_modifiable();
 
@@ -2427,7 +2429,7 @@ function ajouter_les_dossiers_dynamiques(){
 
 
 		les_classes.sort()
-		
+
 		/*
 		console.log(les_classes);
 		console.log(lien_classes);
@@ -8988,6 +8990,8 @@ function clic_bulletin(){
 
 	}else if(recuperer('mon_type').includes('Eleves')){
 		consulter_mon_bulletin(recuperer('identifiant_courant'))
+	}else{
+		alert("fonctionnalité pas encore disponible pour les professeurs.")
 	}
 
 	/*
@@ -9616,8 +9620,80 @@ function recuperer_html_saisie_riche(){
 
 
 
-/********************************************* REDACTION DE TUTORIEL *********************************************/
-//si est déjà dans la liste de rédacteurs -> OK
-//sinon
+/********************************************* SIDE BAR *********************************************/
+function switch_side_bar(){
+	ouvert = $(".sidebar.left")[0].isOpen
+	if(ouvert){
+		fermer_side_bar()
+	}else{
+		ouvrir_side_bar()
+	}
+}
+
+function ouvrir_side_bar(){
+	$(".sidebar.left")[0].isOpen = true;
+	$('.sidebar.left').sidebar().trigger('sidebar:open');
+}
+
+function fermer_side_bar(){
+	$(".sidebar.left")[0].isOpen = false;
+	$('.sidebar.left').sidebar().trigger('sidebar:close');
+}
+
+
+
+function en_cours(){
+	
+	alert("Cette fonctionnalité est en cours de mise en place, merci de votre patience.")
+}
+
+
+
+function ma_journee(){
+	en_cours()
+
+}
+
+
+
+function a_faire(){
+	en_cours()
+
+	
+}
+
+
+
+function conseils_de_classe(){
+	en_cours()
+
+	
+}
+
+
+
+
+function remediations(){
+	en_cours()
+
+	
+}
+
+
+
+function langues(){
+	en_cours()
+
+}
+
+
+//au clic d'un élément du side bar -> le side bar disparait
+
+
+
+
+
+
+
 
 
