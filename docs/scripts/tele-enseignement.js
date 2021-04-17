@@ -3323,7 +3323,7 @@ function recategoriser_fichier(id_fichier,nom_fichier){
 
 	//console.log(id_fichier);
 	var categorie_actuelle = $("[id="+id_fichier+'].span_un_fichier')[0].parentNode.id.split("_")[1];
-
+	//alert(categorie_actuelle)
 	if(categorie_actuelle.includes("devoirs")){
 		alert("Impossible de recatégoriser un devoir.");
 		return -1;
@@ -9764,6 +9764,7 @@ function maj_date_journee(){
 		les_id_dossier_classe = '("'+mes_matieres.map(e => e['ID_URL']).join('","') + '")'
 		url = racine_data + 'Fichiers?' +apikey 
 		url += '&categorie_fichier=neq.Devoirs'
+		url += '&categorie_fichier=neq.Examens'
 		url += '&date_effet=eq.' + $("#date_journee")[0].value 
 		url += '&id_dossier=in.' + les_id_dossier_classe
 	
@@ -9771,6 +9772,7 @@ function maj_date_journee(){
 	}else{
 		url = racine_data + 'Fichiers?' +apikey 
 		url += '&categorie_fichier=neq.Devoirs'
+		url += '&categorie_fichier=neq.Examens'
 		url += '&date_effet=eq.' + $("#date_journee")[0].value 
 	}
 
@@ -9794,20 +9796,20 @@ function maj_date_journee(){
 	if(!recuperer('mon_type').includes('Admin')){
 		les_id_dossier_classe = '("'+mes_matieres.map(e => e['ID_URL']).join('","') + '")'
 		url = racine_data + 'Fichiers?' +apikey 
-		url += '&categorie_fichier=eq.Devoirs'
+		url += '&categorie_fichier=in.("Devoirs","Examens")'
 		url += '&la_date_limite=eq.' + $("#date_journee")[0].value 
 		url += '&id_dossier=in.' + les_id_dossier_classe
 	
 	//admin
 	}else{
 		url = racine_data + 'Fichiers?' +apikey 
-		url += '&categorie_fichier=eq.Devoirs'
+		url += '&categorie_fichier=in.("Devoirs","Examens")'
 		url += '&la_date_limite=eq.' + $("#date_journee")[0].value 
 	}
 	url += '&order=la_date_limite.asc,lheure_limite.asc,id_dossier.asc'
-	//console.log(url)
+	console.log(url)
 	resultats = get_resultat(url)
-	//console.log(resultats)
+	console.log(resultats)
 	traiter_section(mes_matieres,"Devoirs",resultats,"la_date_limite","lheure_limite","id_dossier","nom_fichier","id_fichier","devoir",true)
 
 
