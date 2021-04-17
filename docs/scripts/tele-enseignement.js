@@ -3865,7 +3865,7 @@ function quitter_previsualisation(){
 
 	if($("#visio")[0]) $("#visio")[0].remove(); //éviter la pub dans visio
 
-	$("#mini_popup").remove()
+	//$("#mini_popup").remove()
 
 	//tout enlever les écolages
 	if($(".ecolage")) $(".toggle").remove();
@@ -5147,7 +5147,7 @@ $(function charger_fichiers(e){
 
 			if(!e.target.id.toLowerCase().includes("devoir") && !e.target) afficher_fenetre_rendudevoir(false);
 
-			fermer_side_bar()
+			if(e.target.nodeName === "BODY") fermer_side_bar()
 		}
 
 
@@ -9695,7 +9695,7 @@ function choix_classe_edt(){
 
 function voir_edt_classe_choisie(){
 	recuperer_edt($("#classe_edt")[0].value)
-	$("#mini_popup").remove()
+	$("#mini_popup")[0].style.zIndex = 2
 
 }
 
