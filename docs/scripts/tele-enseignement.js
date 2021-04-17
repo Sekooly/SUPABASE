@@ -3233,6 +3233,7 @@ function autoriser_clic_droit_supprimer_et_renommer(e,ceci){
 	$(document).click(function() {
 		$('.clic_droit').remove();	
 		$('#clic_droit_titres_param').remove();    		
+
 	});
 
 }
@@ -5145,6 +5146,8 @@ $(function charger_fichiers(e){
 			}
 
 			if(!e.target.id.toLowerCase().includes("devoir") && !e.target) afficher_fenetre_rendudevoir(false);
+
+			fermer_side_bar()
 		}
 
 
