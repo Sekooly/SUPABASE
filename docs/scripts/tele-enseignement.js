@@ -9909,7 +9909,7 @@ function traiter_section(mes_matieres,nom_section,resultats,nom_champ_date_refer
 				dejà_traité = false
 			}
 
-			element_journee = creer_element_journee(nom_matiere,nom_fichier,date_reference,heure_reference,champ_id,id_classe_matiere,type_notif,dejà_traité)
+			element_journee = creer_element_journee(nom_matiere,nom_fichier,date_reference,heure_reference,champ_id,id_classe_matiere,type_notif,dejà_traité,est_devoir)
 			$("#section_"+nom_section).append(element_journee)
 		}
 	}
@@ -9922,7 +9922,7 @@ function traiter_section(mes_matieres,nom_section,resultats,nom_champ_date_refer
 }
 
 
-function creer_element_journee(nom_matiere,nom_fichier,date_reference,heure_reference,champ_id,id_classe_matiere,type_notif,dejà_traité){
+function creer_element_journee(nom_matiere,nom_fichier,date_reference,heure_reference,champ_id,id_classe_matiere,type_notif,dejà_traité,est_devoir){
 	/*
 	console.log(champ_id)
 	console.log(id_classe_matiere)
@@ -9934,7 +9934,7 @@ function creer_element_journee(nom_matiere,nom_fichier,date_reference,heure_refe
 	//si prof/admin -> pourcentage de correction
 	//sinon -> coche
 	if(recuperer("mon_type").includes('Eleves')){
-		coche_traitement = dejà_traité ? '✅<i style="color: green;">Rendu</i>' : '❌<i><rouge>Pas encore rendu</rouge></i>'
+		coche_traitement = dejà_traité ? '✅<i style="color: green;">Rendu</i>' : est_devoir ? '❌<i><rouge>Pas encore rendu</rouge></i>': ""
 	}else{
 		coche_traitement = dejà_traité ? dejà_traité : ""
 	}
