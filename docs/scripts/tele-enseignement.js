@@ -8991,7 +8991,8 @@ function clic_bulletin(){
 	}else if(recuperer('mon_type').includes('Eleves')){
 		consulter_mon_bulletin(recuperer('identifiant_courant'))
 	}else{
-		alert("fonctionnalité pas encore disponible pour les professeurs.")
+		alert("Fonctionnalité pas encore disponible pour les professeurs.")
+		chargement(false)
 	}
 
 	/*
@@ -9643,7 +9644,7 @@ function fermer_side_bar(){
 
 
 function en_cours(){
-	
+
 	alert("Cette fonctionnalité est en cours de mise en place, merci de votre patience.")
 }
 
