@@ -1331,7 +1331,7 @@
 	<div class="navbar" id="mynavbar">
 			
 		<span onclick="deconnexion()">
-			<img class="bye" position="50px" src="images/img_deconnexion.svg" width = "35" height = "35" alt="DECONNEXION" >
+			<img class="bye" position="50px" src="images/img_deconnexion.png" width = "35" height = "35" alt="DECONNEXION" >
 		</span>	
 
 
@@ -1350,7 +1350,7 @@
 			<img id="recup_params" position="50px" alt="EDT" class="icone_navbar" style="display: none;width: 37px;" id="params" onclick="recuperer_parametres()" src="images/img_parametres.png">
 		</span>
 
-		<span class="retourner_en_arriere" id="logo" onclick="switch_side_bar()"><img alt="SEKOOLY" src="images/img_side_bar.svg" width="25" height="35"></span>
+		<span class="retourner_en_arriere" id="logo" onclick="switch_side_bar()"><img alt="SEKOOLY" src="images/img_side_bar.png" width="25" height="35"></span>
 		
 
 		<span class="retourner_en_arriere" id="bouton_precedent" >  </span>
@@ -1369,7 +1369,7 @@
 		<div onclick="afficher_modif_profil()">Mon profil</div>
 		<div onclick="edt()">Emploi du temps</div>
 		<div onclick="ma_journee()">Ma journée</div>
-		<div onclick="a_faire()">A faire</div>
+		<div onclick="tableau_de_bord()">Tableau de bord</div>
 		<div onclick="conseils_de_classe()">Conseil de classe</div>
 		<div onclick="remediations()">Remédiations</div>
 		<div onclick="clic_bulletin()">Bulletins</div>
@@ -1437,7 +1437,7 @@
 		
 		<li>
 			<span class="indication">Rendus de devoirs/d'examens</span>
-			<img class="bulle" id="devoirs_a_rendre" alt="devoirs" src="images/img_devoirs.svg" onclick="recuperer_devoirs()" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)">
+			<img class="bulle" id="devoirs_a_rendre" alt="devoirs" src="images/img_devoirs.png" onclick="recuperer_devoirs()" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)">
 		</li>
 
 		<li>
@@ -1482,7 +1482,7 @@
 		<li>
 	    		
 			<span class="indication">Ajouter un fichier</span>
-			<img class="bulle" id="img_ajout" src="images/img_ajout.svg" onclick="afficher_ou_non_choix_fichier(true)" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)">
+			<img class="bulle" id="img_ajout" src="images/img_ajout.png" onclick="afficher_ou_non_choix_fichier(true)" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)">
 			
 	    	
 	    </li>
@@ -1566,7 +1566,7 @@
 		<select id="devoir_choisi"></select>
 
 		<div id="soumettre_devoir" style="overflow: hidden;">
-			<input class="mon_file_devoir" id="file_devoir" value="" type="file" accept=".txt,.bmp,.gif,.jpeg,.jpg,.png,.svg,.pdf,.bmp,.xlsx,.xls,.xlsm,.ppt,.pptx,.doc,.docx,.html,.csv,.js,.rtf,.mp4,.mp3,.wav">
+			<input class="mon_file_devoir" id="file_devoir" value="" type="file" accept=".txt,.bmp,.gif,.jpeg,.jpg,.png,.png,.pdf,.bmp,.xlsx,.xls,.xlsm,.ppt,.pptx,.doc,.docx,.html,.csv,.js,.rtf,.mp4,.mp3,.wav">
 			<button id="bouton_rendre_devoir" type="button" class="rendre" onclick="rendre_devoir()"> Rendre le devoir</button>
 		</div>
 	</div>​
