@@ -370,7 +370,8 @@ CREATE TABLE public."Fichiers"
     coefficient_rendu real,
     taille_fichier bigint DEFAULT '0'::bigint,
     destinataire_par_page text COLLATE pg_catalog."default" DEFAULT 'null'::json,
-    periode_bulletin text COLLATE pg_catalog."default",
+    periode_bulletin text COLLATE pg_catalog."default",    
+    numeros_pages_pdf text COLLATE pg_catalog."default",
     CONSTRAINT "Fichiers_pkey" PRIMARY KEY (id_fichier, id_dossier)
 )
 
