@@ -106,7 +106,8 @@ function se_connecter(){
                     }
                   }else{
 
-                    actualiser_remarque("Frais de scolarité non régularisés. <br> Veuillez contacter l'Économat ou de l'Administration de votre établissement.",recuperer_donnee(snapshot, 'Classe'), "Eleves")
+                    contact_economat = data_etablissement['contact_economat'] ? ' au ' + data_etablissement['contact_economat'] : ""
+                    actualiser_remarque("Frais de scolarité non régularisés. <br> Veuillez contacter l'Économat ou de l'Administration de votre établissement"+contact_economat+".",recuperer_donnee(snapshot, 'Classe'), "Eleves")
 
                   }
 
