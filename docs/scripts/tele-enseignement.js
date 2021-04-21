@@ -4090,7 +4090,7 @@ function avec_bouton_back(oui){
 
 	if (oui){
 
-		element_DOM('bouton_precedent').innerHTML = '<img alt="retour" src="https://sekooly.github.io/SUPABASE/images/img_retour.png" width = 25 height = 25 alt="Retour" >'
+		element_DOM('bouton_precedent').innerHTML = '<img alt="<<" src="https://sekooly.github.io/SUPABASE/images/img_retour.png" width = 25 height = 25>'
 
 		//test click 1er élément
 		element_DOM('bouton_precedent').addEventListener('click', function(e) {
@@ -5586,7 +5586,7 @@ $(function charger_fichiers(e){
 			var date = afficher_date(le_topic['Horodateur']);
 
 			//afficher le poste principal
-			var entete_poste = '	<div id="entete_poste" style="display: flex;overflow-wrap: anywhere;"><img id="retour" src="https://sekooly.github.io/SUPABASE/images/img_retour.png" style="width: 30px;margin: 2%;cursor:pointer;height: 30px;"  onclick="recuperer_les_topics(false)"> <div id="titre_du_poste" style="font-weight: bold;margin: 2%;font-size: 25px;">' + titre_poste + '</div></div>';
+			var entete_poste = '	<div id="entete_poste" style="display: flex;overflow-wrap: anywhere;"><img id="<<" src="https://sekooly.github.io/SUPABASE/images/img_retour.png" style="width: 30px;margin: 2%;cursor:pointer;height: 30px;"  onclick="recuperer_les_topics(false)"> <div id="titre_du_poste" style="font-weight: bold;margin: 2%;font-size: 25px;">' + titre_poste + '</div></div>';
 
 			var entete = document.createElement('div');
 			entete.innerHTML = entete_poste;
