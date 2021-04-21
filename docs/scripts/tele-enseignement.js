@@ -2227,6 +2227,7 @@ function chargement_a_larrivee(){
 	fermer_side_bar()
 	mettre_le_contact_etablissement()
 	rendre_td_modifiable();
+	mettre_mon_mode()
 
 	//todo : pas de lien sur l'alerte pour les primaires
 	var mon_cycle = JSON.parse(recuperer('mes_donnees'))['Cycle'];
@@ -5147,7 +5148,7 @@ $(function charger_fichiers(e){
 
 			if(!e.target.id.toLowerCase().includes("devoir") && !e.target) afficher_fenetre_rendudevoir(false);
 
-			if(e.target.nodeName === "BODY") fermer_side_bar()
+			if(e.target.nodeName === "BODY" || e.target.id === "gros_conteneur" || e.target.id ===  "liste_matieres") fermer_side_bar()
 		}
 
 
@@ -9573,7 +9574,7 @@ function rendre_riche(id_text_area ){
 	ClassicEditor
 		.create( document.querySelector( '[id="'+id_text_area+'"]' )   , config_editor() )
         .then( editor => {
-            console.log( editor )
+            //console.log( editor )
         } )
 	    .catch( error => {
 	        console.error( error );
@@ -9638,11 +9639,13 @@ function switch_side_bar(){
 }
 
 function ouvrir_side_bar(){
+	$(".sidebar.left")[0].style.display = "block"
 	$(".sidebar.left")[0].isOpen = true;
 	$('.sidebar.left').sidebar().trigger('sidebar:open');
 }
 
 function fermer_side_bar(){
+	$(".sidebar.left")[0].style.display = "none"
 	$(".sidebar.left")[0].isOpen = false;
 	$('.sidebar.left').sidebar().trigger('sidebar:close');
 }
@@ -9992,8 +9995,25 @@ function langues(){
 
 }
 
+function mettre_mon_mode(){
+	changer_mode(true)
+}
 
 
+function changer_mode(sans_changer){
+
+	est_deja_mode_nuit = recuperer("mode_nuit_oui") === "oui"
+	if(sans_changer) est_deja_mode_nuit = !est_deja_mode_nuit
+
+	texte_final_mode_nuit_oui = est_deja_mode_nuit ? "" : " ✓"
+	classe_finale_body = est_deja_mode_nuit ? "" : "dark-mode"
+	mode_nuit_oui_final = est_deja_mode_nuit ? "non" : "oui"
+
+	stocker('mode_nuit_oui',mode_nuit_oui_final)
+	$("#mode_nuit_oui")[0].innerText = texte_final_mode_nuit_oui
+	$("body")[0].className = classe_finale_body
+
+}
 
 
 //au clic d'un élément du side bar -> le side bar disparait

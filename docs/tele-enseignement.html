@@ -48,10 +48,97 @@
 		progress::-moz-progress-bar { background: #f9aa71; }
 		progress::-webkit-progress-value { background: #f9aa71; }
 		progress { color: #f9aa71; }
+
+
+
+		.dark-mode {
+		  background-color: rgb(56, 66, 77);
+		  color: white;
+		}
+
+		.dark-mode > .ma_fenetre{
+			background-color: #1E1E1E;
+		}
+
+		.dark-mode > .choix_popup {
+			background-color: #1E1E1E;
+
+		}
+
+
+		.dark-mode > #rendu_devoir {
+			background-color: #1E1E1E;
+
+		}
+
+
+		.dark-mode > div > div > a {
+			text-decoration: none;
+			color: white;
+		}
+
+
+		.dark-mode > div > div > span > .clic_droit{
+			background-color: black;
+		}
+
+		.dark-mode > div > .titre_drive {
+			background-color: #937e7e;
+		}
+
+		.dark-mode > #rendu_devoir > #liste_des_devoirs_rendus > div > #mini-image{
+			-webkit-filter: invert(1);
+   			filter: invert(1);
+		}
+
+		.dark-mode > #rendu_devoir > #liste_des_devoirs_rendus > div > a > #mini-image{
+			-webkit-filter: invert(1);
+   			filter: invert(1);
+		}
+
+
+		.dark-mode > .ma_fenetre > #entete-fenetre > span > img{
+			-webkit-filter: invert(1);
+   			filter: invert(1);
+		}
+
+		.dark-mode > .ma_fenetre > #entete-fenetre > a > img{
+			-webkit-filter: invert(1);
+   			filter: invert(1);
+		}
+
+		.dark-mode > div > .ma_liste > span > .download_fichier {
+			-webkit-filter: invert(1);
+   			filter: invert(1);			
+		}
+
+
+		.dark-mode > .pannel_notif {
+			background-color: #424242;
+		}
+
+
+		.dark-mode > .pannel_notif > .un_filtre_notif > .un_filtre_notif {
+			background-color: #424242;
+		}
+
+
+		.dark-mode > .pannel_notif > .une_notif:hover {
+			background-color: #3e3131;
+		}
+
+		.dark-mode > .ma_fenetre > div > .bloc_topic > span > .byebye {
+			-webkit-filter: invert(1);
+   			filter: invert(1);			
+
+		}
+
 		.nom_matiere_journee{
 			font-weight: bold;
 			color: #FF6C00;
 		}
+
+
 
 		.section_journee{
 			overflow: scroll;
@@ -96,13 +183,14 @@
 		    opacity: 90%;
 		    overflow: auto;
 		    margin-top: 5.2vh;
+		    display: none;
 		}
 
 		.sidebar.left > div{
 			font-size: 25px;
 			font-family: Arial;
 			text-align: center;
-			padding: 10%;
+			padding: 7%;
 		    cursor: pointer;
 		}
 
@@ -124,6 +212,7 @@
 		.ck.ck-editor {
 		    position: relative;
 		    max-width: 100%;
+		    color: black;
 		}
 
 		blockquote{
@@ -466,10 +555,12 @@
 
 
 		/*liens non soulignés*/
-		A {
+		a {
 			text-decoration: none;
 			color: black;
 		}
+
+
 
 		/*Dossier de matière*/
 		.grid-container {
@@ -647,7 +738,6 @@
 		}
 
 		.bloc_topic {
-			color: black;
 			padding: 1%;
 			margin: 0;
 			border-style: double;
@@ -663,7 +753,7 @@
 		}
 
 		.ma_fenetre > div > ul:hover {
-			background-color: #fafafafa;
+			filter: brightness(120%);
 			cursor: pointer;
 			
 		}
@@ -1375,6 +1465,7 @@
 		<div onclick="clic_bulletin()">Bulletins</div>
 		<div onclick="retourner_site()">Aide (tutoriels)</div>
 		<div onclick="langues()">Langue</div>
+		<div onclick="changer_mode()">Mode nuit<span id="mode_nuit_oui"></span></div>
 		<div><a style="color:white;" href="https://sekooly.com" target="_blank">Site de Sekooly</a></div>
 	</div>
 
