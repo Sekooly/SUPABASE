@@ -1495,7 +1495,9 @@
 
 	<div id="choix_popup" class="choix_popup">
 		<img src="images/quitter.png" id="bye_prev" onclick="afficher_ou_non_choix_fichier(false)" class="quitter_rendu_devoir">
-		<img id="mini-image" src="images/img_help.png" onclick="alert('Si vous attendez un rendu de la part des élèves, catégorisez votre fichier en Devoirs/Examens.')">
+		<!--<img id="mini-image" src="images/img_help.png" onclick="alert('Si vous attendez un rendu de la part des élèves, catégorisez votre fichier en Devoirs/Examens.')">-->
+		<rouge id="mini-image" onclick="alert('Si vous attendez un rendu de la part des élèves, catégorisez votre fichier en Devoirs/Examens.')">Cliquez-moi</rouge>
+		
 		<span style="font-size: 14px;"> Catégorie de fichier: </span>
 		<select id="categorie_choisie" class="categorie_choisie">
 			<option value="--">--</option>
@@ -1550,7 +1552,10 @@
 			<input id="lheure_limite" class="la_date_limite" type="time">
 		</div>
 
-		<div id="coef_rendu" class="coef_rendu">Coefficient du rendu: <input id="coef" value="0" style="width: 30px;text-align: right;" class="element_yt"><img id="mini-image" src="images/img_help.png" onclick="alert('Si ce rendu est noté et compte dans le bulletin scolaire, merci de mettre un coefficient > 0.')"></div>
+		<div id="coef_rendu" class="coef_rendu">Coefficient du rendu: <input id="coef" value="0" style="width: 30px;text-align: right;" class="element_yt">
+			<!--<img id="mini-image" src="images/img_help.png" onclick="alert('Si ce rendu est noté et compte dans le bulletin scolaire, merci de mettre un coefficient > 0.')">-->
+			<rouge id="mini-image" onclick="alert('Si ce rendu est noté et compte dans le bulletin scolaire, merci de mettre un coefficient > 0.')">Cliquez-moi</rouge>
+		</div>
 		
 		<button type="button" class="rendre" onclick="" id="mettre_fichier_en_ligne" >Mettre en ligne</button>
 		<div style="font-size: 10px;" id="telechargeable">
@@ -1561,7 +1566,8 @@
 
 	<div id="rendu_devoir">
 		<img src="images/quitter.png" id="bye_prev" onclick="afficher_fenetre_rendudevoir(false)" class="quitter_rendu_devoir">
-		<img id="mini-image" src="images/img_help.png" onclick="aide_devoirs()">	
+		<!--<img id="mini-image" src="images/img_help.png" onclick="aide_devoirs()">	-->
+		<rouge id="mini-image" onclick="aide_devoirs()">Cliquez-moi</rouge>
 		Devoir/Examen à rendre:
 		<select id="devoir_choisi"></select>
 
