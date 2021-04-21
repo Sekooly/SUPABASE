@@ -3854,7 +3854,7 @@ function calcul_lien_de_visu(extension,id_fichier){
 function quitter_previsualisation_bis(){
 	//$("#fenetre_bis")[0].style.display = 'none';
 	$("#fenetre_bis").remove();
-	element_DOM('fenetre_bis').style.overflowY = "";
+	if (element_DOM('fenetre_bis')) element_DOM('fenetre_bis').style.overflowY = "";
 
 }
 
@@ -9835,14 +9835,15 @@ function maj_date_journee(){
 	//console.log(url)
 	resultats = get_resultat(url)
 	//console.log(resultats)
-	traiter_section(mes_matieres,"Discussions",resultats,"Horodateur","Horodateur","Id_classe_matiere","Titre","Id_topic","discussion")
+	traiter_section(mes_matieres,"Discussions",resultats,"Horodateur","Horodateur","Id_classe_matiere","Titre","Id_topic","discussion",false,true)
 
 
 	chargement(false)
 	
 }
 
-function traiter_section(mes_matieres,nom_section,resultats,nom_champ_date_reference,nom_champ_heure_reference,nom_champ_id_classe_matiere,intitulé_nom_fichier,nom_champ_id_voir,type_notif,est_devoir){
+function traiter_section(mes_matieres,nom_section,resultats,nom_champ_date_reference,nom_champ_heure_reference,nom_champ_id_classe_matiere,intitulé_nom_fichier,nom_champ_id_voir,type_notif,est_devoir,date_heure_ensemble){
+	//console.log(date_heure_ensemble)
 	if(resultats.length ===0){
 		$("#section_"+nom_section).append(aucun_element_section())
 	}else{
@@ -9879,8 +9880,10 @@ function traiter_section(mes_matieres,nom_section,resultats,nom_champ_date_refer
 			//console.log(heure_reference)
 
 			if(date_reference===heure_reference && date_reference.length > 0 ){
-				date_reference = date_reference.split(" ")[0]
-				heure_reference = heure_reference.split(" ")[1].split(".")[0]
+				if(!date_heure_ensemble){
+					date_reference = date_reference.split(" ")[0]
+					heure_reference = heure_reference.split(" ")[1].split(".")[0]
+				}
 			}
 
 			champ_id = resultats[numero_fichier][nom_champ_id_voir]
@@ -9914,7 +9917,7 @@ function traiter_section(mes_matieres,nom_section,resultats,nom_champ_date_refer
 				dejà_traité = false
 			}
 
-			element_journee = creer_element_journee(nom_matiere,nom_fichier,date_reference,heure_reference,champ_id,id_classe_matiere,type_notif,dejà_traité,est_devoir)
+			element_journee = creer_element_journee(nom_matiere,nom_fichier,date_reference,heure_reference,champ_id,id_classe_matiere,type_notif,dejà_traité,est_devoir,date_heure_ensemble)
 			$("#section_"+nom_section).append(element_journee)
 		}
 	}
@@ -9927,7 +9930,7 @@ function traiter_section(mes_matieres,nom_section,resultats,nom_champ_date_refer
 }
 
 
-function creer_element_journee(nom_matiere,nom_fichier,date_reference,heure_reference,champ_id,id_classe_matiere,type_notif,dejà_traité,est_devoir){
+function creer_element_journee(nom_matiere,nom_fichier,date_reference,heure_reference,champ_id,id_classe_matiere,type_notif,dejà_traité,est_devoir, date_heure_ensemble){
 	/*
 	console.log(champ_id)
 	console.log(id_classe_matiere)
@@ -9944,7 +9947,9 @@ function creer_element_journee(nom_matiere,nom_fichier,date_reference,heure_refe
 		coche_traitement = dejà_traité ? dejà_traité : ""
 	}
 
-	return '<div class="contenu_section_journee"><div><b class="nom_matiere_journee">'+nom_matiere+"</b> "+nom_fichier+'<i style="color: #bfbfbf;"> '+afficher_date(date_reference,true) + heure_reference+' </i><span class="mini-image deja_traite">'+coche_traitement+'</span> <img id="'+champ_id+'" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" alt="voir" onclick="clic_de_notif(\''+type_notif+'\',\''+champ_id+'\',\''+id_classe_matiere+'\');" class="mini-image"> <div></div>'
+
+	affichage_date = date_heure_ensemble ? afficher_date(date_reference) : afficher_date(date_reference,true) + heure_reference
+	return '<div class="contenu_section_journee"><div><b class="nom_matiere_journee">'+nom_matiere+"</b> "+nom_fichier+'<i style="color: #bfbfbf;"> '+affichage_date+' </i><span class="mini-image deja_traite">'+coche_traitement+'</span> <img id="'+champ_id+'" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" alt="voir" onclick="clic_de_notif(\''+type_notif+'\',\''+champ_id+'\',\''+id_classe_matiere+'\');" class="mini-image"> <div></div>'
 }
 
 
