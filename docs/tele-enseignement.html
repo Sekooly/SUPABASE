@@ -126,7 +126,7 @@
 		.dark-mode > .pannel_notif > .une_notif:hover {
 			background-color: #3e3131;
 		}
-		
+
 		.dark-mode > .pannel_notif > .non_lu:hover {
 			background-color: #3e3131;
 		}
@@ -1531,22 +1531,22 @@
 
 		<li>
 			<span class="indication">Questions et discussions</span>
-			<img class="bulle" src="images/question.png" id="afficher" onclick="charger_les_topics()" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)" >
+			<img alt="Questions et discussions" class="bulle" src="images/question.png" id="afficher" onclick="charger_les_topics()" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)" >
 		</li>
 		
 		<li>
 			<span class="indication">Rendus de devoirs/d'examens</span>
-			<img class="bulle" id="devoirs_a_rendre" alt="devoirs" src="images/img_devoirs.png" onclick="recuperer_devoirs()" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)">
+			<img alt="Rendus de devoirs/d'examens" class="bulle" id="devoirs_a_rendre" alt="devoirs" src="images/img_devoirs.png" onclick="recuperer_devoirs()" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)">
 		</li>
 
 		<li>
 			<span class="indication">Visioconférence</span>
-			<img class="bulle" id="visioconference" alt="visio" src="images/img_visio.png" onclick="rejoindre_visio()" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)">
+			<img alt="Visioconférence" class="bulle" id="visioconference" alt="visio" src="images/img_visio.png" onclick="rejoindre_visio()" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)">
 		</li>
 
 		<li>
 			<span class="indication">Bulletin scolaire</span>
-			<img class="bulle" id="bulletin" alt="bulletin" src="images/img_bulletin.png" onclick="clic_bulletin()" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)">
+			<img alt="Bulletin scolaire" class="bulle" id="bulletin" alt="bulletin" src="images/img_bulletin.png" onclick="clic_bulletin()" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)">
 		</li>
 
 		<!--
@@ -1575,13 +1575,13 @@
 
 		<li>
 			<span class="indication">Liste des élèves</span>
-			<img class="bulle" id="recup_eleves" alt="presence" src="images/img_presence.png" onclick="recuperer_eleves()" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)">
+			<img alt="Liste des élèves" class="bulle" id="recup_eleves" alt="presence" src="images/img_presence.png" onclick="recuperer_eleves()" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)">
 		</li>
 
 		<li>
 	    		
 			<span class="indication">Ajouter un fichier</span>
-			<img class="bulle" id="img_ajout" src="images/img_ajout.png" onclick="afficher_ou_non_choix_fichier(true)" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)">
+			<img alt="Ajouter un fichier" class="bulle" id="img_ajout" src="images/img_ajout.png" onclick="afficher_ou_non_choix_fichier(true)" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)">
 			
 	    	
 	    </li>
@@ -1593,7 +1593,7 @@
 
 
 	<div id="choix_popup" class="choix_popup">
-		<img src="images/quitter.png" id="bye_prev" onclick="afficher_ou_non_choix_fichier(false)" class="quitter_rendu_devoir">
+		<img alt="X" src="images/quitter.png" id="bye_prev" onclick="afficher_ou_non_choix_fichier(false)" class="quitter_rendu_devoir">
 		<!--<img id="mini-image" src="images/img_help.png" onclick="alert('Si vous attendez un rendu de la part des élèves, catégorisez votre fichier en Devoirs/Examens.')">-->
 		<rouge id="mini-image" onclick="alert('Si vous attendez un rendu de la part des élèves, catégorisez votre fichier en Devoirs/Examens.')">Cliquez-moi</rouge>
 		
@@ -1664,7 +1664,7 @@
 	</div>​
 
 	<div id="rendu_devoir">
-		<img src="images/quitter.png" id="bye_prev" onclick="afficher_fenetre_rendudevoir(false)" class="quitter_rendu_devoir">
+		<img alt="X" src="images/quitter.png" id="bye_prev" onclick="afficher_fenetre_rendudevoir(false)" class="quitter_rendu_devoir">
 		<!--<img id="mini-image" src="images/img_help.png" onclick="aide_devoirs()">	-->
 		<rouge id="mini-image" onclick="aide_devoirs()">Cliquez-moi</rouge>
 		Devoir/Examen à rendre:
