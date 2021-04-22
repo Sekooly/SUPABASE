@@ -372,8 +372,19 @@ function recuperer(nom_variable){
 	return window.localStorage.getItem(nom_variable)	
 }
 
+function stocker_temp(nom_variable,valeur_variable){
+  window.sessionStorage.setItem(nom_variable,valeur_variable)
+}
+
+
+function recuperer_temp(nom_variable){
+  return window.sessionStorage.getItem(nom_variable)  
+}
+
+
 function effacer(nom_variable){
 	window.localStorage.removeItem(nom_variable)	
+  window.sessionStorage.removeItem(nom_variable)  
 }
 
 

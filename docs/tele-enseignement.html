@@ -30,6 +30,11 @@
 	  	<script src="scripts/pdf.js"></script>
 	  	<script src="scripts/pdf.worker.js"></script>
 
+
+	  	<!--pour mettre des extraits de manuels-->
+  	    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
+    	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js"></script>
+
 	  	<!-- éditer du texte riche -->
 	  	<script src="https://cdn.ckeditor.com/ckeditor5/27.0.0/classic/ckeditor.js"></script>
 	  	<script src="https://cdn.ckeditor.com/ckeditor5/27.0.0/classic/translations/fr.js"></script>
@@ -1630,6 +1635,17 @@
 		<div id="choix_youtube" style="font-size: 10px;">
 	      <input id="est_video_youtube" type="checkbox" onclick="switch_affichage_youtube()">Vidéo youtube
 	    </div>
+	    <div id="choix_extrait_manuel" style="font-size: 10px;">
+	      <input id="est_extrait_manuel" type="checkbox" onclick="switch_extrait_manuel()">Extrait d'un manuel
+		    <div id="extrait_manuel">
+		    	<select id="manuel_choisi" style="display: none;">
+		    	</select>
+		    	<select id="numero-page" style="display: none;">
+		    	</select>
+		    	<div id="nom_fichier_extrait"></div>
+		    </div>
+	    </div>
+
 
 	    <div id="youtube" style="width: inherit;font-size: 12px;display: none;">
 	    	<div>Titre:

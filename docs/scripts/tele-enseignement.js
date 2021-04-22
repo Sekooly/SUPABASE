@@ -19,6 +19,12 @@ var liste_couleurs = ['blanc','bleu ciel', 'bleu foncé', 'gris','jaune','marron
 var numero_etape = recuperer("numero_etape") ? Number(recuperer("numero_etape")) : 0
 var nb_etapes = 8
 var nouveau_prof = []
+
+
+var image_temporaire = ""
+var nom_image_temporaire = ""
+
+
 /*********************** CONSEIL DE CLASSE ***********************************/
 function afficher_conseil_de_classe(oui){
 
@@ -1643,6 +1649,11 @@ function afficher_ou_non_choix_fichier(oui,forcing){
 		return -1;
 	}
 
+	//effacer les extraits précédents
+	image_temporaire = ""
+	nom_image_temporaire = ""
+
+
 	est_deja_affiche = (element_DOM('choix_popup').style.visibility === "visible");
 
 	if(est_deja_affiche || !oui){
@@ -1685,12 +1696,19 @@ function afficher_ou_non_choix_fichier(oui,forcing){
 
 		element_DOM("lheure_limite").value = "";
 		
-		//par défaut: choix fichier et non youtube
-		element_DOM('est_video_youtube').checked = false;		
+		//par défaut: choix fichier et non youtube ni extrait
+		element_DOM('est_video_youtube').checked = false;	
+		element_DOM('est_extrait_manuel').checked = false;	
 		element_DOM('est_telechargeable').checked = true;	
+
+		//si pas de manuels -> choix_extrait_manuel non visibles
+		afficher_checkbox("choix_extrait_manuel", les_manuels_de_la_matiere() !== "")
+
+		mode_fichier_initialement()
 
 		//par défaut: coefficient = 0
 		element_DOM('coef').value = 0	
+
 
 		afficher_choix_date(false);
 		afficher_choix_coef(false);
@@ -1738,6 +1756,8 @@ function deconnexion(){
 	effacer('fichier_ouvert');
 	effacer('dossier_rendus_cycle')
 
+	image_temporaire = ""
+	nom_image_temporaire = ""
 
 	effacer('liste_params_colonnes_masquees')
 
@@ -2150,7 +2170,7 @@ function initialisation(){
 
 function afficher_fenetre(oui){
 	if(oui){
-		afficher_ou_non_choix_fichier(false);
+		//afficher_ou_non_choix_fichier(false);
 		element_DOM('fenetre').style.visibility = 'visible';
 	}else {
 		element_DOM('fenetre').style.visibility = 'hidden';
@@ -3636,18 +3656,19 @@ function renommer_fichier(id_fichier,ancien_nom){
 
 
 
-function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, pas_de_telechargement, mode_extrait_png){
+function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, pas_de_telechargement, mode_extrait_png_canva, mode_extrait_png_div){
 
 	chargement(true);
+
 	nom_fichier = decodeURIComponent(nom_fichier);
 
 	vider_fenetre(titre_initial ? titre_initial : (nom_fichier + (nom_proprio_devoir ? nom_proprio_devoir : "")));
 		
 	afficher_fenetre(true);
 
-	//console.log(mode_extrait_png)
+	//console.log(mode_extrait_png_canva)
 	//on ajoute le bouton télécharger sauf en cas de PAS DE TELECHARGENEMTN
-	var bouton_télécharger = mode_extrait_png ? '<a id="telechargement" style="position: fixed;z-index:3;" download="Bulletin.png" onclick="telecharger_canvas()"><img alt="télécharger" style="width: 30px; cursor: pointer;position:fixed;" id="'+ id_fichier+ '" src="https://sekooly.github.io/SUPABASE/images/img_download.png"></a>' :
+	var bouton_télécharger = mode_extrait_png_canva ? '<a id="telechargement" style="position: fixed;z-index:3;" download="Bulletin.png" onclick="telecharger_canvas()"><img alt="télécharger" style="width: 30px; cursor: pointer;position:fixed;" id="'+ id_fichier+ '" src="https://sekooly.github.io/SUPABASE/images/img_download.png"></a>' :
 							pas_de_telechargement ? '' :
 							'<a id="telechargement" style="position: fixed;z-index:3;" href = "https://drive.google.com/uc?export=download&id=' + id_fichier +'"><img alt="télécharger" style="width: 30px; cursor: pointer;position:fixed;" id="'+ id_fichier+ '" src="https://sekooly.github.io/SUPABASE/images/img_download.png"></a>';
 
@@ -3694,8 +3715,10 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 	//TODO: si PAS téléchargement -> on cache le côté haut-droit en cas de PAS DE TELECHARGEMENT
 	//console.log(pas_de_telechargement)
 	//console.log(est_youtube(extension))
-	if (pas_de_telechargement && est_youtube(extension)===false) previsualisation = '<div id=previsualisation class="responsive-container">'
+	//si c'est un mode_extrait_png_div -> div
+	if ((pas_de_telechargement && est_youtube(extension)===false) || mode_extrait_png_div) previsualisation = '<div id=previsualisation class="responsive-container">'
 
+	
 	//console.log(previsualisation)
 
 
@@ -3708,7 +3731,7 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 	lien_de_visu = calcul_lien_de_visu(extension,id_fichier);
 
 	//image: cas spécifique
-	if (est_image(extension)){
+	if (est_image(extension) && !mode_extrait_png_div){
 		var viewer = OpenSeadragon({
 	        id: "previsualisation",
 	        prefixUrl: "https://sekooly.github.io/SUPABASE/openseadragon/images/",
@@ -3727,12 +3750,21 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 		});
 
 	//une page de pdf
-	}else if(mode_extrait_png){
+	}else if(mode_extrait_png_canva){
 
 		//console.log("ici")
 		var le_inner_html = '<canvas id="vizcanva"> </canvas>'
 		element_DOM('previsualisation').innerHTML = le_inner_html
 		chargement(false);
+
+
+	//une page pdf SUR DIV
+	}else if(mode_extrait_png_div){
+
+		//console.log("ici")
+		$("#previsualisation")[0].className = ""
+		chargement(false);
+
 
 	//si c'est PAS une image
 	}else{
@@ -4326,6 +4358,10 @@ function mode_livres(){
 	return element_DOM('choix_date_effet').style.visibility === "hidden"
 }
 
+function mode_fichier_initialement(){
+	afficher_choix_youtube(false);	
+	afficher_choix_extrait_manuel(false);
+}
 
 function switch_affichage_youtube(){
 
@@ -4338,6 +4374,7 @@ function switch_affichage_youtube(){
 	element_DOM('lien_youtube').value = ""
 	afficher_choix_youtube(mode_youtube);
 	afficher_choix_fichier(!mode_youtube);
+	afficher_checkbox('choix_extrait_manuel',!mode_youtube)
 	afficher_checkbox_fichier_telechargeable(!mode_youtube);
 	$("#est_telechargeable")[0].checked = !mode_youtube;
 
@@ -4554,9 +4591,9 @@ function pre_validation(nom_champ_obli){
 		//console.log("catégorie ok");
 	}
 
-	//forcément avec un file OU lien YT
-	if ($("#"+nom_champ_obli)[0].value === ""){
-		afficher_alerte('Merci de choisir le fichier en question ou le lien youtube que vous désirez partager.')
+	//forcément avec un file OU lien YT OU un extrait
+	if (($("#"+nom_champ_obli)[0].value === "" || $("#"+nom_champ_obli)[0].value === "--") && !image_temporaire){
+		afficher_alerte('Merci de choisir le fichier, l\'extrait de manuel, ou le lien youtube que vous désirez partager.')
 		return false;
 	}
 
@@ -4605,6 +4642,48 @@ function pre_validation(nom_champ_obli){
 	return true
 }
 
+
+
+
+
+
+
+
+
+
+function base64toBlob(base64Data, contentType) {
+    contentType = contentType || '';
+    var sliceSize = 1024;
+    var byteCharacters = atob(base64Data.split(',')[1]);
+    var bytesLength = byteCharacters.length;
+    var slicesCount = Math.ceil(bytesLength / sliceSize);
+    var byteArrays = new Array(slicesCount);
+
+    for (var sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
+        var begin = sliceIndex * sliceSize;
+        var end = Math.min(begin + sliceSize, bytesLength);
+
+        var bytes = new Array(end - begin);
+        for (var offset = begin, i = 0; offset < end; ++i, ++offset) {
+            bytes[i] = byteCharacters[offset].charCodeAt(0);
+        }
+        byteArrays[sliceIndex] = new Uint8Array(bytes);
+    }
+    return new Blob(byteArrays, { type: contentType, name : nom_image_temporaire });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 $(function charger_fichiers(e){
 
     var lien_script = "https://script.google.com/macros/s/AKfycbwKm1M_Hm2n8bAyqq3jAcDyL65EqKn1-3VMXIw4jMpzqnIeQQI/exec";
@@ -4625,10 +4704,10 @@ $(function charger_fichiers(e){
 
     	var nb_fichiers = les_fichiers.length;
         	                
-		var file = les_fichiers[0];
+		var file = image_temporaire ? base64toBlob(image_temporaire,'image/png') : les_fichiers[0] ;
+		//console.log(file)
 
-
-        nom_fichier = file.name;
+        nom_fichier = nom_image_temporaire ? nom_image_temporaire : file.name ;
         //console.log(nom_fichier)
 
 		extension = nom_fichier.split(".").pop().toUpperCase();
@@ -4719,7 +4798,6 @@ $(function charger_fichiers(e){
                 
 
             }
-
 
 
             fr.readAsDataURL(file);
@@ -9078,6 +9156,7 @@ function mode_bulletin(oui){
 		$("#categorie_choisie")[0].value = "Bulletins"	
 		element_DOM("categorie_choisie").disabled = true;
 		element_DOM("choix_youtube").style.display = "none"
+		element_DOM("choix_extrait_manuel").style.display = "none"
 		element_DOM("choix_date_effet").style.display = "none"
 		element_DOM("telechargeable").style.display = "none"
 		element_DOM("est_telechargeable").checked = false
@@ -9093,6 +9172,7 @@ function mode_bulletin(oui){
 
 		element_DOM("categorie_choisie").disabled = false; 	
 		element_DOM("choix_youtube").style.display = ""
+		element_DOM("choix_extrait_manuel").style.display = ""
 		element_DOM("choix_date_effet").style.display = ""
 		element_DOM("telechargeable").style.display = ""
 		element_DOM("est_telechargeable").checked = true
@@ -10031,3 +10111,345 @@ function changer_mode(sans_changer){
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/****************************************   CHOISIR UNE PAGE A METTRE EN LIGNE   ***********************************************/
+function afficher_choix_extrait_manuel(oui){
+	element_DOM('extrait_manuel').style.display = oui ? "" : "none";
+}
+
+function les_manuels_de_la_matiere(){
+	resultat = ""
+	for (i = 0; i < $("#drive_manuels > .span_un_fichier").length ; i++){
+		resultat += '<option value="'+ $("#drive_manuels > .span_un_fichier")[i].id +'">'+$("#drive_manuels > .span_un_fichier")[i].innerText+'</option>'
+	}
+	return resultat
+}
+
+
+function afficher_checkbox(nom_div_checkbox, oui){
+	element_DOM(nom_div_checkbox).style.display = oui ? "" : "none";
+}
+
+
+
+
+
+function switch_extrait_manuel(){
+
+
+	var mode_extrait_manuel = element_DOM('est_extrait_manuel').checked;
+	element_DOM('manuel_choisi').value = ""
+	element_DOM('manuel_choisi').innerHTML = '<option value="--">--</option>'+ les_manuels_de_la_matiere()
+	element_DOM('manuel_choisi').style.display = mode_extrait_manuel ? "" : "none"
+	//console.log(mode_extrait_manuel)
+	afficher_choix_extrait_manuel(mode_extrait_manuel);
+	afficher_checkbox('choix_youtube',!mode_extrait_manuel)
+	afficher_choix_fichier(!mode_extrait_manuel);
+
+	if(mode_extrait_manuel){
+		$("#manuel_choisi").on('change',function(e){
+			
+			//console.log(e.target.value)
+			e.preventDefault()
+			if(e.target.value === "--") return true
+
+			
+			//choisir les pages à publier
+			numeros_pages_str = prompt("Choisissez les numéros de pages (séparés de virgules et SANS ESPACES):","1,2,3")
+
+			if(!numeros_pages_str){
+				e.target.value = "--"
+				element_DOM("file").value = "";
+				element_DOM("file").style.display = "none"
+				return true
+			}
+
+			numeros_pages = numeros_pages_str.split(',').map(e => Number(e))
+			var url = 'https://www.googleapis.com/drive/v2/files/'+e.target.value+'?key=AIzaSyCeKD82BY1LHYdj-vRf1s79L7qlDH7lwgg&alt=media&source=downloadUrl'
+			var extension = $("#manuel_choisi option:selected" ).text().split(".").pop()
+			var nom_fichier = $( "#manuel_choisi option:selected" ).text().replace("."+extension, " (page "+ numeros_pages_str + ").png")
+			visualiser("","","",nom_fichier,false,false,true)
+			$("#entete-fenetre")[0].style.display = "none"
+			chargement(true)
+			var canvasContainer = document.getElementById('previsualisation')
+			canvasContainer.style.float = "left"
+			canvasContainer.style.overflow = "scroll"
+			canvasContainer.style.textAlign = "center"
+			canvasContainer.style.height= "80%"
+			canvasContainer.style.maxWidth= "100%"
+			
+        	render_ces_pages(canvasContainer,url, numeros_pages)
+
+		});
+
+
+
+
+
+		$("#mettre_fichier_en_ligne").on("click", function (e){
+
+			//check: le tout
+			if (!pre_validation("manuel_choisi")){
+
+			//tout est ok
+			}else{
+				$('#file').change()
+			}
+
+			//chargement(false)
+		});
+
+	}else{
+		$("#mettre_fichier_en_ligne").off("click")
+	}
+
+}
+
+
+function render_ces_pages(canvasContainer,url,numeros_pages){
+	canvasContainer.innerHTML = ""
+	var ma_tache = pdfjsLib.getDocument(url)
+	ma_tache.promise.then(function(pdfDoc){
+		//console.log(pdfDoc._pdfInfo.numPages)
+	  	numeros_pages.forEach(function(num){
+	  		if(num <= pdfDoc._pdfInfo.numPages){
+			    pdfDoc.getPage(num).then(function(page){
+			    	chargement(true)
+			    	renderPage(canvasContainer,page,num).then(function(){
+		    			
+		    			//dernière page
+		    			if(num === numeros_pages[numeros_pages.length-1]){
+
+							$("#choix_pages_pdf").remove()
+							//console.log(numeros_pages.toString())
+							var boutons_valider_ou_annuler = '<div id="choix_pages_pdf" style="text-align: center;" class=""><rouge>Voici les pages que vous avez choisies. Voulez-vous valider ou annuler?</rouge><button class="mon_bouton" onclick="annuler_mon_choix()">Annuler</button><button class="mon_bouton" onclick="choisir_ces_pages(\''+numeros_pages.toString()+'\')">Valider</button></div>'
+							$("#fenetre").append(boutons_valider_ou_annuler)
+
+		    				chargement(false)
+		    			}
+			    	})
+			    });
+			}else{
+				alert("Page " + num + " introuvable.")
+			}
+	  	})
+	})
+
+
+	
+        	
+
+}
+
+function choisir_ces_pages(numeros_pages_str){
+	//console.log(numeros_pages_str)
+	numeros_pages = numeros_pages_str.toString().split(',')
+
+	//stocker le div en tant que png
+	mes_cnv = $("canvas")
+	//console.log(mes_cnv)
+
+
+	//resultat = verticalCanvases($("[id='"+mes_cnv[0]+"']")[0],$("[id='"+mes_cnv[1]+"']")[0],$("[id='"+mes_cnv[2]+"']")[0])
+	resultat = rendre_canvas_vertical(mes_cnv)
+	//insérer le fichier dans file et l'afficher
+
+
+
+	image_temporaire = resultat
+	//renommer le fichier à envoyer
+	nom_image_temporaire = $("#titre_fenetre")[0].innerText
+
+
+	//console.log(resultat)
+	//window.open(resultat, '_blank').focus();
+	//document.getElementById('file').src = resultat;
+
+	//$("#file")[0].name = $("#titre_fenetre")[0].innerText 
+
+	//element_DOM("file").style.display = ""
+	//element_DOM("file").value = resultat;
+	
+	$("#nom_fichier_extrait").innerText = $("#titre_fenetre")[0].innerText 
+
+	$("#file").change()
+
+	//masquer la visualisation
+	quitter_previsualisation()
+
+
+}
+
+function annuler_mon_choix(){
+	$("#manuel_choisi")[0].value = "--"
+	quitter_previsualisation()
+
+}
+
+
+//tout rassembler pour créer le png
+function rendre_canvas_vertical(liste_cnv){
+
+	try{
+		somme_des_hauteurs = 0
+	    liste_des_canvas_avec_position = []
+
+		for(i=0;i<liste_cnv.length;i++){
+			somme_des_hauteurs += liste_cnv[i].height
+	    	valeur_y = i === 0 ? 0 : (liste_cnv[i-1].height)*i
+			liste_des_canvas_avec_position.push({cnv: liste_cnv[i], y:valeur_y})
+		}
+		//console.log(liste_des_canvas_avec_position)
+
+		var newCanvas = document.createElement('canvas'),
+	        ctx = newCanvas.getContext('2d'),
+	        width = liste_cnv[0].width,
+	        height = somme_des_hauteurs;
+
+	    newCanvas.width = width;
+	    newCanvas.height = height;
+
+
+		liste_des_canvas_avec_position.forEach(function(n) {
+	        ctx.beginPath();
+	        ctx.drawImage(n.cnv, 0, n.y, width, n.cnv.height);
+	    });
+
+	    return newCanvas.toDataURL();
+	}catch(e){
+		alert("Impossible de choisir les pages.")
+		return false
+	}
+}
+
+
+//même longeur de canva
+function verticalCanvases(cnv1, cnv2, cnv3) {
+    var newCanvas = document.createElement('canvas'),
+        ctx = newCanvas.getContext('2d'),
+        width = cnv1.width,
+        height = cnv1.height + cnv2.height + cnv3.height;
+
+    newCanvas.width = width;
+    newCanvas.height = height;
+
+    [{
+        cnv: cnv1,
+        y: 0
+    },
+    {
+        cnv: cnv2,
+        y: cnv1.height
+    },
+    {
+        cnv: cnv3,
+        y: cnv1.height + cnv2.height
+    }].forEach(function(n) {
+        ctx.beginPath();
+        ctx.drawImage(n.cnv, 0, n.y, width, n.cnv.height);
+    });
+
+    return newCanvas.toDataURL();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+async function renderPage(canvasContainer,page,num) {
+
+  var scale = 1.25;
+  var viewport = page.getViewport({ scale: scale, });
+
+  //var canvas = document.getElementById('vizcanva');
+  var canvas = document.createElement('canvas');
+  canvas.id = $("#titre_fenetre")[0].innerText + "-"+num
+  canvasContainer.appendChild(canvas);
+
+  var context = canvas.getContext('2d');
+  canvas.height = viewport.height;
+  canvas.width = viewport.width;1
+
+  var renderContext = {
+    canvasContext: context,
+    viewport: viewport
+  };
+
+  return page.render(renderContext)
+  //canva_scrollable(canvas.id)
+  
+}
+
+
+function renderPDF(url, options) {
+
+  var options = options || { scale: 1 };       
+  pdfjsLib.disableWorker = true;
+  var ma_tache = pdfjsLib.getDocument(url)
+  ma_tache.promise.then(renderPages);
+
+}   
+
+
+
+function canva_scrollable(id_canva){
+	var canvas = document.getElementById(id_canva);
+	var context = canvas.getContext('2d');
+	var dragging = false;
+	var lastX;
+	var marginLeft = 0;
+
+	for (var i = 0; i < 1000; i++) {
+	    context.beginPath();
+	    context.arc(Math.random() * 10000, Math.random() * 250, 20.0, 0, 2 * Math.PI, false);
+	    context.stroke();
+	} 
+
+	canvas.addEventListener('mousedown', function(e) {
+	    var evt = e || event;
+	    dragging = true;
+	    lastX = evt.clientX;
+	    e.preventDefault();
+	}, false);
+
+	window.addEventListener('mousemove', function(e) {
+	    var evt = e || event;
+	    if (dragging) {
+	        var delta = evt.clientX - lastX;
+	        lastX = evt.clientX;
+	        marginLeft += delta;
+	        canvas.style.marginLeft = marginLeft + "px";
+	    }
+	    e.preventDefault();
+	}, false);
+
+	window.addEventListener('mouseup', function() {
+	    dragging = false;
+	}, false);
+}
