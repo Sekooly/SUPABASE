@@ -10288,7 +10288,7 @@ function choisir_ces_pages(numeros_pages_str){
 	//element_DOM("file").style.display = ""
 	//element_DOM("file").value = resultat;
 	
-	$("#nom_fichier_extrait").innerText = $("#titre_fenetre")[0].innerText 
+	$("#nom_fichier_extrait")[0].innerText = $("#titre_fenetre")[0].innerText 
 
 	$("#file").change()
 
