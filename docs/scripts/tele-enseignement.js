@@ -2282,6 +2282,9 @@ function chargement_a_larrivee(){
 
 	if(recuperer('mon_type').includes('Administration') && mes_droits === "oui"){
 		mes_matieres = get_resultat(racine_data + '/Matieres?Cycle=eq.'+ mon_cycle + '&' + apikey)
+		mes_matieres = mes_matieres.sort(function(a, b) {
+		  return a.Classe_Matiere > b.Classe_Matiere;
+		})
 		stocker("mes_matieres",JSON.stringify(mes_matieres))
 	}
 
@@ -6860,21 +6863,24 @@ function mettre_en_place_les_notifications(){
 
 /*************************** VISIO *****************************/
 
-function rejoindre_visio(){
+function rejoindre_visio(id_matiere_visio,sans_alerte,valeur_id_div_visio,pas_de_initialisation){
 
 	var mon_type = recuperer('mon_type');
 
-	if(impossible_de_cliquer()) return -1;
+	if(impossible_de_cliquer() && !sans_alerte) return -1;
 	/*
 	if(!mon_type.includes("Administration")){
 		alert("Cette fonctionnalité n'est pas encore disponible.");
 		return -1;
 	}*/
 
-	var confirmation = confirm("Branchez des écouteurs pour mieux entendre pendant la visioconférence.");
 
-	if(!confirmation) return -1;
+	if(!sans_alerte){
 
+		var confirmation = confirm("Branchez des écouteurs pour mieux entendre pendant la visioconférence.");
+		if(!confirmation) return -1;
+
+	}
 
 	chargement(true);
 
@@ -6884,7 +6890,7 @@ function rejoindre_visio(){
 	//var la_classe = (mon_type === "Eleves")? mes_donnees['Classe'] : element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim().toUpperCase();
 
 	//nouveau nom classe = classe ET matière
-	var id_matiere = recuperer('dossier_chargé');
+	var id_matiere = id_matiere_visio ? id_matiere_visio : recuperer('dossier_chargé');
 	var mes_matieres = JSON.parse(recuperer('mes_matieres'));			
 	var la_matiere = mes_matieres.filter(function(element) {
 	  	return element['ID_URL'] === id_matiere;
@@ -6894,23 +6900,32 @@ function rejoindre_visio(){
 	//évite les problèmes avec le signe &
 	la_classe = la_classe.normalize("NFD").replace(/&/g, " et ");
 	
+	if(!pas_de_initialisation){
+		id_div_visio = initialiser_visio(valeur_id_div_visio)	
+	}else{
+		id_div_visio = valeur_id_div_visio
+	}
+
+
+	creer_une_visio("100%","100%",identifiant,la_classe,id_div_visio,id_matiere_visio);
+
+}
+
+function initialiser_visio(valeur_id_div_visio){
 
 	vider_fenetre('Visioconférence',true);
 	afficher_fenetre(true);
 
-	var visio_html = '<div id="visio" style="display:none;" class="previz"></div>';
+	var id_div_visio = valeur_id_div_visio ? valeur_id_div_visio : "visio"
+	var visio_html = '<div id="'+id_div_visio+'" style="display:none;" class="previz"></div>';
 
 	var visio = document.createElement('div');
 	visio.innerHTML = visio_html;
 	element_DOM('fenetre').appendChild(visio.firstChild);
-	
-
-
-	creer_une_visio("100%","100%",identifiant,la_classe);
-
+	return id_div_visio
 }
 
-function creer_une_visio(largeur, hauteur,moi,classe){
+function creer_une_visio(largeur, hauteur,moi,classe,id_div_visio, id_matiere_visio){
 
 	//ajouter le kick out si administrateur
 	var enlever_kickout= !recuperer('mon_type').includes('Admin');
@@ -6925,15 +6940,15 @@ function creer_une_visio(largeur, hauteur,moi,classe){
 		         disableKick: enlever_kickout
 		    }
 		},
-	    roomName: recuperer("dossier_chargé"),
+	    roomName: id_matiere_visio ? id_matiere_visio : recuperer("dossier_chargé"),
 	    width: "100%",
 	    height: "100%",
-	    parentNode: document.querySelector('#visio'),
+	    parentNode: document.querySelector('#'+id_div_visio+''),
 	    userInfo: {
 	    	email:'',
 	    	displayName:moi
 	    },
-	    onload: visio_prete(),
+	    onload: visio_prete(id_div_visio),
 
 	    interfaceConfigOverwrite: {
 	   		DEFAULT_REMOTE_DISPLAY_NAME: moi,
@@ -6952,7 +6967,7 @@ function creer_une_visio(largeur, hauteur,moi,classe){
 	};
 
 	const api = new JitsiMeetExternalAPI(domain, options);
-	api.executeCommand('subject', nom_etablissement + " - " + classe);
+	api.executeCommand('subject', nom_etablissement.toUpperCase() + " - " + classe);
 	envoyer_mon_log_visio(moi.toLowerCase(), classe.toLowerCase(), "debut",mon_role);
 	
 
@@ -6975,10 +6990,10 @@ function creer_une_visio(largeur, hauteur,moi,classe){
 }
 
 
-function visio_prete(){
+function visio_prete(id_div_visio){
 
 	chargement(false);
-	element_DOM('visio').style.display="block";
+	element_DOM(id_div_visio).style.display="block";
 
 }
 
@@ -7081,10 +7096,52 @@ function ajouter_multi_visio_si_non_eleve(){
 }
 
 function multi_visio(){
-	en_cours()
+	les_matieres = JSON.parse(recuperer("mes_matieres"))
+	les_matieres = les_matieres.sort(function(a, b) {
+	  return a.Classe_Matiere > b.Classe_Matiere;
+	})
+	//console.log(les_matieres) 
+
+	elements_html = "<select id='classe_multi_visio' style='width: 90%;' multiple>"
+	for (i = 0; i< les_matieres.length;i++){
+		elements_html += '<option value="'+les_matieres[i]["ID_URL"]+'">'+les_matieres[i]["Classe"] + " " + les_matieres[i]["Matiere"] +'</option>'
+	}
+	elements_html += "</select>"
+	creer_mini_popup("Vous vous apprêtez à faire une visioconférence avec plusieurs classes en même temps. Pour commencer, choisissez les classes-matières dans lesquels vous voulez intéragir simultanément:",elements_html, "Commencer la multi-visioconférence","commencer_multi_visio()")
+
+
 }
 
 
+
+
+function commencer_multi_visio(){
+
+	chargement(true)
+	var liste_classe_multi_visio = $("#classe_multi_visio").val()
+	$("#mini_popup").remove()
+	
+
+	vider_fenetre('Multi-visioconférence',true)
+	
+	if (liste_classe_multi_visio.length === 1){
+
+		rejoindre_visio(liste_classe_multi_visio[0]);
+
+	}else{
+		$('#fenetre').append('<div id="previsualisation" style="width: 100%;height: 85%;display:grid;grid-template-columns: repeat(2, 1fr);">')
+		liste_classe_multi_visio.forEach(function(id_matiere_visio,numero){
+			console.log(id_matiere_visio)
+			$("#previsualisation").append("<div id='visio-"+numero+"' class='une_visio'></div>")
+			sans_alerte = numero < liste_classe_multi_visio.length
+			rejoindre_visio(id_matiere_visio,sans_alerte,"visio-"+numero,true)
+		})		
+	}
+
+
+	afficher_fenetre(true)
+	chargement(false)
+}
 
 
 
