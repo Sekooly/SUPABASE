@@ -9195,7 +9195,7 @@ function mode_bulletin(oui){
 
 
 function afficher_mon_bulletin(id_fichier, numero_page,identifiant_eleve){
-	var url = 'https://www.googleapis.com/drive/v2/files/'+id_fichier+'?key=AIzaSyCeKD82BY1LHYdj-vRf1s79L7qlDH7lwgg&alt=media&source=downloadUrl'
+	var url = 'https://www.googleapis.com/drive/v2/files/'+id_fichier+'?key='+google_api_file_access+'&alt=media&source=downloadUrl'
 	PDFJS.getDocument(url).then(function(pdf){ 
 		//console.log(pdf)
 		//console.log(numero_page)
@@ -10183,7 +10183,7 @@ function switch_extrait_manuel(){
 			}
 
 			numeros_pages = numeros_pages_str.split(',').map(e => Number(e))
-			var url = 'https://www.googleapis.com/drive/v2/files/'+e.target.value+'?key=AIzaSyCeKD82BY1LHYdj-vRf1s79L7qlDH7lwgg&alt=media&source=downloadUrl'
+			var url = 'https://www.googleapis.com/drive/v2/files/'+e.target.value+'?key='+google_api_file_access+'&alt=media&source=downloadUrl'
 			var extension = $("#manuel_choisi option:selected" ).text().split(".").pop()
 			var nom_fichier = $( "#manuel_choisi option:selected" ).text().replace("."+extension, " (page "+ numeros_pages_str + ").png")
 			visualiser("","","",nom_fichier,false,false,true)
