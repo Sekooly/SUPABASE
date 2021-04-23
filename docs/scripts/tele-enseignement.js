@@ -2250,6 +2250,7 @@ function chargement_a_larrivee(){
 	mettre_le_contact_etablissement()
 	rendre_td_modifiable();
 	mettre_mon_mode()
+	ajouter_multi_visio_si_non_eleve()
 
 	//todo : pas de lien sur l'alerte pour les primaires
 	var mon_cycle = JSON.parse(recuperer('mes_donnees'))['Cycle'];
@@ -3274,10 +3275,12 @@ function changer_coef(id_fichier,ancien_coef){
 
 
 
-	var nouveau_coef = Number(prompt("Indiquez le nouveau coefficient du rendu:",ancien_coef))
+	var nouveau_coef = prompt("Indiquez le nouveau coefficient du rendu:",ancien_coef)
 	/*console.log(nouveau_coef)
 	console.log(nouveau_coef >= 0 )*/
-	
+	if(nouveau_coef === null) return -1
+	nouveau_coef = Number(nouveau_coef)
+
 	if(!(nouveau_coef >= 0)){
 		alert("Impossible de changer le coefficient : merci de saisir un coefficient valide (>0).")
 		return -1;
@@ -7064,8 +7067,22 @@ function envoyer_mon_log_visio(mon_identifiant, ma_classe, mon_statut, mon_role)
 
 
 //multi-visio
+function ajouter_multi_visio_si_non_eleve(){
+	if(!recuperer("mon_type").includes("Eleves")){
+		if($("#multi_visio").length === 0){
+			$(".sidebar.left").append('<div id="multi_visio" onclick="multi_visio()">Multi-visio</div>')
+			$("#multi_visio").insertBefore("#dashboard")
+		}
 
+	//si eleve
+	}else{
+		if($("#multi_visio").length > 0) $("#multi_visio").remove()
+	}
+}
 
+function multi_visio(){
+	en_cours()
+}
 
 
 
