@@ -2241,6 +2241,8 @@ function mettre_le_contact_etablissement(){
   if($("#site_etablissement")[0]) $("#site_etablissement")[0].href = site_etablissement
 }
 
+
+
 function chargement_a_larrivee(){
 	
 	chargement(true);
@@ -6947,6 +6949,7 @@ function creer_une_visio(largeur, hauteur,moi,classe){
 	};
 
 	const api = new JitsiMeetExternalAPI(domain, options);
+	api.executeCommand('subject', nom_etablissement + " - " + classe);
 	envoyer_mon_log_visio(moi.toLowerCase(), classe.toLowerCase(), "debut",mon_role);
 	
 
@@ -7058,6 +7061,36 @@ function envoyer_mon_log_visio(mon_identifiant, ma_classe, mon_statut, mon_role)
 	})
 
 }
+
+
+//multi-visio
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
