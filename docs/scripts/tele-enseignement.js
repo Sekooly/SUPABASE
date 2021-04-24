@@ -9387,11 +9387,14 @@ function afficher_mon_bulletin(id_fichier, numero_page,identifiant_eleve){
 
 function mon_ecolage_est_ok(){
 
-	identifiant_eleve = recuperer("identifiant_courant")
-	url = racine_data + "Eleves" + "?Identifiant=eq." + identifiant_eleve + "&" +apikey
-	//console.log(url)
-	return get_resultat(url)[0]["Ecolage_OK"] === "oui"
-
+	if(recuperer('mon_type').includes("Eleves")){
+		identifiant_eleve = recuperer("identifiant_courant")
+		url = racine_data + "Eleves" + "?Identifiant=eq." + identifiant_eleve + "&" +apikey
+		//console.log(url)
+		return get_resultat(url)[0]["Ecolage_OK"] === "oui"
+	}else{
+		return true
+	}
 }
 
 
