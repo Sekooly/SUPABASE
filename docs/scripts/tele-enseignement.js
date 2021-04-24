@@ -1756,6 +1756,7 @@ function deconnexion(){
 	effacer('fichier_ouvert');
 	effacer('dossier_rendus_cycle')
 
+	effacer('quitter_multi_visio')
 	image_temporaire = ""
 	nom_image_temporaire = ""
 
