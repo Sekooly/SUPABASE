@@ -9199,7 +9199,7 @@ function clic_bulletin(){
 	chargement(true)
 	if(recuperer('mon_type').includes('Administration') ){
 		
-		if( recuperer('dossier_chargé')){
+		if(recuperer('dossier_chargé') && $("#accueil_utilisateur")[0].innerText.includes("Vie de classe")){
 			afficher_ou_non_choix_fichier(true)
 			mode_bulletin(true)
 		}else{
@@ -9212,8 +9212,10 @@ function clic_bulletin(){
 	}else if(recuperer('mon_type').includes('Eleves')){
 		choisir_periode_bulletin()
 		chargement(false)
+
+	//profs
 	}else{
-		alert("Fonctionnalité pas encore disponible pour les professeurs.")
+		choisir_periode_et_classe_bulletin()
 		chargement(false)
 	}
 
@@ -9222,10 +9224,73 @@ function clic_bulletin(){
 	*/
 }
 
+function choisir_periode_et_classe_bulletin(){
+	var mes_classes = valeursUniquesDeCetteKey(JSON.parse(recuperer("mes_matieres")),"Classe")
+	var option_classes = ""
+	mes_classes.forEach(function(valeur,index_classe){
+		option_classes += '<option value="'+valeur+'">'+valeur+'</option>'
+	})
+	
+	var elements_html = `<div><label for="periode_bulletin"><select style="width: 60%;" id="periode_bulletin" name="periode_bulletin"><option value="PREMIER TRIMESTRE">PREMIER TRIMESTRE</option><option value="DEUXIEME TRIMESTRE">DEUXIEME TRIMESTRE</option><option value="TROISIEME TRIMESTRE">TROISIEME TRIMESTRE</option><option value="ANNUEL">ANNUEL</option></select></label>
+		<label for="la_classe"><select style="width: 60%;" id="la_classe_bulletin" name="la_classe">`+option_classes+`</select></label></div>`
+	creer_mini_popup("Choisissez la période et la classe du bulletin à consulter:", elements_html,"Consulter","consulter_bulletin_de_la_classe()")
+	
+}
+
+function id_vie_de_classe(id_classe){
+	url = racine_data + 'Matieres?Classe=eq.'+id_classe+'&Matiere=eq.Vie de classe'+ "&" +apikey
+	//console.log(url)
+	resultat = get_resultat(url)
+	//console.log(resultat)
+	if(resultat) resultat = resultat[0]['ID_URL']
+	return resultat
+}
+
+function consulter_bulletin_de_la_classe(){
+
+	chargement(true)
+
+
+	periode_bulletin = $("#periode_bulletin")[0].value
+	nom_classe = $("#la_classe_bulletin")[0].value
+	id_classe = id_vie_de_classe(nom_classe) //récupérer le ID de la vie de classe de la classe choisie
+	//console.log(id_classe)
+	//alert(nom_classe)
+
+	url = racine_data + 'Fichiers?categorie_fichier=eq.Bulletins&periode_bulletin=eq.'+periode_bulletin+'&id_dossier=eq.'+id_classe + "&" +apikey
+	//console.log(url)
+	resultat_bulletins = get_resultat(url)
+	//console.log(resultat_bulletins)
+
+	if(resultat_bulletins.length === 0){
+		alert("Aucun bulletin disponible sur la période '"+periode_bulletin.toLowerCase() +"' pour la classe de '"+nom_classe+"' pour l'instant.")
+		chargement(false)
+	}else{
+		
+		resultat_bulletins = resultat_bulletins[0]
+		console.log(resultat_bulletins)
+		visualiser(resultat_bulletins['nom_fichier'],resultat_bulletins['id_fichier'],"","",true)
+
+		$('#mini_popup').remove()
+		chargement(false)
+	}
+
+
+
+	return "Consultation terminée."
+
+
+
+
+
+
+
+	chargement(false)
+}
 
 function choisir_periode_bulletin(){
 	var elements_html = '<label for="periode_bulletin"><select style="width: 60%;" id="periode_bulletin" name="periode_bulletin"><option value="PREMIER TRIMESTRE">PREMIER TRIMESTRE</option><option value="DEUXIEME TRIMESTRE">DEUXIEME TRIMESTRE</option><option value="TROISIEME TRIMESTRE">TROISIEME TRIMESTRE</option><option value="ANNUEL">ANNUEL</option></select></label>'
-	creer_mini_popup("Choisissez la période du bulletin à consulter:", elements_html,"consulter","consulter()")
+	creer_mini_popup("Choisissez la période du bulletin à consulter:", elements_html,"Consulter","consulter()")
 	
 }
 
