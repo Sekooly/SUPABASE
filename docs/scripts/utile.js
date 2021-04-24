@@ -368,7 +368,7 @@ function stocker(nom_variable,valeur_variable){
 	window.localStorage.setItem(nom_variable,valeur_variable)
 }
 
-function recuperer(nom_variable){
+function recuperer(nom_variable){  
 	return window.localStorage.getItem(nom_variable)	
 }
 
