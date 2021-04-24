@@ -9494,6 +9494,25 @@ function proceder_a_linitialisation(){
 
 
 
+	chargement(true)
+
+
+
+
+
+	//changer la classe, le cycle de admin
+	var nouveau_data = {
+		"Cycle" : a_stocker["Cycle"],
+		"Classe" : '(Tous|' + a_stocker["Cycle"] + ')'
+	}
+	url = racine_data + "Administration?Identifiant=eq.admin&"+ apikey
+	//console.log(url)
+	patch_resultat_asynchrone(url,nouveau_data)
+
+
+
+
+
 
 	chargement(true)
 
