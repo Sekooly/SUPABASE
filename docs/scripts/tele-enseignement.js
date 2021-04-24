@@ -9173,12 +9173,17 @@ function clic_bulletin(){
 
 
 	chargement(true)
-	if(recuperer('mon_type').includes('Administration')){
+	if(recuperer('mon_type').includes('Administration') ){
 		
-		afficher_ou_non_choix_fichier(true)
-		mode_bulletin(true)
+		if( recuperer('dossier_chargé')){
+			afficher_ou_non_choix_fichier(true)
+			mode_bulletin(true)
+		}else{
+			alert("Merci d'ouvrir un dossier Vie de classe avant de publier un bulletin.")
+			
+		}
+		
 		chargement(false)
-
 
 	}else if(recuperer('mon_type').includes('Eleves')){
 		consulter_mon_bulletin(recuperer('identifiant_courant'))
