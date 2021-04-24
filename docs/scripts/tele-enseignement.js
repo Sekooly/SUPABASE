@@ -10296,7 +10296,7 @@ function mettre_les_soons(){
 
 
 function soon(){
-	return '<rouge id="soon" style="top: 0;position: relative;padding-bottom: 10px;font-size: 9px;">BIENTÔT</rouge>'
+	return '<rouge id="soon">BIENTÔT</rouge>'
 }
 
 
