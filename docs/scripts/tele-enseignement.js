@@ -5281,7 +5281,7 @@ $(function charger_fichiers(e){
 
 			//si dossier vie scolaire et non admin: pas de dépôt
 			if(!recuperer('mon_type').includes('Admin') && element_DOM('accueil_utilisateur').innerText.includes('Vie scolaire') ){
-				alert("Vous n'avez pas les droits pour publier une discussion dans la Vie Scolaire. Pour tout problème constaté sur la plateforme, envoyez directement un mail à lycee.hibiscus@gmail.com.");
+				alert("Vous n'avez pas les droits pour publier une discussion dans la Vie Scolaire. Pour tout problème constaté sur la plateforme, envoyez directement un mail à "+data_etablissement['contact_etablissement']+".");
 				return -1;
 			}
 
@@ -5413,7 +5413,7 @@ $(function charger_fichiers(e){
 			//if( element_DOM('anonymisation').checked === true) mon_identifiant = "Anonyme";
 
 			if(mon_contenu.toLowerCase().includes("facebook") || mon_contenu.toLowerCase().includes("fb") || mon_contenu.toLowerCase().includes("messenger")){
-				alert("Vous n'avez pas le droit d'utiliser d'autres plateformes que celle-ci dans le cadre des cours à "+nom_etablissement+".")
+				alert("Vous n'avez pas le droit d'utiliser d'autres plateformes que celle-ci dans le cadre des cours à "+nom_etablissement+" sur SEKOOLY.")
 				return -1;
 			}
 			
