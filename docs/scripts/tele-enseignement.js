@@ -9180,13 +9180,14 @@ function clic_bulletin(){
 			mode_bulletin(true)
 		}else{
 			alert("Merci d'ouvrir un dossier Vie de classe avant de publier un bulletin.")
-			
+
 		}
 		
 		chargement(false)
 
 	}else if(recuperer('mon_type').includes('Eleves')){
-		consulter_mon_bulletin(recuperer('identifiant_courant'))
+		choisir_periode_bulletin()
+		chargement(false)
 	}else{
 		alert("Fonctionnalité pas encore disponible pour les professeurs.")
 		chargement(false)
@@ -9195,6 +9196,19 @@ function clic_bulletin(){
 	/*
 
 	*/
+}
+
+
+function choisir_periode_bulletin(){
+	var elements_html = '<label for="periode_bulletin"><select style="width: 60%;" id="periode_bulletin" name="periode_bulletin"><option value="PREMIER TRIMESTRE">PREMIER TRIMESTRE</option><option value="DEUXIEME TRIMESTRE">DEUXIEME TRIMESTRE</option><option value="TROISIEME TRIMESTRE">TROISIEME TRIMESTRE</option><option value="ANNUEL">ANNUEL</option></select></label>'
+	creer_mini_popup("Choisissez la période du bulletin à consulter:", elements_html,"consulter","consulter()")
+	
+}
+
+function consulter(){
+	chargement(true)
+	consulter_mon_bulletin(recuperer('identifiant_courant'))
+	chargement(false)
 }
 
 
@@ -9227,14 +9241,15 @@ function consulter_mon_bulletin(identifiant_eleve){
 	motif = '*"'+identifiant_eleve+'"*'
 	if(!identifiant_eleve) motif = "*"
 
+	periode_bulletin = $("#periode_bulletin")[0].value
 
-	url = racine_data + 'Fichiers?categorie_fichier=eq.Bulletins&destinataire_par_page=like.'+motif + "&" +apikey
+	url = racine_data + 'Fichiers?categorie_fichier=eq.Bulletins&periode_bulletin=eq.'+periode_bulletin+'&destinataire_par_page=like.'+motif + "&" +apikey
 	//console.log(url)
 	resultat_bulletins = get_resultat(url)
 	//console.log(resultat_bulletins)
 
 	if(resultat_bulletins.length === 0){
-		alert("Aucun bulletin disponible à votre nom pour l'instant.")
+		alert("Aucun bulletin disponible à votre nom sur la période '"+periode_bulletin.toLowerCase() +"' pour l'instant.")
 		chargement(false)
 	}else{
 
@@ -9252,7 +9267,7 @@ function consulter_mon_bulletin(identifiant_eleve){
 			}
 		}
 			
-
+		$('#mini_popup').remove()
 
 		//console.log(url)	
 	}
