@@ -5339,11 +5339,14 @@ $(function charger_fichiers(e){
 			
 			var contenu_poste = contenu_poste_bis//encodeURIComponent(contenu_poste_bis);
 
+			var le_mot_interdit = chercher_le_mot_interdit(contenu_poste)
+			if(le_mot_interdit !== ""){
+				alert("Vous n'avez pas le droit d'utiliser le terme '"+le_mot_interdit+"' dans le cadre des cours à "+nom_etablissement+" sur SEKOOLY.")
+				return -1;
+			}
 
 			//on n'envoie qu'une fois le message
 			element_DOM('envoicommentaire').disabled=true;
-
-			//element_DOM('maquestion').src = mon_action;
 
 			chargement(true);
 
@@ -5409,6 +5412,21 @@ $(function charger_fichiers(e){
 
 		}
 
+
+		function chercher_le_mot_interdit(phrase){
+			if(!data_etablissement['mots_interdits']) return ""
+				
+			var mots_interdits = data_etablissement['mots_interdits'].split(",")
+			var le_mot_interdit = ""
+			mots_interdits.some(function(valeur_mot){
+				contient = phrase.toLowerCase().includes(valeur_mot.toLowerCase())
+				le_mot_interdit = contient ? valeur_mot : ""
+				return contient
+			})
+
+			return le_mot_interdit
+		}
+
 		function envoyer_le_topic(){
 
 			var mon_titre = encodeURIComponent(element_DOM('titre_question').value.trim());
@@ -5417,8 +5435,10 @@ $(function charger_fichiers(e){
 			
 			//if( element_DOM('anonymisation').checked === true) mon_identifiant = "Anonyme";
 
-			if(mon_contenu.toLowerCase().includes("facebook") || mon_contenu.toLowerCase().includes("fb") || mon_contenu.toLowerCase().includes("messenger")){
-				alert("Vous n'avez pas le droit d'utiliser d'autres plateformes que celle-ci dans le cadre des cours à "+nom_etablissement+" sur SEKOOLY.")
+			//if(mon_contenu.toLowerCase().includes("facebook") || mon_contenu.toLowerCase().includes("fb") || mon_contenu.toLowerCase().includes("messenger")){
+			var le_mot_interdit = chercher_le_mot_interdit(mon_contenu)
+			if(le_mot_interdit !== ""){
+				alert("Vous n'avez pas le droit d'utiliser le terme '"+le_mot_interdit+"' dans le cadre des cours à "+nom_etablissement+" sur SEKOOLY.")
 				return -1;
 			}
 			
@@ -7500,6 +7520,7 @@ function appliquer_filtre_choisi(nom_champ_reference, valeur_champ_reference){
 
 
 function un_menu_clic(id_parametre){
+
 
 	//si c'est une analyse -> on va direct dans le nouvel onglet
 	if(id_parametre.includes("Analyses")){
