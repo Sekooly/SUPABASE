@@ -6874,7 +6874,7 @@ function rejoindre_visio(id_matiere_visio,sans_alerte,valeur_id_div_visio,pas_de
 		return -1;
 	}*/
 
-
+	//alert("sans_alerte dans rejoindre visio:" + sans_alerte)
 	if(!sans_alerte){
 
 		var confirmation = confirm("Branchez des écouteurs pour mieux entendre pendant la visioconférence.");
@@ -6907,7 +6907,7 @@ function rejoindre_visio(id_matiere_visio,sans_alerte,valeur_id_div_visio,pas_de
 	}
 
 
-	creer_une_visio("100%","100%",identifiant,la_classe,id_div_visio,id_matiere_visio);
+	creer_une_visio("100%","100%",identifiant,la_classe,id_div_visio,id_matiere_visio,sans_alerte);
 
 }
 
@@ -6925,8 +6925,8 @@ function initialiser_visio(valeur_id_div_visio){
 	return id_div_visio
 }
 
-function creer_une_visio(largeur, hauteur,moi,classe,id_div_visio, id_matiere_visio){
-
+function creer_une_visio(largeur, hauteur,moi,classe,id_div_visio, id_matiere_visio, sans_alerte){
+	chargement(true)
 	//ajouter le kick out si administrateur
 	var enlever_kickout= !recuperer('mon_type').includes('Admin');
 	const domain = 'meet.jit.si';
@@ -6970,19 +6970,24 @@ function creer_une_visio(largeur, hauteur,moi,classe,id_div_visio, id_matiere_vi
 	api.executeCommand('subject', nom_etablissement.toUpperCase() + " - " + classe);
 	envoyer_mon_log_visio(moi.toLowerCase(), classe.toLowerCase(), "debut",mon_role, id_matiere_visio);
 	
-
+	
 	//au clic de quitter : confirmer
 	$("#bye_prev").on('click',function(e){
 
 		e.preventDefault();
+		var est_premier_visio = (id_div_visio === "visio-0" || id_div_visio === "visio")
+		//alert(id_div_visio + " " + sans_alerte)
 
-		var confirmation = confirm("Êtes-vous sûr de vouloir quitter la visioconférence?");
-
-		if(confirmation){
+		if(est_premier_visio){
+			var confirmation = confirm("Êtes-vous sûr de vouloir quitter la visioconférence?");
+			stocker("quitter_multi_visio",confirmation)
+		}
+		
+		if(confirmation || (!est_premier_visio && recuperer("quitter_multi_visio") === "true")){
 			//je notifie via formulaire
-			envoyer_mon_log_visio(moi.toLowerCase(), classe, "fin",mon_role, id_matiere_visio);			
+			envoyer_mon_log_visio(moi.toLowerCase(), classe, "fin",mon_role, id_matiere_visio);
+			api.dispose();			
 			quitter_previsualisation();
-			api.dispose();
 		}
 
 	})
@@ -7037,14 +7042,12 @@ function notif_visio(id_classe_matiere, statut_visio, identifiant){
 
 function envoyer_mon_log_visio(mon_identifiant, ma_classe, mon_statut, mon_role, id_classe_matiere){
 
-	$.getJSON('https://ipapi.co/json/', function(data) {
+	if(!id_classe_matiere) id_classe_matiere = recuperer("dossier_chargé")
+	//alert(id_classe_matiere)
+
+	try{
+    	var data = get_resultat('https://ipapi.co/json/')
 		//console.log(data);
-
-		//si c'est prof, on envoie juste "prof"
-		if(ma_classe.includes("|")) ma_classe = "Professeur";
-		//si c'est un admin, on envoie le rôle
-		if(mon_role) ma_classe = mon_role;
-
 
 		var mon_adresse_ip = data['ip'];
 		var ma_ville = data['city'];
@@ -7052,30 +7055,45 @@ function envoyer_mon_log_visio(mon_identifiant, ma_classe, mon_statut, mon_role,
 		var ma_latitude = data['latitude'];
 		var ma_longitude = data['longitude'];
 		var mon_operateur = data['org'];
+	}catch{
+
+		var mon_adresse_ip = '';
+		var ma_ville = '';
+		var mon_pays = '';
+		var ma_latitude = '';
+		var ma_longitude = '';
+		var mon_operateur = '';
 
 
-		nom_table = "Visio"
-		var les_matieres = JSON.parse(recuperer("mes_matieres"))
-		var la_classe_matiere = les_matieres.filter(e => e['ID_URL'] === id_classe_matiere)[0]["Classe_Matiere"]
+	}
 
-		nouveau_visio = {
-			"Horodateur": maintenant(),
-			"Identifiant": mon_identifiant,
-			"Type": mon_role,
-			"Statut": mon_statut,
-			"IP": mon_adresse_ip,
-			"Ville": ma_ville,
-			"Pays": mon_pays,
-			"Latitude": ma_latitude,
-			"Longitude": ma_longitude, 
-			"Operateur": mon_operateur,
-			"Id_classe_matiere" : id_classe_matiere,
-			"Classe_matiere" : la_classe_matiere
-		}
-		console.log(nouveau_visio)
-		ajouter_un_element(nom_table, nouveau_visio)
+	//si c'est prof, on envoie juste "prof"
+	if(ma_classe.includes("|")) ma_classe = "Professeur";
+	//si c'est un admin, on envoie le rôle
+	if(mon_role) ma_classe = mon_role;
 
-	})
+
+	nom_table = "Visio"
+	var les_matieres = JSON.parse(recuperer("mes_matieres"))
+	var la_classe_matiere = les_matieres.filter(e => e['ID_URL'] === id_classe_matiere)[0]["Classe_Matiere"]
+
+	nouveau_visio = {
+		"Horodateur": maintenant(),
+		"Identifiant": mon_identifiant,
+		"Type": mon_role,
+		"Statut": mon_statut,
+		"IP": mon_adresse_ip,
+		"Ville": ma_ville,
+		"Pays": mon_pays,
+		"Latitude": ma_latitude,
+		"Longitude": ma_longitude, 
+		"Operateur": mon_operateur,
+		"Id_classe_matiere" : id_classe_matiere,
+		"Classe_matiere" : la_classe_matiere
+	}
+	console.log(nouveau_visio)
+	ajouter_un_element(nom_table, nouveau_visio)
+
 
 }
 
@@ -7118,7 +7136,6 @@ function commencer_multi_visio(){
 
 	chargement(true)
 	var liste_classe_multi_visio = $("#classe_multi_visio").val()
-	$("#mini_popup").remove()
 	
 
 	vider_fenetre('Multi-visioconférence',true)
@@ -7130,15 +7147,19 @@ function commencer_multi_visio(){
 	}else{
 		$('#fenetre').append('<div id="previsualisation" style="width: 100%;height: 85%;display:grid;grid-template-columns: repeat(2, 1fr);">')
 		liste_classe_multi_visio.forEach(function(id_matiere_visio,numero){
-			console.log(id_matiere_visio)
+			chargement(true)
+			//console.log(id_matiere_visio)
 			$("#previsualisation").append("<div id='visio-"+numero+"' class='une_visio'></div>")
-			sans_alerte = numero < liste_classe_multi_visio.length
+			//alert(numero + " VS " + liste_classe_multi_visio.length)
+			sans_alerte = numero < liste_classe_multi_visio.length-1
 			rejoindre_visio(id_matiere_visio,sans_alerte,"visio-"+numero,true)
 		})		
 	}
 
 
 	afficher_fenetre(true)
+	$("#mini_popup").remove()
+	
 	chargement(false)
 }
 
