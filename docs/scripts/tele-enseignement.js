@@ -2268,6 +2268,9 @@ function chargement_a_larrivee(){
 	    }
 	})
 
+	//si écolage pas ok -> deconnexion automatique
+	if(!mon_ecolage_est_ok()) deconnexion()
+
 
 	if(!plateforme_prete()){
 		return initialisation_de_la_plateforme()
@@ -9382,16 +9385,19 @@ function afficher_mon_bulletin(id_fichier, numero_page,identifiant_eleve){
 
 
 
+function mon_ecolage_est_ok(){
+
+	identifiant_eleve = recuperer("identifiant_courant")
+	url = racine_data + "Eleves" + "?Identifiant=eq." + identifiant_eleve + "&" +apikey
+	//console.log(url)
+	return get_resultat(url)[0]["Ecolage_OK"] === "oui"
+
+}
 
 
 
 function telecharger_canvas(){
-	identifiant_eleve = recuperer("identifiant_courant")
-	url = racine_data + "Eleves" + "?Identifiant=eq." + identifiant_eleve + "&" +apikey
-	//console.log(url)
-	mon_ecolage_ok = get_resultat(url)[0]["Ecolage_OK"] === "oui"
-
-	
+	mon_ecolage_ok = mon_ecolage_est_ok()
 
 	if(mon_ecolage_ok){
 		var link = document.createElement('a');
