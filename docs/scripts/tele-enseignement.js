@@ -2251,6 +2251,7 @@ function chargement_a_larrivee(){
 	mettre_le_contact_etablissement()
 	rendre_td_modifiable();
 	mettre_mon_mode()
+	mettre_les_soons()
 	ajouter_multi_visio_si_non_eleve()
 
 	//todo : pas de lien sur l'alerte pour les primaires
@@ -9976,6 +9977,7 @@ function fermer_side_bar(){
 function en_cours(){
 
 	alert("Cette fonctionnalité est en cours de mise en place, merci de votre patience.")
+
 }
 
 
@@ -10280,9 +10282,22 @@ function aucun_element_section(){
 
 
 
+function mettre_les_soons(){
+	if($("#soon").length === 0){
+
+		for ( i = 0 ; i <$("[soon]").length;i++){
+			//console.log($("[soon]")[i])
+			$(".sidebar.left>div[soon]")[i].innerHTML += soon()
+		}
+
+	}
+}
 
 
 
+function soon(){
+	return '<rouge id="soon" style="top: 0;position: relative;padding-bottom: 10px;font-size: 9px;">BIENTÔT</rouge>'
+}
 
 
 
@@ -10320,6 +10335,9 @@ function langues(){
 	en_cours()
 
 }
+
+
+
 
 function mettre_mon_mode(){
 	changer_mode(true)
