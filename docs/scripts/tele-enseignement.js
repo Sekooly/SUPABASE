@@ -6968,7 +6968,7 @@ function creer_une_visio(largeur, hauteur,moi,classe,id_div_visio, id_matiere_vi
 
 	const api = new JitsiMeetExternalAPI(domain, options);
 	api.executeCommand('subject', nom_etablissement.toUpperCase() + " - " + classe);
-	envoyer_mon_log_visio(moi.toLowerCase(), classe.toLowerCase(), "debut",mon_role);
+	envoyer_mon_log_visio(moi.toLowerCase(), classe.toLowerCase(), "debut",mon_role, id_matiere_visio);
 	
 
 	//au clic de quitter : confirmer
@@ -6980,7 +6980,7 @@ function creer_une_visio(largeur, hauteur,moi,classe,id_div_visio, id_matiere_vi
 
 		if(confirmation){
 			//je notifie via formulaire
-			envoyer_mon_log_visio(moi.toLowerCase(), classe, "fin",mon_role);			
+			envoyer_mon_log_visio(moi.toLowerCase(), classe, "fin",mon_role, id_matiere_visio);			
 			quitter_previsualisation();
 			api.dispose();
 		}
@@ -7035,7 +7035,7 @@ function notif_visio(id_classe_matiere, statut_visio, identifiant){
 	}
 
 
-function envoyer_mon_log_visio(mon_identifiant, ma_classe, mon_statut, mon_role){
+function envoyer_mon_log_visio(mon_identifiant, ma_classe, mon_statut, mon_role, id_classe_matiere){
 
 	$.getJSON('https://ipapi.co/json/', function(data) {
 		//console.log(data);
@@ -7052,12 +7052,11 @@ function envoyer_mon_log_visio(mon_identifiant, ma_classe, mon_statut, mon_role)
 		var ma_latitude = data['latitude'];
 		var ma_longitude = data['longitude'];
 		var mon_operateur = data['org'];
-		var id_classe_matiere = recuperer('dossier_chargé');
 
 
 		nom_table = "Visio"
-		la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
-		la_matiere = recuperer('mon_type') === "Eleves" ? $("#accueil_utilisateur")[0].innerText : $("#accueil_utilisateur")[0].innerText.replace(la_classe,"").trim()
+		var les_matieres = JSON.parse(recuperer("mes_matieres"))
+		var la_classe_matiere = les_matieres.filter(e => e['ID_URL'] === id_classe_matiere)[0]["Classe_Matiere"]
 
 		nouveau_visio = {
 			"Horodateur": maintenant(),
@@ -7071,7 +7070,7 @@ function envoyer_mon_log_visio(mon_identifiant, ma_classe, mon_statut, mon_role)
 			"Longitude": ma_longitude, 
 			"Operateur": mon_operateur,
 			"Id_classe_matiere" : id_classe_matiere,
-			"Classe_matiere" : "(" + la_classe + "|" + la_matiere + ")" 
+			"Classe_matiere" : la_classe_matiere
 		}
 		console.log(nouveau_visio)
 		ajouter_un_element(nom_table, nouveau_visio)
