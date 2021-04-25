@@ -25,6 +25,16 @@ var image_temporaire = ""
 var nom_image_temporaire = ""
 
 
+var mes_devoirs_a_faire = []
+var mes_devoirs_rendus = []
+var tous_les_eleves_de_mon_cycle = []
+
+var mes_discussions = []
+var mes_coms = []
+var mes_visios = []
+
+var mes_fichiers = []
+
 /*********************** CONSEIL DE CLASSE ***********************************/
 function afficher_conseil_de_classe(oui){
 
@@ -3384,14 +3394,15 @@ function recategoriser_fichier(id_fichier,nom_fichier){
 
 }
 
-function creer_mini_popup(titre,elements_html,nom_bouton,fonction_bouton,valeur_actuelle,id_element_valeur_actuelle, valeur_actuelle_bis, id_element_valeur_actuelle_bis){
+function creer_mini_popup(titre,elements_html,nom_bouton,fonction_bouton,valeur_actuelle,id_element_valeur_actuelle, valeur_actuelle_bis, id_element_valeur_actuelle_bis,taille_du_titre){
 
 	$("#mini_popup").remove();
 
 	//on ajoute le bouton quitter
-		var bouton_quitter = '<div id="entete-fenetre" style="display: inline-flex;float: right;"><img  alt="X" src="https://sekooly.github.io/SUPABASE/images/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div>';
+	var bouton_quitter = '<div id="entete-fenetre" style="display: inline-flex;float: right;"><img  alt="X" src="https://sekooly.github.io/SUPABASE/images/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div>';
 
-		var titre_html = '<div>'+titre+'</div>'
+	var taille = taille_du_titre ? 'style="font-size: '+taille_du_titre+'px;"' : ""
+	var titre_html = '<div '+taille+' >'+titre+'</div>'
 
 
 	var valider_changement = '<button type="button" class="rendre" onclick="'+fonction_bouton+'">'+nom_bouton+'</button>'
@@ -6371,7 +6382,9 @@ function clic_de_notif(type_notif,id_notif,id_dossier){
 	
 	//commenter
 	envoyer_ma_date_de_consultation()
-		
+	
+	//pas de minipopup tdb
+	$("#mini_popup").remove()
 	
 	//on attend 0.5 seconde avant de passer a la suite
 	setTimeout(function(){	
@@ -10160,8 +10173,6 @@ function maj_date_journee(){
 	traiter_section(mes_matieres,"Devoirs",resultats,"la_date_limite","lheure_limite","id_dossier","nom_fichier","id_fichier","devoir",true)
 
 
-
-
 	/************************************* discussions ******************************************/
 	
 	if(!recuperer('mon_type').includes('Admin')){
@@ -10293,7 +10304,7 @@ function creer_element_journee(nom_matiere,nom_fichier,date_reference,heure_refe
 
 
 	affichage_date = date_heure_ensemble ? afficher_date(date_reference) : afficher_date(date_reference,true) + heure_reference
-	return '<div class="contenu_section_journee"><div><b class="nom_matiere_journee">'+nom_matiere+"</b> "+nom_fichier+'<i style="color: #bfbfbf;"> '+affichage_date+' </i><span class="mini-image deja_traite">'+coche_traitement+'</span> <img id="'+champ_id+'" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" alt="voir" onclick="clic_de_notif(\''+type_notif+'\',\''+champ_id+'\',\''+id_classe_matiere+'\');" class="mini-image"> <div></div>'
+	return '<div class="contenu_section_journee"><b class="nom_matiere_journee">'+nom_matiere+"</b> "+nom_fichier+'<i style="color: #bfbfbf;"> '+affichage_date+' </i><span class="mini-image deja_traite">'+coche_traitement+'</span> <img id="'+champ_id+'" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" alt="voir" onclick="clic_de_notif(\''+type_notif+'\',\''+champ_id+'\',\''+id_classe_matiere+'\');" class="mini-image"></div>'
 }
 
 
@@ -10325,21 +10336,605 @@ function soon(){
 
 
 
-
+	
 
 
 
 function tableau_de_bord(){
 	//en_cours()
+	var aujourdhui = maintenant()
+	vider_fenetre('<span id="titre-tdb">Tableau de bord - ' + afficher_date(aujourdhui) + '</span>' + bouton_actualiser("tdb_tout_actualiser()",20))
+	$("#fenetre").append('<div id="previsualisation" style="width: 100%;height: 85%;overflow-y:auto;text-align: center;"></div>');
 
-	vider_fenetre("Tableau de bord")
-	$("#fenetre").append('<div id="previsualisation" style="width: 100%;height: 85%;"></div>');
-	$("#previsualisation")
+
+	var mon_type = recuperer("mon_type")
+
+	elements_tdb =  mon_type === "Eleves" ? ["Présence sur la plateforme", "Devoirs rendus", "Participations", "Fichiers à consulter"] :
+					mon_type === "Profs" ? ["Présence sur la plateforme", "Devoirs corrigés", "Participations", "Fichiers en ligne"] :
+					mon_type.includes("Admin") ? ["Présence sur la plateforme", "Devoirs rendus et corrigés", "Participations", "Fichiers en ligne"]:
+					[]
+
+
+	//width si mobile -> 
+	for (compteur = 1; compteur <= elements_tdb.length; compteur++ ){
+
+		//si non 1 -> avec détails
+		bouton_voir_details = compteur !== 1 ? bouton_details(compteur) : ""
+		$("#previsualisation").append("<span class='element_tdb'><div class='element_tdb_titre'>"+elements_tdb[compteur-1]+bouton_actualiser(fonction_actualiser_du_tdb(compteur,aujourdhui),15)+bouton_voir_details+"</div><div id='tdb-"+compteur+"' class='graphe_tdb'  style='width:99.9%; height:94%;'></div></span>")
+	}
+
+
+	tdb_tout_actualiser(aujourdhui)
 	afficher_fenetre(true)
 
-
-	
 }
+
+function fonction_actualiser_du_tdb(compteur,aujourdhui){
+	resultat = compteur === 1 ? "tdb_recuperer_mes_connexions(false,'"+aujourdhui+"')" :
+				compteur === 2 ? "tdb_recuperer_devoirs(false,'"+aujourdhui+"')" :
+				compteur === 3 ? "tdb_recuperer_participations(false,'"+aujourdhui+"')" :
+				compteur === 4 ? "tdb_recuperer_fichiers_a_consulter(false,'"+aujourdhui+"')" :
+				""
+
+	return resultat
+				
+}
+
+function bouton_details(compteur){
+	return '<span style="padding-left: 10px;"><span onclick="details_tdb_'+compteur+'(this)" style="width: 15px; cursor: pointer;" class="voir_tdb">Voir les détails</span></span>'
+
+}
+
+
+function bouton_actualiser(nom_fonction_actualisation,taille_bouton_px){
+	return '<span style="padding-left: 10px;"><img alt="actualiser" src="https://sekooly.github.io/SUPABASE/images/img_actualiser.png" onclick="'+nom_fonction_actualisation+'" style="width: '+taille_bouton_px+'px; cursor: pointer;"></span>'
+}
+
+function tdb_tout_actualiser(){
+	chargement(true)
+	$("#titre-tdb")[0].innerText = 'Tableau de bord - ' + afficher_date(maintenant()) 
+	aujourdhui = maintenant()
+	//console.log(aujourdhui)
+	tdb_recuperer_mes_connexions(true,aujourdhui)
+	tdb_recuperer_devoirs(true,aujourdhui)
+	tdb_recuperer_participations(true,aujourdhui)
+	tdb_recuperer_fichiers_a_consulter(true,aujourdhui)
+	chargement(false)
+}
+
+function tdb_recuperer_mes_connexions(ne_pas_arreter_chargement,aujourdhui){
+	const el = document.getElementById('tdb-1');
+	el.innerHTML = ""
+
+	var premier_mot_statut = ["Connexion","Deconnexion","Code","La","Frais"]
+	var legende = ["Connexion","Deconnexion","Code erroné","Maintenance","Frais non payés"]
+	var series_statuts = []
+	var url = racine_data + "Logs?Identifiant=eq." + recuperer("identifiant_courant") + "&" + apikey
+	var mes_connexions = get_resultat(url)
+
+	//return tesssst('1')
+
+	//console.log(mes_connexions.length)
+
+	//récupérer les 12 derniers mois en mode intervalles de semaines 
+	les_12_mois = les_12_derniers_mois_en_intervalles_semaines(aujourdhui)
+	var legende_x = les_12_mois.map(e => 'semaine du ' + e.split(" ")[0])
+
+
+	//pour chaque statut possible
+	premier_mot_statut.forEach(function(valeur_statut,index_statut){
+		
+		//pour chaque intervalle de semaine
+		les_12_mois.forEach(function(valeur,index){
+
+			debut = moment(valeur.split(" ")[0])
+			fin = moment(valeur.split(" ")[1])
+
+			//on garder que ce statut (premier mot)
+			logs_avec_ce_statut = mes_connexions.filter(e => e['Statut'].split(' ')[0] === valeur_statut && moment(e['Horodateur']).isBetween(debut, fin, 'day', '(]'))
+			//on compte le nombre d'horodateur entre les 2 dates avec CE statut
+			series_statuts.push({[valeur_statut] : { [valeur]: logs_avec_ce_statut.length }})
+				
+		})
+			
+	})
+
+
+	mes_series_finales = []
+
+	//pour chaque statut possible
+	//on crée la série
+	premier_mot_statut.forEach(function(valeur_statut,index_statut){
+		mes_series_finales.push({
+			name: legende[index_statut],
+			data: series_statuts.filter(e=>e[valeur_statut]).map(e=>e[valeur_statut]).map(e => Object.values(e)[0]),
+			spline: true
+		})
+	})
+
+	//console.log(mes_series_finales)
+
+	//console.log(mes_series_finales[0]["data"])
+	creer_chart(1,mes_series_finales,legende_x,"Evolution des tentatives de connexions")
+
+	return mes_series_finales//series_statuts.filter(e=>e['Connexion']).map(e=>e["Connexion"]).map(e => Object.values(e)[0])
+
+	if(!ne_pas_arreter_chargement) chargement(false)
+
+}
+
+
+
+
+
+
+function tdb_recuperer_devoirs(ne_pas_arreter_chargement,aujourdhui){
+	document.getElementById('tdb-2').innerHTML = ""
+
+	mes_matieres = JSON.parse(recuperer("mes_matieres"))
+	les_id_dossier_classe = '("'+mes_matieres.map(e => e['ID_URL']).join('","') + '")'
+		
+	//prof ou eleve
+	if(!recuperer('mon_type').includes('Admin')){
+		url = racine_data + 'Fichiers?' +apikey 
+		url += '&categorie_fichier=in.(Devoirs,Examens)'
+		url += '&id_dossier=in.' + les_id_dossier_classe
+	
+	//admin
+	}else{
+		url = racine_data + 'Fichiers?' +apikey 
+		url += '&categorie_fichier=in.(Devoirs,Examens)'
+	}
+
+	url += '&order=date_effet.asc,heure_effet.asc,id_dossier.asc'
+
+	//console.log(les_id_dossier_classe)
+	//console.log(url)
+	mes_devoirs_a_faire = get_resultat(url)
+	mes_devoirs_a_faire = mes_devoirs_a_faire.filter(e => les_id_dossier_classe.includes(e["id_dossier"]))
+	//console.log(mes_devoirs_a_faire)
+
+
+
+	//récupérer tous mes/les rendus si eleve OU admin
+	mon_type = recuperer('mon_type')
+
+	le_proprietaire = mon_type.includes('Admin') || mon_type.includes('Prof') ? "" : 'proprietaire=eq.'+recuperer("identifiant_courant")
+	le_titre_moyen = mon_type.includes('Admin') || mon_type.includes('Prof') ? "moyen" : ""
+	details_rendus =  mon_type.includes('Admin') || mon_type.includes('Prof') ? "" : mes_devoirs_rendus.length+" devoirs rendus sur "+mes_devoirs_a_faire.length
+
+	url = racine_data + 'Rendus?'+le_proprietaire+'&'+apikey  //racine_data + 'Rendus?'+le_proprietaire+'&id_dossier_sujetdevoir=in.'+les_id_dossier_classe+'&'+apikey 
+	mes_devoirs_rendus = get_resultat(url)
+	mes_devoirs_rendus = mes_devoirs_rendus.filter(function(valeur){
+		return les_id_dossier_classe.includes(valeur['id_dossier_sujetdevoir'])
+	})
+	//console.log(mes_devoirs_rendus)
+
+	var taux_rendu = 0
+	//pour les élèves
+	if(mon_type.includes('Eleves')){
+		taux_rendu = 100*mes_devoirs_rendus.length/mes_devoirs_a_faire.length	
+
+	//pour profs ET admin
+	}else{
+		//récupérer toutes les classes
+		var mes_matieres = JSON.parse(recuperer("mes_matieres"))
+		var mes_classes = valeursUniquesDeCetteKey(mes_matieres,"Classe")
+		var mon_cycle = JSON.parse(recuperer("mes_donnees"))['Cycle']
+		var url = racine_data + "Eleves?Cycle=eq." + mon_cycle + "&"+ apikey
+		//console.log(url)
+		//récupérer les élèves de toutes les classes du cycle
+		tous_les_eleves_de_mon_cycle = get_resultat(url)
+		var nb_eleves = tous_les_eleves_de_mon_cycle.length
+		nb_total_rendus_attendus = 0
+
+
+		//pour chaque devoir
+		var liste_taux = []
+		mes_devoirs_a_faire.forEach(function(le_devoir,index_devoir){
+
+			//chercher la classe correspondante (et non la classe matiere)
+			nom_classe_du_devoir = mes_matieres.find(e => e['ID_URL'] === le_devoir['id_dossier'])['Classe']
+
+			//chercher le nombre d'élèves de la classe X
+			//console.log(tous_les_eleves_de_mon_cycle)
+			nb_eleves = tous_les_eleves_de_mon_cycle.filter(e => e['Classe'] === nom_classe_du_devoir).length
+
+			//chercher le nombre de rendus de ce sujet de devoir Y
+			nb_rendus_ce_devoir = mes_devoirs_rendus.filter(e=>e['id_fichier_sujetdevoir'] === le_devoir['id_fichier']).length
+
+			//taux de rendu pour ce devoir = nb_rendus_ce_devoir/nb_eleves
+			taux_actuel = 100*nb_rendus_ce_devoir/nb_eleves
+			if(!taux_actuel) taux_actuel = 0
+
+			//le nombre de rendus attendus total = nb devoirs de la classe*nb eleves classe
+			nb_total_rendus_attendus += nb_eleves
+
+			liste_taux.push(taux_actuel)
+
+			
+		})
+
+		//calcul du taux moyen: moyenne(les taux de rendus càd chaqye Y/X)
+		taux_rendu = liste_taux.length > 0 ? (liste_taux.reduce((a,b) => a+b) / liste_taux.length) : 0
+		//console.log(liste_taux)
+		//console.log(taux_rendu)
+		//console.log(nb_total_rendus_attendus)
+
+		details_rendus = mes_devoirs_rendus.length + ' rendus sur ' + nb_total_rendus_attendus + ' attendus'
+	}
+	
+
+
+	//créer la jauge
+	mes_series =[{name:'Taux de rendu',data:[taux_rendu]}]
+	creer_chart(2,mes_series,null,"Taux de rendu "+le_titre_moyen+" ("+parseFloat(taux_rendu.toFixed(2))+"%) "+details_rendus)
+
+
+
+	if(!ne_pas_arreter_chargement) chargement(false)
+}
+
+
+function details_tdb_2(ceci){
+
+/*
+	détails des devoirs à faire VS devoirs rendus
+	ordonner par:
+		- rendus d'abord
+		- horodateurs
+*/
+	
+	//pour chaque devoir à faire
+	//si rendu -> on affiche (avec eventuellement les remarques)
+
+	elements_html = ""
+
+	//pour chaque fichier devoir
+	mes_devoirs_a_faire.forEach(function(le_devoir,index){
+
+		if(recuperer("mon_type") === "Eleves"){
+			dejà_traité = mes_devoirs_rendus.filter(e => e['id_fichier_sujetdevoir'] === le_devoir["id_fichier"]).length > 0
+			nom_classe_du_devoir = ""
+			titre_mini_popup = "Devoirs à faire"
+		}else{
+			nb_corrigés = mes_devoirs_rendus.filter(e => e['id_fichier_sujetdevoir'] === le_devoir["id_fichier"] && e['remarque']).length
+			nb_rendus = mes_devoirs_rendus.filter(e => e['id_fichier_sujetdevoir'] === le_devoir["id_fichier"]).length
+			mes_matieres = JSON.parse(recuperer('mes_matieres'))
+			nom_classe_du_devoir = mes_matieres.find(e => e['ID_URL'] === le_devoir['id_dossier'])['Classe'] + " "
+			nb_eleves = tous_les_eleves_de_mon_cycle.filter(e => e['Classe'] === nom_classe_du_devoir.trim()).length
+			dejà_traité = mes_devoirs_rendus.length > 0 ? '<progress style="width: 60px;" value="'+nb_corrigés+'" max="'+nb_rendus+'"></progress> <b><rouge>' + nb_corrigés + " corrigés sur "+nb_rendus + ' rendus, sur '+nb_eleves +' élèves</rouge></b>' : false
+			nom_classe_du_devoir = nom_classe_du_devoir + " "
+			titre_mini_popup = "Devoirs à faire et corriger"
+		}	
+
+		nom_matiere = nom_classe_du_devoir+ JSON.parse(recuperer("mes_matieres")).filter(e => e['ID_URL'] === le_devoir["id_dossier"])[0]['Matiere']
+		elements_html = elements_html + creer_element_journee(nom_matiere,le_devoir["nom_fichier"],le_devoir["la_date_limite"],le_devoir["lheure_limite"],le_devoir["id_fichier"],le_devoir["id_dossier"],"devoir",dejà_traité,true)
+		//console.log(elements_html + "\n\n")
+	})
+	
+
+
+	creer_mini_popup(titre_mini_popup,elements_html,"    OK    ","$('#mini_popup').remove();",null,null,null,null,25)
+	//ordonner_elements(".contenu_section_journee",'innerText')
+	$('#mini_popup')[0].style.overflow = "auto"
+}
+
+
+
+
+
+
+
+
+function tdb_recuperer_participations(ne_pas_arreter_chargement,aujourdhui){
+	document.getElementById('tdb-3').innerHTML = ""
+
+	//filtrer sur les dicsussions que j'ai créées
+	url = racine_data + "Topic?Identifiant=eq." + recuperer('identifiant_courant') + "&" + apikey
+	mes_discussions = get_resultat(url)
+	//console.log(mes_discussions)
+
+	//filtrer sur les commentaires que j'ai créées
+	url = racine_data + "Coms?Identifiant=eq." + recuperer('identifiant_courant') + "&" + apikey
+	mes_coms = get_resultat(url)
+	//console.log(mes_coms)
+
+	//filtrer sur les clics de visio que j'ai faites
+	url = racine_data + "Visio?Statut=eq.debut&Identifiant=eq." + recuperer('identifiant_courant') + "&" + apikey
+	mes_visios = get_resultat(url)
+	//console.log(les_clics_visio)
+
+
+	//barcharts sur chaque classes OU matière
+	var mon_axe_x = ['Discussions créées', 'Commentaires envoyées', 'Clics sur visioconférence']
+	var mes_series = [{name: 'Nombre total',data: [mes_discussions.length, mes_coms.length, mes_visios.length]}]
+
+
+
+	//console.log(mes_series[0]["data"])
+	creer_chart(3,mes_series,mon_axe_x,"Total des intéractions")
+
+	if(!ne_pas_arreter_chargement) chargement(false)
+}
+
+function details_tdb_3(ceci){
+	var elements_html = ""
+	var mes_matieres = JSON.parse(recuperer("mes_matieres"))
+
+
+
+	//mes discussions créées
+	elements_html += '<br><br><b><div style="background: #bf8a6a;"> MES DISCUSSIONS </div></b><br>'
+	mes_discussions.forEach(function(la_discu,index){
+		la_matiere = mes_matieres.find(e => e['ID_URL'] === la_discu['Id_classe_matiere'])
+		nom_matiere = la_matiere['Classe'] + " " + la_matiere['Matiere']
+		elements_html += creer_element_journee(nom_matiere,la_discu['Votre_message'],la_discu['Horodateur'],la_discu['Horodateur'],"Id_topic",la_discu["Id_classe_matiere"],"discussion",false,false, true)
+	})
+
+
+	//mes commentaires
+	elements_html += '<br><br><b><div style="background: #bf8a6a;"> MES COMMENTAIRES </div></b><br>'
+	//récupérer une bonne fois pour toutes les id classe matiere des id_com
+	liste_id_topics = '(' + mes_coms.map(e => e['Id_topic']).join(',') + ')'
+	url = racine_data + 'Topic?Id_topic=in.' +liste_id_topics + '&order=Horodateur.asc' + "&" + apikey 
+	//console.log(url)
+	liste_id_classe_matieres_des_coms = get_resultat(url)
+	//console.log(liste_id_classe_matieres_des_coms)
+	
+
+
+	mes_coms.forEach(function(le_com,index){
+		//console.log("On cherche le topic " +  le_com['Id_topic'])
+		le_topic_source = liste_id_classe_matieres_des_coms.find(e => e['Id_topic'] === le_com['Id_topic'])
+		//console.log(le_topic_source)
+		id_classe_matiere = le_topic_source['Id_classe_matiere']
+		la_matiere =  mes_matieres.find(e => e['ID_URL'] === id_classe_matiere)
+		nom_matiere = la_matiere['Classe'] + " " + la_matiere['Matiere']
+		elements_html += creer_element_journee(nom_matiere,le_com['Votre_commentaire'],le_com['Horodateur'],le_com['Horodateur'],le_com['Id_topic'],id_classe_matiere,"discussion",false,false, true)	
+	})
+
+
+	creer_mini_popup("Discussions et commentaires",elements_html,"    OK    ","$('#mini_popup').remove();",null,null,null,null,25)
+	//ordonner_elements(".contenu_section_journee",'innerText')
+	$('#mini_popup')[0].style.overflow = "auto"
+
+}
+
+
+
+
+
+
+
+function tdb_recuperer_fichiers_a_consulter(ne_pas_arreter_chargement,aujourdhui){
+	document.getElementById('tdb-4').innerHTML = ""
+	var mes_matieres = JSON.parse(recuperer('mes_matieres'));
+	var les_id_dossier_classe = '("'+mes_matieres.map(e => e['ID_URL']).join('","') + '")'
+	
+
+	//prof ou eleve
+	if(!recuperer('mon_type').includes('Admin')){
+		url = racine_data + 'Fichiers?' +apikey 
+		url += '&id_dossier=in.' + les_id_dossier_classe
+	
+	//admin
+	}else{
+		url = racine_data + 'Fichiers?' +apikey 
+	}
+
+	url += '&order=date_effet.asc,heure_effet.asc,id_dossier.asc'
+
+	//console.log(les_id_dossier_classe)
+	//console.log(url)
+	mes_fichiers = get_resultat(url)
+	mes_fichiers = mes_fichiers.filter(e => les_id_dossier_classe.includes(e["id_dossier"]))
+
+	//console.log(mes_fichiers)
+
+	//pour chaque categorie de fichier
+	mes_series = []
+	categories_de_fichiers = valeursUniquesDeCetteKey(mes_fichiers,"categorie_fichier")
+	categories_de_fichiers.forEach(function(categorie_fichier,index_fichier){
+		part_de_la_categ = (mes_fichiers.filter(e => e['categorie_fichier'] === categorie_fichier).length) / mes_fichiers.length
+		mes_series.push({name: categorie_fichier, data: part_de_la_categ})
+	})
+	
+	creer_chart(4,mes_series,null,"Part des catégories sur "+mes_fichiers.length+" fichiers")
+
+	if(!ne_pas_arreter_chargement) chargement(false)
+}
+
+function details_tdb_4(ceci){
+
+	var elements_html = ""
+	var mes_matieres = JSON.parse(recuperer("mes_matieres"))
+	var mon_type = recuperer("mon_type")
+
+
+	//mes fichiers en ligne (à consulter si eleve, à évaluer si prof/admin)
+	mes_fichiers.forEach(function(le_fichier,index){
+
+
+		id_classe_matiere = le_fichier["id_dossier"]
+		nom_classe = mon_type === "Eleves" ? "" : mes_matieres.filter(e => e['ID_URL'] === id_classe_matiere)[0]['Classe'] + " "
+		nom_matiere = mes_matieres.filter(e => e['ID_URL'] === id_classe_matiere)[0]['Matiere'] +" ("+le_fichier['categorie_fichier']+")"
+
+		elements_html += creer_element_journee(nom_classe + nom_matiere,le_fichier['nom_fichier'],le_fichier['date_effet'],le_fichier['heure_effet'],le_fichier["id_fichier"],id_classe_matiere,"fichier",false,false,false)
+	})
+
+
+	creer_mini_popup("Fichiers en ligne",elements_html,"    OK    ","$('#mini_popup').remove();",null,null,null,null,25)
+	//ordonner_elements(".contenu_section_journee",'innerText')
+	$('#mini_popup')[0].style.overflow = "auto"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function creer_chart(numero_tdb,mes_series,mon_axe_x,titre_eventuel){
+	const el = document.getElementById('tdb-'+numero_tdb);
+	
+	//console.log(numero_tdb + ": " +mes_series[0]["data"])
+
+	mes_series_finales = mes_series
+	//console.log(numero_tdb + ": " +mes_series_finales[0]["data"])
+
+	//console.log(numero_tdb+ ": " +mon_axe_x)
+
+	if(numero_tdb === 1){
+		reduction = reduire_serie(mes_series,mon_axe_x)
+		//console.log("on va réduire pour " + numero_tdb)
+		mon_axe_x = reduction[0]
+		mes_series_finales = reduction[1]
+	}else{
+		mon_axe_x = mon_axe_x
+		mes_series_finales = mes_series
+	}
+
+	//console.log(numero_tdb+ ": " +mon_axe_x)
+
+	//console.log(numero_tdb + ": " +mes_series_finales[0]["data"])
+
+	const data = {
+		categories: mon_axe_x,
+		series: mes_series_finales,
+	};
+
+	//console.log("*******DATA "+numero_tdb+"******")
+	//console.log(data['categories'])
+
+	var options = {
+		chart: { width: 'auto', height: 'auto' }
+	};
+
+	if(titre_eventuel) options['chart']['title'] = titre_eventuel
+	
+	//lignes d'évolution
+	if(numero_tdb === 1){
+		options['xAxis'] = { pointOnColumn: true, title: { text: 'Période' }}
+		options['yAxis'] = { title: 'Nombre de tentatives de connexions' }		
+		const chart = toastui.Chart.areaChart({ el, data, options });
+
+
+	//barcharts
+	}else if(numero_tdb === 3){
+		options['series'] = {
+			dataLabels: {
+				fontFamily: 'Arial',
+				fontSize: 13,
+				fontWeight: 500,
+            	color: '#FF6C00',
+				textBubble: { visible: true, arrow: { visible: true } },
+			},
+			stack:
+			{
+				type: 'normal',
+			}
+		}
+
+		const chart = toastui.Chart.barChart({ el, data, options });
+
+
+	//CAMEMBERT
+	}else if(numero_tdb === 4){
+		options['series'] = {
+			dataLabels: {
+	            visible: true,
+	            pieSeriesName: {visible: true}
+          }
+		}
+
+		const chart = toastui.Chart.pieChart({ el, data, options });
+
+	//jauges
+	}else{
+		
+        options['circularAxis'] = {
+          scale: {
+            min: 0,
+            max: 100,
+          },
+          title: '%',
+        }
+
+		options['series'] = {
+			angleRange : {				
+				start: 270,
+				end: 90	
+			}
+		}
+
+
+        options['plot'] = {
+          bands: [
+            { range: [0, 20], color: '#df5353' },
+            { range: [20, 50], color: '#dddf0d' },
+            { range: [50, 100], color: '#55bf3b' },
+          ]
+        }
+
+
+        options['theme'] = {
+          plot: { bands: { barWidth: 50 } },
+        }
+
+        //console.log("*******OPTIONS******")
+        //console.log(options)
+		const chart = toastui.Chart.gaugeChart({ el, data, options })
+	}
+
+	return options
+    
+}
+
+
+function reduire_serie(mes_series,mon_axe_x){
+	mes_series_finales = mes_series
+
+
+	//créer l'array somme de toutes les séries
+	var sum = (r, a) => r.map((b, i) => a[i] + b);
+	somme_series = mes_series.map(e => e['data']).reduce(sum)
+	//console.log(somme_series)
+	//chercher l'index-1 à partir de laquelle on a des données > 0
+	var index_debut = somme_series.findIndex(e => e) -1
+	//console.log(index_debut)
+
+	//slice pour chaque serie et axe x si index_debut > 0
+	if(index_debut){
+		mon_axe_x = mon_axe_x.slice(index_debut)
+		mes_series.forEach(function(e,index){
+			mes_series_finales[index]['data'] = mes_series[index]['data'].slice(index_debut)
+		})
+	}
+
+	return [mon_axe_x, mes_series_finales]
+
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

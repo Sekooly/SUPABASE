@@ -42,6 +42,11 @@
 	  	<!-- SIDE BAR -->
 	  	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sidebar/3.3.2/jquery.sidebar.min.js"></script>
 
+
+	  	<!-- dashboards -->
+	  	<link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.min.css" />
+		<script src="https://uicdn.toast.com/chart/latest/toastui-chart.min.js"></script>
+
 	</head> 
 
 	<body>
@@ -54,11 +59,45 @@
 		progress::-webkit-progress-value { background: #f9aa71; }
 		progress { color: #f9aa71; }
 
-		.element_tdb{
-			min-width: 50%;
-			height: 50%;
-			display: inline flow-root list-item;
+
+
+		.dark-mode #mini_popup .contenu_section_journee img.mini-image{			
+			-webkit-filter: invert(1);
+   			filter: invert(1);
 		}
+
+		.dark-mode .element_tdb_titre{
+			background: #41626c;
+		}
+
+		.graphe_tdb{
+			height: 94%;
+			width: 100%;
+			text-align: center;
+		}
+
+		.element_tdb_titre{
+			background: #a3e9ff;
+		}
+
+
+		.element_tdb{
+			min-width: 49.8%;
+			height: 49%;
+			display: inline-block;
+			border-style: groove;
+			border-width: 1px;
+		}
+
+		/* If the screen size is 850px wide or less, set the width to 100% */
+		@media screen and (max-width: 850px) {
+		  .element_tdb {
+		    min-width: 99%;
+		  }
+		    
+
+		}
+
 
 		#soon{
 			top: 0;
@@ -201,6 +240,17 @@
 			-webkit-filter: invert(1);
    			filter: invert(1);			
 
+		}
+
+		.dark-mode #mon_devoir_rendu img{
+			-webkit-filter: invert(1);
+   			filter: invert(1);		
+
+		}
+
+
+		.voir_tdb{
+			color: #f00;
 		}
 
 
@@ -1530,7 +1580,7 @@
 		<div onclick="afficher_modif_profil()">Mon profil</div>
 		<div onclick="edt()">Emploi du temps</div>
 		<div onclick="ma_journee()">Ma journée</div>
-		<div onclick="tableau_de_bord()" id="dashboard" SOON>Tableau de bord</div>
+		<div onclick="tableau_de_bord()" id="dashboard">Tableau de bord</div>
 		<div onclick="conseils_de_classe()" SOON>Conseil de classe</div>
 		<div onclick="remediations()" SOON>Remédiations</div>
 		<div onclick="clic_bulletin()">Bulletins</div>

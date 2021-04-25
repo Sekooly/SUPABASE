@@ -535,6 +535,70 @@ function afficher_date(date_initiale,sans_heure){
 }
 
 
+function afficher_date_mois_annee(date_initiale, sans_heure){
+  var formatage = sans_heure ? 'YYYY-MM-DD' :
+                  date_initiale.includes('+') ? 'YYYY-MM-DD HH:mm:ssZ' :
+                  "DD/MM/YYYY HH:mm:ss"
+  return new Date(moment(date_initiale,formatage)).toLocaleDateString('fr-FR', {year: 'numeric', month: 'numeric'})
+}
+
+
+function date_mois_precedent(date_initiale,nb_mois){
+  return moment(date_initiale).subtract(nb_mois,'months').endOf('month').format('YYYY-MM-DD HH:mm:ssZ');
+}
+
+
+function les_12_derniers_mois(aujourdhui){
+  resultat = []
+  //console.log(aujourdhui)
+  aujourdhui = aujourdhui ? aujourdhui : maintenant()
+  for (i = 0; i<=11;i++){
+    resultat.push(afficher_date_mois_annee(date_mois_precedent(aujourdhui,i)))
+  }
+  return resultat.reverse()
+}
+
+function les_12_derniers_mois_en_semaines(aujourdhui){
+  derniers_mois = date_mois_precedent(aujourdhui,11)
+  //console.log(derniers_mois)
+  premiere_date = moment(derniers_mois)
+  //console.log(premiere_date)
+  derniere_date = moment(aujourdhui)
+  //console.log(derniere_date)
+  resultat = [];
+  var current = premiere_date.clone();
+
+  //console.log(current)
+
+  while (current.add(7,'days').isBefore(derniere_date)) {
+    //console.log(current)
+    resultat.push(current.clone());
+  }
+
+  resultat.push(derniere_date);
+
+  return resultat.map(m => m.format('YYYY-MM-DD'));
+
+
+
+
+}
+
+
+
+function les_12_derniers_mois_en_intervalles_semaines(aujourdhui){
+  var intermediaire = les_12_derniers_mois_en_semaines(aujourdhui)
+  var resultat = intermediaire.map(function(valeur,index){
+    if(intermediaire[index+1]) return intermediaire[index] + " " + intermediaire[index+1]
+  })
+
+  return resultat.filter(e=>e)
+
+
+}
+
+
+
 function afficher_date_old(element, sans_heure){
 
   //console.log("\n"+ element + ":" + element.length)
