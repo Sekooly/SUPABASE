@@ -5415,7 +5415,7 @@ $(function charger_fichiers(e){
 
 		function chercher_le_mot_interdit(phrase){
 			if(!data_etablissement['mots_interdits']) return ""
-				
+
 			var mots_interdits = data_etablissement['mots_interdits'].split(",")
 			var le_mot_interdit = ""
 			mots_interdits.some(function(valeur_mot){
@@ -10327,11 +10327,49 @@ function soon(){
 
 
 
+
+
 function tableau_de_bord(){
-	en_cours()
+	//en_cours()
+
+	vider_fenetre("Tableau de bord")
+	$("#fenetre").append('<div id="previsualisation" style="width: 100%;height: 85%;"></div>');
+	$("#previsualisation")
+	afficher_fenetre(true)
+
 
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
