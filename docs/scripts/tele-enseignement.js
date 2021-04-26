@@ -2496,7 +2496,7 @@ function ajouter_les_dossiers_dynamiques(){
 
 	}
 
-	stocker('dossier_chargé','');
+	stocker_temp('dossier_chargé','');
 	stocker("les_fichiers",'');
 	stocker('fichier_ouvert','');
 	stocker('les_topics','');
@@ -2771,7 +2771,7 @@ function charger_dossier(id_dossier,final_booleen,titre){
 		
 		
 		//on a chargé un dossier: changement de la variable locale
-		stocker('dossier_chargé',id_dossier);
+		stocker_temp('dossier_chargé',id_dossier);
 		
 		//on recupere les fichiers deja en ligne
 		//console.log("on va recuperer les fichiers");
@@ -4246,7 +4246,7 @@ function decharger_dossier_final(){
 	afficher_params_si_droits_et_admin();
 	
 	//retour aux dossiers initiaux
-	stocker("dossier_chargé",'');
+	stocker_temp('dossier_chargé','');
 	stocker("les_fichiers",'');
 
 	//on actualise le iframe des messages
@@ -6419,7 +6419,7 @@ function notif_fichier(id_notif,id_dossier){
 	//changer dossier_chargé
 	//changer fichier_ouvert
 	//puis chargement a l'arrivée
-	stocker('dossier_chargé',id_dossier);
+	stocker_temp('dossier_chargé',id_dossier);
 	stocker('fichier_ouvert',id_notif);
 	window.location.href = window.location.href;			
 }
@@ -6427,7 +6427,7 @@ function notif_fichier(id_notif,id_dossier){
 function notif_discussion(id_notif,id_dossier){
 	
 	//charger dossier à charger
-	stocker('dossier_chargé',id_dossier);
+	stocker_temp('dossier_chargé',id_dossier);
 	//pas d'autres fenêtre 
 	stocker('fichier_ouvert','');
 
@@ -6464,7 +6464,7 @@ function notif_devoir(id_notif,id_dossier){
 
 	
 	//charger dossier à charger
-	stocker('dossier_chargé',id_dossier);
+	stocker_temp('dossier_chargé',id_dossier);
 	//pas d'autres fenêtre 
 	stocker('fichier_ouvert','');
 

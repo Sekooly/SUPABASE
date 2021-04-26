@@ -369,7 +369,7 @@ function stocker(nom_variable,valeur_variable){
 }
 
 function recuperer(nom_variable){  
-	return window.localStorage.getItem(nom_variable)	
+	return window.localStorage.getItem(nom_variable)	|| window.sessionStorage.getItem(nom_variable)  
 }
 
 function stocker_temp(nom_variable,valeur_variable){
