@@ -3704,7 +3704,14 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 		remarque = donnees_devoir_a_corriger[0]['remarque']
 		coefficient_rendu = donnees_devoir_a_corriger[0]['coefficient_rendu']
 		note_rendu = donnees_devoir_a_corriger[0]['note_rendu']
-		var bouton_corriger = '<span id="'+id_fichier+'"><img id="corriger" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png" style="width: 30px; height: 30px; cursor: pointer; position: fixed; z-index: 3; top: 141px; left: 913px;" onclick="mettre_remarque_devoir(this,\'' + remarque +'\',' + coefficient_rendu +','+ note_rendu + ')"></span>'
+
+
+		remarque = decodeURIComponent(remarque);
+		remarque= JSON.stringify(remarque).replace(/&/, "&amp;").replace(/"/g, "");
+		remarque = remarque.replace(/'/g, "\\'");
+
+
+		var bouton_corriger = '<span id="'+id_fichier+'"><img id="corriger" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png" style="width: 30px; height: 30px; cursor: pointer; position: fixed; z-index: 3; top: 141px; left: 913px;" onclick="mettre_remarque_devoir(this,\'' +remarque +'\',' + coefficient_rendu +','+ note_rendu + ')"></span>'
 
 
 	}else{
@@ -3740,10 +3747,10 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 	//console.log(pas_de_telechargement)
 	//console.log(est_youtube(extension))
 	//si c'est un mode_extrait_png_div -> div
-	if ((pas_de_telechargement && est_youtube(extension)===false) || mode_extrait_png_div) previsualisation = '<div id=previsualisation class="responsive-container">'
+	if ((pas_de_telechargement && est_youtube(extension)===false ) || mode_extrait_png_div) previsualisation = '<div id=previsualisation class="responsive-container">'
 
 	
-	//console.log(previsualisation)
+	console.log(previsualisation)
 
 
 	//on le met dans la fenêtre
@@ -3918,7 +3925,8 @@ function quitter_previsualisation(){
 
 
 	if(element_DOM("previsualisation")) element_DOM("previsualisation").src="";
-
+	if(element_DOM("viz_frame")) element_DOM("viz_frame").src="";
+	
 
 	if($("#visio")[0]) $("#visio")[0].remove(); //éviter la pub dans visio
 

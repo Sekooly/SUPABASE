@@ -471,12 +471,28 @@
 
 		.responsive-container {
 			position:relative;
-			padding-bottom:56.25%;
+			padding-bottom: 56.25%;
 			padding-top:30px;
 			overflow:hidden;
 			width: 100%;
-			height: 90%;
 			border-width: 0;
+		}
+
+		/* If the screen size is computer*/
+		@media (orientation: landscape) {
+
+			.responsive-container {
+				height: 45%;
+			}
+		}
+
+
+		/* If the screen size is phone*/
+		@media (orientation: portrait) {
+
+			.responsive-container {
+				height: 99%;
+			}
 		}
 
 		.responsive-container iframe, .responsive-container object, .responsive-container embed {
