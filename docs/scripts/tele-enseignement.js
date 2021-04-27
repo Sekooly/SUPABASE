@@ -3750,7 +3750,7 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 	if ((pas_de_telechargement && est_youtube(extension)===false ) || mode_extrait_png_div) previsualisation = '<div id=previsualisation class="responsive-container">'
 
 	
-	console.log(previsualisation)
+	//console.log(previsualisation)
 
 
 	//on le met dans la fenêtre
