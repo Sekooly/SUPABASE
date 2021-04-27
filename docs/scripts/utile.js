@@ -868,16 +868,20 @@ function masquer_colonne(id_colonne,non_plutot_afficher){
 }
 
 
-function somme(nom_json_initial, nom_champ){
+function somme(nom_json_initial, nom_champ, valeur_recherchee){
 
-  json_initial_str = recuperer(nom_json_initial)
+  total = 0
+  numero_colonne_champ_a_sommer = $("[id='"+nom_champ+"']")[0].cellIndex +1
+  les_elements = transformer_en_array_de_JSON($('table tr td:nth-child('+numero_colonne_champ_a_sommer+'):visible'))
+  les_elements.forEach(function(la_ligne) {
+    //console.log(la_ligne.innerText)
+    var value = parseInt(la_ligne.innerText)
+    if (!isNaN(value)) {
+      total += value;
+    }
+  });
+  return total
 
-  if (json_initial_str){
-    return eval(JSON.parse(json_initial_str).map(e=>e['octets_utilises']).join('+'))  
-  }else{
-    return 0
-  }
-  
 }
 
 function actualiser_octets(){

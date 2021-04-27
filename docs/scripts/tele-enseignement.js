@@ -7945,7 +7945,7 @@ function mettre_barre_recherche(){
 	$("#conteneur_filtre").append(zone_recherche)
 }
 
-function mettre_etat_espace(id_parametre){
+function mettre_etat_espace(id_parametre, valeur_recherchee){
 
 	resultat = ""
 
@@ -7953,20 +7953,43 @@ function mettre_etat_espace(id_parametre){
 		
 		$('label_filtre_parametre').remove()
 		$('filtre_parametre').remove()
-
-		setTimeout(function(){		
-			la_somme = somme('Espace etablissement restant','octets_utilises')
-			valeur_max = 50e9
-			pourcentage = 100*(la_somme/valeur_max).toFixed(4)
-			resultat='<div id="stockage" style="color: #b7b2aa;"><i style="margin-left: 50px;"><label>Stockage utilisé:<progress style="width: 60px;" value="'+la_somme+'" max="'+valeur_max+'"></progress> '+pourcentage+'% ('+(la_somme/1E9).toFixed(2)+'/50 Go)</i></span></div>'
+		$(".stockage").remove()
 
 
-			$("#conteneur_filtre").append(resultat)
-		}, 300);
+		//au bout de 1 seconde
+		setTimeout(function(){
 
+			mettre_la_somme(valeur_recherchee)
+
+		}, 1000);
+
+
+
+		//à chaque fois qu'on filtre
+		$("#zone_recherche").on('input',function(e){
+			valeur_recherchee = e.target.value
+			//console.log("on a modifié donc on doit actualiser par " + valeur_recherchee)
+			$(".stockage").remove()
+
+			//si toujours sur cet onglet
+			//remettre le stockage				
+			if(id_parametre === "Espace etablissement restant") mettre_la_somme(valeur_recherchee)
+		})
 
 	}
 
+}
+
+function mettre_la_somme(valeur_recherchee){
+
+	la_somme = somme('Espace etablissement restant','octets_utilises',valeur_recherchee)
+	valeur_max = 50e9
+	pourcentage = 100*(la_somme/valeur_max).toFixed(4)
+	precisions = valeur_recherchee ?valeur_recherchee : "total"
+	resultat='<div id="stockage" class="stockage"><i style="margin-left: 50px;"><label>Stockage utilisé '+(precisions)+':<progress style="width: 60px;" value="'+la_somme+'" max="'+valeur_max+'"></progress> '+pourcentage+'% ('+(la_somme/1E9).toFixed(2)+'/50 Go)</i></span></div>'
+
+
+	$("#conteneur_filtre").append(resultat)
 }
 
 function chercher(){
@@ -7974,7 +7997,7 @@ function chercher(){
 	// Declarer les variables
 	table = element_DOM("table_affichee");
 	tr = table.getElementsByTagName("tr");
-	mon_filtre = element_DOM("zone_recherche").value.toUpperCase().replaceAll(" ","");
+	mon_filtre = element_DOM("zone_recherche").value.toUpperCase().trim();
 
 
 
