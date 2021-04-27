@@ -51,6 +51,12 @@ GRANT ALL ON TABLE public."Administration" TO supabase_admin;
 
 
 
+-- CREER L'ADMIN PAR DEFAUT
+-- la classe et le cycle seront mis à jour dès l'initialisation du 1er inscrit
+INSERT INTO public."Administration"(
+	"Identifiant", "Code", "Cycle", "Classe", code_hash, "Derniere_consultation_notifs", "Droit_acces_anticipe_examen", "Droit_changer_ecolage", "Droits_modifs", "Ecolage_OK", "Role", "Telephone", droit_hors_maintenance, type, "position", "Reponse_sondage", "Nom", "Prénom(s)", "Mail", "Genre", "2è_Prénom", "3è_Prénom", "Numero_telephone", "Nom_complet", liste_notifs_lues)
+	VALUES ('admin', '444bcb3a3fcf8389296c49467f27e1d6', 'Aucun', '(Tous|aucun)', 'ok', '', 'oui', 'oui', 'oui', 'oui', 'Sekooly', 'ok', 'oui', 'Administration', '', '', 'Admin', 'Sekooly', 'contact@sekooly.com', '', '', '', null, 'Admin Sekooly', '');
+
 
 
 
