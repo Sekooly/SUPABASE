@@ -364,6 +364,11 @@ function chargement(oui){
 }
 
 
+function recuperer_nb_pages_pdf(id_fichier){
+  url = "https://script.google.com/macros/s/AKfycbw3ASmNiz9CSmjI5tWhUBVSk81x_c-vCqOmwqlIqb5Kz7ejZXoa0QziZ0VzuFs7-D0w/exec?id_fichier=" + id_fichier
+  return get_resultat(url)
+}
+
 function stocker(nom_variable,valeur_variable){
 	window.localStorage.setItem(nom_variable,valeur_variable)
 }

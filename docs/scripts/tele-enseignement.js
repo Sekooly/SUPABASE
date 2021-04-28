@@ -2955,7 +2955,7 @@ function traitement_fichiers_recus(){
 			//console.log(nom_drive)
 
 			//console.log(valeur['heure_effet']);
-			ajouter_un_fichier(valeur['id_fichier'],nom_fichier,nom_drive,extension_fichier, valeur['date_effet'], valeur['heure_effet'], valeur['est_telechargeable'], valeur['coefficient_rendu'], valeur['la_date_limite'], valeur['lheure_limite']);
+			ajouter_un_fichier(valeur['id_fichier'],nom_fichier,nom_drive,extension_fichier, valeur['date_effet'], valeur['heure_effet'], valeur['est_telechargeable'], valeur['coefficient_rendu'], valeur['la_date_limite'], valeur['lheure_limite'], valeur['periode_bulletin'], valeur['destinataire_par_page'] );
 
 		});
 
@@ -3031,7 +3031,7 @@ function masquer_drive_vide(){
 }
 
 
-function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,date_effet,heure_effet,est_telechargeable,coefficient_rendu, date_limite, heure_limite){
+function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,date_effet,heure_effet,est_telechargeable,coefficient_rendu, date_limite, heure_limite, periode_bulletin, destinataire_par_page){
 
 
 
@@ -3048,7 +3048,9 @@ function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,d
 	//todo: sans téléchargement EN PLUS DE YOUTUBE
 	var padding_yt = est_telechargeable === "oui" ?  "" : ' style="padding-top: 25%;" ' 
 	var telecharger_le_fichier = est_telechargeable === "oui" ? '<img alt="télécharger" src="https://sekooly.github.io/SUPABASE/images/img_download.png" onclick="telecharger_fichier(event,this)" id="telecharger" class="download_fichier">' : ""
-	var code_html = '<span oncontextmenu="autoriser_clic_droit_supprimer_et_renommer(event,this)" onclick="ouvrir_fichier(this)" class="span_un_fichier" id="' + id_fichier + '" ma_date_effet="'+ la_date_yyyy_mm_dd(date_effet)+'" mon_heure_effet="'+ heure_effet + '" ma_date_limite="'+ la_date_yyyy_mm_dd(date_limite)+'" mon_heure_limite="'+ heure_limite +'" est_telechargeable="'+est_telechargeable+'"    coefficient_rendu='+coefficient_rendu+'    >' + telecharger_le_fichier + '<img id="' + id_fichier + '" src="'+ image_fichier +'" class="un_fichier" '+padding_yt+'>' + nom_fichier +'</span>';
+	var periode_bulletin = periode_bulletin ? " periode_bulletin='"+periode_bulletin+"'" : ""
+	var destinataire_par_page = destinataire_par_page ? " destinataire_par_page='"+destinataire_par_page+"'" : ""
+	var code_html = '<span oncontextmenu="autoriser_clic_droit_supprimer_et_renommer(event,this)" onclick="ouvrir_fichier(this)" class="span_un_fichier" id="' + id_fichier + '" ma_date_effet="'+ la_date_yyyy_mm_dd(date_effet)+'" mon_heure_effet="'+ heure_effet + '" ma_date_limite="'+ la_date_yyyy_mm_dd(date_limite)+'" mon_heure_limite="'+ heure_limite +'" est_telechargeable="'+est_telechargeable+'"    coefficient_rendu='+ coefficient_rendu + periode_bulletin  + destinataire_par_page + '    >' + telecharger_le_fichier + '<img id="' + id_fichier + '" src="'+ image_fichier +'" class="un_fichier" '+padding_yt+'>' + nom_fichier +'</span>';
 
 	//console.log(code_html);
 
@@ -3265,11 +3267,19 @@ function autoriser_clic_droit_supprimer_et_renommer(e,ceci){
 	}else{
 		mon_offset = 0
 	}
+
+	//si c'est un bulletin -> on peut changer 1) la période du bulletin 2) la correspondance page -> élève 
+	if($("#"+ceci.id)[0].parentNode.id  === "drive_bulletins"){
+		ajouter_fonction_clic_droit(e,ceci,3,"changer_periode_bulletin","Période du bulletin",id_fichier);
+		//ajouter_fonction_clic_droit(e,ceci,4,"changer_eleve_par_page_bulletin","Ré-assigner pages",id_fichier);
+		mon_offset = mon_offset === 1 ? 2 : 1
+	}
 	
 	//ajouter l'offset
 
 	ajouter_fonction_clic_droit(e,ceci,3+mon_offset,"changer_coef","Coefficient",id_fichier,null,$("#"+id_fichier)[0].getAttribute("coefficient_rendu"));
-	ajouter_fonction_clic_droit(e,ceci,4+mon_offset,"supprimer_fichier","Supprimer",id_fichier);
+	ajouter_fonction_clic_droit(e,ceci,4+mon_offset,"changer_telechargeable","Téléchargeable ou non",id_fichier);
+	ajouter_fonction_clic_droit(e,ceci,5+mon_offset,"supprimer_fichier","Supprimer",id_fichier);
 
 	//au clic de n'importe où : ça enleve le clic droit
 	$(document).click(function() {
@@ -3277,6 +3287,165 @@ function autoriser_clic_droit_supprimer_et_renommer(e,ceci){
 		$('#clic_droit_titres_param').remove();    		
 
 	});
+
+}
+
+
+
+
+function changer_eleve_par_page_bulletin(id_fichier,ancien_destinataire_par_page){
+	chargement(true)
+	nb_pages = recuperer_nb_pages_pdf(id_fichier)
+	chargement(false)
+
+	ancien_destinataire_par_page = '{"nouveau":"1","test":"2"}'
+	elements_html = modif_attribution_page_eleve(nb_pages, ancien_destinataire_par_page)
+	creer_mini_popup("Re-attribuez chaque page:", elements_html,"Attribuer","envoyer_modif_destinataires_bulletins('"+ancien_destinataire_par_page+"')")
+	
+
+
+
+}
+
+
+function envoyer_modif_destinataires_bulletins(ancien_destinataire_par_page){
+
+ 	chargement(true)
+
+ 	//console.log(id_fichier)
+
+	nouveau_destinataire_par_page = {1:"truc"}
+	if(nouveau_destinataire_par_page === ancien_destinataire_par_page) return -1
+
+	//on modifie dans la bdd 
+	nom_table = "Fichiers"
+	nom_champ_reference = "id_fichier"
+	valeur_champ_reference = id_fichier
+	nouveau_data = {
+		'destinataire_par_page' : nouveau_destinataire_par_page
+	}
+	actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouveau_data)
+	
+	setTimeout(function(){
+		location.reload();
+	}, 1000);
+
+	chargement(false);
+
+}
+
+
+
+
+function modif_attribution_page_eleve(nombre_pages, ancien_destinataire_par_page){
+
+	liste_eleves = JSON.parse(ancien_destinataire_par_page)
+	console.log(liste_eleves)
+
+	select_liste_eleves = '<select style="width: 80%;" name="numero_page" id="numero_page"><option value="eleve_de_cette_page">eleve_de_cette_page</option></select>'
+	//console.log(select_liste_eleves)
+
+
+	attribution = '<form id="attribution" style="margin-top: 20px;">'
+	for (numero_page = 1 ; numero_page <= nombre_pages ; numero_page++){
+		nom_eleve = Object.keys(liste_eleves).find(key => liste_eleves[key] === numero_page.toString())
+		attribution = attribution + '<div><label for="'+numero_page+'">Page n°'+numero_page+':' + select_liste_eleves.replace(/"numero_page"/g,numero_page).replace(/"eleve_de_cette_page"/g,nom_eleve) + '</label></div>'
+	}
+	attribution = attribution + '</form>'
+	
+	return attribution
+	
+
+}
+
+
+
+
+function changer_periode_bulletin(id_fichier,ancienne_periode){
+
+	ancienne_periode = $("[id='"+id_fichier+"']")[0].getAttribute("periode_bulletin")
+	var elements_html = `<div><label for="periode_bulletin"><select style="width: 60%;" id="periode_bulletin" name="periode_bulletin"><option value="PREMIER TRIMESTRE">PREMIER TRIMESTRE</option><option value="DEUXIEME TRIMESTRE">DEUXIEME TRIMESTRE</option><option value="TROISIEME TRIMESTRE">TROISIEME TRIMESTRE</option><option value="ANNUEL">ANNUEL</option></select></label></div>`
+	creer_mini_popup("Choisissez la nouvelle période de ce bulletin:", elements_html,"Modifier la période","changer_periode('"+id_fichier+"','"+ancienne_periode+"')")
+	$("#periode_bulletin")[0].value = ancienne_periode
+
+
+}
+
+function changer_periode(id_fichier,ancienne_periode){
+	nouvelle_periode = $('#periode_bulletin')[0].value
+	if(nouvelle_periode === ancienne_periode) return -1
+
+ 	chargement(true)
+
+ 	//console.log(id_fichier)
+
+	//on modifie dans la bdd 
+	nom_table = "Fichiers"
+	nom_champ_reference = "id_fichier"
+	valeur_champ_reference = id_fichier
+	nouveau_data = {
+		'periode_bulletin' : nouvelle_periode
+	}
+	actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouveau_data)
+	
+	setTimeout(function(){
+		location.reload();
+	}, 1000);
+
+	chargement(false);
+}
+
+function changer_telechargeable(id_fichier,ancien_telechargeable){
+	
+	//console.log(id_fichier)
+	var categorie_actuelle = $("[id='"+id_fichier+"'].span_un_fichier")[0].parentNode.id.split("_")[1];
+	var extension_fichier =  $("[id='"+id_fichier+"']")[0].innerText.split('.')[1].split('\n')[0]
+
+
+	//console.log(extension_fichier)
+	if(categorie_actuelle.includes("manuels")){
+		alert("Impossible de rendre un manuel téléchargeable.");
+		return -1;
+	}else if(categorie_actuelle.includes("bulletins")){
+		alert("Impossible de rendre un fichier de bulletins téléchargeable.");
+		return -1;
+	}else if (extension_fichier === "youtube"){
+		alert("Impossible de rendre une vidéo youtube téléchargeable.");
+		return -1;
+	}
+
+
+
+	var ancien_telechargeable = $(".span_un_fichier[id='"+id_fichier+"']")[0].children[0].id === "telecharger" ? "oui" : "non"
+
+	var nouveau_telechargeable = prompt("Indiquez si 'oui' ou 'non' vous voulez que ce fichier soit téléchargeable:",ancien_telechargeable)
+
+	if(nouveau_telechargeable === null) return -1
+
+	chargement(true);
+
+	nouveau_telechargeable = nouveau_telechargeable === "oui" ? "oui" : "non"
+
+
+	if(nouveau_telechargeable === ancien_telechargeable) return -1;
+
+
+
+	//on modifie dans la bdd 
+	nom_table = "Fichiers"
+	nom_champ_reference = "id_fichier"
+	valeur_champ_reference = id_fichier
+	nouveau_data = {
+		'est_telechargeable' : nouveau_telechargeable
+	}
+	actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouveau_data)
+	
+	setTimeout(function(){
+		location.reload();
+	}, 1000);
+
+	chargement(false);
+
 
 }
 
