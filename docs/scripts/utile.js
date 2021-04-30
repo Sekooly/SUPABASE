@@ -306,7 +306,7 @@ function envoyer_log(mon_identifiant, mon_statut, ma_classe, mon_type, partir){
           mon_pays, mon_type, ma_ville)
 
   }catch (error){
-    console.log("on a trouvé une erreur")
+    //console.log("on a trouvé une erreur")
     console.error(error)
     var mon_adresse_ip = "";
     var ma_ville = "";

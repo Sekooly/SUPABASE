@@ -2,10 +2,60 @@ var identifiant = document.getElementById('Identifiant')
 var code = document.getElementById('Code')
 var remarque = document.getElementById('remarque')
 var connect = document.getElementById('connect')
-
-
+var est_premier_clic = true
+var nb_clics = Number(recuperer("nb_clics") ? recuperer("nb_clics") : 0)
 
 function se_connecter(){
+
+
+  // détecte le premier clic
+  if(nb_clics > 1) {
+    est_premier_clic  = false
+
+  }
+
+  // le nombre de clics augmente
+  nb_clics += 1
+  stocker("nb_clics",nb_clics)
+  //console.log(nb_clics)
+
+  // si il y a une date_heure_depassement 
+  if(recuperer("date_heure_depassement")){
+
+    // ajouter 30 secondes d'attente
+    date_heure_delai_attente_ok = moment(recuperer("date_heure_depassement")).add(30,'seconds')
+    //console.log("date_heure_delai_attente_ok: " + date_heure_delai_attente_ok._d)
+
+    // regarder si on a dépassé ces 30 secondes d'attente
+    date_heure_maintenant = moment(maintenant())
+    //console.log("date_heure_maintenant: " + date_heure_maintenant._d)
+    delai_attente_ok = date_heure_maintenant > date_heure_delai_attente_ok  
+    //console.log("delai_attente_ok: " + delai_attente_ok)
+    
+  //pas de date_heure_depassement -> delai_attente_ok au nombre de clics
+  }else{
+    delai_attente_ok = nb_clics <= 5
+  }
+
+
+  // si pas au premier clic ET on a une date_heure_depassement > date_heure_maintenant ET plus de 5 clics
+  if(!est_premier_clic && !delai_attente_ok){
+    stocker("date_heure_depassement",maintenant())
+    date_heure_delai_attente_ok = moment(recuperer("date_heure_depassement")).add(30,'seconds')
+    affichage_date_heure_depassement = moment(date_heure_delai_attente_ok._d).format("DD/MM/YYYY HH:mm:ss")
+    actualiser_remarque("Vous avez cliqué trop de fois le bouton de connexion.<br>Merci de réessayer dans 30 secondes, soit le " + affichage_date_heure_depassement + ".<br><br><i>NB: Changer l'heure de votre système ne vous permettra PAS d'accéder plus tôt à la plateforme.</i>","","",true)
+    return false
+
+  //delai attente ok OU premier clic
+  }else{
+    //s'il y avait initialement un date heure de dépassement -> on remet le compteur de clics à zero
+    if(recuperer("date_heure_depassement")) nb_clics = 0
+
+    //plus de date heure de dépassement
+    effacer("date_heure_depassement")
+    //console.log("connexion réussie")
+  }
+
 
   actualiser_remarque("")
   chargement(true)
@@ -297,12 +347,12 @@ function actualiser_en_hash_code(type, identifiant, code, code_hash){
 }
 
 
-function actualiser_remarque(valeur_remarque, ma_classe, mon_type){
+function actualiser_remarque(valeur_remarque, ma_classe, mon_type, sans_envoyer_le_log){
   $("#remarque")[0].innerHTML = valeur_remarque
   
   if (valeur_remarque !=="" ){
     mon_role = init_mon_role()
-    envoyer_log(valeur_identifiant(), valeur_remarque, ma_classe, mon_role)
+    if(!sans_envoyer_le_log) envoyer_log(valeur_identifiant(), valeur_remarque, ma_classe, mon_role)
   }
 
 
@@ -374,6 +424,7 @@ function aucun_API(){
   effacer("API_KEY_DEVOIR")
   effacer("API_KEY_RENAME")
   effacer("API_KEY_UPLOAD")
+  effacer("dossier_chargé")
   effacer("dossier_rendus_cycle")
 }
 
