@@ -6824,7 +6824,6 @@ function jai_pas_lu(notif_id_source, envoyer_cette_non_lecture){
 }
 
 function jai_lu(notif_id_source, envoyer_cette_lecture){
-	une_notif = $("#pannel_notif > [id='"+notif_id_source+"']")[0]
 	
 	//console.log("✅lire " + notif_id_source)
 
@@ -6834,7 +6833,8 @@ function jai_lu(notif_id_source, envoyer_cette_lecture){
 	//console.log(liste_notifs_lues)
 
 	//virer les classes non lues
-	une_notif.className = "une_notif"
+	une_notif = $("#pannel_notif > [id='"+notif_id_source+"']")[0]
+	if(une_notif) une_notif.className = "une_notif"
 
 	if(envoyer_cette_lecture) envoyer_ce_que_jai_lu()
 
