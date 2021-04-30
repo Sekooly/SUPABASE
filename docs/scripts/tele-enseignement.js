@@ -35,6 +35,9 @@ var mes_visios = []
 
 var mes_fichiers = []
 
+
+var liste_notifs_lues = ""
+
 /*********************** CONSEIL DE CLASSE ***********************************/
 function afficher_conseil_de_classe(oui){
 
@@ -2163,10 +2166,19 @@ function initialisation(){
 	document.title = "Sekooly | " + nom_etablissement.toUpperCase();
 
 	effacer("date_heure_depassement")
+
+	//si pas de données
 	if (recuperer('mes_donnees') === "" || recuperer('mon_type') === "" || recuperer('mes_donnees') === null || recuperer('mon_type') === null){
 
-		document.body.style.display="none";
-		deconnexion();
+		tout_quitter()
+
+	//pas de liste de notifs lus
+	}else if(JSON.parse(recuperer("mes_donnees"))['liste_notifs_lues'] === undefined){
+
+		tout_quitter()
+
+
+	//tout est ok
 	}else{
 		afficher_discussions(false);
 		configurer_profil();
@@ -2179,6 +2191,12 @@ function initialisation(){
 
 	}
 	chargement(false);
+}
+
+function tout_quitter(){
+
+	document.body.style.display="none";
+	deconnexion();
 }
 
 
@@ -6501,8 +6519,15 @@ function switch_pannel_notifs(){
 	positionner_bulle_notif();
 	positionner_pannel_notif();
 
+
 	//on active par défaut "tous"
 	$("#filtre_tous").click();
+
+	//au clic droit -> marquer non lu
+	$(".une_notif").on("contextmenu",function(e){
+		console.log("vous avez cliqué droit sur " + e.target.id)
+	})
+
 
 
 	chargement(false);
@@ -6537,10 +6562,14 @@ function ajouter_la_notif(la_notif,index){
 	};
 
 
-	//surbrillance
+	//surbrillance si pas encore lu (OLD)
+	/*
 	if(index<Number($("#bulle_notif")[0].innerText)){
 		ma_notif.className = "non_lu";
-	}
+	}*/
+
+
+	ma_notif.className = liste_notifs_lues.includes("," + Id_source + ",") ? "une_notif" : "non_lu"
 
 
 
@@ -6563,6 +6592,12 @@ function clic_de_notif(type_notif,id_notif,id_dossier){
 	//commenter
 	envoyer_ma_date_de_consultation()
 	
+	//envoyer cet ID
+	//console.log("on va cliquer sur " + id_notif)
+	jai_lu(id_notif, true)
+	//console.log("on a cliqué sur "+ id_notif)
+
+
 	//pas de minipopup tdb
 	$("#mini_popup").remove()
 	
@@ -6713,8 +6748,10 @@ function contenu_notification(type_notif,la_matiere_concernee,la_classe_concerne
 
 }
 
+
+
 function vider_les_notifs(){
-	element_DOM('pannel_notif').innerHTML= '<div class="filtres_notifs un_filtre_notif" height="50px" style=""><div class="un_filtre_notif"  id="filtre_tous">Tous</div><div class="un_filtre_notif"><img alt="Discussions" src="https://sekooly.github.io/SUPABASE/images/question.png" class="icone_filtre_notif"></div><div class="un_filtre_notif"><img alt="Devoirs" src="https://sekooly.github.io/SUPABASE/images/img_devoirs.png" class="icone_filtre_notif"></div><div class="un_filtre_notif"><img alt="Fichiers" src="https://sekooly.github.io/SUPABASE/images/img_ajout.png" class="icone_filtre_notif"></div></div>';
+	element_DOM('pannel_notif').innerHTML= '<span class="tout_marquer" id="rien_lire" onclick="executer_ne_rien_lire()">Tout marquer comme NON LU❌</span><span class="tout_marquer" id="tout_lire" onclick="executer_tout_lire()">Tout marquer comme LU✅</span><div class="filtres_notifs un_filtre_notif" height="50px" style=""><div class="un_filtre_notif"  id="filtre_tous">Tous</div><div class="un_filtre_notif"><img alt="Discussions" src="https://sekooly.github.io/SUPABASE/images/question.png" class="icone_filtre_notif"></div><div class="un_filtre_notif"><img alt="Devoirs" src="https://sekooly.github.io/SUPABASE/images/img_devoirs.png" class="icone_filtre_notif"></div><div class="un_filtre_notif"><img alt="Fichiers" src="https://sekooly.github.io/SUPABASE/images/img_ajout.png" class="icone_filtre_notif"></div></div>';
 
 		
 
@@ -6731,6 +6768,90 @@ function vider_les_notifs(){
 		e.stopPropagation();
 		activer_filtre(e.target);
 	});
+
+
+}
+
+
+function executer_tout_lire(){
+
+	//au clic de tout marquer comme lu -> on ajoute toutes les ID dans la liste de notifs lues	
+	//pour chaque élément "non_lu"
+	$(".non_lu").each(function(index,une_notif){
+		jai_lu(une_notif.id, false)
+
+	})
+
+	apres_maj_lecture_notifs()
+
+}
+
+function executer_ne_rien_lire(){
+	//pour chaque élément "non_lu"
+	$(".une_notif:visible").each(function(index,une_notif){
+		jai_pas_lu(une_notif.id, false)
+	})
+
+	apres_maj_lecture_notifs()
+}
+
+function apres_maj_lecture_notifs(){
+
+	//envoyer au serveur
+	envoyer_ce_que_jai_lu()
+
+	//récupérer la nouvelle valeur de liste
+	recuperer_liste_notifs_lues()
+
+	//actualiser ma liste perso
+	afficher_bulle_notifs()
+}
+
+function jai_pas_lu(notif_id_source, envoyer_cette_non_lecture){
+	une_notif = $("#pannel_notif > [id='"+notif_id_source+"']:visible")[0]
+	
+	//console.log("❌ignorer " + notif_id_source)
+
+	//stocker dans la variable globale
+	liste_notifs_lues = liste_notifs_lues.includes(","+notif_id_source+",") ? liste_notifs_lues.replaceAll(notif_id_source + ",", "") : liste_notifs_lues
+
+	//console.log(liste_notifs_lues)
+
+	//virer les classes non lues
+	une_notif.className = "non_lu"
+
+	if(envoyer_cette_non_lecture) envoyer_ce_que_jai_lu()
+}
+
+function jai_lu(notif_id_source, envoyer_cette_lecture){
+	une_notif = $("#pannel_notif > [id='"+notif_id_source+"']")[0]
+	
+	//console.log("✅lire " + notif_id_source)
+
+	//stocker dans la variable globale
+	liste_notifs_lues = !liste_notifs_lues.includes(","+notif_id_source+",") ? liste_notifs_lues + notif_id_source + "," : liste_notifs_lues
+
+	//console.log(liste_notifs_lues)
+
+	//virer les classes non lues
+	une_notif.className = "une_notif"
+
+	if(envoyer_cette_lecture) envoyer_ce_que_jai_lu()
+
+}
+
+function envoyer_ce_que_jai_lu(){
+
+	nom_table = recuperer("mon_type").split("_")[0]
+	nouvelle_liste = {
+		liste_notifs_lues: liste_notifs_lues
+	}
+	url = racine_data + nom_table + "?Identifiant=eq." + recuperer("identifiant_courant") + "&" + apikey
+	/*
+	console.log(url)
+	console.log(nouvelle_liste)
+	*/
+	patch_resultat_asynchrone(url, nouvelle_liste)
 
 
 }
@@ -6780,6 +6901,9 @@ function recuperer_notifs(){
 
 	var mes_notifs= [];
 	var url = racine_data + mon_type + "?Identifiant=eq."+ identifiant + "&" + apikey
+
+
+
 
 	try{
 		var ma_date_consultation = get_resultat(url)[0]['Derniere_consultation_notifs'];
@@ -6931,6 +7055,10 @@ function masquer_bulle_notifs(){
 	element_DOM('bulle_notif').style.display = "";
 }
 
+function recuperer_liste_notifs_lues(){
+	return get_resultat(racine_data + recuperer("mon_type").split("_")[0] + "?" + "Identifiant=eq." + recuperer("identifiant_courant") + "&" + apikey )[0]['liste_notifs_lues']
+}
+
 function afficher_bulle_notifs(){
 	chargement(true);
 
@@ -6938,28 +7066,22 @@ function afficher_bulle_notifs(){
 	positionner_pannel_notif();
 
 	var mes_notifs = JSON.parse(recuperer('mes_notifs'));
-
 	var ma_date_consultation = recuperer('ma_date_consultation');
+
+
+	
+	liste_notifs_lues = recuperer_liste_notifs_lues()
+	if(!liste_notifs_lues) liste_notifs_lues = ","
+
+
+	//console.log(liste_notifs_lues)
+
 
 	//on filtre pour afficher dans la bulle que celles dont date modif > date dernière consultation
 	//console.log(mes_notifs)
 	nouvelles_notifs = mes_notifs.filter(function(valeur){
 
 
-		/*
-		avec_format = !valeur['Date_derniere_modif'].includes('+')
-		if(avec_format){
-			Date_derniere_modif = moment(valeur['Date_derniere_modif'], "DD/MM/YYYY HH:mm:ss")	
-		}else{
-			Date_derniere_modif = moment(valeur['Date_derniere_modif'])
-		}
-		
-		avec_format = !ma_date_consultation.includes('+')
-		if (avec_format){
-			Date_consultation = moment(ma_date_consultation, "DD/MM/YYYY HH:mm:ss");
-		}else{
-			Date_consultation = moment(ma_date_consultation);
-		} */
 		
 		Date_derniere_modif = convertir_en_date(valeur['Date_derniere_modif'])
 		Date_consultation = convertir_en_date(ma_date_consultation)
@@ -6971,7 +7093,11 @@ function afficher_bulle_notifs(){
 		*/
 
 
-		return Date_derniere_modif > Date_consultation;
+		//anciennement via la date de derniere consultation
+		//return Date_derniere_modif > Date_consultation;
+
+		//nouvellement aux clics des notifs 1 par 1
+		return !liste_notifs_lues.includes("," + valeur['Id_source'] + ",")
 		
 	});
 
@@ -6981,8 +7107,11 @@ function afficher_bulle_notifs(){
 	if(nombre>99) nombre = "+99";
 	
 	var bulle_notif = element_DOM('bulle_notif');
+	//console.log(nombre)
+	element_DOM('bulle_notif').style.display = nombre > 0 ? "block" : "";
 	bulle_notif.innerText = nombre;
-	if (nombre > 0) element_DOM('bulle_notif').style.display = "block";
+	
+
 
 	chargement(false);
 
@@ -9633,6 +9762,7 @@ function mode_bulletin(oui){
 		element_DOM('file').setAttribute('accept',".txt,.bmp,.gif,.jpeg,.jpg,.png,.png,.pdf,.bmp,.xlsx,.xls,.xlsm,.ppt,.pptx,.doc,.docx,.html,.csv,.js,.rtf,.mp4,.mp3,.wav")
 		element_DOM('choix_popup').setAttribute('style','visibility: visible')
 		$("[value='Bulletins']")[0].style.display = "none"
+		$("#categorie_choisie > [value='Manuels']")[0].style.display = !recuperer("mon_type").includes("Administration") ? "none" : "" //manuels interdits sauf aux membres de l'administration
 	}
 	
 }

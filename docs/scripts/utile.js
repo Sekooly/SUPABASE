@@ -111,9 +111,11 @@ function rechercher_notifs_prof(liste_classes_matieres, nombrelimite){
 
   //Notifs?Classe_matiere=in.("(Divers|Salle%20des%20profs)")
 
+
   url = racine_data + "Notifs?Classe_matiere=in.(\""+liste_classes_matieres+ "\")&"+apikey
+  url = url + '&order=Horodateur.desc' 
   url = nombrelimite ? url+"&limit="+nombrelimite : url
-  
+
   //console.log(url)
 
   return get_resultat_asynchrone(url)
@@ -374,7 +376,7 @@ function stocker(nom_variable,valeur_variable){
 }
 
 function recuperer(nom_variable){  
-	return window.localStorage.getItem(nom_variable)	|| window.sessionStorage.getItem(nom_variable)  
+	return window.sessionStorage.getItem(nom_variable)  || window.localStorage.getItem(nom_variable)
 }
 
 function stocker_temp(nom_variable,valeur_variable){
