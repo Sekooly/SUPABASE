@@ -349,7 +349,8 @@ function actualiser_en_hash_code(type, identifiant, code, code_hash){
 
 
 function actualiser_remarque(valeur_remarque, ma_classe, mon_type, sans_envoyer_le_log){
-  $("#remarque")[0].innerHTML = valeur_remarque
+  $("#remarque")[0].innerHTML = valeur_remarque  
+  chargement(false)
   
   if (valeur_remarque !=="" ){
     mon_role = init_mon_role()
@@ -357,7 +358,6 @@ function actualiser_remarque(valeur_remarque, ma_classe, mon_type, sans_envoyer_
   }
 
 
-  chargement(false)
 }
 
 
