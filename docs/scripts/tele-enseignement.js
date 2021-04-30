@@ -1767,6 +1767,8 @@ function deconnexion(){
 	effacer('dossier_rendus_cycle')
 
 	effacer('quitter_multi_visio')
+	effacer("nb_clics")
+
 	image_temporaire = ""
 	nom_image_temporaire = ""
 
@@ -2160,6 +2162,7 @@ function initialisation(){
 	chargement(true);
 	document.title = "Sekooly | " + nom_etablissement.toUpperCase();
 
+	effacer("date_heure_depassement")
 	if (recuperer('mes_donnees') === "" || recuperer('mon_type') === "" || recuperer('mes_donnees') === null || recuperer('mon_type') === null){
 
 		document.body.style.display="none";
