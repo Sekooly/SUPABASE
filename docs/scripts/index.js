@@ -43,6 +43,7 @@ function se_connecter(){
     stocker("date_heure_depassement",maintenant())
     date_heure_delai_attente_ok = moment(recuperer("date_heure_depassement")).add(30,'seconds')
     affichage_date_heure_depassement = moment(date_heure_delai_attente_ok._d).format("DD/MM/YYYY HH:mm:ss")
+    chargement(false)
     actualiser_remarque("Vous avez cliqué trop de fois le bouton de connexion.<br>Merci de réessayer dans 30 secondes, soit le " + affichage_date_heure_depassement + ".<br><br><i>NB: Changer l'heure de votre système ne vous permettra PAS d'accéder plus tôt à la plateforme.</i>","","",true)
     return false
 

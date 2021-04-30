@@ -715,7 +715,7 @@ function identifiant_par_table(nom_table){
 function init_mon_role(){
   mon_role = recuperer('mon_type');
 
-  if (mon_role !== null){
+  if (mon_role !== null && mon_role !==undefined){
     //on enleve le S à la fin pour eleves et professeurs
     mon_role = mon_role.substring(0, mon_role.length - 1);
 
