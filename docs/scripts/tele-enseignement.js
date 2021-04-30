@@ -6808,7 +6808,6 @@ function apres_maj_lecture_notifs(){
 }
 
 function jai_pas_lu(notif_id_source, envoyer_cette_non_lecture){
-	une_notif = $("#pannel_notif > [id='"+notif_id_source+"']:visible")[0]
 	
 	//console.log("❌ignorer " + notif_id_source)
 
@@ -6818,7 +6817,8 @@ function jai_pas_lu(notif_id_source, envoyer_cette_non_lecture){
 	//console.log(liste_notifs_lues)
 
 	//virer les classes non lues
-	une_notif.className = "non_lu"
+	une_notif = $("#pannel_notif > [id='"+notif_id_source+"']:visible")[0]
+	if(une_notif) une_notif.className = "non_lu"
 
 	if(envoyer_cette_non_lecture) envoyer_ce_que_jai_lu()
 }
