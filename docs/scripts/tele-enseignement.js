@@ -11002,7 +11002,7 @@ function details_tdb_3(ceci){
 	mes_discussions.forEach(function(la_discu,index){
 		la_matiere = mes_matieres.find(e => e['ID_URL'] === la_discu['Id_classe_matiere'])
 		nom_matiere = la_matiere['Classe'] + " " + la_matiere['Matiere']
-		elements_html += creer_element_journee(nom_matiere,la_discu['Votre_message'],la_discu['Horodateur'],la_discu['Horodateur'],"Id_topic",la_discu["Id_classe_matiere"],"discussion",false,false, true)
+		elements_html += creer_element_journee(nom_matiere,la_discu['Votre_message'],la_discu['Horodateur'],la_discu['Horodateur'],la_discu["Id_topic"],la_discu["Id_classe_matiere"],"discussion",false,false, true)
 	})
 
 
