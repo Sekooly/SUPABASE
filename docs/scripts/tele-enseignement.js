@@ -5440,7 +5440,7 @@ $(function charger_fichiers(e){
 
 			if(typeof(e.target.className)==="string"){
 				//console.log(e.target.className)
-				if(e.target.id!=="bulle_notif" && e.target.id!=="recup_notifs" && !e.target.className.includes("notif")){
+				if(e.target.id!=="bulle_notif" && e.target.id!=="recup_notifs" && !e.target.className.includes("notif") && e.target.id!=="rien_lire" && e.target.id!=="tout_lire"){
 					
 					virer_le_pannel_notifs();
 				}
