@@ -722,7 +722,7 @@ function init_mon_role(){
     mon_role = mon_role.substring(0, mon_role.length - 1);
 
     //si administration alors on envoie l'intitulé de son rôle:
-    if (mon_role.includes('Admin')) mon_role = JSON.parse(recuperer('mes_donnees'))['Role'];
+    if (mon_role.includes('Admin')) mon_role = recuperer('mes_donnees') ? JSON.parse(recuperer('mes_donnees'))['Role'] : "";
   }
 
   return mon_role
