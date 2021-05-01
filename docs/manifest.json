@@ -3,12 +3,12 @@
   "name": "Sekooly - Faciliter et démocratiser le télé-enseignement.",
   "icons": [
     {
-      "src": "https://sekooly.com/assets/images/index-meta.png",
+      "src": "https://sekooly.com/assets/images/logo-no-background-128x128.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "https://sekooly.com/assets/images/index-meta.png",
+      "src": "https://sekooly.com/assets/images/logo-no-background-128x128.png",
       "type": "image/png",
       "sizes": "512x512"
     }

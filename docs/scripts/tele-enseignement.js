@@ -1427,7 +1427,8 @@ function afficher_modif_profil(){
 
 
 function calculer_mes_XP(){
-	return "585000" + " XP"
+	//return "585000" + " XP"
+	return "En cours de construction."
 }
 
 function switch_edition(){
