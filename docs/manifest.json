@@ -3,18 +3,18 @@
   "name": "Sekooly - Faciliter et démocratiser le télé-enseignement.",
   "icons": [
     {
-      "src": "https://hibiscus.sekooly.com/images/logo-no-background-128x128.png",
+      "src": "https://hibiscus.sekooly.com/images/index-meta.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "https://hibiscus.sekooly.com/images/logo-no-background-128x128.png",
+      "src": "https://hibiscus.sekooly.com/images/index-meta.png",
       "type": "image/png",
       "sizes": "512x512"
     }
   ],
   "start_url": "/tele-enseignement.html",
-  "background_color": "#ff6c00",
+  "background_color": "#fff",
   "display": "standalone",
   "scope": "/",
   "description": "Application Sekooly"
