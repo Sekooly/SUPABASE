@@ -4,7 +4,7 @@
 
 	<head>
 
-		
+		<link rel="manifest" href="manifest.json">
 		<link rel="shortcut icon" href="images/logo-no-background-128x128.png" type="image/x-icon">
 		<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
 
@@ -53,6 +53,13 @@
 
 
 	<style>
+
+		.add-button {
+		  position: absolute;
+		  top: 1px;
+		  left: 1px;
+		  display: none;
+		}
 
 
 		progress::-moz-progress-bar { background: #f9aa71; }
@@ -1577,7 +1584,7 @@
 
 
 	<div class="navbar" id="mynavbar">
-			
+		<button class="add-button">Ajouter à l'accueil</button>	
 		<span onclick="deconnexion()">
 			<img class="bye" position="50px" src="images/img_deconnexion.png" width = "35" height = "35" alt="DECONNEXION" >
 		</span>	
