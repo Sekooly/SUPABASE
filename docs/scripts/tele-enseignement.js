@@ -1383,6 +1383,9 @@ function afficher_modif_profil(){
 	vider_fenetre("Votre profil");
 
 	var mes_donnees = JSON.parse(recuperer('mes_donnees'));
+
+	var mon_niveau_XP = mon_detail('Niveau XP',calculer_mes_XP());
+
 	var mes_details_identifiant =mon_detail('Identifiant',mes_donnees['Identifiant']);
 	var mes_details_nom =mon_detail('Nom',mes_donnees['Nom']);
 	var mes_details_prenoms =mon_detail('Prénom(s)',mes_donnees['Prénom(s)']);
@@ -1407,7 +1410,7 @@ function afficher_modif_profil(){
 
 	var boutons = '<span id="les_boutons" style="text-align: center;position: relative;display: block;"><button type="button" id="annuler_modifs" onclick="quitter_previsualisation()"> Annuler </button><button type="button" id="valider_modifs" onclick="switch_edition()">Enregistrer</button></span>';
 
-	var details_profil_html = '<div id="mes_details" class="mes_details">' + mes_details_identifiant + mes_details_nom + mes_details_prenoms + mes_details_type + mes_details_classe + mes_details_contact + mes_details_code_acces +'</div>' + boutons;
+	var details_profil_html = '<div id="mes_details" class="mes_details">' + mon_niveau_XP + mes_details_identifiant + mes_details_nom + mes_details_prenoms + mes_details_type + mes_details_classe + mes_details_contact + mes_details_code_acces +'</div>' + boutons;
 
 	var details_profil = document.createElement('div');
 	details_profil.innerHTML = details_profil_html;
@@ -1416,8 +1419,15 @@ function afficher_modif_profil(){
 			element_DOM('fenetre').appendChild(details_profil.firstChild);
 
 		mode_edition(false,true);
+
+
 	afficher_fenetre(true);
 
+}
+
+
+function calculer_mes_XP(){
+	return "585000" + " XP"
 }
 
 function switch_edition(){
@@ -6780,7 +6790,8 @@ function executer_tout_lire(){
 	//au clic de tout marquer comme lu -> on ajoute toutes les ID dans la liste de notifs lues	
 	//pour chaque élément "non_lu"
 	$(".non_lu").each(function(index,une_notif){
-		jai_lu(une_notif.id, false)
+		//console.log(une_notif.id)
+		jai_lu(une_notif.id, false, une_notif)
 
 	})
 
@@ -6790,8 +6801,8 @@ function executer_tout_lire(){
 
 function executer_ne_rien_lire(){
 	//pour chaque élément "non_lu"
-	$(".une_notif:visible").each(function(index,une_notif){
-		jai_pas_lu(une_notif.id, false)
+	$(".une_notif").each(function(index,une_notif){
+		jai_pas_lu(une_notif.id, false, une_notif)
 	})
 
 	apres_maj_lecture_notifs()
@@ -6809,7 +6820,7 @@ function apres_maj_lecture_notifs(){
 	afficher_bulle_notifs()
 }
 
-function jai_pas_lu(notif_id_source, envoyer_cette_non_lecture){
+function jai_pas_lu(notif_id_source, envoyer_cette_non_lecture, une_notif){
 	
 	//console.log("❌ignorer " + notif_id_source)
 
@@ -6819,13 +6830,13 @@ function jai_pas_lu(notif_id_source, envoyer_cette_non_lecture){
 	//console.log(liste_notifs_lues)
 
 	//virer les classes non lues
-	une_notif = $("#pannel_notif > [id='"+notif_id_source+"']:visible")[0]
+	//une_notif = $("#pannel_notif > [id='"+notif_id_source+"']:visible")[0]
 	if(une_notif) une_notif.className = "non_lu"
 
 	if(envoyer_cette_non_lecture) envoyer_ce_que_jai_lu()
 }
 
-function jai_lu(notif_id_source, envoyer_cette_lecture){
+function jai_lu(notif_id_source, envoyer_cette_lecture, une_notif){
 	
 	//console.log("✅lire " + notif_id_source)
 
@@ -6835,7 +6846,7 @@ function jai_lu(notif_id_source, envoyer_cette_lecture){
 	//console.log(liste_notifs_lues)
 
 	//virer les classes non lues
-	une_notif = $("#pannel_notif > [id='"+notif_id_source+"']")[0]
+	//une_notif = $("#pannel_notif > [id='"+notif_id_source+"']")[0]
 	if(une_notif) une_notif.className = "une_notif"
 
 	if(envoyer_cette_lecture) envoyer_ce_que_jai_lu()
