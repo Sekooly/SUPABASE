@@ -6804,7 +6804,7 @@ function executer_tout_lire(){
 
 	//au clic de tout marquer comme lu -> on ajoute toutes les ID dans la liste de notifs lues	
 	//pour chaque élément "non_lu"
-	$(".non_lu").each(function(index,une_notif){
+	$(".non_lu:visible").each(function(index,une_notif){
 		//console.log(une_notif.id)
 		jai_lu(une_notif.id, false, une_notif)
 
@@ -6816,7 +6816,7 @@ function executer_tout_lire(){
 
 function executer_ne_rien_lire(){
 	//pour chaque élément "non_lu"
-	$(".une_notif").each(function(index,une_notif){
+	$(".une_notif:visible").each(function(index,une_notif){
 		jai_pas_lu(une_notif.id, false, une_notif)
 	})
 
