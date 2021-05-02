@@ -10386,7 +10386,7 @@ function edt(){
 	}else{
 
 		//dossier chargé ou mode bis -> ok
-		if(recuperer("dossier_chargé") !== "" || mon_type.includes('bis')){
+		if(recuperer("dossier_chargé") || mon_type.includes('bis')){
 			recuperer_edt()
 		
 		//sinon -> choisir la classe à consulter
