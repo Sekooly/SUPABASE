@@ -6754,6 +6754,7 @@ function ajouter_la_notif(la_notif,index){
 
 	var Type_notif=la_notif['Type_notif'];
 	var Id_source=la_notif['Id_source'];
+	var id_notif=la_notif['id_notif'];
 	var Identifiant_derniere_modif=la_notif['Identifiant_derniere_modif'].toUpperCase();
 	var Identifiant_originaire = la_notif['Identifiant_originaire'].toUpperCase();
 	var Role_derniere_modif=la_notif['Role_derniere_modif'];
@@ -6771,9 +6772,10 @@ function ajouter_la_notif(la_notif,index){
 	var ma_notif = document.createElement('div');
 	ma_notif.className = "une_notif";
 	ma_notif.id = Id_source;
+	ma_notif.setAttribute('id_notif',id_notif.toString());
 	ma_notif.onclick = function(e){
 		chargement(true);
-		clic_de_notif(Type_notif,ma_notif.id,id_dossier);
+		clic_de_notif(Type_notif,ma_notif.id,id_dossier,ma_notif.getAttribute('id_notif'));
 	};
 
 
@@ -6784,7 +6786,7 @@ function ajouter_la_notif(la_notif,index){
 	}*/
 
 
-	ma_notif.className = liste_notifs_lues.includes("," + Id_source + ",") ? "une_notif" : "non_lu"
+	ma_notif.className = liste_notifs_lues.includes("," + id_notif + ",") ? "une_notif" : "non_lu"
 
 
 
@@ -6802,14 +6804,14 @@ function ajouter_la_notif(la_notif,index){
 
 }
 
-function clic_de_notif(type_notif,id_notif,id_dossier){
+function clic_de_notif(type_notif,id_source,id_dossier,id_notif){
 	
 	//commenter
 	envoyer_ma_date_de_consultation()
 	
 	//envoyer cet ID
 	//console.log("on va cliquer sur " + id_notif)
-	jai_lu(id_notif, true)
+	if(id_notif) jai_lu(id_notif, true)
 	//console.log("on a cliqué sur "+ id_notif)
 
 
@@ -6828,11 +6830,11 @@ function clic_de_notif(type_notif,id_notif,id_dossier){
 
 
 		if(type_notif === "fichier"){
-			notif_fichier(id_notif,id_dossier);
+			notif_fichier(id_source,id_dossier);
 		}else if(type_notif === "discussion"){
-			notif_discussion(id_notif,id_dossier);
+			notif_discussion(id_source,id_dossier);
 		}else if(type_notif === "devoir"){
-			notif_devoir(id_notif,id_dossier);
+			notif_devoir(id_source,id_dossier);
 		};
 
 
@@ -6844,17 +6846,17 @@ function clic_de_notif(type_notif,id_notif,id_dossier){
 
 }
 
-function notif_fichier(id_notif,id_dossier){
+function notif_fichier(id_source,id_dossier){
 
 	//changer dossier_chargé
 	//changer fichier_ouvert
 	//puis chargement a l'arrivée
 	stocker_temp('dossier_chargé',id_dossier);
-	stocker('fichier_ouvert',id_notif);
+	stocker('fichier_ouvert',id_source);
 	window.location.href = window.location.href;			
 }
 
-function notif_discussion(id_notif,id_dossier){
+function notif_discussion(id_source,id_dossier){
 	
 	//charger dossier à charger
 	stocker_temp('dossier_chargé',id_dossier);
@@ -6868,14 +6870,14 @@ function notif_discussion(id_notif,id_dossier){
 		//ouvrir les topics
 		charger_les_topics(true).then(function(){
 
-			if($('#'+id_notif+'.bloc_topic').length>0){
+			if($('#'+id_source+'.bloc_topic').length>0){
 				
 				//console.log('on y est!!!')
 				//nouvelle couleur topic (temporaire)
-				changer_couleur_temporairement(id_notif,"bloc_topic","#b9e5de",1000);
+				changer_couleur_temporairement(id_source,"bloc_topic","#b9e5de",1000);
 
-				//var position_scroll = $('#'+id_notif+'.bloc_topic').offset().top;
-				var position_scroll = $("#"+id_notif+".bloc_topic")[0].offsetTop - $("#"+id_notif+".bloc_topic")[0].offsetHeight;
+				//var position_scroll = $('#'+id_source+'.bloc_topic').offset().top;
+				var position_scroll = $("#"+id_source+".bloc_topic")[0].offsetTop - $("#"+id_source+".bloc_topic")[0].offsetHeight;
 				$("#div_liste_topics").scrollTop(position_scroll);
 
 			
@@ -6889,7 +6891,7 @@ function notif_discussion(id_notif,id_dossier){
 
 }
 
-function notif_devoir(id_notif,id_dossier){
+function notif_devoir(id_source,id_dossier){
 
 
 	
@@ -6905,7 +6907,7 @@ function notif_devoir(id_notif,id_dossier){
 		recuperer_devoirs(true);
 
 		//choisir le devoir à afficher
-		$("#devoir_choisi").val(id_notif);
+		$("#devoir_choisi").val(id_source);
 		//console.log("c'est choisi");
 		$("#devoir_choisi").change();
 		//console.log("c'est changé");
@@ -6996,7 +6998,7 @@ function executer_tout_lire(){
 	//pour chaque élément "non_lu"
 	$(".non_lu:visible").each(function(index,une_notif){
 		//console.log(une_notif.id)
-		jai_lu(une_notif.id, false, une_notif)
+		jai_lu(une_notif.getAttribute("id_notif"), false, une_notif)
 
 	})
 
@@ -7007,7 +7009,7 @@ function executer_tout_lire(){
 function executer_ne_rien_lire(){
 	//pour chaque élément "non_lu"
 	$(".une_notif:visible").each(function(index,une_notif){
-		jai_pas_lu(une_notif.id, false, une_notif)
+		jai_pas_lu(une_notif.getAttribute("id_notif"), false, une_notif)
 	})
 
 	apres_maj_lecture_notifs()
@@ -7025,33 +7027,33 @@ function apres_maj_lecture_notifs(){
 	afficher_bulle_notifs()
 }
 
-function jai_pas_lu(notif_id_source, envoyer_cette_non_lecture, une_notif){
+function jai_pas_lu(id_notif, envoyer_cette_non_lecture, une_notif){
 	
-	//console.log("❌ignorer " + notif_id_source)
+	//console.log("❌ignorer " + id_notif)
 
 	//stocker dans la variable globale
-	liste_notifs_lues = liste_notifs_lues.includes(","+notif_id_source+",") ? liste_notifs_lues.replaceAll(notif_id_source + ",", "") : liste_notifs_lues
+	liste_notifs_lues = liste_notifs_lues.includes(","+id_notif+",") ? liste_notifs_lues.replaceAll(id_notif + ",", "") : liste_notifs_lues
 
 	//console.log(liste_notifs_lues)
 
 	//virer les classes non lues
-	//une_notif = $("#pannel_notif > [id='"+notif_id_source+"']:visible")[0]
+	//une_notif = $("#pannel_notif > [id='"+id_notif+"']:visible")[0]
 	if(une_notif) une_notif.className = "non_lu"
 
 	if(envoyer_cette_non_lecture) envoyer_ce_que_jai_lu()
 }
 
-function jai_lu(notif_id_source, envoyer_cette_lecture, une_notif){
+function jai_lu(id_notif, envoyer_cette_lecture, une_notif){
 	
-	//console.log("✅lire " + notif_id_source)
+	//console.log("✅lire " + id_notif)
 
 	//stocker dans la variable globale
-	liste_notifs_lues = !liste_notifs_lues.includes(","+notif_id_source+",") ? liste_notifs_lues + notif_id_source + "," : liste_notifs_lues
+	liste_notifs_lues = !liste_notifs_lues.includes(","+id_notif+",") ? liste_notifs_lues + id_notif + "," : liste_notifs_lues
 
 	//console.log(liste_notifs_lues)
 
 	//virer les classes non lues
-	//une_notif = $("#pannel_notif > [id='"+notif_id_source+"']")[0]
+	//une_notif = $("#pannel_notif > [id='"+id_notif+"']")[0]
 	if(une_notif) une_notif.className = "une_notif"
 
 	if(envoyer_cette_lecture) envoyer_ce_que_jai_lu()
@@ -7315,7 +7317,7 @@ function afficher_bulle_notifs(){
 		//return Date_derniere_modif > Date_consultation;
 
 		//nouvellement aux clics des notifs 1 par 1
-		return !liste_notifs_lues.includes("," + valeur['Id_source'] + ",")
+		return !liste_notifs_lues.includes("," + valeur['id_notif'] + ",")
 		
 	});
 
@@ -10696,6 +10698,7 @@ function maj_date_journee(){
 	//console.log(url)
 	resultats = get_resultat(url)
 	//console.log(resultats)
+	//console.log(mes_matieres)
 	traiter_section(mes_matieres,"Fichiers",resultats,"date_effet","heure_effet","id_dossier","nom_fichier","id_fichier","fichier")
 
 
@@ -10768,63 +10771,68 @@ function traiter_section(mes_matieres,nom_section,resultats,nom_champ_date_refer
 		for (var numero_fichier = 0; numero_fichier < resultats.length; numero_fichier++) {
 
 			id_classe_matiere = resultats[numero_fichier][nom_champ_id_classe_matiere]
-			nom_classe = mes_matieres.filter(e => e['ID_URL'] === id_classe_matiere)[0]['Classe']
-			nom_matiere = mes_matieres.filter(e => e['ID_URL'] === id_classe_matiere)[0]['Matiere']
-			nom_fichier = resultats[numero_fichier][intitulé_nom_fichier]
+			if(id_classe_matiere !== "pp"){
 
-			//si c'est un non eleve -> on ajoute nom_classe
-			if(!recuperer('mon_type').includes('Eleves')) nom_matiere = nom_classe + ' - ' + nom_matiere
 
-			//console.log(nom_champ_date_reference)
-			date_reference =  resultats[numero_fichier][nom_champ_date_reference]
-			
-			//console.log(nom_champ_heure_reference)
-			heure_reference =  resultats[numero_fichier][nom_champ_heure_reference]
-			
+				nom_classe = mes_matieres.filter(e => e['ID_URL'] === id_classe_matiere)[0]['Classe']
+				nom_matiere = mes_matieres.filter(e => e['ID_URL'] === id_classe_matiere)[0]['Matiere']
+				nom_fichier = resultats[numero_fichier][intitulé_nom_fichier]
 
-			//console.log(date_reference)
-			//console.log(heure_reference)
+				//si c'est un non eleve -> on ajoute nom_classe
+				if(!recuperer('mon_type').includes('Eleves')) nom_matiere = nom_classe + ' - ' + nom_matiere
 
-			if(date_reference===heure_reference && date_reference.length > 0 ){
-				if(!date_heure_ensemble){
-					date_reference = date_reference.split(" ")[0]
-					heure_reference = heure_reference.split(" ")[1].split(".")[0]
-				}
-			}
-
-			champ_id = resultats[numero_fichier][nom_champ_id_voir]
-
-			if(est_devoir){
-				deja_rendu = false
-				deja_corrigé = false
+				//console.log(nom_champ_date_reference)
+				date_reference =  resultats[numero_fichier][nom_champ_date_reference]
 				
-				//pour les élèves : regarder si on a des rendus à mon nom
-				if(recuperer('mon_type') === 'Eleves'){
-					url = racine_data + 'Rendus?proprietaire=eq.' +recuperer('identifiant_courant').toLowerCase() 
-					url += '&id_fichier_sujetdevoir=eq.' + champ_id
-					url += '&' + apikey
-					//console.log(url)
-					deja_rendu = get_resultat(url).length > 0
+				//console.log(nom_champ_heure_reference)
+				heure_reference =  resultats[numero_fichier][nom_champ_heure_reference]
+				
 
-				//pour les profs/admin : regarder si on a des rendus -> si oui, mettre une coche SSI tout est corrigé
-				}else if(recuperer('mon_type') === 'Profs' || recuperer('mon_type').includes('Admin')){
-					url = racine_data + 'Rendus?id_fichier_sujetdevoir=eq.' + champ_id
-					url += '&' + apikey
-					//console.log(url)
-					rendus_recus = get_resultat(url)
-					nb_corrigés = rendus_recus.filter(e => e['remarque'] !== "").length
-					deja_corrigé = rendus_recus.length > 0 ? '<progress style="width: 60px;" value="'+nb_corrigés+'" max="'+rendus_recus.length+'"></progress> <b><rouge>' + nb_corrigés + "/"+rendus_recus.length + '</rouge></b>' : false
-					//console.log(deja_corrigé)
+				//console.log(date_reference)
+				//console.log(heure_reference)
+
+				if(date_reference===heure_reference && date_reference.length > 0 ){
+					if(!date_heure_ensemble){
+						date_reference = date_reference.split(" ")[0]
+						heure_reference = heure_reference.split(" ")[1].split(".")[0]
+					}
 				}
 
-				dejà_traité = deja_rendu || deja_corrigé
+				champ_id = resultats[numero_fichier][nom_champ_id_voir]
 
-			}else{
-				dejà_traité = false
+				if(est_devoir){
+					deja_rendu = false
+					deja_corrigé = false
+					
+					//pour les élèves : regarder si on a des rendus à mon nom
+					if(recuperer('mon_type') === 'Eleves'){
+						url = racine_data + 'Rendus?proprietaire=eq.' +recuperer('identifiant_courant').toLowerCase() 
+						url += '&id_fichier_sujetdevoir=eq.' + champ_id
+						url += '&' + apikey
+						//console.log(url)
+						deja_rendu = get_resultat(url).length > 0
+
+					//pour les profs/admin : regarder si on a des rendus -> si oui, mettre une coche SSI tout est corrigé
+					}else if(recuperer('mon_type') === 'Profs' || recuperer('mon_type').includes('Admin')){
+						url = racine_data + 'Rendus?id_fichier_sujetdevoir=eq.' + champ_id
+						url += '&' + apikey
+						//console.log(url)
+						rendus_recus = get_resultat(url)
+						nb_corrigés = rendus_recus.filter(e => e['remarque'] !== "").length
+						deja_corrigé = rendus_recus.length > 0 ? '<progress style="width: 60px;" value="'+nb_corrigés+'" max="'+rendus_recus.length+'"></progress> <b><rouge>' + nb_corrigés + "/"+rendus_recus.length + '</rouge></b>' : false
+						//console.log(deja_corrigé)
+					}
+
+					dejà_traité = deja_rendu || deja_corrigé
+
+				}else{
+					dejà_traité = false
+				}
+
+				element_journee = creer_element_journee(nom_matiere,nom_fichier,date_reference,heure_reference,champ_id,id_classe_matiere,type_notif,dejà_traité,est_devoir,date_heure_ensemble)
+				$("#section_"+nom_section).append(element_journee)
+
 			}
-
-			element_journee = creer_element_journee(nom_matiere,nom_fichier,date_reference,heure_reference,champ_id,id_classe_matiere,type_notif,dejà_traité,est_devoir,date_heure_ensemble)
-			$("#section_"+nom_section).append(element_journee)
 		}
 	}
 
