@@ -10771,7 +10771,7 @@ function traiter_section(mes_matieres,nom_section,resultats,nom_champ_date_refer
 		for (var numero_fichier = 0; numero_fichier < resultats.length; numero_fichier++) {
 
 			id_classe_matiere = resultats[numero_fichier][nom_champ_id_classe_matiere]
-			if(id_classe_matiere !== "pp"){
+			if(id_classe_matiere !== "pp"){//on zappe les fichiers pp
 
 
 				nom_classe = mes_matieres.filter(e => e['ID_URL'] === id_classe_matiere)[0]['Classe']
