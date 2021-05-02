@@ -1384,6 +1384,8 @@ function afficher_modif_profil(){
 
 	var mes_donnees = JSON.parse(recuperer('mes_donnees'));
 
+	var ma_photo_de_profil = mon_detail('Photo de profil',ma_photo());
+
 	var mon_niveau_XP = mon_detail('Niveau XP',calculer_mes_XP());
 
 	var mes_details_identifiant =mon_detail('Identifiant',mes_donnees['Identifiant']);
@@ -1410,7 +1412,7 @@ function afficher_modif_profil(){
 
 	var boutons = '<span id="les_boutons" style="text-align: center;position: relative;display: block;"><button type="button" id="annuler_modifs" onclick="quitter_previsualisation()"> Annuler </button><button type="button" id="valider_modifs" onclick="switch_edition()">Enregistrer</button></span>';
 
-	var details_profil_html = '<div id="mes_details" class="mes_details">' + mon_niveau_XP + mes_details_identifiant + mes_details_nom + mes_details_prenoms + mes_details_type + mes_details_classe + mes_details_contact + mes_details_code_acces +'</div>' + boutons;
+	var details_profil_html = '<div id="mes_details" class="mes_details">' + ma_photo_de_profil+ mon_niveau_XP + mes_details_identifiant + mes_details_nom + mes_details_prenoms + mes_details_type + mes_details_classe + mes_details_contact + mes_details_code_acces +'</div>' + boutons;
 
 	var details_profil = document.createElement('div');
 	details_profil.innerHTML = details_profil_html;
@@ -1425,6 +1427,18 @@ function afficher_modif_profil(){
 
 }
 
+function ma_photo(){
+	chargement(true)
+	url = "https://script.google.com/macros/s/AKfycbzD8D3K991-OKlGLFbdDcyHmjXnPh6XDXIK_hADdcOvwS8w9lLACI6lTpmSS8qzU2n8/exec"
+	url += "?nom_etablissement=" + data_etablissement["nom_etablissement"]
+	url += "&identifiant=" + recuperer("identifiant_courant") 
+	url += "&get_mon_id_pp=true"
+	id_pp = get_resultat_brut(url)
+	le_lien_pp = id_pp ? lien_pp(id_pp) : "https://sekooly.com/assets/images/default-user.svg"
+	chargement(false)
+	return "<img class='pp' src=" + le_lien_pp +">"
+
+}
 
 function calculer_mes_XP(){
 	//return "585000" + " XP"
@@ -11807,3 +11821,41 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/******************** PHOTO DE PROFIL *************************/
+function lien_pp(id_pp){
+	return "https://drive.google.com/uc?export=download&id=" + id_pp
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

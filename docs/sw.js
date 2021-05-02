@@ -7,8 +7,13 @@ self.addEventListener('install', function(e) {
     e.waitUntil(
         caches.open(cacheName).then(function(cache) {
             return cache.addAll([
-                'scripts/moment.js'
-               
+                'scripts/aes.js',
+                'scripts/hash.js',
+                'scripts/jquery.min.js',
+                'scripts/moment.js',
+                'scripts/pdf.js',
+                'scripts/pdf.worker.js',
+                'scripts/thenBy.js'               
             ]).then(function() {
                 self.skipWaiting();
             });
