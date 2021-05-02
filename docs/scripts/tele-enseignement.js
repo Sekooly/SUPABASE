@@ -1427,16 +1427,206 @@ function afficher_modif_profil(){
 
 }
 
+function bouton_supprimer_pp(){
+	return '<img id="suppr_pp" onclick="supprimer_pp()" class="editer" src="images/img_trash.png" alt="supprimer">'
+}
+
 function ma_photo(){
 	chargement(true)
-	url = "https://script.google.com/macros/s/AKfycbzD8D3K991-OKlGLFbdDcyHmjXnPh6XDXIK_hADdcOvwS8w9lLACI6lTpmSS8qzU2n8/exec"
-	url += "?nom_etablissement=" + data_etablissement["nom_etablissement"]
-	url += "&identifiant=" + recuperer("identifiant_courant") 
-	url += "&get_mon_id_pp=true"
-	id_pp = get_resultat_brut(url)
+	
+	var nom_table = "Fichiers"
+	url = racine_data + nom_table
+	url += "?proprietaire=eq." + recuperer("identifiant_courant") 
+	url += "&categorie_fichier=eq.Profil"
+	url += "&" + apikey
+	//console.log(url)
+	id_pp = get_resultat(url)[0]
+	if(id_pp) id_pp = id_pp['id_fichier']
+
+	//console.log(id_pp)
 	le_lien_pp = id_pp ? lien_pp(id_pp) : "https://sekooly.com/assets/images/default-user.svg"
+	supprimer_si_pp_existante = id_pp ? bouton_supprimer_pp() : ""
 	chargement(false)
-	return "<img class='pp' src=" + le_lien_pp +">"
+	return "<img class='pp' id='ma_pp' src=" + le_lien_pp +">" + '<span class="pp-upload"><label for="pp-input"><img src="https://sekooly.com/assets/images/img_edit.png" alt="modifier" class="editer"></label><input onchange="changer_pp()" accept=".png,.jpeg,.jpg,.bmp,.svg,.gif" id="pp-input" type="file"/> </span>' + supprimer_si_pp_existante
+
+}
+
+var basic_croppie
+var donnees_pp
+var extension_pp = ""
+
+
+
+
+function supprimer_pp(sans_confirmation){
+
+	if(!sans_confirmation) var confirmation = confirm("Voulez-vous supprimer votre photo de profil ? Cette action est irréversible.")
+
+	if(confirmation || sans_confirmation){
+
+		chargement(true)
+
+		//supprimer sur le drive
+		var url = "https://script.google.com/macros/s/AKfycbxv5oFMBxSpxGnpQhv24lRp5AFCMqxW6VXaNdQ3dBeDT7n9A7gpHgFYMkjKvINaA7Yk/exec"
+		url += "?supp_mon_id_pp=true"
+		url += "&nom_etablissement=" + data_etablissement['nom_etablissement']
+		url += "&identifiant=" + recuperer("identifiant_courant")
+		url += "&supp_mon_id_pp=true"
+		return get_resultat_asynchrone(url).then(function(e){
+			if(!sans_confirmation) afficher_alerte(e)
+
+
+			//supprimer dans les fichiers
+			nom_table = "Fichiers"
+
+			var url = racine_data + nom_table + "?proprietaire=eq." + recuperer("identifiant_courant")
+			url += "&categorie_fichier=eq.Profil"
+			url += "&" + apikey
+
+			//console.log(url)
+			return delete_resultat_asynchrone(url).then(function(){
+
+				//changer localement
+				$("#ma_pp")[0].src = "https://sekooly.com/assets/images/default-user.svg";			
+				$("#suppr_pp").remove()
+				if(!sans_confirmation) chargement(false)
+			})
+
+		})
+
+
+	}
+
+
+
+}
+
+
+
+
+function changer_pp(){
+	var reader = new FileReader()
+
+
+	//on crée le popup d'édition
+	creer_mini_popup("","<div id='nouvelle_pp' style='overflow: hidden;width: 200px;height:300px;'></div>","Valider la photo","envoyer_pp()")
+	
+	//on déclare l'endroit où on fera l'édition
+	basic_croppie = $('#nouvelle_pp').croppie({
+	    viewport: {
+	        width: 200,
+	        height: 200,
+	        type: 'circle'
+	    },
+	    boundary: {
+	        width: 200,
+	        height: 200
+	    },
+		
+		enableExif: true
+	});
+
+
+	//on prépare la lecture de l'image
+	reader.onload = function(results){
+		donnees = reader.result
+		//$("#mini_popup")[0].style.overflow = "auto"
+
+		basic_croppie.croppie('bind', {
+			url: donnees,
+			points: [5, 5, 5, 5]
+		});
+	}
+
+
+
+	//on lit l'image pour redimensionner
+	extension_pp = $("#pp-input")[0].files[0].name.split(".").pop();
+	reader.readAsDataURL($("#pp-input")[0].files[0])
+
+}
+
+function envoyer_pp(){
+	chargement(true)
+	url = "https://script.google.com/macros/s/AKfycbxv5oFMBxSpxGnpQhv24lRp5AFCMqxW6VXaNdQ3dBeDT7n9A7gpHgFYMkjKvINaA7Yk/exec"
+
+
+
+	//supprimer toute ancienne photo
+	supprimer_pp(true).then(function(){
+
+
+		//console.log("on a bien supprimé l'ancienne pp.")
+
+		basic_croppie.croppie('result', {
+			type: 'canvas',
+			size: 'viewport'
+		}).then(function (resp) {
+
+			//console.log("on a récupéré l'élément croppé.")
+
+			$("#mini_popup").remove()
+			//envoyer en asynchrone
+			data = {
+				nom_etablissement: data_etablissement['nom_etablissement'],
+				identifiant: recuperer("identifiant_courant"),
+				API_KEY_UPLOAD : recuperer("API_KEY_UPLOAD"),
+				API_KEY_DEVOIR : recuperer("API_KEY_DEVOIR"),
+				extension : extension_pp,
+				file: resp.replace(/^.*,/, '')
+
+			}
+
+			/*
+			console.log(url)
+			console.log(data)
+			*/
+
+			//changer sur le serveur
+			post_resultat_asynchrone(url,data).then(function(valeur){
+				afficher_alerte(valeur.split("|")[0])
+
+				id_pp = valeur.split("|")[1].trim()
+
+				date_heure_aujourdhui = maintenant()
+
+
+				//envoyer le ID dans la base
+				nom_table = "Fichiers"
+				mes_donnees = {
+					id_fichier: id_pp,
+					categorie_fichier: "Profil",
+					proprietaire: recuperer("identifiant_courant"),
+					nom_fichier: recuperer("identifiant_courant") + "." + extension_pp,
+					date_effet: moment(date_heure_aujourdhui).format("YYYY-MM-DD"),
+					id_dossier: "pp",
+					est_telechargeable: "non",
+					date_publication: date_heure_aujourdhui,
+					taille_fichier: $("#pp-input")[0].files[0].size
+				}
+
+				var url = racine_data + nom_table + "?" + apikey
+				//console.log(url)
+				post_resultat_asynchrone(url, mes_donnees).then(function(){
+
+					//changer localement
+					$("#ma_pp")[0].src = resp;
+					
+					//ajouter le bouton supprimer photo s'il n'existe pas encore
+					if($("#suppr_pp").length === 0) $("#Photo").append(bouton_supprimer_pp())
+
+				})
+
+
+
+				chargement(false)
+			})
+		});
+
+
+
+
+	})
 
 }
 

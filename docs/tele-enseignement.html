@@ -47,12 +47,31 @@
 	  	<link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.min.css" />
 		<script src="https://uicdn.toast.com/chart/latest/toastui-chart.min.js"></script>
 
+
+		<!-- pour la photo de profil-->
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.4/croppie.css" rel="stylesheet" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.4/croppie.js"></script>
+
 	</head> 
 
 	<body>
 
 
 	<style>
+
+		.pp-upload > input {
+		    display: none;
+		}
+
+		.editer{
+			width: 20px;
+			position: unset;
+			cursor: pointer;
+		}
+
+		.dark-mode .editer {
+			filter: invert(1);
+		}
 
 		.pp{
 			width: 75px;
