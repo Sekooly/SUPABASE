@@ -1534,7 +1534,7 @@ function changer_pp(){
 
 		basic_croppie.croppie('bind', {
 			url: donnees,
-			points: [5, 5, 5, 5]
+			points: [77,469,280,739]
 		});
 	}
 
