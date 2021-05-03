@@ -10360,6 +10360,21 @@ function proceder_a_linitialisation(){
 
 
 
+	//récupérer mes données et mes matières
+	rechercher("Matieres", "Cycle", a_stocker["Cycle"]).then(e => {stocker("mes_matieres",JSON.stringify(e))})
+	rechercher("Administration","Identifiant",recuperer("identifiant_courant")).then(e => {stocker("mes_donnees",JSON.stringify(e[0]))})
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 		
@@ -10385,7 +10400,7 @@ function proceder_a_linitialisation(){
 		//dans 3 secondes, on masque l'alerte
 		setTimeout(function(){
 			msg_alerte.className = "";
-			window.location.href = window.location.href
+			//window.location.href = window.location.href
 		}, 3000);
 
 
