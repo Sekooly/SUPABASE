@@ -1466,7 +1466,7 @@ var extension_pp = ""
 
 function supprimer_pp(identifiant_courant, sans_confirmation){
 
-	if(!sans_confirmation) var confirmation = confirm("Voulez-vous supprimer votre photo de profil ? Cette action est irréversible.")
+	if(!sans_confirmation) var confirmation = confirm("Voulez-vous supprimer cette photo de profil ? Cette action est irréversible.")
 
 	if(confirmation || sans_confirmation){
 
