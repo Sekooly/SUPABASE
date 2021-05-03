@@ -6973,7 +6973,7 @@ function contenu_notification(type_notif,la_matiere_concernee,la_classe_concerne
 
 	var phrase_discussion = Identifiant_originaire===Identifiant_derniere_modif ? " a créé ou commenté une discussion dans " : " a récemment commenté dans "
 
-	var phrase_devoir = Identifiant_originaire===Identifiant_derniere_modif ? " a rendu un devoir dans " : " a laissé une remarque sur votre devoir dans "
+	var phrase_devoir = Identifiant_originaire===Identifiant_derniere_modif ? " a rendu un devoir dans " : " a laissé une remarque sur un devoir dans "
 
 	var phrase = type_notif==="fichier" ? " a publié un nouveau fichier dans "
 	: type_notif==="discussion" ? phrase_discussion
