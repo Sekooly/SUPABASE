@@ -1462,6 +1462,9 @@ var donnees_pp
 var extension_pp = ""
 
 
+function url_pp(){
+	return "https://script.google.com/macros/s/AKfycbzGLJpVC55WvaC2akFbRw8Y-jOr--w7wwArd0IFHZGPORNuZV8DHl7e2T0sCaeGrh-k/exec"
+}
 
 
 function supprimer_pp(identifiant_courant, sans_confirmation){
@@ -1475,7 +1478,7 @@ function supprimer_pp(identifiant_courant, sans_confirmation){
 		identifiant_courant = identifiant_courant ? identifiant_courant : recuperer("identifiant_courant")
 
 		//supprimer sur le drive
-		var url = "https://script.google.com/macros/s/AKfycbxv5oFMBxSpxGnpQhv24lRp5AFCMqxW6VXaNdQ3dBeDT7n9A7gpHgFYMkjKvINaA7Yk/exec"
+		var url =  url_pp()
 		url += "?supp_mon_id_pp=true"
 		url += "&nom_etablissement=" + data_etablissement['nom_etablissement']
 		url += "&identifiant=" + identifiant_courant
@@ -1566,7 +1569,7 @@ function changer_pp(identifiant_courant){
 
 function envoyer_pp(identifiant_courant){
 	chargement(true)
-	url = "https://script.google.com/macros/s/AKfycbxv5oFMBxSpxGnpQhv24lRp5AFCMqxW6VXaNdQ3dBeDT7n9A7gpHgFYMkjKvINaA7Yk/exec"
+	url =  url_pp()
 
 	identifiant_courant = identifiant_courant ? identifiant_courant : recuperer("identifiant_courant")
 
