@@ -59,6 +59,24 @@
 
 	<style>
 
+		.un_eleve{
+			/*
+			text-align: center;
+			border-bottom-style: groove;
+			border-width: 1px;
+			overflow-wrap: anywhere;
+			height: 80%;*/
+			text-align: center;
+			overflow-wrap: anywhere;
+			height: 130%;
+			width: 120%;
+			
+		}
+
+		.element_eleve{
+			position: relative;
+		}
+
 		.pp-upload > input {
 		    display: none;
 		}
@@ -75,7 +93,7 @@
 
 		.pp{
 			width: 75px;
-			height: 75px
+			height: 75px;
 		}
 
 		.add-button {
@@ -581,12 +599,22 @@
 			width: 270px;
 		}
 		.liste_des_eleves{
+			/*
 			position: relative;
 			overflow: hidden auto;
 			height: 90%;
 			text-align: center;
 			display: grid;
-			grid-gap: 10px;
+			grid-gap: 10px;*/
+
+		    position: relative;
+		    overflow: hidden auto;
+		    height: 90%;
+		    text-align: center;
+		    display: grid;
+		    grid-gap: 50px;
+			grid-template-columns: repeat(auto-fill, minmax(150px, 150px));
+			grid-template-rows: repeat(auto-fill, minmax(150px, 150px));
 		}
 
 		.toggle{
@@ -594,7 +622,6 @@
 			width: max-content;
 			height: max-content;
 			display: inline-flex;
-
 		}
 
 		.switch {

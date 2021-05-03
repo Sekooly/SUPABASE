@@ -1427,8 +1427,14 @@ function afficher_modif_profil(){
 
 }
 
-function bouton_supprimer_pp(){
-	return '<img id="suppr_pp" onclick="supprimer_pp()" class="editer" src="images/img_trash.png" alt="supprimer">'
+function bouton_supprimer_pp(identifiant_courant){
+	identifiant_courant = identifiant_courant ? identifiant_courant : recuperer("identifiant_courant")
+	return '<img id="suppr_pp" onclick="supprimer_pp(\''+identifiant_courant+'\')" class="editer" src="images/img_trash.png" alt="supprimer">'
+}
+
+function bouton_modifier_pp(identifiant_courant){
+	identifiant_courant = identifiant_courant ? identifiant_courant : recuperer("identifiant_courant")
+	return '<span class="pp-upload"><label for="pp-'+identifiant_courant+'"><img src="https://sekooly.com/assets/images/img_edit.png" alt="modifier" class="editer"></label><input onchange="changer_pp(\''+identifiant_courant+'\')" accept=".png,.jpeg,.jpg,.bmp,.svg,.gif" id="pp-'+identifiant_courant+'" type="file"/> </span>'
 }
 
 function ma_photo(){
@@ -1444,10 +1450,10 @@ function ma_photo(){
 	if(id_pp) id_pp = id_pp['id_fichier']
 
 	//console.log(id_pp)
-	le_lien_pp = id_pp ? lien_pp(id_pp) : "https://sekooly.com/assets/images/default-user.svg"
+	le_lien_pp = lien_pp(id_pp)
 	supprimer_si_pp_existante = id_pp ? bouton_supprimer_pp() : ""
 	chargement(false)
-	return "<img class='pp' id='ma_pp' src=" + le_lien_pp +">" + '<span class="pp-upload"><label for="pp-input"><img src="https://sekooly.com/assets/images/img_edit.png" alt="modifier" class="editer"></label><input onchange="changer_pp()" accept=".png,.jpeg,.jpg,.bmp,.svg,.gif" id="pp-input" type="file"/> </span>' + supprimer_si_pp_existante
+	return "<img class='pp' id='pp_"+recuperer('identifiant_courant')+"' src=" + le_lien_pp +">" + bouton_modifier_pp() + supprimer_si_pp_existante
 
 }
 
@@ -1458,7 +1464,7 @@ var extension_pp = ""
 
 
 
-function supprimer_pp(sans_confirmation){
+function supprimer_pp(identifiant_courant, sans_confirmation){
 
 	if(!sans_confirmation) var confirmation = confirm("Voulez-vous supprimer votre photo de profil ? Cette action est irréversible.")
 
@@ -1466,30 +1472,39 @@ function supprimer_pp(sans_confirmation){
 
 		chargement(true)
 
+		identifiant_courant = identifiant_courant ? identifiant_courant : recuperer("identifiant_courant")
+
 		//supprimer sur le drive
 		var url = "https://script.google.com/macros/s/AKfycbxv5oFMBxSpxGnpQhv24lRp5AFCMqxW6VXaNdQ3dBeDT7n9A7gpHgFYMkjKvINaA7Yk/exec"
 		url += "?supp_mon_id_pp=true"
 		url += "&nom_etablissement=" + data_etablissement['nom_etablissement']
-		url += "&identifiant=" + recuperer("identifiant_courant")
+		url += "&identifiant=" + identifiant_courant
 		url += "&supp_mon_id_pp=true"
 		return get_resultat_asynchrone(url).then(function(e){
 			if(!sans_confirmation) afficher_alerte(e)
 
+			//console.log("on supprime l'ancienne photo de " + identifiant_courant)
 
 			//supprimer dans les fichiers
 			nom_table = "Fichiers"
 
-			var url = racine_data + nom_table + "?proprietaire=eq." + recuperer("identifiant_courant")
+			var url = racine_data + nom_table + "?proprietaire=eq." + identifiant_courant
 			url += "&categorie_fichier=eq.Profil"
 			url += "&" + apikey
 
 			//console.log(url)
 			return delete_resultat_asynchrone(url).then(function(){
+				//console.log("on supprime l'ancienne photo de " + identifiant_courant + " dans la table")
 
 				//changer localement
-				$("#ma_pp")[0].src = "https://sekooly.com/assets/images/default-user.svg";			
+				//console.log("changer localement pour " + identifiant_courant)
+				$("[id='pp_"+identifiant_courant+"']")[0].src = "https://sekooly.com/assets/images/default-user.svg";	
 				$("#suppr_pp").remove()
+				
+				
 				if(!sans_confirmation) chargement(false)
+
+				
 			})
 
 		})
@@ -1504,12 +1519,12 @@ function supprimer_pp(sans_confirmation){
 
 
 
-function changer_pp(){
+function changer_pp(identifiant_courant){
 	var reader = new FileReader()
-
+	identifiant_courant = identifiant_courant ? identifiant_courant : ""
 
 	//on crée le popup d'édition
-	creer_mini_popup("","<div id='nouvelle_pp' style='overflow: hidden;width: 200px;height:300px;'></div>","Valider la photo","envoyer_pp()")
+	creer_mini_popup("","<div id='nouvelle_pp' style='overflow: hidden;width: 200px;height:300px;'></div>","Valider la photo","envoyer_pp('"+identifiant_courant+"')")
 	
 	//on déclare l'endroit où on fera l'édition
 	basic_croppie = $('#nouvelle_pp').croppie({
@@ -1529,6 +1544,7 @@ function changer_pp(){
 
 	//on prépare la lecture de l'image
 	reader.onload = function(results){
+		chargement(false)
 		donnees = reader.result
 		//$("#mini_popup")[0].style.overflow = "auto"
 
@@ -1541,19 +1557,21 @@ function changer_pp(){
 
 
 	//on lit l'image pour redimensionner
-	extension_pp = $("#pp-input")[0].files[0].name.split(".").pop();
-	reader.readAsDataURL($("#pp-input")[0].files[0])
+	extension_pp = $("#pp-" + identifiant_courant)[0].files[0].name.split(".").pop();
+	chargement(true)
+	reader.readAsDataURL($("#pp-" + identifiant_courant)[0].files[0])
+
 
 }
 
-function envoyer_pp(){
+function envoyer_pp(identifiant_courant){
 	chargement(true)
 	url = "https://script.google.com/macros/s/AKfycbxv5oFMBxSpxGnpQhv24lRp5AFCMqxW6VXaNdQ3dBeDT7n9A7gpHgFYMkjKvINaA7Yk/exec"
 
-
+	identifiant_courant = identifiant_courant ? identifiant_courant : recuperer("identifiant_courant")
 
 	//supprimer toute ancienne photo
-	supprimer_pp(true).then(function(){
+	supprimer_pp(identifiant_courant,true).then(function(){
 
 
 		//console.log("on a bien supprimé l'ancienne pp.")
@@ -1569,7 +1587,7 @@ function envoyer_pp(){
 			//envoyer en asynchrone
 			data = {
 				nom_etablissement: data_etablissement['nom_etablissement'],
-				identifiant: recuperer("identifiant_courant"),
+				identifiant: identifiant_courant,
 				API_KEY_UPLOAD : recuperer("API_KEY_UPLOAD"),
 				API_KEY_DEVOIR : recuperer("API_KEY_DEVOIR"),
 				extension : extension_pp,
@@ -1596,13 +1614,13 @@ function envoyer_pp(){
 				mes_donnees = {
 					id_fichier: id_pp,
 					categorie_fichier: "Profil",
-					proprietaire: recuperer("identifiant_courant"),
-					nom_fichier: recuperer("identifiant_courant") + "." + extension_pp,
+					proprietaire: identifiant_courant,
+					nom_fichier: identifiant_courant + "." + extension_pp,
 					date_effet: moment(date_heure_aujourdhui).format("YYYY-MM-DD"),
 					id_dossier: "pp",
 					est_telechargeable: "non",
 					date_publication: date_heure_aujourdhui,
-					taille_fichier: $("#pp-input")[0].files[0].size
+					taille_fichier: $("#pp-" + identifiant_courant)[0].files[0].size
 				}
 
 				var url = racine_data + nom_table + "?" + apikey
@@ -1610,7 +1628,8 @@ function envoyer_pp(){
 				post_resultat_asynchrone(url, mes_donnees).then(function(){
 
 					//changer localement
-					$("#ma_pp")[0].src = resp;
+					console.log("changer localement pour " + identifiant_courant)
+					$("[id='pp_"+identifiant_courant+"']")[0].src  = resp;
 					
 					//ajouter le bouton supprimer photo s'il n'existe pas encore
 					if($("#suppr_pp").length === 0) $("#Photo").append(bouton_supprimer_pp())
@@ -2056,7 +2075,7 @@ function recuperer_eleves(){
 
 	var le_cycle = JSON.parse(recuperer('mes_donnees'))['Cycle']
 
-	nom_table = "Eleves"
+	nom_table = "Trombinoscope" //"Eleves"
 	nom_champ_reference = classe === "Tous" ? "Cycle" : "Classe"
 	valeur_champ_reference = classe === "Tous" ? le_cycle : classe
 	nom_champ_a_chercher = ""
@@ -2230,7 +2249,10 @@ function traitement_la_classe(resultats){
 		var Droit_changer_ecolage = (JSON.parse(recuperer('mes_donnees'))['Droit_changer_ecolage'] === "oui" && recuperer('mon_type').includes('Admin'));
 		if (Droit_changer_ecolage) ecolage_eleve = '<span class="toggle"><label class="switch"><input class="ecolage" id="'+ valeur['Identifiant']+'" type="checkbox"><span class="slider round"></span>	</label></span>';
 
-		var un_eleve = '<div><span style="top: 5px;position: relative;">' + valeur['Nom'] + " " + valeur['Prénom(s)'] + " <b>" + valeur['Classe'] + '</b></span> ' + ecolage_eleve +'</div>';
+		var le_lien_pp = lien_pp(valeur['id_fichier'])
+		var bouton_modif = recuperer('mon_type').includes('Admin') ? bouton_modifier_pp(valeur['Identifiant']) : ""
+		var bouton_suppr = recuperer('mon_type').includes('Admin') && !le_lien_pp.includes("default-user.svg") ? bouton_supprimer_pp(valeur['Identifiant']) : ""
+		var un_eleve = '<div class="un_eleve"><img class="pp" id="pp_'+valeur['Identifiant']+'" src='+ le_lien_pp +'>' + bouton_modif + bouton_suppr +'<div><span class="element_eleve">' + valeur['Nom'] + " " + valeur['Prénom(s)'] + " <b>" + valeur['Classe'] + '</b></span></div>' + ecolage_eleve +'</div>';
 		var un_bloc_eleve = document.createElement('div');
 		un_bloc_eleve.innerHTML = un_eleve;
 
@@ -12036,7 +12058,7 @@ if ('serviceWorker' in navigator) {
 
 /******************** PHOTO DE PROFIL *************************/
 function lien_pp(id_pp){
-	return "https://drive.google.com/uc?export=download&id=" + id_pp
+	return id_pp ? "https://drive.google.com/uc?export=download&id=" + id_pp : "https://sekooly.com/assets/images/default-user.svg"
 }
 
 
