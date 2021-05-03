@@ -13,14 +13,17 @@ var data_etablissement = get_resultat(url)
 if(data_etablissement) data_etablissement = data_etablissement[0]
 
 
+if(data_etablissement){
 
-var racine_data = data_etablissement["racine_data"] 
-//console.log(racine_data)
-var apikey = "apikey=" + data_etablissement["apikey"]
-var contact_etablissement = data_etablissement["contact_etablissement"]
-var nom_fichier_logo =  data_etablissement["nom_fichier_logo"]
-var site_etablissement =  data_etablissement["site_etablissement"]
-//console.log(apikey)
+		
+	var racine_data = data_etablissement["racine_data"] 
+	//console.log(racine_data)
+	var apikey = "apikey=" + data_etablissement["apikey"]
+	var contact_etablissement = data_etablissement["contact_etablissement"]
+	var nom_fichier_logo =  data_etablissement["nom_fichier_logo"]
+	var site_etablissement =  data_etablissement["site_etablissement"]
+	//console.log(apikey)
 
+}
 
 //pour savoir comment fonctionne l'api, faire get_resultat_asynchrone(racine_data+"?"+apikey)
