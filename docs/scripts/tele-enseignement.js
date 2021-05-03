@@ -10400,7 +10400,7 @@ function proceder_a_linitialisation(){
 		//dans 3 secondes, on masque l'alerte
 		setTimeout(function(){
 			msg_alerte.className = "";
-			//window.location.href = window.location.href
+			window.location.href = window.location.href
 		}, 3000);
 
 
