@@ -1557,9 +1557,9 @@ function changer_pp(identifiant_courant){
 
 
 	//on lit l'image pour redimensionner
-	extension_pp = $("#pp-" + identifiant_courant)[0].files[0].name.split(".").pop();
+	extension_pp = $("[id='pp-"+identifiant_courant+"']")[0].files[0].name.split(".").pop();
 	chargement(true)
-	reader.readAsDataURL($("#pp-" + identifiant_courant)[0].files[0])
+	reader.readAsDataURL($("[id='pp-"+identifiant_courant+"']")[0].files[0])
 
 
 }
@@ -1620,7 +1620,7 @@ function envoyer_pp(identifiant_courant){
 					id_dossier: "pp",
 					est_telechargeable: "non",
 					date_publication: date_heure_aujourdhui,
-					taille_fichier: $("#pp-" + identifiant_courant)[0].files[0].size
+					taille_fichier: $("[id='pp-"+identifiant_courant+"']")[0].files[0].size
 				}
 
 				var url = racine_data + nom_table + "?" + apikey
@@ -1628,7 +1628,7 @@ function envoyer_pp(identifiant_courant){
 				post_resultat_asynchrone(url, mes_donnees).then(function(){
 
 					//changer localement
-					console.log("changer localement pour " + identifiant_courant)
+					//console.log("changer localement pour " + identifiant_courant)
 					$("[id='pp_"+identifiant_courant+"']")[0].src  = resp;
 					
 					//ajouter le bouton supprimer photo s'il n'existe pas encore
