@@ -1429,7 +1429,7 @@ function afficher_modif_profil(){
 
 function bouton_supprimer_pp(identifiant_courant){
 	identifiant_courant = identifiant_courant ? identifiant_courant : recuperer("identifiant_courant")
-	return '<img id="suppr_pp" onclick="supprimer_pp(\''+identifiant_courant+'\')" class="editer" src="images/img_trash.png" alt="supprimer">'
+	return '<img id="suppr_pp" onclick="supprimer_pp(\''+identifiant_courant+'\')" class="editer" src="https://sekooly.com/assets/images/img_trash.png" alt="supprimer">'
 }
 
 function bouton_modifier_pp(identifiant_courant){
