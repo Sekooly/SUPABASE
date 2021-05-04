@@ -2055,6 +2055,80 @@ function afficher_devoirs(oui){
 
 
 
+function trier_par_identifiant(a, b){
+  var aName = a.Identifiant.toLowerCase();
+  var bName = b.Identifiant.toLowerCase(); 
+  return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
+}
+
+
+function recuperer_profs(){
+	var mes_classes_matieres = JSON.parse(recuperer("mes_matieres")).map(e => e['Classe_Matiere']).sort()
+	//console.log(mes_classes_matieres)
+	var snapshot = []
+
+	//dans tous les cas: chercher puis traiter
+	url = racine_data + "Trombinoscope_profs" + "?" + apikey
+	get_resultat_asynchrone(url).then(function(resultats){
+		//console.log(url)
+	
+		//console.log(resultats)
+		var copie_resultats = resultats.sort(trier_par_identifiant)
+		
+		//pour les eleves uniquement
+		if(recuperer('mon_type') === "Eleves"){
+
+			//pour chacune de mes classes matieres, je garde si ce prof enseigne cette classe matiere
+			mes_classes_matieres.forEach(function(ma_classe_matiere,index_matiere){
+				//console.log(index_matiere)
+				//console.log(ma_classe_matiere)
+				
+				//on regarder si cette matiere appartient a ce prof
+				le_prof = copie_resultats.filter(e => e['Classe'].includes(ma_classe_matiere))			
+				//console.log(le_prof)
+
+				//on a au moins 1 prof pour cette matiere
+				if(le_prof.length > 0){
+					//pour chaque prof de la matiere
+					le_prof.forEach(function(le_prof_actuel){
+
+						//console.log(le_prof_actuel['Identifiant'])
+
+						//on regarde si ce prof est PAS ENCORE listé
+						a_ajouter = snapshot.filter(e => e['Identifiant'] === le_prof_actuel['Identifiant']).length === 0
+						//console.log(le_prof_actuel['Identifiant'] + ": " +a_ajouter)		
+
+						le_prof_actuel['Classe'] = ma_classe_matiere
+
+						//si pas encore listé -> on ajoute
+						if(a_ajouter) snapshot.push(le_prof_actuel)	
+						//console.log(snapshot.length + '\n\n\n')
+					})
+				} 
+
+			})
+
+		//profs et admin
+		}else{
+			snapshot = copie_resultats
+		}
+
+
+		//console.log(snapshot)
+		//console.log(snapshot.length + '\n\n\n')
+
+		//on configure la fenêtre
+		var titre_fenetre = "Liste de vos professeurs"
+		vider_fenetre(titre_fenetre);
+
+		//afficher le resultat
+		traitement_trombino(snapshot,true)
+		afficher_fenetre(true);
+		
+	})
+
+}
+
 
 
 function recuperer_eleves(){
@@ -2104,7 +2178,7 @@ function recuperer_eleves(){
 
 	rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher).then(snapshot => {
 		
-		traitement_la_classe(snapshot);
+		traitement_trombino(snapshot,false);
 		chargement(false);
 
 	}).catch(error => {
@@ -2231,8 +2305,11 @@ function telecharger(nom_fichier,contenu_fichier){
 
 var nombre_changement_ecolage = 0;
 
-function traitement_la_classe(resultats){
+function traitement_trombino(resultats, sans_ecolage){
 	
+	//console.log(resultats)
+	//console.log(sans_ecolage)
+
 	//au moins 1 élément: on crée ub conteneur de la liste
 	var liste_des_eleves = document.createElement('div');
 	liste_des_eleves.id = "liste_des_eleves";
@@ -2246,18 +2323,23 @@ function traitement_la_classe(resultats){
 		return valeur['Cycle'] === JSON.parse(recuperer('mes_donnees'))['Cycle'];
 	})
 
-	resultats.forEach(function(valeur,index){
+	//console.log(resultats)
 
+
+	resultats.forEach(function(valeur,index){
+		//console.log(index)
 		var ecolage_eleve = "";
 
 		//seuls les admins avec Droit_changer_ecolage peuvent changer l'écolage
 		var Droit_changer_ecolage = (JSON.parse(recuperer('mes_donnees'))['Droit_changer_ecolage'] === "oui" && recuperer('mon_type').includes('Admin'));
-		if (Droit_changer_ecolage) ecolage_eleve = '<span class="toggle"><label class="switch"><input class="ecolage" id="'+ valeur['Identifiant']+'" type="checkbox"><span class="slider round"></span>	</label></span>';
+		if (Droit_changer_ecolage && !sans_ecolage) ecolage_eleve = '<span class="toggle"><label class="switch"><input class="ecolage" id="'+ valeur['Identifiant']+'" type="checkbox"><span class="slider round"></span>	</label></span>';
 
+		
 		var le_lien_pp = lien_pp(valeur['id_fichier'])
 		var bouton_modif = recuperer('mon_type').includes('Admin') ? bouton_modifier_pp(valeur['Identifiant']) : ""
 		var bouton_suppr = recuperer('mon_type').includes('Admin') && !le_lien_pp.includes("default-user.svg") ? bouton_supprimer_pp(valeur['Identifiant']) : ""
-		var un_eleve = '<div class="un_eleve"><img class="pp" id="pp_'+valeur['Identifiant']+'" src='+ le_lien_pp +'>' + bouton_modif + bouton_suppr +'<div><span class="element_eleve">' + valeur['Nom'] + " " + valeur['Prénom(s)'] + " <b>" + valeur['Classe'] + '</b></span></div>' + ecolage_eleve +'</div>';
+		var la_classe_utilisateur = !sans_ecolage ? valeur['Classe'] : valeur['Classe'].split('|')[1].split(')')[0] //cas des profs
+		var un_eleve = '<div class="un_eleve"><img class="pp" id="pp_'+valeur['Identifiant']+'" src='+ le_lien_pp +'>' + bouton_modif + bouton_suppr +'<div><span class="element_eleve">' + valeur['Nom'] + " " + valeur['Prénom(s)'] + " <b>" + la_classe_utilisateur + '</b></span></div>' + ecolage_eleve +'</div>';
 		var un_bloc_eleve = document.createElement('div');
 		un_bloc_eleve.innerHTML = un_eleve;
 
@@ -2265,7 +2347,7 @@ function traitement_la_classe(resultats){
 		while(un_bloc_eleve.firstChild) liste_des_eleves.appendChild(un_bloc_eleve.firstChild);
 
 		//seuls les admins avec Droit_changer_ecolage peuvent changer l'écolage
-		if(Droit_changer_ecolage){
+		if(Droit_changer_ecolage && !sans_ecolage){
 			var check_ecolage = valeur['Ecolage_OK'] === "oui";
 			element_DOM(valeur['Identifiant']).checked = check_ecolage;
 		}
@@ -2273,29 +2355,32 @@ function traitement_la_classe(resultats){
 	});
 
 
-	//quand le toggle est mis à jour: on change l'écolage
-	$('.ecolage').on("change",function(e){
+	if(!sans_ecolage){
 
-		nombre_changement_ecolage = nombre_changement_ecolage+1;
+		//quand le toggle est mis à jour: on change l'écolage
+		$('.ecolage').on("change",function(e){
 
-		chargement(true);
+			nombre_changement_ecolage = nombre_changement_ecolage+1;
 
-		//envoyer la nouvelle valeur dans la bdd
-		var valeur_ecolage_ok = e.target.checked ? "oui" : "non"
-		var maj_ecolage_ok = {
-			'Ecolage_OK': valeur_ecolage_ok
-		}
+			chargement(true);
 
-		var nom_table = "Eleves"
-		var nom_champ_reference = "Identifiant"
-		var valeur_champ_reference = e.target.id
-		actualiser(nom_table, nom_champ_reference, valeur_champ_reference, maj_ecolage_ok)
+			//envoyer la nouvelle valeur dans la bdd
+			var valeur_ecolage_ok = e.target.checked ? "oui" : "non"
+			var maj_ecolage_ok = {
+				'Ecolage_OK': valeur_ecolage_ok
+			}
+
+			var nom_table = "Eleves"
+			var nom_champ_reference = "Identifiant"
+			var valeur_champ_reference = e.target.id
+			actualiser(nom_table, nom_champ_reference, valeur_champ_reference, maj_ecolage_ok)
 
 
-		chargement(false);
+			chargement(false);
 
-	});
+		});
 
+	}
 
 	//on ajoute la taille de la classe entre parenthèses
 	element_DOM('titre_fenetre').innerHTML += ' (' + resultats.length + ')';

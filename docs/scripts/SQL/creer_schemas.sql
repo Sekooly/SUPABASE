@@ -1619,6 +1619,30 @@ ORDER BY "Eleves"."Cycle", "Eleves"."Classe", "Eleves"."Identifiant"
 
 
 
+CREATE OR REPLACE VIEW public."Trombinoscope_profs"
+AS
+SELECT * FROM "Profs" left join (select * from "Fichiers" where categorie_fichier = 'Profil') as intermediaire on "Profs"."Identifiant" = intermediaire.proprietaire
+ORDER BY "Profs"."Cycle", "Profs"."Classe", "Profs"."Identifiant"
+
+
+
+
+
+
+
+
+
+
+CREATE OR REPLACE VIEW public."Trombinoscope_admin"
+AS
+SELECT * FROM "Administration" left join (select * from "Fichiers" where categorie_fichier = 'Profil') as intermediaire on "Administration"."Identifiant" = intermediaire.proprietaire
+ORDER BY "Administration"."Cycle", "Administration"."Classe", "Administration"."Identifiant"
+
+
+
+
+
+
 
 
 
