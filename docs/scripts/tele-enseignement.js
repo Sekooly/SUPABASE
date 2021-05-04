@@ -2727,7 +2727,12 @@ function ajouter_les_dossiers_dynamiques(){
 		
 		//on recupere les classes une seule fois, avec leur ID
 		var les_classes = valeursUniquesDeCetteKey(mes_matieres, 'Classe').sort();
-		var lien_classes = valeursUniquesDeCetteKey(mes_matieres, 'classe_id') ;
+		var lien_classes = []
+		les_classes.forEach(function(la_classe){
+			lien_classes.push(mes_matieres.find(e => e['Classe'] === la_classe )['classe_id'] )
+		})
+
+		//valeursUniquesDeCetteKey(mes_matieres, 'classe_id') ;
 
 
 		//les_classes.sort()
