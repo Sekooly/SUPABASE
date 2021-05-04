@@ -2949,7 +2949,7 @@ function ajouter_date_filtre(id_date,valeur_date,valeur_aujd){
 
 function charger_dossier(id_dossier,final_booleen,titre){
 
-
+	$("#barre_verticale")[0].style.display = "grid"
 
 	//le dossier est déjà chargé
 	if (id_dossier !== "" && id_dossier !== null) {
@@ -4626,6 +4626,8 @@ function decharger_dossier_final(){
 	chargement(true);
 
 	//console.log("on décharge...");
+
+	$("#barre_verticale")[0].style.display = ""
 
 	//on enlève tout
 	element_DOM('liste_matieres').innerHTML = "";
