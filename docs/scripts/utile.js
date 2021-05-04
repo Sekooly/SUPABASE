@@ -25,6 +25,9 @@ function mettre_le_contact_etablissement(){
 }
 
 
+function ordonner_JSON(ma_liste,nom_propriete){
+  return ma_liste.sort((a, b) => (a[nom_propriete] > b[nom_propriete]) ? 1 : -1)
+}
 
 
 window.onbeforeunload = function() {

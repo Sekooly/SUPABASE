@@ -2422,11 +2422,8 @@ function initialisation(){
 
 	//tout est ok
 	}else{
-		afficher_discussions(false);
 		configurer_profil();
-		mon_role = init_mon_role();
-
-		if (recuperer('dossier_chargé') !== "" && recuperer('dossier_chargé') !== null) afficher_discussions(true);
+		mon_role = init_mon_role();		
 		
 		return chargement_a_larrivee();
 		
@@ -2600,6 +2597,7 @@ function chargement_a_larrivee(){
 		afficher_ajout(false);
 		//TODO
 		//afficher_devoirs(recuperer('mon_type')==="Eleves"); 
+		afficher_discussions(false);
 		afficher_devoirs(false);
 		afficher_tri_fichiers(false);
 		afficher_visio(false);
@@ -2715,22 +2713,21 @@ function valeursUniquesDeCetteKey(array, key){
 }
 
 
+
 function ajouter_les_dossiers_dynamiques(){
 //charger dynamiquement les dossiers avec l'ID = ID DOSSIER SUR DRIVE
 
 	afficher_le_drive(false);
 
 	var mes_matieres = JSON.parse(recuperer('mes_matieres'));	
-			
-	
-	
+
 	//admin: dossiers de toutes les classes PUIS toutes les matières de la classe
 	if (recuperer('mon_type') ==="Administration" ){
 
 		
 		//on recupere les classes une seule fois, avec leur ID
-		var les_classes = valeursUniquesDeCetteKey(mes_matieres, 'Classe');
-		var lien_classes = valeursUniquesDeCetteKey(mes_matieres, 'classe_id');
+		var les_classes = valeursUniquesDeCetteKey(mes_matieres, 'Classe').sort();
+		var lien_classes = valeursUniquesDeCetteKey(mes_matieres, 'classe_id') ;
 
 
 		//les_classes.sort()
@@ -2982,7 +2979,7 @@ function charger_dossier(id_dossier,final_booleen,titre){
 
 		//afficher les devoirs
 		afficher_devoirs(true);
-
+		afficher_discussions(true);
 
 		//afficher le tri par date
 		afficher_tri_fichiers(true);
@@ -4652,6 +4649,7 @@ function decharger_dossier_final(){
 
 	//masquer les devoirs (pour les élèves, lister tous les devoirs)
 	afficher_devoirs(false);
+	afficher_discussions(false);
 
 	//masquer le conseil de classe
 	//afficher_conseil_de_classe(false);
