@@ -8024,7 +8024,7 @@ function recuperer_parametres(){
 	var conteneur_menu_html = '<div id="conteneur_menu"><div id="menu_haut" class="menu_haut"> ' + contenu_menu_haut+ '</div><div id="menu_params" class="menu_params"><div id="conteneur_filtre"><span id="label_filtre_parametre"></span><select id="filtre_parametre" class="filtre_parametre"></select></div><div id="menu_details"></div>'+nombre_elements+'</div></div>'
 
 
-	$("#conteneur_menu_html").remove();
+	
 	$("#fenetre").append(conteneur_menu_html);
 
 
@@ -8314,10 +8314,13 @@ function actualiser_details_parametre(id_parametre){
 		
 		
 		$("#menu_details").append(info_etablissement_html)
+		
 
 
 	//LISTE JSON
 	}else{
+
+		
 
 		//on cherche TOUT dans la table id_parametre
 		//Classes: 
@@ -8459,7 +8462,7 @@ function actualiser_filtre_onglet(id_parametre){
 	//maintenance: filtre = etablissement
 	//alerte:  filtre = etablissement
 	//un seul établissement
-	if(id_parametre === "Cycles" || id_parametre === "Maintenance" || id_parametre === "Alerte" || id_parametre === "Logs"  || id_parametre === "Espace etablissement restant"){
+	if(id_parametre === "Cycles" || id_parametre === "Maintenance" || id_parametre === "Alerte" || id_parametre === "Logs"  || id_parametre === "Espace etablissement restant" || id_parametre === "Infos établissement"){
 
 		etiquette_filtre = "Etablissement"
 		filtre_liste = [nom_etablissement];
