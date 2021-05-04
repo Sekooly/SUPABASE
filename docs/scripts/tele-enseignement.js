@@ -1,4 +1,4 @@
-var elements_menu_haut = ["Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Alerte", "Logs", "Visio", "Notifs", "Fichiers", "Rendus", "Topic", "Coms","Espace etablissement restant","Analyses des connexions"]
+var elements_menu_haut = ["Infos établissement","Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Alerte", "Logs", "Visio", "Notifs", "Fichiers", "Rendus", "Topic", "Coms","Espace etablissement restant","Analyses des connexions"]
 var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL_Mapping","URL_agenda",
 								"id_googlecalendar","nb_avis_donnés", "nb_avis_max","nom_fiche","taux_conseil",
 								"Matiere_bis", "classe_id", "classe_bis", "type", "Derniere_consultation_notifs",
@@ -8238,6 +8238,10 @@ function mettre_en_forme_onglet_clicked(id_onglet){
 
 }
 
+function information_etablissement(id_info, etiquette_info, valeur_info){
+
+
+}
 
 function actualiser_details_parametre(id_parametre){
 	$("#menu_details")[0].innerHTML = "";
@@ -8247,19 +8251,12 @@ function actualiser_details_parametre(id_parametre){
 		mettre_details_maintenance()
 		$("#nombre_elements_param")[0].innerText = 1
 
-	/*
-	//liste ARRAY (nombre de cycles)
-	}else if (id_parametre === "Cycles"){
-		mettre_details_cycle()
-		$("#nombre_elements_param")[0].innerText = 0
-	*/
 
+	//si infos établissements
+	}else if(id_parametre === "Infos établissement"){
 
+		$("#menu_details").append(JSON.stringify(data_etablissement))
 
-	//si octets pris
-	}else if(id_parametre === "OCTETS_PRIS"){
-
-		//<progress max="50000000000" value=""></progress>
 
 	//LISTE JSON
 	}else{
@@ -8727,10 +8724,13 @@ function rendre_td_modifiable(){
 function fonction_td_modifiable(e, sans_suite){
 
 	//si double clic sur un champ contenant ";" -> on fait une liste des Cycles (admin) OU Matieres (profs) en check box
+	//si parmi les parametres auto -> interdire
 	//sinon: saisie libre
 	
 	var ancienne_valeur = e.target.innerText;
 	var id_parametre = $(".un_menu_orange")[0].id 
+	var liste_index_params_auto = ',' + parametres_automatiques.map(e => $('[id="'+e+'"].header_table.entete_sticky:visible')).filter(e => e.length > 0).map(e => e[0].cellIndex).join(',') +','
+	//console.log(liste_index_params_auto)
 
 	var est_classe = $("#Classe")[0] ? e.target.cellIndex === $("#Classe")[0].cellIndex : false
 	var est_classe_principale = $("#Classe_principale")[0] ? e.target.cellIndex === $("#Classe_principale")[0].cellIndex : false
@@ -8765,6 +8765,10 @@ function fonction_td_modifiable(e, sans_suite){
 
 
 		
+	}else if(liste_index_params_auto.includes(','+ e.target.cellIndex +',')){
+		alert("Impossible de modifier ce paramètre car c'est une valeur automatiquement attribuée par Sekooly.")
+		return false
+
 	}else{
 		var nouvelle_valeur = prompt("Indiquez la nouvelle valeur",ancienne_valeur);
 		suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur)
