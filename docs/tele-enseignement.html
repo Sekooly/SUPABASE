@@ -59,6 +59,28 @@
 
 	<style>
 
+		img{
+			cursor: pointer;
+		}
+
+		.droite{
+			display: block;
+			margin-left: auto;
+			margin-right: 0;
+			
+		}
+
+		.dropdown:hover{
+			filter: invert();
+		}
+
+		.dropdown{
+			filter: invert();
+			width: 20px;
+			height: 20px;
+			top: 10px;
+		}
+
 		.un_eleve{
 			/*
 			text-align: center;
@@ -363,7 +385,7 @@
 		}
 
 
-		.sidebar.left {
+		.sidebar {
 		    position: fixed;
 		    top: 0;
 		    left: 0;
@@ -373,14 +395,15 @@
 		    color: white;
 		    z-index: 4;
 		    margin-top: 5%;
-		    max-width: 35%;
+		    max-width: 38%;
 		    opacity: 90%;
 		    overflow: auto;
-		    margin-top: 5.2vh;
+		    /*margin-top: 5.2vh;*/
+		    margin-top: 4.8vh;
 		    display: none;
 		}
 
-		.sidebar.left > div{
+		.sidebar > div{
 			font-size: 25px;
 			font-family: Arial;
 			text-align: center;
@@ -388,7 +411,7 @@
 		    cursor: pointer;
 		}
 
-		.sidebar.left > div:hover{
+		.sidebar > div:hover{
 			font-weight: bold;
 		}
 
@@ -723,7 +746,7 @@
 		  }
 		    
 
-		  .sidebar.left > div{
+		  .sidebar > div{
 		    font-size: 150%;
 		  }
 
@@ -739,7 +762,7 @@
 		    max-width: 50%;
 		  }
 		    
-  		  .sidebar.left > div{
+  		  .sidebar > div{
 	        font-size: 15px;
 		  }
 
@@ -751,7 +774,7 @@
 
 
 		/*Deconnexion*/
-		.bye{
+		.haut_droite{
 			position: relative;
 			float: right;
 			padding-right: 1%;
@@ -1023,6 +1046,13 @@
 			width: 35px;
 			display: block;
 			z-index: 1;
+			filter: invert();
+		}
+
+
+		.icone_navbar:hover{
+			filter: invert();
+
 		}
 
 		.bulle{
@@ -1639,25 +1669,31 @@
 
 	<button class="add-button">Ajouter Sekooly à l'accueil</button>	
 	<div class="navbar" id="mynavbar">
+		<img class="haut_droite dropdown" onclick="switch_side_bar_top()" position="50px" alt="PLUS..." src="images/img_down.png" width="35" height="35">
+
+		<!--
 		<span onclick="deconnexion()">
-			<img class="bye" position="50px" src="images/img_deconnexion.png" width = "35" height = "35" alt="DECONNEXION" >
-		</span>	
+			<img class="haut_droite" position="50px" src="images/img_deconnexion.png" width = "35" height = "35" alt="DECONNEXION" >
+		</span>	-->
 
 
 		
 		<span>
-			<img id="recup_notifs" position="50px" alt="NOTIF" class="icone_navbar" onclick="switch_pannel_notifs()" src="images/img_notif.png">
+			<img id="recup_notifs" position="50px" alt="NOTIF" class="icone_navbar" onclick="switch_pannel_notifs()" src="images/img_cloche.svg">
 		</span>
 		<div id="bulle_notif" class="bulle_notif" onclick="switch_pannel_notifs()"></div>
 
-
+		<!--
 		<span>
 			<img id="recup_edt" position="50px" alt="EDT" class="icone_navbar" onclick="recuperer_edt()" src="images/img_edt.png">
 		</span>		
+		-->
 
+		<!--
 		<span>
 			<img id="recup_params" position="50px" alt="EDT" class="icone_navbar" style="display: none;width: 37px;" id="params" onclick="recuperer_parametres()" src="images/img_parametres.png">
 		</span>
+		-->
 
 		<span class="retourner_en_arriere" id="logo" onclick="switch_side_bar()"><img alt="SEKOOLY" src="images/img_side_bar.png" width="25" height="35"></span>
 		
@@ -1671,6 +1707,7 @@
 
 
 	</div>
+
 
 
 
@@ -1688,6 +1725,15 @@
 		<div><a style="color:white;" href="https://sekooly.com" target="_blank">Site de Sekooly</a></div>
 	</div>
 
+
+	<div onclick="fermer_side_bar()" style="right:0;position: fixed;z-index: 4;" >
+		<div class="droite sidebar top"  style="height: min-content;float: right;position: relative;width: 550px;">
+			<div id="recup_eleves" onclick="recuperer_eleves()" >Liste des élèves</div>
+			<div id="recup_params" onclick="recuperer_parametres()" >Paramètres</div>
+			<div onclick="deconnexion()">Se déconnecter</div>		
+		</div>
+		
+	</div>
 		
 		
 	<span id="span_date_effet" class="span_date_effet">
@@ -1784,10 +1830,12 @@
 		-->
 
 
+		<!--
 		<li>
 			<span class="indication">Liste des élèves</span>
 			<img alt="Liste des élèves" class="bulle" id="recup_eleves" alt="presence" src="images/img_presence.png" onclick="recuperer_eleves()" onmouseover="afficher_mon_indication(this)" onmouseout="masquer_mon_indication(this)">
 		</li>
+		-->
 
 		<li>
 	    		

@@ -2,7 +2,9 @@ var elements_menu_haut = ["Cycles", "Classes", "Matieres", "Eleves","Profs", "Ad
 var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL_Mapping","URL_agenda",
 								"id_googlecalendar","nb_avis_donnés", "nb_avis_max","nom_fiche","taux_conseil",
 								"Matiere_bis", "classe_id", "classe_bis", "type", "Derniere_consultation_notifs",
-								"id_formulaire_remediation", "id_fiche", "URL_Mapping","niveau", "commun_au_cycle"
+								"id_formulaire_remediation", "id_fiche", "URL_Mapping","niveau",
+								"classe_bis", "id_dossier_cycle", "dossier_rendus_cycle", "liste_notifs_lues",
+								"id", "Id_classe_matiere", "id_notif", "Id_source", "id_fichier", "id_dossier", "id_devoir", "id_dossier_sujetdevoir", "id_fichier_sujetdevoir", "Id_topic", "id_com", "ID_FICHIER"
 								]
 
 var elements_menu_haut_avec_modifs = ["Classes","Matieres","Eleves","Profs","Administration"]
@@ -11,7 +13,7 @@ nom_etablissement = data_etablissement['nom_etablissement']
 
 
 var champs_avec_listes_dynamiques = ['Classe','classe_bis','Classe_principale','Cycle','cycle','Matiere','Matiere_bis']
-var champs_oui_ou_non = ['Est_délégué','code_hash','Reponse_sondage','Ecolage_OK','Droits_modifs', 'Droit_acces_anticipe_examen','Droit_changer_ecolage','commun_au_cycle','droit_hors_maintenance']
+var champs_oui_ou_non = ['Est_délégué','code_hash','Reponse_sondage','Ecolage_OK','Droits_modifs', 'Droit_acces_anticipe_examen','Droit_changer_ecolage','commun_au_cycle','droit_hors_maintenance','Est_délégué']
 var liste_couleurs = ['blanc','bleu ciel', 'bleu foncé', 'gris','jaune','marron','noir','orange','rose','rouge','vert clair','vert foncé', 'violet']
 
 
@@ -2474,8 +2476,8 @@ function afficher_edt(oui){
 }
 
 function afficher_liste_eleves(oui){
-	if (oui) element_DOM('recup_eleves').style.visibility ="visible";
-	if (!oui) element_DOM('recup_eleves').style.visibility ="hidden";
+	if (oui) element_DOM('recup_eleves').style.display ="";
+	if (!oui) element_DOM('recup_eleves').style.display ="none";
 }
 
 
@@ -2566,7 +2568,7 @@ function chargement_a_larrivee(){
 
 	//affichage si dossier chargé OU admin_bis OU eleves
 	var affichage_icone_edt = (recuperer('dossier_chargé')) || (recuperer('mon_type') === "Eleves");
-	afficher_edt(affichage_icone_edt);
+	//afficher_edt(affichage_icone_edt);
 
 
 	//affichage de la liste SSI admin OU (prof + dossier chargé)
@@ -2870,7 +2872,7 @@ function ajouter_listener_dossier_non_final(id){
 		avec_bouton_back(true);
 
 		//afficher l'EDT
-		afficher_edt(true);
+		//afficher_edt(true);
 
 		//afficher la visio
 		//afficher_visio(true);
@@ -2992,7 +2994,7 @@ function charger_dossier(id_dossier,final_booleen,titre){
 		//afficher_conseil_de_classe(true);
 
 		//afficher l'EDT
-		afficher_edt(true);
+		//afficher_edt(true);
 			
 		//ajouter le bouton ajout et LISTE pour profs 
 		if (recuperer('mon_type')=== 'Profs'){
@@ -4551,19 +4553,20 @@ window.addEventListener("resize", function(){
 function afficher_discussions(oui){
 	
 	if(oui){
-		element_DOM('afficher').style.visibility ="visible";
+		element_DOM('afficher').style.display ="";
 	}else{
-		element_DOM('afficher').style.visibility ="hidden";
+		element_DOM('afficher').style.display ="none";
 	}
 }
 
 
 function afficher_ajout(oui){
 	if (!oui) {
-		element_DOM('img_ajout').style.visibility = 'hidden';
+		element_DOM('img_ajout').style.display ="none";
 
 	}else{
-		element_DOM('img_ajout').style.visibility = 'visible';
+		element_DOM('img_ajout').style.display ="";
+	
 	}
 }
 
@@ -4669,7 +4672,7 @@ function decharger_dossier_final(){
 
 	//masquer l'emploi du temps SI ET SEULEMENT SI NON ELEVE
 	//console.log("non eleve donc on masque");
-	afficher_edt(recuperer('mon_type')==="Eleves");
+	//afficher_edt(recuperer('mon_type')==="Eleves");
 
 
 	//masquer la liste d'élèves si on n'est pas admin
@@ -4711,10 +4714,11 @@ function decharger_dossier_final(){
 function afficher_le_drive(oui){
 
 	if (oui){
-		element_DOM('gros_conteneur').style.visibility = "visible";
+		element_DOM('gros_conteneur').style.display ="";
+	
 		
 	}else{
-		element_DOM('gros_conteneur').style.visibility = "hidden";
+		element_DOM('gros_conteneur').style.display ="";
 		//console.log("c'est masqué");
 	}
 
@@ -5896,9 +5900,9 @@ $(function charger_fichiers(e){
 			//console.log("on va envoyer via " + mon_role);
 			
 
-			var mon_action = "https://docs.google.com/forms/d/e/1FAIpQLSdJSsvIrh2f4cQ6t7KjHfvqFnU59urE1uHYdadhqYTTuEjobw/formResponse?usp=pp_url&entry.926690826="+ mon_titre +"&entry.75640320=" + mon_contenu +"&entry.513447430="+ mon_identifiant + "&entry.985226520="+ mon_id_classe_matiere + "&entry.746299129="+ mon_role+"&submit=Submit";
+			//var mon_action = "https://docs.google.com/forms/d/e/1FAIpQLSdJSsvIrh2f4cQ6t7KjHfvqFnU59urE1uHYdadhqYTTuEjobw/formResponse?usp=pp_url&entry.926690826="+ mon_titre +"&entry.75640320=" + mon_contenu +"&entry.513447430="+ mon_identifiant + "&entry.985226520="+ mon_id_classe_matiere + "&entry.746299129="+ mon_role+"&submit=Submit";
 
-        	var url = mon_action;
+        	//var url = mon_action;
 
         	//console.log("l'action: " + url);
         	//console.log("taille actuellement : " + url.length);
@@ -5963,10 +5967,10 @@ $(function charger_fichiers(e){
 
 
 
-				//actualiser au bout de 3 secondes
+				//actualiser au bout de 1.5 secondes
 				setTimeout(function(){
 					actualiser_topics();
-				},3000);
+				},1500);
 
 
 
@@ -8103,6 +8107,7 @@ function un_menu_clic(id_parametre){
 	    actualiser_filtre_onglet(id_parametre);
 	    actualiser_details_parametre(id_parametre);
 		mettre_etat_espace(id_parametre)
+		
 	    
 	    //pas de modifs à faire
 	    if($("#boutons_params")){
@@ -8134,6 +8139,7 @@ function un_menu_clic(id_parametre){
 				autoriser_tout_voir(true)
 			}
 		}
+	    
 	    
 		
 	}
@@ -8175,8 +8181,18 @@ function affichage_par_defaut(id_parametre){
 
 	}
 
+
 	//console.log("\n")
 
+}
+
+function masquer_params_auto(){	
+	//masquer par défaut toutes les colonnes automatiques
+	parametres_automatiques.forEach(function(e){
+		mon_element = $(".header_table.entete_sticky[id='"+e+"']")
+		//console.log(mon_element)
+		if(mon_element.length > 0)	masquer_colonne(e)
+	})
 }
 
 function autoriser_les_modifs(oui){
@@ -8262,6 +8278,7 @@ function actualiser_details_parametre(id_parametre){
 			traiter_liste_JSON(id_parametre,liste_JSON, identifiant_table)
 			$("#nombre_elements_param")[0].innerText = liste_JSON.length
 			affichage_par_defaut(id_parametre);
+			masquer_params_auto()
 				
 		}else{
 			rechercher_tout(id_parametre).then(function(snapshot){
@@ -8272,6 +8289,7 @@ function actualiser_details_parametre(id_parametre){
 				traiter_liste_JSON(id_parametre,liste_JSON, identifiant_table)
 				$("#nombre_elements_param")[0].innerText = liste_JSON.length
 				affichage_par_defaut(id_parametre);
+				masquer_params_auto()
 
 			});
 		}
@@ -9388,8 +9406,9 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 			donnee_dupliquee = avec_duplicata  ? ($(".selected") ? ' value="'+$(".selected")[0].children[i].innerText+'" ' : '' ) : 
 								une_donnee ? ' value="' + (une_donnee[liste_champs[i]] ? une_donnee[liste_champs[i]] : "") + '" ' : ""
 
+			//si c'est disabled alors on masque cet élément carrément
 
-			html_du_input = '<input class="donnee" '+donnee_dupliquee+' id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" '+disabled+'>'
+			html_du_input = '<input class="donnee" '+donnee_dupliquee+' id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" '+disabled +'>'
 			
 
 			//SI SANS DUPLICATION
@@ -9460,8 +9479,8 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 			
 
 			//console.log(html_du_input)
-
-			liste_champs_html = liste_champs_html + '<div class="une_donnee_saisie" id="'+liste_champs[i]+'"><label>'+liste_champs[i]+'</label>'+html_du_input+'</div>'
+			var display_element = " style='display:"+(disabled ? "none" : "")+"';"			
+			liste_champs_html = liste_champs_html + '<div class="une_donnee_saisie" '+display_element+' id="'+liste_champs[i]+'"><label>'+liste_champs[i]+'</label>'+html_du_input+'</div>'
 		}
 	}
 
@@ -10587,16 +10606,39 @@ function switch_side_bar(){
 	}
 }
 
+
+function switch_side_bar_top(){
+	ouvert = $(".sidebar.top")[0].isOpen
+	if(ouvert){
+		fermer_side_bar()
+	}else{
+		ouvrir_side_bar_top()
+	}
+}
+
 function ouvrir_side_bar(){
 	$(".sidebar.left")[0].style.display = "block"
 	$(".sidebar.left")[0].isOpen = true;
-	$('.sidebar.left').sidebar().trigger('sidebar:open');
+	$('.sidebar.left').sidebar({side: "left"}).trigger('sidebar:open');
+}
+
+function ouvrir_side_bar_top(){
+	$(".sidebar.top")[0].style.display = "block"
+	$(".sidebar.top")[0].isOpen = true;
+	$('.sidebar.top').sidebar({side: "top"}).trigger('sidebar:open');
+
 }
 
 function fermer_side_bar(){
+	/*gauche*/
 	$(".sidebar.left")[0].style.display = "none"
 	$(".sidebar.left")[0].isOpen = false;
-	$('.sidebar.left').sidebar().trigger('sidebar:close');
+	$('.sidebar.left').sidebar({side: "left"}).trigger('sidebar:close');
+
+	/*droite*/	
+	$(".sidebar.top")[0].style.display = "none"
+	$(".sidebar.top")[0].isOpen = false;
+	$('.sidebar.top').sidebar({side: "top"}).trigger('sidebar:close');
 }
 
 
