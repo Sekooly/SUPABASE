@@ -8238,9 +8238,59 @@ function mettre_en_forme_onglet_clicked(id_onglet){
 
 }
 
-function information_etablissement(id_info, etiquette_info, valeur_info){
+function information_etablissement(id_info, etiquette_info, valeur_info, est_modifiable){
+	sur_double_clic = est_modifiable ? bouton_editer("modifier_info(this)") : ""
+	return '<div class="un_detail"><b style="color:#FF6C00">'+etiquette_info+': </b><br><span id="' + id_info +'">'+valeur_info+sur_double_clic+'</span></div>';
+}
+
+function bouton_editer(nom_fonction_clic){
+	return '<img onclick="'+nom_fonction_clic+'" src="https://sekooly.com/assets/images/img_edit.png" alt="modifier" class="editer">'
+}
+
+function modifier_info(ceci){
 
 
+
+	id_info = ceci.parentNode.id
+	etiquette_info = element_DOM(id_info).previousSibling.previousSibling.innerText.replaceAll(':','')
+	//console.log("on va modifier " + id_info)
+
+	var ancienne_valeur = $("[id='"+id_info+"']")[0].innerText
+	var nouvelle_valeur = prompt("Indiquez la nouvelle valeur de '"+etiquette_info+"':", ancienne_valeur)
+
+	if(nouvelle_valeur) nouvelle_valeur = nouvelle_valeur.trim()
+
+	if(nouvelle_valeur && nouvelle_valeur !== ancienne_valeur){
+		//console.log("on va modifier " + etiquette_info + " avec " + nouvelle_valeur)
+		chargement(true)
+
+		//envoyer la modif
+		url = racine_initiale + "Etablissements" + "?"+"id"+"=eq."+data_etablissement['id']+ "&"+api_initial
+		nouveau_data = {
+			[id_info]: nouvelle_valeur
+		}
+		patch_resultat_asynchrone(url,nouveau_data).then(function(){
+
+
+			//récupérer le nouveau data_etablissement
+			get_resultat_asynchrone(url).then(function(resultats){
+
+				data_etablissement = resultats[0]
+				//console.log(data_etablissement)
+
+				//actualiser Infos établissement
+				un_menu_clic("Infos établissement")
+
+				chargement(false)
+
+			})
+		})
+
+
+	}else{
+
+		afficher_alerte("Modification annulée.")
+	}
 }
 
 function actualiser_details_parametre(id_parametre){
@@ -8255,7 +8305,15 @@ function actualiser_details_parametre(id_parametre){
 	//si infos établissements
 	}else if(id_parametre === "Infos établissement"){
 
-		$("#menu_details").append(JSON.stringify(data_etablissement))
+		liste_id_infos_etablissement = ["nom_etablissement:Nom de l'établissement:false", "date_premier_abonnement:Date d'abonnement:false" , "duree_contrat_en_mois:Durée du contrat (en mois):false", "adresse_etablissement:Adresse:true", "contact_etablissement:Contact de l'Administration:true", "contact_economat:Contact de l'Economat:true", "mots_interdits:Liste des mots interdits (séparés par une virgule):true" ]
+		var info_etablissement_html = ""
+
+		liste_id_infos_etablissement.forEach(function(info){
+			info_etablissement_html += information_etablissement(info.split(':')[0], info.split(':')[1], data_etablissement[info.split(':')[0]], eval(info.split(':')[2]))	
+		})
+		
+		
+		$("#menu_details").append(info_etablissement_html)
 
 
 	//LISTE JSON
