@@ -2405,6 +2405,8 @@ divContainer.appendChild(table);
 
 function initialisation(){
 	chargement(true);
+	
+	mettre_mon_mode()
 	document.title = "Sekooly | " + nom_etablissement.toUpperCase();
 
 	effacer("date_heure_depassement")
@@ -2520,7 +2522,6 @@ function chargement_a_larrivee(){
 	fermer_side_bar()
 	mettre_le_contact_etablissement()
 	rendre_td_modifiable();
-	mettre_mon_mode()
 	mettre_les_soons()
 	ajouter_multi_visio_si_non_eleve()
 
