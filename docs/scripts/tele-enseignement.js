@@ -8699,7 +8699,7 @@ function mettre_la_somme(valeur_recherchee){
 	valeur_max = 50e9
 	pourcentage = 100*(la_somme/valeur_max).toFixed(4)
 	precisions = valeur_recherchee ?valeur_recherchee : "total"
-	resultat='<div id="stockage" class="stockage"><i style="margin-left: 50px;"><label>Stockage utilisé '+(precisions)+':<progress style="width: 60px;" value="'+la_somme+'" max="'+valeur_max+'"></progress> '+pourcentage+'% ('+(la_somme/1E9).toFixed(2)+'/50 Go)</i></span></div>'
+	resultat='<div id="stockage" class="stockage"><i style="margin-left: 50px;"><label>Stockage utilisé '+(precisions)+':<progress style="width: 60px;" value="'+la_somme+'" max="'+valeur_max+'"></progress> '+pourcentage.toFixed(2)+'% ('+(la_somme/1E9).toFixed(2)+'/50 Go)</i></span></div>'
 
 
 	$("#conteneur_filtre").append(resultat)
@@ -9445,6 +9445,8 @@ function importer_parametres(){
   				chargement(true)
   				
   				for (var i = 0; i< json_final.length; i++) {
+  					/*Afficher la barre de progression ici...*/
+  					afficher_alerte("Progression de l'import: " + Number(100*i/json_final.length).toFixed(2) + "% ("+i+"/"+json_final.length+")")
   					try{
   						//ajouter_un_element(id_parametre, json_final[i])
   						//console.log(json_final[i])
@@ -9455,8 +9457,9 @@ function importer_parametres(){
   						console.error(error)
   						alert(error)
   					}
-  				}	
+  				}
 
+  				afficher_alerte("Import terminé.")
   				/*
 				setTimeout(function(){
 					actualiser_parametre()
@@ -9570,14 +9573,18 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 			//SI SANS DUPLICATION
 			if(!une_donnee){
 
+				//console.log(liste_champs[i] + ": " + donnee_dupliquee)
+
 
 				//si c'est Couleur_matiere
 				if(liste_champs[i] === "Couleur_matiere"){
 
 					html_du_input = '<select class="donnee" id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" >'
-					
+
 					for (j = 0; j<liste_couleurs.length ; j ++){
-						html_du_input = html_du_input + '<option value ="'+liste_couleurs[j]+'">'+liste_couleurs[j]+'</option>'
+						selectionner_la_donnee_dupliquee = ""
+						if($(".selected")[0]) selectionner_la_donnee_dupliquee = liste_couleurs[j] === $(".selected")[0].children[i].innerText ? " selected " : ""
+						html_du_input = html_du_input + '<option '+selectionner_la_donnee_dupliquee+' value ="'+liste_couleurs[j]+'">'+liste_couleurs[j]+'</option>'
 					}
 
 					html_du_input = html_du_input + '</select>'
@@ -9617,7 +9624,9 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 						html_du_input = '<select class="donnee" id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" '+multiple_choix_classes+'>'
 					
 						for (j = 0; j<valeurs_possibles.length ; j ++){
-							html_du_input =  html_du_input + '<option value ="'+valeurs_possibles[j]+'">'+valeurs_possibles[j]+'</option>'
+							selectionner_la_donnee_dupliquee = ""
+							if($(".selected")[0]) selectionner_la_donnee_dupliquee = valeurs_possibles[j] === $(".selected")[0].children[i].innerText ? " selected " : ""
+							html_du_input =  html_du_input + '<option '+selectionner_la_donnee_dupliquee+' value ="'+valeurs_possibles[j]+'">'+valeurs_possibles[j]+'</option>'
 						}
 
 						html_du_input = html_du_input + '<option value="nouveau" style="font-style: oblique;" >Nouvelle valeur</option>' + '</select>'
