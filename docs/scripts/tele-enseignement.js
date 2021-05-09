@@ -3625,8 +3625,8 @@ function autoriser_clic_droit_supprimer_et_renommer(e,ceci){
 	ajouter_fonction_clic_droit(e,ceci,1,"recategoriser_fichier","Recatégoriser",id_fichier);
 	ajouter_fonction_clic_droit(e,ceci,2,"changer_date_effet","Date d\'effet",id_fichier);
 
-	//si devoir/examen -> on peut changer la date limite aussi -> offset = 1, sinon 0
-	if($("#"+ceci.id)[0].parentNode.id === "drive_devoirs" || $("#"+ceci.id)[0].parentNode.id === "drive_examens"){
+	//si devoir UNIQUEMENT -> on peut changer la date limite aussi -> offset = 1, sinon 0
+	if($("#"+ceci.id)[0].parentNode.id === "drive_devoirs"){
 		ajouter_fonction_clic_droit(e,ceci,3,"changer_date_limite_rendu","Date limite de rendu",id_fichier);
 		mon_offset = 1	
 	}else{
