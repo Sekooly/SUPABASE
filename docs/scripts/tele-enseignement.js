@@ -569,11 +569,12 @@ function initialisation_choix_devoir(){
 				var est_examen = e.target.options[e.target.selectedIndex].getAttribute('examen')
 				
 				var date_debut = $('[id='+e.target.value+"].span_un_fichier")[0].attributes['ma_date_effet'].value
+				var heure_debut = $('[id='+e.target.value+"].span_un_fichier")[0].attributes['mon_heure_effet'].value
 
 				//fin = début + 48h
 				nb_heures_delai_examen = data_etablissement['nb_heures_delai_examen'] || 12 //12 par défaut
 				//console.log(nb_heures_delai_examen)
-				var date_fin = moment(date_debut + " 23:59","yyyy-MM-DD hh:mm").add(nb_heures_delai_examen,'hours')._d;
+				var date_fin = moment(date_debut + " " + heure_debut,"yyyy-MM-DD hh:mm").add(nb_heures_delai_examen,'hours')._d;
 				//console.log(date_debut)
 				//console.log(date_fin)
 				
@@ -3286,20 +3287,27 @@ function traitement_fichiers_recus(){
 			//la bonne date limite pour les examens (si 2 jours)
 			if(ma_categorie==="examens" && valeur['la_date_limite'].length === 0){
 				date_debut = la_date_yyyy_mm_dd(valeur['date_effet']);
-				date_debut = moment(new Date(date_debut), "yyyy-MM-DD")
+				date_debut = moment(date_debut + " " + valeur['heure_effet'])
 
-				//console.log("date_debut : " + date_debut)
+				console.log("date_debut : " + date_debut.format("YYYY-MM-DD HH:mm"))
 
 				la_date_limite = date_debut;
-				la_date_limite = la_date_limite.add(2,'days');
-				la_date_limite = la_date_yyyy_mm_dd(la_date_limite)
+				nb_heures_delai_examen = data_etablissement['nb_heures_delai_examen'] || 12 //12 par défaut
+				la_date_limite = la_date_limite.add(nb_heures_delai_examen,'hours');
+				//la_date_limite = la_date_yyyy_mm_dd(la_date_limite)
 				//console.log("la_date_limite : " + la_date_limite)
-				la_date_limite = afficher_date(la_date_limite,true);
+				//la_date_limite = afficher_date(la_date_limite,true);
 				
-				lheure_limite = " à 23h59";
+				//lheure_limite = " à " + valeur['heure_effet'] ;
 
 				//console.log("de " + afficher_date(date_debut._i,true));
 				//console.log("au " + la_date_limite + lheure_limite);
+
+
+				console.log("la_date_limite : " + la_date_limite.format("YYYY-MM-DD HH:mm"))
+				lheure_limite = " à " + la_date_limite.format("YYYY-MM-DD HH:mm").split(" ")[1]
+				la_date_limite = afficher_date(la_date_limite,true);
+
 			}
 
 			//on n'affiche le coef que si > 0
@@ -3448,11 +3456,13 @@ function bool_examen_terminé(drive_parent, le_span_un_fichier){
 
 
 	var date_debut = le_span_un_fichier.getAttribute('ma_date_effet');
+	var heure_debut = le_span_un_fichier.getAttribute('mon_heure_effet').value
 
 	//fin = début + 48h
 	nb_heures_delai_examen = data_etablissement['nb_heures_delai_examen'] || 12 //12 par défaut
 	//console.log(nb_heures_delai_examen)
-	var date_fin = moment(date_debut + " 23:59","yyyy-MM-DD hh:mm").add(nb_heures_delai_examen,'hours')._d;
+	var date_fin = moment(date_debut + " " + heure_debut,"yyyy-MM-DD hh:mm").add(nb_heures_delai_examen,'hours')._d;
+
 	//console.log(date_debut)
 	//console.log(date_fin)
 	
@@ -8405,7 +8415,7 @@ function actualiser_details_parametre(id_parametre){
 	//si infos établissements
 	}else if(id_parametre === "Infos établissement"){
 
-		liste_id_infos_etablissement = ["nom_etablissement:Nom de l'établissement:false", "date_premier_abonnement:Date d'abonnement:false" , "duree_contrat_en_mois:Durée du contrat (en mois):false", "adresse_etablissement:Adresse:true", "contact_etablissement:Contact de l'Administration:true", "contact_economat:Contact de l'Economat:true", "mots_interdits:Liste des mots interdits (séparés par une virgule):true" ]
+		liste_id_infos_etablissement = ["nom_etablissement:Nom de l'établissement:false", "date_premier_abonnement:Date d'abonnement:false" , "duree_contrat_en_mois:Durée du contrat (en mois):false", "adresse_etablissement:Adresse:true", "contact_etablissement:Contact de l'Administration:true", "contact_economat:Contact de l'Economat:true", "mots_interdits:Liste des mots interdits (séparés par une virgule):true", "nb_heures_delai_examen:Nombre d'heures de tolérance pour les examens:true" ]
 		var info_etablissement_html = ""
 
 		liste_id_infos_etablissement.forEach(function(info){
