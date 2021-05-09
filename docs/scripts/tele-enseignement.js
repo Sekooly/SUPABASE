@@ -9645,7 +9645,7 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 					//aucune valeur déja existante
 					}else{
 
-						html_du_input = '<select class="donnee" id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" '+multiple_choix_classes+'>'
+						html_du_input = '<select class="donnee" id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" '+multiple_choix_classes + " " + disabled +'>'
 					
 						for (j = 0; j<valeurs_possibles.length ; j ++){
 							selectionner_la_donnee_dupliquee = ""
@@ -9824,9 +9824,9 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 			post_resultat_asynchrone(racine_data + "ID_RENDUS?" + apikey, nouveau_data)
 		}
 		
-		//en mode matière ET matiere = cycle -> commun
+		//en mode matière ET (matiere = cycle -> commun OU matiere = Vie scolaire)
 		//sinon, non 
-		$(".donnee[id='commun_au_cycle']")[0].value = id_parametre === "Matieres" && $(".donnee#Cycle")[0].value === $(".donnee#Matiere")[0].value ? "oui" : "non"
+		$(".donnee[id='commun_au_cycle']")[0].value = id_parametre === "Matieres" && ($(".donnee#Cycle")[0].value === $(".donnee#Matiere")[0].value || $(".donnee#Matiere")[0].value === "Vie scolaire") ? "oui" : "non"
 
 		if(id_parametre === "Classes"){
 		/******* POUR CLASSE ********/
@@ -11498,7 +11498,7 @@ function details_tdb_3(ceci){
 	elements_html += '<br><br><b><div style="background: #bf8a6a;"> MES DISCUSSIONS </div></b><br>'
 	mes_discussions.forEach(function(la_discu,index){
 		la_matiere = mes_matieres.find(e => e['ID_URL'] === la_discu['Id_classe_matiere'])
-		nom_matiere = la_matiere['Classe'] + " " + la_matiere['Matiere']
+		nom_matiere = la_matiere ? la_matiere['Classe'] + " " + la_matiere['Matiere'] : "Matière inconnue"
 		elements_html += creer_element_journee(nom_matiere,la_discu['Votre_message'],la_discu['Horodateur'],la_discu['Horodateur'],la_discu["Id_topic"],la_discu["Id_classe_matiere"],"discussion",false,false, true)
 	})
 
@@ -11520,7 +11520,7 @@ function details_tdb_3(ceci){
 		//console.log(le_topic_source)
 		id_classe_matiere = le_topic_source['Id_classe_matiere']
 		la_matiere =  mes_matieres.find(e => e['ID_URL'] === id_classe_matiere)
-		nom_matiere = la_matiere['Classe'] + " " + la_matiere['Matiere']
+		nom_matiere = la_matiere ? la_matiere['Classe'] + " " + la_matiere['Matiere'] : "Matière inconnue"
 		elements_html += creer_element_journee(nom_matiere,le_com['Votre_commentaire'],le_com['Horodateur'],le_com['Horodateur'],le_com['Id_topic'],id_classe_matiere,"discussion",false,false, true)	
 	})
 
