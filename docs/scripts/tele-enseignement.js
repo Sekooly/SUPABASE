@@ -571,9 +571,13 @@ function initialisation_choix_devoir(){
 				var date_debut = $('[id='+e.target.value+"].span_un_fichier")[0].attributes['ma_date_effet'].value
 
 				//fin = début + 48h
-				var date_fin = moment(date_debut + " 23:59","yyyy-MM-DD hh:mm").add(2,'days')._d;
-
-				var examen_terminé = est_examen && (new Date(moment()) > date_fin)
+				nb_heures_delai_examen = data_etablissement['nb_heures_delai_examen'] || 12 //12 par défaut
+				//console.log(nb_heures_delai_examen)
+				var date_fin = moment(date_debut + " 23:59","yyyy-MM-DD hh:mm").add(nb_heures_delai_examen,'hours')._d;
+				//console.log(date_debut)
+				//console.log(date_fin)
+				
+				var examen_terminé = est_examen && (moment(maintenant()) > date_fin)
 
 				//console.log("examen_terminé: " + examen_terminé);
 
@@ -677,7 +681,7 @@ function recuperer_mon_devoir(id_fichier_sujetdevoir,proprietaire,examen_termin�
 
 				//récupérer la note si coef > 0
 				note_rendu = donnees_initiales['note_rendu']
-				console.log(note_rendu)
+				//console.log(note_rendu)
 				if(note_rendu !== null){
 
 					$("#note_rendu").remove();
@@ -711,7 +715,8 @@ function recuperer_mon_devoir(id_fichier_sujetdevoir,proprietaire,examen_termin�
 			}else{
 
 				if(examen_terminé){
-					alert("Rendre cet examen n'est plus possible depuis le " + afficher_date(date_fin,false) +".");
+					//console.log(date_fin)
+					alert("Rendre cet examen n'est plus possible depuis le " + moment(date_fin).format("DD/MM/YYYY HH:mm") +".");
 
 				}else{
 
@@ -3443,12 +3448,21 @@ function bool_examen_terminé(drive_parent, le_span_un_fichier){
 
 
 	var date_debut = le_span_un_fichier.getAttribute('ma_date_effet');
-	
-	//fin = début + 48h
-	var date_fin = moment(date_debut + " 23:59","yyyy-MM-DD hh:mm").add(2,'days')._d;
 
-	var examen_terminé = new Date(moment()) > date_fin;
-	return (drive_parent === "drive_examens" && examen_terminé);
+	//fin = début + 48h
+	nb_heures_delai_examen = data_etablissement['nb_heures_delai_examen'] || 12 //12 par défaut
+	//console.log(nb_heures_delai_examen)
+	var date_fin = moment(date_debut + " 23:59","yyyy-MM-DD hh:mm").add(nb_heures_delai_examen,'hours')._d;
+	//console.log(date_debut)
+	//console.log(date_fin)
+	
+	var est_examen = drive_parent === "drive_examens" 
+	var examen_terminé = est_examen && (moment(maintenant()) > date_fin)
+
+
+	return examen_terminé
+
+
 }
 
 function fichier_ouvrable(id_fichier,bouton_telecharger,ceci_bouton_telecharger){
