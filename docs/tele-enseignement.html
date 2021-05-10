@@ -59,6 +59,38 @@
 
 	<style>
 
+		.msg_recu {
+
+		}
+
+		.msg_envoye {
+
+		}
+
+
+		.msg_non_lu{
+			cursor: pointer;
+			border-left-color: #e99b8a80;
+			border-left-width: 15px;
+		}
+
+		.bouton_sekooly{
+			height: 30px;
+			background-color: #FF6C00;
+		}
+
+		#liste_destinataires{
+			background: #b5b5b5;
+		}
+
+		.emplacement_des_msgs {
+			padding: 2%;
+			display: block;
+			overflow-wrap: anywhere;
+			overflow: hidden auto;
+			height: 85%;
+		}
+
 		img{
 			cursor: pointer;
 		}
@@ -987,6 +1019,24 @@
 
 		}
 
+		.bloc_msg {
+			padding: 1%;
+			margin: 0;
+			border-style: double;
+			margin: 0px;
+			display: grid;
+			grid-template-columns: 90px 8fr;
+		}
+
+		#details_conv {
+
+		}
+
+		.dark-mode .byebye {
+			-webkit-filter: invert(1);
+   			filter: invert(1);
+		}
+
 		.petite_ecriture{
 			font-size: 10px;
 			position: sticky;
@@ -1683,6 +1733,15 @@
 		</span>
 		<div id="bulle_notif" class="bulle_notif" onclick="switch_pannel_notifs()"></div>
 
+
+
+		<!--
+		<span>
+			<img id="recup_msgs" position="50px" alt="MESSAGES" class="icone_navbar" onclick="recuperer_msgs()" src="images/img_enveloppe.svg">		
+		</span>
+		-->
+
+
 		<!--
 		<span>
 			<img id="recup_edt" position="50px" alt="EDT" class="icone_navbar" onclick="recuperer_edt()" src="images/img_edt.png">
@@ -1727,9 +1786,10 @@
 
 
 	<div onclick="fermer_side_bar()" style="right:0;position: fixed;z-index: 4;" >
-		<div class="droite sidebar top"  style="height: min-content;float: right;position: relative;width: 550px;">
+		<div class="droite sidebar top"  style="height: min-content;float: right;position: relative;width: 650px;">
 			<div id="recup_eleves" onclick="recuperer_eleves()" >Liste des élèves</div>
 			<div id="recup_profs" onclick="recuperer_profs()" >Liste des professeurs</div>
+			<div id="recup_admin" onclick="recuperer_admin()">Liste de l'Administration</div>
 			<div id="recup_params" onclick="recuperer_parametres()" >Paramètres</div>
 			<div onclick="deconnexion()">Se déconnecter</div>		
 		</div>

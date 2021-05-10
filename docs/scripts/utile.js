@@ -220,6 +220,9 @@ function rechercher_contenant_motif(nom_table, nom_champ_reference, valeur_champ
 
 }
 
+
+
+
 function nouvel_id(nom_table, nom_champ_id){
   url = racine_data + nom_table + "?select="+nom_champ_id
   url = url + "&order="+nom_champ_id+".desc"
@@ -956,4 +959,32 @@ function ordonner_elements(selector, attrName) {
             bVal = parseInt(b.getAttribute(attrName));
         return aVal - bVal;
     }));
+}
+
+
+function creer_uuid(){
+  return get_resultat_brut("https://www.uuidgenerator.net/api/version4")
+}
+
+
+function ajouter_motif(identifiant){
+  return "-" + identifiant + "-"
+}
+
+function create_id_conv(destinataire, id_conv_initial){
+  //uniquement si c'est le id_conv_initial est null
+  if(!id_conv_initial){
+    return ajouter_motif(recuperer("identifiant_courant")) + ajouter_motif(destinataire)
+
+  //on a déjà un id_conv
+  }else{
+    return id_conv_initial
+  }
+}
+
+
+function recuperer_destinataire(id_conv){
+  resultat = id_conv.replaceAll('-','').replaceAll(recuperer("identifiant_courant"),"").toUpperCase()
+  if(!resultat) resultat = recuperer("identifiant_courant").toUpperCase()
+  return resultat
 }

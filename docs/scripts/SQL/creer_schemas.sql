@@ -1656,6 +1656,56 @@ ORDER BY "Administration"."Cycle", "Administration"."Classe", "Administration"."
 
 
 
+-- Table: public.Conversations
+
+-- DROP TABLE public."Conversations";
+
+CREATE TABLE public."Conversations"
+(
+    "Horodateur" text COLLATE pg_catalog."default",
+    "Expediteur" text COLLATE pg_catalog."default",
+    "Destinataire" text COLLATE pg_catalog."default",
+    "Message" text COLLATE pg_catalog."default",
+    id_msg uuid NOT NULL DEFAULT uuid_generate_v4(),
+    "Date_lecture" text COLLATE pg_catalog."default",
+    id_conv text COLLATE pg_catalog."default",
+    CONSTRAINT "Conversations_pkey" PRIMARY KEY (id_msg)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public."Conversations"
+    OWNER to supabase_admin;
+
+GRANT ALL ON TABLE public."Conversations" TO anon;
+
+GRANT ALL ON TABLE public."Conversations" TO authenticated;
+
+GRANT ALL ON TABLE public."Conversations" TO postgres;
+
+GRANT ALL ON TABLE public."Conversations" TO service_role;
+
+GRANT ALL ON TABLE public."Conversations" TO supabase_admin;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

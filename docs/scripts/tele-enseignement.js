@@ -1,4 +1,4 @@
-var elements_menu_haut = ["Infos établissement","Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Alerte", "Logs", "Visio", "Notifs", "Fichiers", "Rendus", "Topic", "Coms","Espace etablissement restant","Analyses des connexions"]
+var elements_menu_haut = ["Infos établissement","Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Alerte", "Logs", "Conversations", "Visio", "Notifs", "Fichiers", "Rendus", "Topic", "Coms","Espace etablissement restant","Analyses des connexions"]
 var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL_Mapping","URL_agenda",
 								"id_googlecalendar","nb_avis_donnés", "nb_avis_max","nom_fiche","taux_conseil",
 								"Matiere_bis", "classe_id", "classe_bis", "type", "Derniere_consultation_notifs",
@@ -1445,23 +1445,28 @@ function bouton_modifier_pp(identifiant_courant){
 	return '<span class="pp-upload"><label for="pp-'+identifiant_courant+'"><img src="https://sekooly.com/assets/images/img_edit.png" alt="modifier" class="editer"></label><input onchange="changer_pp(\''+identifiant_courant+'\')" accept=".png,.jpeg,.jpg,.bmp,.svg,.gif" id="pp-'+identifiant_courant+'" type="file"/> </span>'
 }
 
-function ma_photo(){
+function ma_photo(identifiant_optionnel, sans_bouton_modifier){
 	chargement(true)
 	
 	var nom_table = "Fichiers"
 	url = racine_data + nom_table
-	url += "?proprietaire=eq." + recuperer("identifiant_courant") 
+	url += "?proprietaire=eq." + (identifiant_optionnel || recuperer("identifiant_courant"))
 	url += "&categorie_fichier=eq.Profil"
 	url += "&" + apikey
 	//console.log(url)
 	id_pp = get_resultat(url)[0]
 	if(id_pp) id_pp = id_pp['id_fichier']
 
-	//console.log(id_pp)
+	//console.log("identifiant_optionnel: " + identifiant_optionnel)
+	//console.log("id_pp: " + id_pp)
 	le_lien_pp = lien_pp(id_pp)
-	supprimer_si_pp_existante = id_pp ? bouton_supprimer_pp() : ""
+	//console.log("le_lien_pp: " + le_lien_pp)
+
+
+	supprimer_si_pp_existante = id_pp ? (sans_bouton_modifier ? "" : bouton_supprimer_pp()) : ""
+	bouton_modifier = sans_bouton_modifier ? "" : bouton_modifier_pp()
 	chargement(false)
-	return "<img class='pp' id='pp_"+recuperer('identifiant_courant')+"' src=" + le_lien_pp +">" + bouton_modifier_pp() + supprimer_si_pp_existante
+	return "<img class='pp' id='pp_"+recuperer('identifiant_courant')+"' src=" + le_lien_pp +">" + bouton_modifier + supprimer_si_pp_existante
 
 }
 
@@ -2017,6 +2022,12 @@ function deconnexion(){
 	effacer('quitter_multi_visio')
 	effacer("nb_clics")
 
+	effacer('les_msgs_details')
+	effacer('mes_destinataires')
+	effacer('mes_msgs')
+	effacer('msg_chargé')
+
+
 	image_temporaire = ""
 	nom_image_temporaire = ""
 
@@ -2068,14 +2079,14 @@ function trier_par_identifiant(a, b){
 }
 
 
-function recuperer_profs(){
+function recuperer_profs(sans_fenetre){
 	var mes_classes_matieres = JSON.parse(recuperer("mes_matieres")).map(e => e['Classe_Matiere']).sort()
 	//console.log(mes_classes_matieres)
 	var snapshot = []
 
 	//dans tous les cas: chercher puis traiter
 	url = racine_data + "Trombinoscope_profs" + "?" + apikey
-	get_resultat_asynchrone(url).then(function(resultats){
+	return get_resultat_asynchrone(url).then(function(resultats){
 		//console.log(url)
 	
 		//console.log(resultats)
@@ -2123,21 +2134,88 @@ function recuperer_profs(){
 		//console.log(snapshot)
 		//console.log(snapshot.length + '\n\n\n')
 
-		//on configure la fenêtre
-		var titre_fenetre = "Liste de vos professeurs"
-		vider_fenetre(titre_fenetre);
 
-		//afficher le resultat
-		traitement_trombino(snapshot,true)
-		afficher_fenetre(true);
+		if(sans_fenetre){
+			chargement(false);
+			return snapshot
+		}else{
+
+
+			//on configure la fenêtre
+			var titre_fenetre = "Liste de vos professeurs"
+			vider_fenetre(titre_fenetre);
+
+			//afficher le resultat
+			traitement_trombino(snapshot,true)
+			afficher_fenetre(true);
+
+		}
+
 		
 	})
 
 }
 
+function recuperer_admin(sans_fenetre){
+	//en_cours()
 
 
-function recuperer_eleves(){
+	if (impossible_de_cliquer()) return -1;
+
+
+	chargement(true);
+
+	var le_cycle = JSON.parse(recuperer('mes_donnees'))['Cycle']
+
+	nom_table = "Trombinoscope_admin" //"Admin"
+	nom_champ_reference = "Cycle"
+	valeur_champ_reference = le_cycle
+	nom_champ_a_chercher = ""
+
+
+
+	/*
+	console.log(nom_table)
+	console.log(nom_champ_reference)
+	console.log(valeur_champ_reference)
+	console.log(nom_champ_a_chercher)
+	*/
+
+	return rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher).then(snapshot => {
+		
+
+
+		if(sans_fenetre){
+			chargement(false);
+			return snapshot
+		}else{
+			var titre_fenetre = "Membres de l'Administration - " + valeur_champ_reference;
+			
+
+			vider_fenetre(titre_fenetre);
+
+			//on affiche la fenêtre
+			afficher_fenetre(true);
+
+			//avec les rôles pour admin
+			traitement_trombino(snapshot,false, true);
+			chargement(false);
+		}
+
+
+	}).catch(error => {
+		console.error(error);
+		alert('Cycle introuvable, veuillez réessayer.');
+		
+		chargement(false);
+	})
+
+
+}
+
+
+
+function recuperer_eleves(sans_fenetre){
 
 	if (impossible_de_cliquer()) return -1;
 
@@ -2166,15 +2244,6 @@ function recuperer_eleves(){
 	nom_champ_a_chercher = ""
 
 
-
-	var titre_fenetre = "Liste des élèves en " + valeur_champ_reference;
-	
-
-	vider_fenetre(titre_fenetre);
-
-	//on affiche la fenêtre
-	afficher_fenetre(true);
-
 	/*
 	console.log(nom_table)
 	console.log(nom_champ_reference)
@@ -2182,10 +2251,25 @@ function recuperer_eleves(){
 	console.log(nom_champ_a_chercher)
 	*/
 
-	rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher).then(snapshot => {
+	return rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher).then(snapshot => {
 		
-		traitement_trombino(snapshot,false);
-		chargement(false);
+		if(sans_fenetre){
+			chargement(false);
+			return snapshot
+		}else{
+
+
+			var titre_fenetre = "Liste des élèves en " + valeur_champ_reference;
+			
+
+			vider_fenetre(titre_fenetre);
+
+			//on affiche la fenêtre
+			afficher_fenetre(true);
+
+			traitement_trombino(snapshot,false);
+			chargement(false);
+		}
 
 	}).catch(error => {
 		console.error(error);
@@ -2311,7 +2395,7 @@ function telecharger(nom_fichier,contenu_fichier){
 
 var nombre_changement_ecolage = 0;
 
-function traitement_trombino(resultats, sans_ecolage){
+function traitement_trombino(resultats, sans_ecolage, avec_role){
 	
 	//console.log(resultats)
 	//console.log(sans_ecolage)
@@ -2345,6 +2429,7 @@ function traitement_trombino(resultats, sans_ecolage){
 		var bouton_modif = recuperer('mon_type').includes('Admin') ? bouton_modifier_pp(valeur['Identifiant']) : ""
 		var bouton_suppr = recuperer('mon_type').includes('Admin') && !le_lien_pp.includes("default-user.svg") ? bouton_supprimer_pp(valeur['Identifiant']) : ""
 		var la_classe_utilisateur = !sans_ecolage ? valeur['Classe'] : valeur['Classe'].split('|')[1].split(')')[0] //cas des profs
+		if(avec_role) la_classe_utilisateur = valeur['Role'] //cas des admin
 		var un_eleve = '<div class="un_eleve"><img class="pp" id="pp_'+valeur['Identifiant']+'" src='+ le_lien_pp +'>' + bouton_modif + bouton_suppr +'<div><span class="element_eleve">' + valeur['Nom'] + " " + valeur['Prénom(s)'] + " <b>" + la_classe_utilisateur + '</b></span></div>' + ecolage_eleve +'</div>';
 		var un_bloc_eleve = document.createElement('div');
 		un_bloc_eleve.innerHTML = un_eleve;
@@ -5836,8 +5921,8 @@ $(function charger_fichiers(e){
 		}
 
 
-		function html_boutons_fenetre(){
-			return '<div id="entete-fenetre" style="text-align: center;"> <img alt="actualiser"  src="https://sekooly.github.io/SUPABASE/images/img_actualiser.png" onclick="actualiser_topics()" id="actu_topics" style="width: 30px; cursor: pointer;"> <img alt="ajouter" src="https://sekooly.github.io/SUPABASE/images/img_ajout.png" onclick="ajouter_une_discu()" id="nouvelle_discu" style="width: 30px; cursor: pointer;"></div><div id="entete-fenetre" style="text-align: center;color: #c1c1c1;font-size: 13px;border-bottom-width: 1px;border-bottom-style: ridge;">Pour commenter, cliquez sur une question/discussion</div>';
+		function html_boutons_fenetre(nom_fonction_actualiser, nom_fonction_ajouter, texte_aide){
+			return '<div id="entete-fenetre" style="text-align: center;"> <img alt="actualiser"  src="https://sekooly.github.io/SUPABASE/images/img_actualiser.png" onclick="'+nom_fonction_actualiser+'" id="actu_topics" style="width: 30px; cursor: pointer;"> <img alt="ajouter" src="https://sekooly.github.io/SUPABASE/images/img_ajout.png" onclick="'+nom_fonction_ajouter+'" id="nouvelle_discu" style="width: 30px; cursor: pointer;"></div><div id="entete-fenetre" style="text-align: center;color: #c1c1c1;font-size: 13px;border-bottom-width: 1px;border-bottom-style: ridge;">'+texte_aide+'</div>';
 		}
 
 		function ajouter_une_discu(){
@@ -5862,12 +5947,6 @@ $(function charger_fichiers(e){
 			element_DOM('maquestion').src="";
 
 			var nouveau_message = '<form id="mon_formulaire" autocomplete="off" style="padding: 0% 3% 0% 3%;height:82%;overflow-y: auto;"><label id="label" for="titre_question">Titre: </label><input type="text" id="titre_question" maxlength="50" style="width: 100%;">	<br><br><label id="label" for="contenu_question">Votre message: </label><textarea id="contenu_question" maxlength="1700" style="width: 100%;height: 70%;resize: none;font-size: 13px;"></textarea><div id="nb_max_div" style="margin-left: 90%;margin-top: 0%;font-size: 10px; display:none;"> <font id="nb_max"> 0 / 1700</font> </div><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button type="button" id="Annuler" onclick="recuperer_les_topics(false)"> Annuler </button><button type="button" id="envoi" onclick="envoyer_le_topic()"> Poster </button></div><div id="msg_erreur" style="text-align: center;padding: 1%;color: green;"> </div></form>';
-
-
-			//sans anonymisation pour l'instant
-			/*
-			var les_boutons = '<div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button id="Annuler" onclick="recuperer_les_topics(false)"> Annuler </button><button id="envoi" onclick="envoyer_le_topic()"> Poster </button><div id="affichage"><input type="checkbox" id="anonymisation"><label id="affichage" for="anonymisation" style="font-size: 13px;">Anonyme</label></div></div>';
-			*/
 
 
 			//ajouter la fenettre de nouveau message au DOM
@@ -5960,8 +6039,12 @@ $(function charger_fichiers(e){
 			//console.log("c'est ajouté");
 
 			//on enlève et on remet le bloc commentaire
+			/*
 			ajouter_bloc_commenter(false);
 			ajouter_bloc_commenter(true);
+			*/
+			ajouter_bloc_commenter(false, "ajouter_mon_com()", "Commenter");
+			ajouter_bloc_commenter(true, "ajouter_mon_com()", "Commenter");
 
 
 
@@ -6275,6 +6358,7 @@ $(function charger_fichiers(e){
 
 
 
+
 			var emplacement_commentaire = '<div id="emplacement_commentaire" style="padding: 2%;display: block;overflow-wrap: anywhere;"></div>';
 
 			
@@ -6288,18 +6372,18 @@ $(function charger_fichiers(e){
 
 			element_DOM('fenetre').appendChild(les_commentaires);
 		
-			ajouter_bloc_commenter(true);
+			ajouter_bloc_commenter(true, "ajouter_mon_com()", "Commenter");
 
 
 		}
 
-		function ajouter_bloc_commenter(oui){
+		function ajouter_bloc_commenter(oui, fonction_ajout_commentaire, intitule_bouton){
 			
 			//element_DOM('maquestion').src="";
 
 			if (oui){
 
-				var bloc_commenter = '<div id="bloc_commenter" style="padding: 2%;display: block;text-align: end;"><textarea id="mon_com" style="display:inline-block; width:100%; resize: unset; min-height:200px; overflow-y:hidden;" placeholder="Votre commentaire..." maxlength="1500"></textarea><button id="envoicommentaire" onclick=ajouter_mon_com() style="height: 30px;background-color: #FF6C00;">Commenter</button></div>';
+				var bloc_commenter = '<div id="bloc_commenter" style="padding: 2%;display: block;text-align: end;"><textarea id="mon_com" style="display:inline-block; width:100%; resize: unset; min-height:200px; overflow-y:hidden;" placeholder="Votre commentaire..." maxlength="1500"></textarea><button id="envoicommentaire" onclick="'+fonction_ajout_commentaire+'" style="height: 30px;background-color: #FF6C00;">'+intitule_bouton+'</button></div>';
 
 				//ajouter le bloc COMMENTER dans le DOM
 				var le_bloc = document.createElement('div');
@@ -6401,7 +6485,7 @@ $(function charger_fichiers(e){
 			//console.log("c'est vidé");
 			afficher_fenetre(true);
 
-			element_DOM('fenetre').innerHTML += html_boutons_fenetre();
+			element_DOM('fenetre').innerHTML += html_boutons_fenetre("actualiser_topics()","ajouter_une_discu()", "Pour commenter, cliquez sur une question/discussion");
 
 
 		    if (forcing ||recuperer("les_topics") === null || recuperer("les_topics") === ''){
@@ -11149,8 +11233,13 @@ function mettre_les_soons(){
 
 		for ( i = 0 ; i <$("[soon]").length;i++){
 			//console.log($("[soon]")[i])
-			$(".sidebar.left>div[soon]")[i].innerHTML += soon()
+			//todo: rectifier
+
+			//$(".sidebar.left>div[soon]")[i].innerHTML += soon()
+
 		}
+
+		$("[soon]").append(soon())
 
 	}
 }
@@ -12319,7 +12408,334 @@ function lien_pp(id_pp){
 
 
 
+/******************** MESSAGES PERSOS ******************************/
+function recuperer_msgs(forcing){
+	//en_cours()
 
+	chargement(true);
+	
+	//on ajoute les boutons Actualiser/Ajout/Quitter TOPIC au DOM
+	//console.log("on va vider");
+	vider_fenetre("");
+	//console.log("c'est vidé");
+	afficher_fenetre(true);
+
+	element_DOM('fenetre').innerHTML += html_boutons_fenetre("recuperer_msgs(true)","ajouter_un_tout_nouveau_msg()","Pour répondre, cliquez sur le message en question.");
+
+
+    if (forcing ||recuperer("mes_msgs") === null || recuperer("mes_msgs") === ''){
+		
+		//chercher tous les messages envoyés et reçus
+    	nom_table = "Conversations"
+    	nom_champ_reference = "id_conv"
+    	valeur_champ_reference = "*" + ajouter_motif(recuperer("identifiant_courant")) + "*"
+    	nom_champ_a_chercher = ""
+
+    	/*
+    	console.log(nom_table)
+    	console.log(nom_champ_reference)
+    	console.log(valeur_champ_reference)
+    	console.log(nom_champ_a_chercher)
+    	*/
+    	
+    	//console.log("Récupérons d'abord...")
+    	rechercher_contenant_motif(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher).then(mes_msgs => {
+    		//console.log(mes_msgs)
+    		mes_msgs = mes_msgs.sort(function tri_ordre_chrono_decroissant(a, b) {
+				//return moment(b.Horodateur, "DD/MM/YYYY HH:mm:ss")  - moment(a.Horodateur, "DD/MM/YYYY HH:mm:ss")
+				return convertir_en_date(b.Horodateur) - convertir_en_date(a.Horodateur)
+			});
+    		//console.log(mes_msgs)
+
+    		stocker("mes_msgs",JSON.stringify(mes_msgs));
+    		traitement_msgs();
+    		chargement(false);
+		}).catch(e => {
+			console.error(e)
+			alert("Impossible de récupérer vos messages. Vérifiez que vous êtes toujours connecté à internet, ou réessayer plus tard.")
+			chargement(false);
+		})
+	
+
+
+	}else{
+		//console.log("traitement direct")
+		//on traite direct les données
+		traitement_msgs();
+		chargement(false);				
+	}
+
+
+
+function traitement_msgs(){
+	stocker("les_msgs_details","")
+
+	if (recuperer("mes_msgs").length === 0 || recuperer("mes_msgs") === "[]") {
+		commentaire = '<div id="vide" style="text-align: center;color: grey;margin: 10%;"> <i id="vide"> Vous n\'avez pas encore de messages privés.<br><br>Les messages que vous échangez avec d\'autres utilisateurs sont susceptibles d\'être vus par les membres de l\'Administration de votre établissement.</i> </div>';
+
+		//ajouter la fenêtre au DOM
+		var mon_commentaire = document.createElement('div');
+		mon_commentaire.innerHTML = commentaire;
+		while(mon_commentaire.firstChild) {
+		    element_DOM('fenetre').appendChild(mon_commentaire.firstChild);
+		}
+
+	}else{
+
+		var liste_des_msgs = JSON.parse(recuperer("mes_msgs"));
+	
+		//pour chaque topic, l'afficher en mode bg dans la fenetre
+		if(!element_DOM('div_liste_topics')){
+			var ma_liste = document.createElement('div');
+			ma_liste.style.overflowX = "hidden";
+			ma_liste.style.overflowY = "auto";
+			ma_liste.id = "div_liste_topics";
+			ma_liste.style.height = '90%';
+			element_DOM('fenetre').appendChild(ma_liste);
+		}else{
+			//si la liste existe déjà
+			var ma_liste = element_DOM('div_liste_topics');
+		}
+
+		
+
+		liste_des_msgs.forEach(function (valeur){
+			var id_topic = valeur['id_conv'] ;
+			//console.log("on va ajouter " + id_topic);
+
+			//rassembler les msgs de la meme conversation
+			//on zappe si c'est déjà présent
+			
+			//console.log("[id='"+id_topic+"']")
+			if($("[id='"+id_topic+"']").length > 0) return true
+
+			var titre = recuperer_destinataire(valeur['id_conv']);
+			element_contenu = document.createElement('div')
+			element_contenu.innerHTML = valeur['Message'];
+			var contenu = element_contenu.innerText
+			
+			var date = afficher_date(valeur['Horodateur']);
+			var nb_coms = liste_des_msgs.filter(e => e['id_conv'] === valeur['id_conv']).length
+			if(nb_coms === undefined) nb_coms = 0;
+
+
+			var icone_poubelle = "" //'<span id="bye' + id_topic + '"><img alt="supprimer" class="byebye" onclick="supprimer_conversation(this)" src="https://sekooly.github.io/SUPABASE/images/img_trash.png" style="width: 20px;position: relative;float: right;" id="bye' + id_topic + '"></span>';
+
+			//si élève/prof et le topic n'est pas le sien: pas d'icone poubelle
+			if(!recuperer('mon_type').includes("Administration") && valeur['Identifiant'] !== recuperer('identifiant_courant').trim()) icone_poubelle = "";
+
+			//console.log("l'icone poubelle = " + icone_poubelle + "\n")
+
+			var img_pp = ma_photo(titre.toLowerCase(), true) //pas de modifs de la pp
+
+			var dans_fenetre_str = '<ul class="bloc_msg msg_non_lu" onclick="clic_de_msg(this.id)" id="' + id_topic + '"> '+ img_pp + '<span id="details_conv">' + icone_poubelle + ' <p id="' + id_topic + '" style="font-size: 25px; margin:0px;"> <b class="contenu_question" id="' + id_topic + '"> '  + titre +'  </b> <p id="' + id_topic + '" class="contenu_question"> ' + contenu + '</p><i class="petite_ecriture"> <h id="' + id_topic + '"><u id="' + id_topic + '"> Nombre de messages</u>: <u class="nb_com_actuel" id="' + id_topic + '">' + nb_coms + '</u> </h> <h id="' + id_topic + '">  &emsp; <u id="' + id_topic + '"> Dernier message le</u>: ' + date + ' </h><h id="' + id_topic + '"></h></i></span></ul>';
+			
+			//console.log("dans_fenetre: " + dans_fenetre_str)
+			
+
+
+
+			//ajouter la fenetre au DOM	
+			var un_msg = document.createElement('div');
+			un_msg.innerHTML += dans_fenetre_str;
+			while(un_msg.firstChild) ma_liste.appendChild(un_msg.firstChild);
+
+
+
+		});
+		
+	}
+}
+
+
+
+
+
+
+}
+
+//récupérer mes messages (get)
+function clic_de_msg(id_conv){
+	//console.log(id_conv)
+	stocker("msg_chargé",id_conv)
+
+	//ajouter le message dans la liste des notifs consultées
+
+
+	//on récupère tous les msgs de la conversation
+	//console.log('on recupere les msgs de la conv n° ' + id_conv + '...');
+	recuperer_tous_les_msgs(id_conv, false);
+}
+
+function recuperer_tous_les_msgs(id_conv, forcing){
+
+	//console.log("on cherche "  + id_conv)
+	var mes_msgs = JSON.parse(recuperer("mes_msgs"))
+	var nom_destinataire = mes_msgs.find(e => e['id_conv'].includes(id_conv))['id_conv']
+	nom_destinataire = recuperer_destinataire(nom_destinataire)
+
+	var entete_convo = '<div id="entete_convo" style="display: flex;overflow-wrap: anywhere;"><img id="<<" src="https://sekooly.github.io/SUPABASE/images/img_retour.png" style="width: 30px;margin: 2%;cursor:pointer;height: 30px;"  onclick="recuperer_msgs(false)"> <div id="titre_du_poste" style="font-weight: bold;margin: 2%;font-size: 25px;">' + nom_destinataire + '</div></div>';
+	//console.log(entete_convo)
+
+	$("#fenetre")[0].innerHTML = entete_convo
+
+
+
+	var emplacement_des_msgs = '<div id="emplacement_des_msgs" class="emplacement_des_msgs"></div>';
+
+	
+
+	//tout ajouter
+	var les_msgs = document.createElement('div');
+	les_msgs.innerHTML = emplacement_des_msgs ;
+
+	element_DOM('fenetre').appendChild(les_msgs);
+
+	//ajouter chaque message
+
+
+
+}
+
+
+async function liste_de_mes_destinataires(){
+	var mon_type = recuperer('mon_type')
+	var liste_eleves = await recuperer_eleves(true)
+	var liste_profs = await recuperer_profs(true)
+	var liste_admins = await recuperer_admin(true)
+	var mes_destinataires = []
+
+	mes_destinataires.push(liste_eleves)
+	mes_destinataires.push(liste_profs)
+	mes_destinataires.push(liste_admins)
+
+
+	mes_destinataires = [].concat.apply([], mes_destinataires)
+	mes_destinataires = mes_destinataires.map(function(e){
+		le_type = e['type'].includes("Admin") ? e['Role'] : e['type'].substring(0, e['type'].length - 1)
+		return e['Identifiant'].toUpperCase() + " (" + le_type + ")"
+	})
+
+
+	stocker("mes_destinataires",mes_destinataires)
+
+
+}
+
+
+
+
+//envoyer un message (post)
+function ajouter_un_tout_nouveau_msg(){
+
+	//récupérer la liste des destinataires
+	liste_de_mes_destinataires()
+
+	var probleme = false;
+	if (probleme){
+		alert("Impossible d'envoyer un nouveau message pour le moment.");
+		return -1;
+	}
+
+
+	if(impossible_de_cliquer()) return -1;
+
+
+	vider_fenetre("Nouveau message");
+	element_DOM('maquestion').src="";
+
+	var nouveau_message = '<form id="mon_formulaire" autocomplete="off" style="padding: 0% 3% 0% 3%;height:82%;overflow-y: auto;"><label id="label" for="Destinataire">Destinataire: </label><div id="div_autocompletion" class="autocompletion"> <input placeholder="Tapez pour chercher le destinataire..." autocomplete="on"  oninput="faire_autocompletion_input(\'Destinataire\')" type="text" name="Destinataire" id="Destinataire" maxlength="50" style="width: 100%;"></div><br><br><label id="label" for="Message">Votre message: </label><textarea id="Message" name="Message" maxlength="1700" style="width: 100%;height: 70%;resize: none;font-size: 13px;"></textarea><div id="nb_max_div" style="margin-left: 90%;margin-top: 0%;font-size: 10px; display:none;"> <font id="nb_max"> 0 / 1700</font> </div><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button class="bouton_sekooly" type="button" id="Annuler" onclick="recuperer_msgs(false)"> Annuler </button><button class="bouton_sekooly" type="button" id="envoi" onclick="envoyer_mon_message()"> Envoyer le message </button></div><div id="msg_erreur" style="text-align: center;padding: 1%;color: green;"> </div></form>';
+
+	//ajouter la fenettre de nouveau message au DOM
+	var mon_message = document.createElement('span');
+	mon_message.innerHTML = nouveau_message;
+
+	element_DOM('fenetre').appendChild(mon_message);
+
+
+	$('#div_autocompletion').append('<div id="liste_destinataires"></div>')
+
+	rendre_riche("Message")
+
+	//focus direct sur le titre
+	element_DOM('Destinataire').focus();
+
+}
+
+function faire_autocompletion_input(nom_champ){
+	var mes_destinataires = recuperer("mes_destinataires").split(",")
+	var valeur_du_champ = $("[id='"+nom_champ+"']")[0].value.toUpperCase().replaceAll(" ","")
+
+	//console.log(mes_destinataires)
+	//console.log("\n\n\n\n")
+
+	liste_destinataires.innerHTML = ""
+
+	if(valeur_du_champ){
+		mes_destinataires = mes_destinataires.filter(function(e){
+			//console.log(valeur_du_champ + " VS " + e)
+			return e.toUpperCase().replaceAll(" ","").includes(valeur_du_champ)
+		})
+		
+		//rajouter chaque destinataire
+		mes_destinataires.forEach(function(un_destinataire){
+			$("#liste_destinataires").append('<div onclick="choisir(\''+nom_champ+'\',this)" value="'+un_destinataire+'">'+un_destinataire+'</div>')
+		})
+	}
+}
+
+
+function choisir(nom_champ,ceci){
+	//console.log(ceci)
+	//console.log(ceci.getAttribute('value'))
+	$("[id='"+nom_champ+"']")[0].value = ceci.getAttribute('value')
+
+	liste_destinataires.innerHTML = ""
+}
+
+
+function envoyer_mon_message(){
+	//vérifier que le destinataire existe
+	mes_destinataires =  recuperer("mes_destinataires").split(",")
+	if( mes_destinataires.indexOf($("#Destinataire")[0].value) < 0 ){
+		alert("Votre destinataire n'existe pas, merci de vérifier votre saisie.")
+		return false
+	}
+
+	//vérifier que le message est clean
+	var phrase = $("#Message")[0].value
+	var le_mot_interdit = chercher_le_mot_interdit(phrase)
+	if(le_mot_interdit !== ""){
+		alert("Vous n'avez pas le droit d'utiliser le terme '"+le_mot_interdit+"' dans le cadre des cours à "+nom_etablissement+" sur SEKOOLY.")
+		return -1;
+	}
+
+	var destinataire = $("#Destinataire")[0].value.split(" (")[0].toLowerCase()
+
+	var nouvelle_conversation = {
+		"Horodateur" : maintenant(),
+		"Expediteur" : recuperer("identifiant_courant"),
+		"Destinataire" : destinataire,
+		"Message" : phrase,
+		"id_msg" : creer_uuid(),
+		"id_conv" : create_id_conv(destinataire, false)
+	}
+
+	//envoyer
+	ajouter_un_element("Conversations",nouvelle_conversation).then(() => recuperer_msgs(true))
+
+
+}
+
+
+//supprimer un message (delete) -> non pour le moment sauf admin
+function supprimer_conversation(ceci){
+
+	//e.stopPropagation();
+	id_convo = ceci.id.split("bye")[1]
+	console.log(id_convo)
+
+}
 
 
 
