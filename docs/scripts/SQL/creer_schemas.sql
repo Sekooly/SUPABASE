@@ -1667,7 +1667,6 @@ CREATE TABLE public."Conversations"
     "Destinataire" text COLLATE pg_catalog."default",
     "Message" text COLLATE pg_catalog."default",
     id_msg uuid NOT NULL DEFAULT uuid_generate_v4(),
-    "Date_lecture" text COLLATE pg_catalog."default",
     id_conv text COLLATE pg_catalog."default",
     CONSTRAINT "Conversations_pkey" PRIMARY KEY (id_msg)
 )

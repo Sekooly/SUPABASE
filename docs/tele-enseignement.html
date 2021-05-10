@@ -59,24 +59,125 @@
 
 	<style>
 
-		.msg_recu {
+		.msg_non_lu{
+			position: sticky;
+			background-color: red;
+			border-radius: 50%;
+			right: 5%;
+			width: 20px;
+			height: 20px;
+			text-align: center;
+			top: 38px;
+			font-weight: bold;
+		}
 
+		#Message {
+			resize: none;
+			width: 56vw;
+			min-width: 90%;
+			border-radius: 5px;
+		}
+
+		/* If the screen size is phone*/
+		@media (orientation: portrait) {
+
+			#Message {
+				min-width: 80%;
+			}
+		}
+
+		#nouveau_msg_convo{
+			display: block;
+			padding: 0 2% 0 2%;
+		}
+
+		.bouton_envoi {
+			background-color: #FF6C00;
+			position: absolute;
+			margin-top: 0.5%;
+			height: 50px;
+			width: 50px;
+			border-radius: 50%;
+			
+		}
+
+		.titre_du_poste {
+			font-weight: bold;
+			margin: 2%;
+			font-size: 25px;
+		}
+
+		.retour_msgs {
+			width: 30px;
+			margin: 2%;
+			cursor:pointer;
+			height: 30px;
+		}
+
+		#entete_convo {
+			display: flex;
+			overflow-wrap: anywhere;
+		}
+
+		#auteur_du_poste {
+			font-weight: bold;
+			color: #FF6C00;
+		}
+
+		#date_poste {
+			color: #B5B3B8;
+		}
+
+		.un_msg{
+			display: block;
+			overflow-wrap: anywhere;
+			border-width: 1px;
+			padding: 10px;
+			border-radius: 25px;
+			width: max-content;
+			max-width: 70%;
+			margin-bottom: 2px;
+		}
+
+		.un_msg blockquote {
+			padding: 10px;
+		}
+
+		.conversation{
+
+		}
+
+		.quitter_previz{
+			width: 30px;
+			height: 30px;
+			cursor: pointer;
+			position: fixed;
+			z-index: 3;
+		}
+
+		.msg_recu {
+			background-color: #fff;
+		}
+
+		.dark-mode .msg_recu {
+			background-color: black;
 		}
 
 		.msg_envoye {
-
+			background-color: #ffd3b8;
+			position: sticky;
+			left: 90%;
 		}
 
-
-		.msg_non_lu{
-			cursor: pointer;
-			border-left-color: #e99b8a80;
-			border-left-width: 15px;
+		.dark-mode .msg_envoye {
+			background-color: #4a1c00;
 		}
+
 
 		.bouton_sekooly{
 			height: 30px;
 			background-color: #FF6C00;
+			margin-right: 1%;
 		}
 
 		#liste_destinataires{
@@ -84,11 +185,12 @@
 		}
 
 		.emplacement_des_msgs {
-			padding: 2%;
+			padding: 0 1% 0 1%;
 			display: block;
 			overflow-wrap: anywhere;
 			overflow: hidden auto;
-			height: 85%;
+			height: 75%;
+			border-top-style: double;
 		}
 
 		img{
@@ -1025,7 +1127,7 @@
 			border-style: double;
 			margin: 0px;
 			display: grid;
-			grid-template-columns: 90px 8fr;
+			grid-template-columns: 90px 95% auto;
 		}
 
 		#details_conv {
@@ -1735,11 +1837,11 @@
 
 
 
-		<!--
 		<span>
-			<img id="recup_msgs" position="50px" alt="MESSAGES" class="icone_navbar" onclick="recuperer_msgs()" src="images/img_enveloppe.svg">		
+			<img id="recup_msgs" position="50px" alt="MESSAGES" class="icone_navbar" onclick="recuperer_msgs(true)" src="images/img_enveloppe.svg">		
 		</span>
-		-->
+		<div class="bulle_notif" id="bulle_notif_msg" onclick="recuperer_msgs(true)"></div>
+
 
 
 		<!--

@@ -942,7 +942,7 @@ function fenetre_remarque_note(id_fichier, note_rendu, remarque){
 	/*
 	alert(nom_proprio_devoir)
 	console.log(nom_proprio_devoir)*/
-	return '<div class="ma_fenetre" id="remarque_et_note" style="visibility: visible;height: 33%;width: 280px;height: 300px;top: 35%;left: 10%;"><b style="text-align: center;"><div id="titre_fenetre" class="">Note et remarque de '+nom_proprio_devoir+' </div></b><span style=""><form id="mon_formulaire" autocomplete="off" style="padding: 0% 3% 0% 3%;height:82%;overflow-y: auto;">	<div id="champ_note"><label id="label" for="note_rendu">Note (sur 20)</label><input type="number" min=0 max=20 step=0.125 id="note_rendu" maxlength="2" style="width: 100%;" value="'+note_rendu+'"></div><br><label id="label" for="remarque">Votre remarque</label><textarea id="remarque" maxlength="300" style="width: 100%;resize: none;font-size: 13px;height: 50%;">'+remarque+'</textarea><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button type="button" id="Annuler" onclick="$(\'#remarque_et_note\').remove()"> Annuler </button><button type="button" id="envoyer_note">Valider</button></div></form></span></div>'
+	return '<div class="ma_fenetre" id="remarque_et_note" style="visibility: visible;height: 33%;width: 280px;height: 300px;top: 35%;left: 10%;"><b style="text-align: center;"><div id="titre_fenetre" class="">Note et remarque de '+nom_proprio_devoir+' </div></b><span style=""><form id="mon_formulaire" autocomplete="off" style="padding: 0% 3% 0% 3%;height:82%;overflow-y: auto;">	<div id="champ_note"><label id="label" for="note_rendu">Note (sur 20)</label><input type="number" min=0 max=20 step=0.125 id="note_rendu" maxlength="2" style="width: 100%;" value="'+note_rendu+'"></div><br><label id="label" for="remarque">Votre remarque</label><textarea id="remarque" maxlength="300" style="width: 100%;resize: none;font-size: 13px;height: 50%;">'+remarque+'</textarea><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button class="bouton_sekooly" type="button" id="Annuler" onclick="$(\'#remarque_et_note\').remove()"> Annuler </button><button  class="bouton_sekooly" type="button" id="envoyer_note">Valider</button></div></form></span></div>'
 	//return '<div></div>'
 }
 
@@ -1466,7 +1466,7 @@ function ma_photo(identifiant_optionnel, sans_bouton_modifier){
 	supprimer_si_pp_existante = id_pp ? (sans_bouton_modifier ? "" : bouton_supprimer_pp()) : ""
 	bouton_modifier = sans_bouton_modifier ? "" : bouton_modifier_pp()
 	chargement(false)
-	return "<img class='pp' id='pp_"+recuperer('identifiant_courant')+"' src=" + le_lien_pp +">" + bouton_modifier + supprimer_si_pp_existante
+	return "<img class='pp' id='pp_"+(identifiant_optionnel || recuperer("identifiant_courant"))+"' src=" + le_lien_pp +">" + bouton_modifier + supprimer_si_pp_existante
 
 }
 
@@ -2022,7 +2022,6 @@ function deconnexion(){
 	effacer('quitter_multi_visio')
 	effacer("nb_clics")
 
-	effacer('les_msgs_details')
 	effacer('mes_destinataires')
 	effacer('mes_msgs')
 	effacer('msg_chargé')
@@ -2228,7 +2227,7 @@ function recuperer_eleves(sans_fenetre){
 	chargement(true);
 
 	//la classe actuellement ouverte
-	var classe = element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
+	var classe = recuperer('mon_type').includes('Eleves') ? JSON.parse(recuperer("mes_donnees"))['Classe'] : element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
 	//si on est admin et à la première page: on récupère tout
 	if (recuperer('mon_type') === "Administration") classe = "Tous";
 
@@ -3374,7 +3373,7 @@ function traitement_fichiers_recus(){
 				date_debut = la_date_yyyy_mm_dd(valeur['date_effet']);
 				date_debut = moment(date_debut + " " + valeur['heure_effet'])
 
-				console.log("date_debut : " + date_debut.format("YYYY-MM-DD HH:mm"))
+				//console.log("date_debut : " + date_debut.format("YYYY-MM-DD HH:mm"))
 
 				la_date_limite = date_debut;
 				nb_heures_delai_examen = data_etablissement['nb_heures_delai_examen'] || 12 //12 par défaut
@@ -3389,7 +3388,7 @@ function traitement_fichiers_recus(){
 				//console.log("au " + la_date_limite + lheure_limite);
 
 
-				console.log("la_date_limite : " + la_date_limite.format("YYYY-MM-DD HH:mm"))
+				//console.log("la_date_limite : " + la_date_limite.format("YYYY-MM-DD HH:mm"))
 				lheure_limite = " à " + la_date_limite.format("YYYY-MM-DD HH:mm").split(" ")[1]
 				la_date_limite = afficher_date(la_date_limite,true);
 
@@ -5946,7 +5945,7 @@ $(function charger_fichiers(e){
 			vider_fenetre("Nouvelle discussion");
 			element_DOM('maquestion').src="";
 
-			var nouveau_message = '<form id="mon_formulaire" autocomplete="off" style="padding: 0% 3% 0% 3%;height:82%;overflow-y: auto;"><label id="label" for="titre_question">Titre: </label><input type="text" id="titre_question" maxlength="50" style="width: 100%;">	<br><br><label id="label" for="contenu_question">Votre message: </label><textarea id="contenu_question" maxlength="1700" style="width: 100%;height: 70%;resize: none;font-size: 13px;"></textarea><div id="nb_max_div" style="margin-left: 90%;margin-top: 0%;font-size: 10px; display:none;"> <font id="nb_max"> 0 / 1700</font> </div><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button type="button" id="Annuler" onclick="recuperer_les_topics(false)"> Annuler </button><button type="button" id="envoi" onclick="envoyer_le_topic()"> Poster </button></div><div id="msg_erreur" style="text-align: center;padding: 1%;color: green;"> </div></form>';
+			var nouveau_message = '<form id="mon_formulaire" autocomplete="off" style="padding: 0% 3% 0% 3%;height:82%;overflow-y: auto;"><label id="label" for="titre_question">Titre: </label><input type="text" id="titre_question" maxlength="50" style="width: 100%;">	<br><br><label id="label" for="contenu_question">Votre message: </label><textarea id="contenu_question" maxlength="1700" style="width: 100%;height: 70%;resize: none;font-size: 13px;"></textarea><div id="nb_max_div" style="margin-left: 90%;margin-top: 0%;font-size: 10px; display:none;"> <font id="nb_max"> 0 / 1700</font> </div><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button  class="bouton_sekooly" type="button" id="Annuler" onclick="recuperer_les_topics(false)"> Annuler </button><button  class="bouton_sekooly" type="button" id="envoi" onclick="envoyer_le_topic()"> Poster </button></div><div id="msg_erreur" style="text-align: center;padding: 1%;color: green;"> </div></form>';
 
 
 			//ajouter la fenettre de nouveau message au DOM
@@ -7273,18 +7272,24 @@ function jai_pas_lu(id_notif, envoyer_cette_non_lecture, une_notif){
 
 function jai_lu(id_notif, envoyer_cette_lecture, une_notif){
 	
-	//console.log("✅lire " + id_notif)
+	//console.log(liste_notifs_lues)	
+	//console.log("✅lire '" + id_notif + "'")
+
 
 	//stocker dans la variable globale
 	liste_notifs_lues = !liste_notifs_lues.includes(","+id_notif+",") ? liste_notifs_lues + id_notif + "," : liste_notifs_lues
 
 	//console.log(liste_notifs_lues)
+	//console.log("\n\n")
 
 	//virer les classes non lues
 	//une_notif = $("#pannel_notif > [id='"+id_notif+"']")[0]
 	if(une_notif) une_notif.className = "une_notif"
 
+
+	//envoyer cette notif 
 	if(envoyer_cette_lecture) envoyer_ce_que_jai_lu()
+
 
 }
 
@@ -7299,7 +7304,9 @@ function envoyer_ce_que_jai_lu(){
 	console.log(url)
 	console.log(nouvelle_liste)
 	*/
-	patch_resultat_asynchrone(url, nouvelle_liste)
+	return patch_resultat_asynchrone(url, nouvelle_liste).then(function(e){
+		return liste_notifs_lues
+	})
 
 
 }
@@ -7339,6 +7346,11 @@ function recuperer_notifs(){
 	chargement(true);
 
 	if(!recuperer('mes_donnees')) return -1;
+
+
+
+	//notifs des messages
+	recuperer_msgs(true,true)
 
 
 	var ma_classe = JSON.parse(recuperer('mes_donnees'))['Classe'];
@@ -7414,6 +7426,8 @@ function recuperer_notifs(){
 
 
 	}
+
+
 
 
 }
@@ -7513,6 +7527,10 @@ function afficher_bulle_notifs(){
 	positionner_bulle_notif();
 	positionner_pannel_notif();
 
+
+
+
+	/********************************** NOTIFS STANDARD ***********************************/
 	var mes_notifs = JSON.parse(recuperer('mes_notifs'));
 	var ma_date_consultation = recuperer('ma_date_consultation');
 
@@ -7553,15 +7571,38 @@ function afficher_bulle_notifs(){
 
 	var nombre = nouvelles_notifs.length;
 	if(nombre>99) nombre = "+99";
-	
-	var bulle_notif = element_DOM('bulle_notif');
 	//console.log(nombre)
 	element_DOM('bulle_notif').style.display = nombre > 0 ? "block" : "";
-	bulle_notif.innerText = nombre;
+	element_DOM('bulle_notif').innerText = nombre;
 	
+
+
+
+
+
+
+
+
+	/*************************** NOTIFS DES MESSAGES ***************************/
+	var mes_msgs = JSON.parse(recuperer('mes_msgs'));
+	if(mes_msgs){
+		var nouveaux_msgs = mes_msgs.filter(e => !liste_notifs_lues.includes("," + e['id_msg'] + ","))
+		nombre_msgs = nouveaux_msgs.length
+		if(nombre_msgs>99) nombre_msgs = "+99";
+		//console.log(nombre)
+		element_DOM('bulle_notif_msg').style.display = nombre_msgs > 0 ? "block" : "";
+		element_DOM('bulle_notif_msg').innerText = nombre_msgs;
+	}else{
+		nombre_msgs =0
+	}
+
+
+
+
 
 
 	chargement(false);
+	return [nombre, nombre_msgs]
 
 
 }
@@ -7618,6 +7659,9 @@ function positionner_bulle_notif(){
 	if(element_DOM('bulle_notif'))
 		$("#bulle_notif")[0].style.left =  (22+$("#recup_notifs")[0].offsetLeft) + "px";
 
+	if(element_DOM('bulle_notif_msg'))
+		$("#bulle_notif_msg")[0].style.left =  (22+$("#recup_msgs")[0].offsetLeft) + "px";
+	
 }
 
 function positionner_pannel_notif(){	
@@ -7632,6 +7676,7 @@ function positionner_pannel_notif(){
 function mettre_en_place_les_notifications(){
 
 	recuperer_notifs();
+
 
 	$(window).on('resize', function(){
 
@@ -12409,22 +12454,20 @@ function lien_pp(id_pp){
 
 
 /******************** MESSAGES PERSOS ******************************/
-function recuperer_msgs(forcing){
+function recuperer_msgs(forcing, sans_fenetre){
 	//en_cours()
 
 	chargement(true);
 	
-	//on ajoute les boutons Actualiser/Ajout/Quitter TOPIC au DOM
-	//console.log("on va vider");
+
 	vider_fenetre("");
-	//console.log("c'est vidé");
-	afficher_fenetre(true);
-
-	element_DOM('fenetre').innerHTML += html_boutons_fenetre("recuperer_msgs(true)","ajouter_un_tout_nouveau_msg()","Pour répondre, cliquez sur le message en question.");
+	element_DOM('fenetre').innerHTML += html_boutons_fenetre("recuperer_msgs(true)","ajouter_un_tout_nouveau_msg()","Pour répondre, cliquez sur le message en question.<br>" +alerte_conv());
 
 
-    if (forcing ||recuperer("mes_msgs") === null || recuperer("mes_msgs") === ''){
+    if (forcing || recuperer("mes_msgs") === null || recuperer("mes_msgs") === ''){
 		
+    	//alert("on récup depuis le serveur")
+
 		//chercher tous les messages envoyés et reçus
     	nom_table = "Conversations"
     	nom_champ_reference = "id_conv"
@@ -12439,21 +12482,26 @@ function recuperer_msgs(forcing){
     	*/
     	
     	//console.log("Récupérons d'abord...")
-    	rechercher_contenant_motif(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher).then(mes_msgs => {
+    	return rechercher_contenant_motif(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher).then(mes_msgs => {
+
     		//console.log(mes_msgs)
-    		mes_msgs = mes_msgs.sort(function tri_ordre_chrono_decroissant(a, b) {
-				//return moment(b.Horodateur, "DD/MM/YYYY HH:mm:ss")  - moment(a.Horodateur, "DD/MM/YYYY HH:mm:ss")
-				return convertir_en_date(b.Horodateur) - convertir_en_date(a.Horodateur)
-			});
-    		//console.log(mes_msgs)
+    		//décroissant ici
+    		mes_msgs = mes_msgs.sort((a,b) => a.Horodateur < b.Horodateur)
 
     		stocker("mes_msgs",JSON.stringify(mes_msgs));
-    		traitement_msgs();
     		chargement(false);
+    		if(!sans_fenetre){
+    			return traitement_msgs();	
+    		}else{
+    			return mes_msgs
+    		}
+    		
+
 		}).catch(e => {
 			console.error(e)
 			alert("Impossible de récupérer vos messages. Vérifiez que vous êtes toujours connecté à internet, ou réessayer plus tard.")
 			chargement(false);
+			return false
 		})
 	
 
@@ -12461,17 +12509,26 @@ function recuperer_msgs(forcing){
 	}else{
 		//console.log("traitement direct")
 		//on traite direct les données
-		traitement_msgs();
-		chargement(false);				
+		chargement(false);		
+		if(!sans_fenetre){
+			return traitement_msgs();	
+		}else{
+			return JSON.parse(recuperer("mes_msgs"))
+		}	
 	}
 
 
+function alerte_conv(){
+	//return "Les messages que vous échangez avec d\'autres utilisateurs sont susceptibles d\'être vus par les membres de l\'Administration de votre établissement."
+	return ""
+}
 
 function traitement_msgs(){
-	stocker("les_msgs_details","")
+	
+	afficher_fenetre(true);
 
 	if (recuperer("mes_msgs").length === 0 || recuperer("mes_msgs") === "[]") {
-		commentaire = '<div id="vide" style="text-align: center;color: grey;margin: 10%;"> <i id="vide"> Vous n\'avez pas encore de messages privés.<br><br>Les messages que vous échangez avec d\'autres utilisateurs sont susceptibles d\'être vus par les membres de l\'Administration de votre établissement.</i> </div>';
+		commentaire = '<div id="vide" style="text-align: center;color: grey;margin: 10%;"> <i id="vide"> Vous n\'avez pas encore de messages privés.<br><br></i> </div>';
 
 		//ajouter la fenêtre au DOM
 		var mon_commentaire = document.createElement('div');
@@ -12479,6 +12536,8 @@ function traitement_msgs(){
 		while(mon_commentaire.firstChild) {
 		    element_DOM('fenetre').appendChild(mon_commentaire.firstChild);
 		}
+
+		return commentaire
 
 	}else{
 
@@ -12503,9 +12562,17 @@ function traitement_msgs(){
 			var id_topic = valeur['id_conv'] ;
 			//console.log("on va ajouter " + id_topic);
 
+
+
+
+			//nb de msgs non lus
+			//console.log("pour " +valeur['id_msg'])
+			var nb_non_lus = liste_des_msgs.filter(e => e['id_conv'] === valeur['id_conv'] && !liste_notifs_lues.includes("," + e["id_msg"] +",")).length
+			//console.log("	nb_non_lus:" + nb_non_lus)
+
+
 			//rassembler les msgs de la meme conversation
 			//on zappe si c'est déjà présent
-			
 			//console.log("[id='"+id_topic+"']")
 			if($("[id='"+id_topic+"']").length > 0) return true
 
@@ -12528,7 +12595,8 @@ function traitement_msgs(){
 
 			var img_pp = ma_photo(titre.toLowerCase(), true) //pas de modifs de la pp
 
-			var dans_fenetre_str = '<ul class="bloc_msg msg_non_lu" onclick="clic_de_msg(this.id)" id="' + id_topic + '"> '+ img_pp + '<span id="details_conv">' + icone_poubelle + ' <p id="' + id_topic + '" style="font-size: 25px; margin:0px;"> <b class="contenu_question" id="' + id_topic + '"> '  + titre +'  </b> <p id="' + id_topic + '" class="contenu_question"> ' + contenu + '</p><i class="petite_ecriture"> <h id="' + id_topic + '"><u id="' + id_topic + '"> Nombre de messages</u>: <u class="nb_com_actuel" id="' + id_topic + '">' + nb_coms + '</u> </h> <h id="' + id_topic + '">  &emsp; <u id="' + id_topic + '"> Dernier message le</u>: ' + date + ' </h><h id="' + id_topic + '"></h></i></span></ul>';
+			var span_nb_non_lus = nb_non_lus > 0 ? '<div class="msg_non_lu">'+nb_non_lus+'</div>' : ""
+			var dans_fenetre_str = '<ul class="bloc_msg" onclick="clic_de_msg(this.id)" id="' + id_topic + '"> '+ img_pp + '<span id="details_conv">' + icone_poubelle + ' <p id="' + id_topic + '" style="font-size: 25px; margin:0px;"> <b class="contenu_question" id="' + id_topic + '"> '  + titre +'  </b> <p id="' + id_topic + '" class="contenu_question"> ' + contenu + '</p><i class="petite_ecriture"> <h id="' + id_topic + '"><u id="' + id_topic + '"> Nombre de messages</u>: <u class="nb_com_actuel" id="' + id_topic + '">' + nb_coms + '</u> </h> <h id="' + id_topic + '">  &emsp; <u id="' + id_topic + '"> Dernier message le</u>: ' + date + ' </h><h id="' + id_topic + '"></h></i></span> '+span_nb_non_lus+' </ul>';
 			
 			//console.log("dans_fenetre: " + dans_fenetre_str)
 			
@@ -12544,6 +12612,7 @@ function traitement_msgs(){
 
 		});
 		
+		return liste_des_msgs
 	}
 }
 
@@ -12559,9 +12628,6 @@ function clic_de_msg(id_conv){
 	//console.log(id_conv)
 	stocker("msg_chargé",id_conv)
 
-	//ajouter le message dans la liste des notifs consultées
-
-
 	//on récupère tous les msgs de la conversation
 	//console.log('on recupere les msgs de la conv n° ' + id_conv + '...');
 	recuperer_tous_les_msgs(id_conv, false);
@@ -12571,14 +12637,23 @@ function recuperer_tous_les_msgs(id_conv, forcing){
 
 	//console.log("on cherche "  + id_conv)
 	var mes_msgs = JSON.parse(recuperer("mes_msgs"))
+
+	//ordre croissant ici
+	mes_msgs = mes_msgs.sort((a,b) => a.Horodateur > b.Horodateur)
+
+
+	//console.log("récupérer toute cette conv: " + id_conv)
 	var nom_destinataire = mes_msgs.find(e => e['id_conv'].includes(id_conv))['id_conv']
 	nom_destinataire = recuperer_destinataire(nom_destinataire)
+	//console.log(nom_destinataire)
+	var src_pp = $("[id='pp_" + nom_destinataire.toLowerCase() +"']")[0].src
 
-	var entete_convo = '<div id="entete_convo" style="display: flex;overflow-wrap: anywhere;"><img id="<<" src="https://sekooly.github.io/SUPABASE/images/img_retour.png" style="width: 30px;margin: 2%;cursor:pointer;height: 30px;"  onclick="recuperer_msgs(false)"> <div id="titre_du_poste" style="font-weight: bold;margin: 2%;font-size: 25px;">' + nom_destinataire + '</div></div>';
+	var entete_convo = '<span id="entete_convo"><img id="<<" class="retour_msgs" src="https://sekooly.github.io/SUPABASE/images/img_retour.png" onclick="recuperer_msgs(true)"> <img class="retour_msgs" src="'+src_pp+'"><div id="Destinataire" class="titre_du_poste">'+nom_destinataire+'</div></span>';
 	//console.log(entete_convo)
 
-	$("#fenetre")[0].innerHTML = entete_convo
-
+	$("#div_liste_topics").remove()
+	vider_fenetre(entete_convo)
+	
 
 
 	var emplacement_des_msgs = '<div id="emplacement_des_msgs" class="emplacement_des_msgs"></div>';
@@ -12589,12 +12664,61 @@ function recuperer_tous_les_msgs(id_conv, forcing){
 	var les_msgs = document.createElement('div');
 	les_msgs.innerHTML = emplacement_des_msgs ;
 
-	element_DOM('fenetre').appendChild(les_msgs);
+	element_DOM('fenetre').appendChild(les_msgs.firstChild);
 
 	//ajouter chaque message
+	mes_msgs = mes_msgs.filter(e => e['id_conv'] === id_conv)
+
+	//console.log(mes_msgs)
+	var une_conversation = "<div id='conversation' class='conversation'>"
+	//console.log(liste_notifs_lues)
+	mes_msgs.forEach(function(le_msg){
+		//console.log(le_msg)
+		msg_html = afficher_msg_conversation(le_msg) 
+		une_conversation += msg_html
+		
+		//ajouter le message dans la liste des notifs consultées	
+		//si c'est pas déjà consulté
+		//console.log("on vient de lire " + le_msg['id_msg'])
+		jai_lu(le_msg['id_msg'],false)	
+		
+	})
+	apres_maj_lecture_notifs()
+	//console.log(liste_notifs_lues)
 
 
 
+	//actualiser la bulle
+	afficher_bulle_notifs()
+
+	//une_conversation += "</div>"
+	//console.log("\n\n\n" + une_conversation)
+	$("#emplacement_des_msgs").append(une_conversation)	
+
+	//scroller tout en bas
+	le_dernier_msg = mes_msgs[mes_msgs.length - 1]
+	element_DOM(le_dernier_msg['id_msg']).scrollIntoView()
+
+	//ajouter la nouvelle zone d'envoi
+	$("#fenetre").append(zone_envoi(id_conv))
+
+	//focus sur la zone de texte
+	$("#Message").focus()
+
+
+}
+
+
+
+
+function zone_envoi(id_conv){
+	return '<div id="nouveau_msg_convo"><textarea id="Message" name="Message" placeholder="Ecrivez votre message..."></textarea><button class="bouton_envoi" onclick="envoyer_mon_message(\''+id_conv+'\')"><img alt="Envoyer" class="pp" src="images/img_send.png" style="width: 30px;height: 30px;filter: invert(1);"></button></div>'
+}
+
+function afficher_msg_conversation(le_msg){
+	la_className = "un_msg " + (le_msg['Expediteur'] === recuperer('identifiant_courant') ? "msg_envoye" : "msg_recu")	
+	Expediteur = le_msg['Expediteur'] === recuperer('identifiant_courant') ? "MOI-MÊME" :  le_msg['Expediteur'].toUpperCase()
+	return '<div class="'+la_className+'" id="'+le_msg['id_msg']+'"><div id="auteur_du_poste">'+Expediteur+'</div><h id="contenu_poste"><p data-placeholder="Votre commentaire...">'+le_msg['Message']+'</p></h><h id="date_poste">'+ afficher_date(le_msg['Horodateur']) +'</h></div>'
 }
 
 
@@ -12644,7 +12768,7 @@ function ajouter_un_tout_nouveau_msg(){
 	vider_fenetre("Nouveau message");
 	element_DOM('maquestion').src="";
 
-	var nouveau_message = '<form id="mon_formulaire" autocomplete="off" style="padding: 0% 3% 0% 3%;height:82%;overflow-y: auto;"><label id="label" for="Destinataire">Destinataire: </label><div id="div_autocompletion" class="autocompletion"> <input placeholder="Tapez pour chercher le destinataire..." autocomplete="on"  oninput="faire_autocompletion_input(\'Destinataire\')" type="text" name="Destinataire" id="Destinataire" maxlength="50" style="width: 100%;"></div><br><br><label id="label" for="Message">Votre message: </label><textarea id="Message" name="Message" maxlength="1700" style="width: 100%;height: 70%;resize: none;font-size: 13px;"></textarea><div id="nb_max_div" style="margin-left: 90%;margin-top: 0%;font-size: 10px; display:none;"> <font id="nb_max"> 0 / 1700</font> </div><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button class="bouton_sekooly" type="button" id="Annuler" onclick="recuperer_msgs(false)"> Annuler </button><button class="bouton_sekooly" type="button" id="envoi" onclick="envoyer_mon_message()"> Envoyer le message </button></div><div id="msg_erreur" style="text-align: center;padding: 1%;color: green;"> </div></form>';
+	var nouveau_message = '<div id="mon_formulaire" autocomplete="off" style="padding: 0% 3% 0% 3%;height:82%;overflow-y: auto;"><label id="label" for="Destinataire">Destinataire: </label><div id="div_autocompletion" class="autocompletion"> <input placeholder="Tapez pour chercher le destinataire..." autocomplete="on" onkeyup="validation_par_touche(event)" oninput="faire_autocompletion_input(this,\'Destinataire\')" type="text" name="Destinataire" id="Destinataire" maxlength="50" style="width: 100%;"></div><br><br><label id="label" for="Message">Votre message: </label><textarea id="Message" name="Message" placeholder="Saisissez votre message..." maxlength="1700" style="width: 100%;height: 70%;resize: none;font-size: 13px;"></textarea><div id="nb_max_div" style="margin-left: 90%;margin-top: 0%;font-size: 10px; display:none;"> <font id="nb_max"> 0 / 1700</font> </div><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button class="bouton_sekooly" type="button" id="Annuler" onclick="recuperer_msgs(false)"> Annuler </button><button class="bouton_sekooly" type="button" id="envoi" onclick="envoyer_mon_message()"> Envoyer le message </button></div><div id="msg_erreur" style="text-align: center;padding: 1%;color: green;"> </div></div>';
 
 	//ajouter la fenettre de nouveau message au DOM
 	var mon_message = document.createElement('span');
@@ -12655,14 +12779,24 @@ function ajouter_un_tout_nouveau_msg(){
 
 	$('#div_autocompletion').append('<div id="liste_destinataires"></div>')
 
-	rendre_riche("Message")
+	//rendre_riche("Message")
 
 	//focus direct sur le titre
 	element_DOM('Destinataire').focus();
 
 }
 
-function faire_autocompletion_input(nom_champ){
+function validation_par_touche(e){
+	//console.log(e)
+	if(e.keyCode === 13) choisir("Destinataire",$("#liste_destinataires")[0].firstChild)
+}
+
+function faire_autocompletion_input(ceci,nom_champ){
+
+	
+
+	if(!recuperer("mes_destinataires")) liste_de_mes_destinataires()
+
 	var mes_destinataires = recuperer("mes_destinataires").split(",")
 	var valeur_du_champ = $("[id='"+nom_champ+"']")[0].value.toUpperCase().replaceAll(" ","")
 
@@ -12682,6 +12816,8 @@ function faire_autocompletion_input(nom_champ){
 			$("#liste_destinataires").append('<div onclick="choisir(\''+nom_champ+'\',this)" value="'+un_destinataire+'">'+un_destinataire+'</div>')
 		})
 	}
+
+
 }
 
 
@@ -12691,38 +12827,104 @@ function choisir(nom_champ,ceci){
 	$("[id='"+nom_champ+"']")[0].value = ceci.getAttribute('value')
 
 	liste_destinataires.innerHTML = ""
+
+	destinataire = ceci.getAttribute('value').toLowerCase().split(" (")[0]
+	id_conv1 = ajouter_motif(destinataire) + ajouter_motif(recuperer("identifiant_courant")) 
+	id_conv2 = ajouter_motif(recuperer("identifiant_courant")) + ajouter_motif(destinataire) 
+
+	//console.log(id_conv1)
+	//console.log(id_conv2)
+
+
+	//si on a déjà une conv -> on va la bas
+	mes_msgs = JSON.parse(recuperer("mes_msgs"))
+	conv_initiale = mes_msgs.find(e => e['id_conv'] === id_conv1 ||  e['id_conv'] === id_conv2 )
+	if (conv_initiale){
+		id_conv = conv_initiale['id_conv']
+		charger_la_conv(id_conv)
+	}
+}
+
+function charger_la_conv(id_conv){
+	//console.log("on veut cette conv: " + id_conv)
+	recuperer_msgs(true).then(e => $("ul[id='"+id_conv+"']").click())	
 }
 
 
-function envoyer_mon_message(){
+function le_destinataire(){
+	return $("#Destinataire")[0].value || $("#Destinataire")[0].innerText
+}
+
+async function envoyer_mon_message(id_conv){
+
+	chargement(true)
+
+	//mode : deja_conv si id_conv, nouvelle_conv sinon
+	var mode_deja_conv = id_conv ? true : false
+
 	//vérifier que le destinataire existe
+	if(!recuperer("mes_destinataires")) await liste_de_mes_destinataires()
 	mes_destinataires =  recuperer("mes_destinataires").split(",")
-	if( mes_destinataires.indexOf($("#Destinataire")[0].value) < 0 ){
+	var destinataire = le_destinataire()
+	//console.log(destinataire)
+	if(!destinataire || !mes_destinataires.find(e => e.includes(destinataire)) ){
 		alert("Votre destinataire n'existe pas, merci de vérifier votre saisie.")
+		chargement(false)
 		return false
 	}
 
 	//vérifier que le message est clean
-	var phrase = $("#Message")[0].value
+	var phrase = $("#Message")[0].value.replaceAll("\n","<br>").trim()
+	if(phrase.length === 0){
+		alert("Merci de saisir un message avant de l'envoyer.")
+		chargement(false)
+		return false		
+	}
 	var le_mot_interdit = chercher_le_mot_interdit(phrase)
 	if(le_mot_interdit !== ""){
 		alert("Vous n'avez pas le droit d'utiliser le terme '"+le_mot_interdit+"' dans le cadre des cours à "+nom_etablissement+" sur SEKOOLY.")
 		return -1;
 	}
 
-	var destinataire = $("#Destinataire")[0].value.split(" (")[0].toLowerCase()
+	destinataire = destinataire.split(" (")[0].toLowerCase()
+	id_msg = creer_uuid()
 
+	var id_conv_vrai = id_conv ? id_conv : create_id_conv(destinataire, false)
 	var nouvelle_conversation = {
 		"Horodateur" : maintenant(),
 		"Expediteur" : recuperer("identifiant_courant"),
 		"Destinataire" : destinataire,
 		"Message" : phrase,
-		"id_msg" : creer_uuid(),
-		"id_conv" : create_id_conv(destinataire, false)
+		"id_msg" : id_msg,
+		"id_conv" : id_conv_vrai
 	}
 
 	//envoyer
-	ajouter_un_element("Conversations",nouvelle_conversation).then(() => recuperer_msgs(true))
+	ajouter_un_element("Conversations",nouvelle_conversation).then(function(e){
+
+		if(mode_deja_conv){			
+			$("#conversation").append(afficher_msg_conversation(nouvelle_conversation))
+			
+			//scroll au dernier message
+			//dans #conversation
+			element_DOM(id_msg).scrollIntoView()
+
+			//pas de texte
+			$("#Message")[0].value = ""
+
+			//focus
+			$("#Message").focus()
+
+			//j'ai lu
+			jai_lu(id_msg, true)
+
+
+		}else{
+			charger_la_conv(id_conv_vrai)
+		}
+		
+		chargement(false)
+	})
 
 
 }
