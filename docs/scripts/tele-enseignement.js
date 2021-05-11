@@ -13118,7 +13118,7 @@ function maj_matiere(){
 
 	if(bouton_ajouter_nouveau_chapitre){
 		$("#fenetre").append(bouton_ajouter_nouveau_chapitre)
-		$("#fenetre")[0].style.textAlign = "center"
+		//$("#fenetre")[0].style.textAlign = "center"
 	}
 
 
