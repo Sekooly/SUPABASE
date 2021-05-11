@@ -13263,18 +13263,23 @@ function modifier_chapitre(id_chapitre, champ_du_chapitre, valeur_du_chapitre){
 
 
 //par défaut: date heure pour le moment
-choisir_ce_mode($("#par_date_heure")[0])
+//choisir_ce_mode($("#par_date_heure")[0])
 
 
 function choisir_ce_mode(ceci){
-	$(".mode_affichage_fichiers")[0].className = "mode_affichage_fichiers"
-	$(".mode_affichage_fichiers")[1].className = "mode_affichage_fichiers"
 
-	//todo
-	//changer le filtre date VS filtre chapitre
+	if($(".mode_affichage_fichiers")){
 
-	ceci.className = "mode_affichage_fichiers mode_choisi"
-	masquer_config_mode()
+
+		$(".mode_affichage_fichiers")[0].className = "mode_affichage_fichiers"
+		$(".mode_affichage_fichiers")[1].className = "mode_affichage_fichiers"
+
+		//todo
+		//changer le filtre date VS filtre chapitre
+
+		ceci.className = "mode_affichage_fichiers mode_choisi"
+		masquer_config_mode()
+	}
 }
 
 function afficher_config_mode(){
