@@ -12560,7 +12560,9 @@ function traitement_msgs(){
 		//console.log("AVANT")
 		//console.log(liste_des_msgs)
 		
-		liste_des_msgs = liste_des_msgs.sort((a,b) => new moment(b.Horodateur)- new moment(a.Horodateur))
+		liste_des_msgs.sort(function tri_ordre_chrono_decroissant(a, b) {
+			return convertir_en_date(b.Horodateur) - convertir_en_date(a.Horodateur)
+		});
 
 		//console.log("APRES")
 		//console.log(liste_des_msgs)
