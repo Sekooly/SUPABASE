@@ -12371,7 +12371,7 @@ function canva_scrollable(id_canva){
 
 
 let deferredPrompt;
-const addBtn = document.querySelector('.add-button');
+const addBtn = $("#a2hs")[0]
 
 
 /*********************** PWA ***************************/
@@ -12383,28 +12383,32 @@ window.addEventListener('beforeinstallprompt', (e) => {
 	deferredPrompt = e;
 	// Update UI to notify the user they can add to home screen
 	addBtn.style.display = 'block';
+	$("#mynavbar")[0].style.top = "20px"
 
-	addBtn.addEventListener('click', (e) => {
-		// hide our user interface that shows our A2HS button
-		addBtn.style.display = 'none';
-		// Show the prompt
-		deferredPrompt.prompt();
-		// Wait for the user to respond to the prompt
-		deferredPrompt.userChoice.then((choiceResult) => {
-		if (choiceResult.outcome === 'accepted') {
-			console.log('Accepté.');
-		} else {
-			console.log('Refusé.');
-		}
-		deferredPrompt = null;
-		});
-	});
 });
 
 
 
 
+function ajouter_a_laccueil(){
+	
+	// hide our user interface that shows our A2HS button
+	$("#a2hs")[0].style.display = 'none';
+	$("#mynavbar")[0].style.top = ""
 
+	// Show the prompt
+	deferredPrompt.prompt();
+	// Wait for the user to respond to the prompt
+	deferredPrompt.userChoice.then((choiceResult) => {
+	if (choiceResult.outcome === 'accepted') {
+		console.log('Accepté.');
+	} else {
+		console.log('Refusé.');
+	}
+
+	deferredPrompt = null;
+	});
+}
 
 
 
@@ -12638,11 +12642,13 @@ function traitement_msgs(){
 //récupérer mes messages (get)
 function clic_de_msg(id_conv){
 	//console.log(id_conv)
+	chargement(true)
 	stocker("msg_chargé",id_conv)
 
 	//on récupère tous les msgs de la conversation
 	//console.log('on recupere les msgs de la conv n° ' + id_conv + '...');
 	recuperer_tous_les_msgs(id_conv, false);
+	chargement(false)
 }
 
 function recuperer_tous_les_msgs(id_conv, forcing){
@@ -12958,3 +12964,25 @@ function supprimer_conversation(ceci){
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+/************************************ NOTIFICATION ********************************************/
+function demander_notifications(){
+
+
+	if(Notification.permission === "granted"){
+		console.log("notifications acceptées")
+	}else if(Notification.permission !== "denied"){
+		Notification.requestPermission().then(permission => console.log(permission))
+	}
+
+}
