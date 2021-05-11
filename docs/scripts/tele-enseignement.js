@@ -12482,11 +12482,11 @@ function recuperer_msgs(forcing, sans_fenetre){
     	*/
     	
     	//console.log("Récupérons d'abord...")
-    	return rechercher_contenant_motif(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher).then(mes_msgs => {
+    	return rechercher_contenant_motif(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher, "Horodateur", "desc").then(mes_msgs => {
 
     		//console.log(mes_msgs)
     		//décroissant ici
-    		mes_msgs = mes_msgs.sort((a,b) => a.Horodateur < b.Horodateur)
+    		//mes_msgs = mes_msgs.sort((a,b) => a.Horodateur < b.Horodateur)
 
     		stocker("mes_msgs",JSON.stringify(mes_msgs));
     		chargement(false);
@@ -12556,8 +12556,15 @@ function traitement_msgs(){
 			var ma_liste = element_DOM('div_liste_topics');
 		}
 
+		//trier du plus récent au plus ancien (Horodateur)
+		//console.log("AVANT")
+		//console.log(liste_des_msgs)
 		
+		liste_des_msgs = liste_des_msgs.sort((a,b) => new moment(b.Horodateur)- new moment(a.Horodateur))
 
+		//console.log("APRES")
+		//console.log(liste_des_msgs)
+		
 		liste_des_msgs.forEach(function (valeur){
 			var id_topic = valeur['id_conv'] ;
 			//console.log("on va ajouter " + id_topic);
@@ -12581,7 +12588,10 @@ function traitement_msgs(){
 			element_contenu.innerHTML = valeur['Message'];
 			var contenu = element_contenu.innerText
 			
-			var date = afficher_date(valeur['Horodateur']);
+			//on récupère la date du dernier message
+			var horodateur_max =  moment.max( liste_des_msgs.filter(e => e['id_conv'] === valeur['id_conv']).map(e => e.Horodateur).map(e => moment(e)) ).format("DD/MM/YYY HH:mm")
+			//console.log(horodateur_max)
+			var date = afficher_date(horodateur_max);
 			var nb_coms = liste_des_msgs.filter(e => e['id_conv'] === valeur['id_conv']).length
 			if(nb_coms === undefined) nb_coms = 0;
 
