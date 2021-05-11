@@ -1716,6 +1716,81 @@ GRANT ALL ON TABLE public."Conversations" TO supabase_admin;
 
 
 
+-- Table: public.Programme
+
+-- DROP TABLE public."Programme";
+
+CREATE TABLE public."Programme"
+(
+    "ID_URL" text COLLATE pg_catalog."default" NOT NULL,
+    "Classe_Matiere" text COLLATE pg_catalog."default",
+    id_chapitre text COLLATE pg_catalog."default" NOT NULL,
+    intitule_chapitre text COLLATE pg_catalog."default",
+    position_chapitre bigint,
+    etat text COLLATE pg_catalog."default",
+    date_fin text COLLATE pg_catalog."default",
+    CONSTRAINT "Programme_pkey" PRIMARY KEY (id_chapitre)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public."Programme"
+    OWNER to supabase_admin;
+
+GRANT ALL ON TABLE public."Programme" TO anon;
+
+GRANT ALL ON TABLE public."Programme" TO authenticated;
+
+GRANT ALL ON TABLE public."Programme" TO postgres;
+
+GRANT ALL ON TABLE public."Programme" TO service_role;
+
+GRANT ALL ON TABLE public."Programme" TO supabase_admin;
+
+COMMENT ON TABLE public."Programme"
+    IS 'Contient le programme scolaire pour chaque matière';
+
+COMMENT ON COLUMN public."Programme"."ID_URL"
+    IS 'c''est l''ID URL de la MATIERE';
+
+COMMENT ON COLUMN public."Programme"."Classe_Matiere"
+    IS 'intitulé de la classe matière';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

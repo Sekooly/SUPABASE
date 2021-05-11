@@ -1,10 +1,10 @@
-var elements_menu_haut = ["Infos établissement","Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Alerte", "Logs", "Conversations", "Visio", "Notifs", "Fichiers", "Rendus", "Topic", "Coms","Espace etablissement restant","Analyses des connexions"]
+var elements_menu_haut = ["Infos établissement","Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Programme", "Alerte", "Logs", "Conversations", "Visio", "Notifs", "Fichiers", "Rendus", "Topic", "Coms","Espace etablissement restant","Analyses des connexions"]
 var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL_Mapping","URL_agenda",
 								"id_googlecalendar","nb_avis_donnés", "nb_avis_max","nom_fiche","taux_conseil",
 								"Matiere_bis", "classe_id", "classe_bis", "type", "Derniere_consultation_notifs",
 								"id_formulaire_remediation", "id_fiche", "URL_Mapping","niveau",
 								"classe_bis", "id_dossier_cycle", "dossier_rendus_cycle", "liste_notifs_lues", "nombre_avis", "Numero_telephone",
-								"id", "Id_classe_matiere", "id_notif", "Id_source", "id_fichier", "id_dossier", "id_devoir", "id_dossier_sujetdevoir", "id_fichier_sujetdevoir", "Id_topic", "id_com", "ID_FICHIER", "id_msg","id_conv"
+								"id", "Id_classe_matiere", "id_notif", "Id_source", "id_fichier", "id_dossier", "id_devoir", "id_dossier_sujetdevoir", "id_fichier_sujetdevoir", "Id_topic", "id_com", "ID_FICHIER", "id_msg","id_conv", "id_chapitre"
 								]
 
 var elements_menu_haut_avec_modifs = ["Classes","Matieres","Eleves","Profs","Administration"]
@@ -12986,3 +12986,271 @@ function demander_notifications(){
 	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*************************************** PROGRAMME SCOLAIRE ********************************************/
+function recuperer_programme(){
+	vider_fenetre("Programme scolaire")
+
+	
+
+	//lister mes matieres
+	//nom_classe - nom_matiere
+	var mes_matieres = JSON.parse(recuperer("mes_matieres"))
+	var id_matieres = mes_matieres.map(e => e['ID_URL'])
+	mes_matieres = mes_matieres.map(e => e['Classe'] + " " + e['Matiere'] )
+
+	//console.log(mes_matieres)
+	//console.log(id_matieres)
+
+	var liste_matieres = ''
+	for(numero_matiere = 0 ; numero_matiere < mes_matieres.length ; numero_matiere++){
+		liste_matieres += '<option value="'+id_matieres[numero_matiere]+'">'+mes_matieres[numero_matiere]+'</option>'
+	}
+
+
+	var menu_programme = '<div id="menu_programme" style="text-align: center;" class="menu_haut">Matière: <select id="ID_URL">'+liste_matieres+'</select> </div>'
+	$("#menu_programme").remove();
+
+
+
+	$("#fenetre").append(menu_programme);
+
+	// à l'actualisation de la matiere
+	$("#ID_URL").on('change', maj_matiere)
+
+	//par défaut: première matière	
+	maj_matiere()
+	
+	
+
+	afficher_fenetre(true)
+}
+
+function maj_matiere(){
+
+	chargement(true)
+
+	var je_suis_eleve = recuperer("mon_type") === "Eleves"
+
+
+	//console.log($("#ID_URL")[0].value)
+	var ID_URL = $("#ID_URL")[0].value
+	le_programme = donnees_programme(ID_URL)
+
+	//effacer le programme précédent
+	$("#programme_scolaire").remove()
+	$(".bouton_ajout_chapitre").remove()
+
+	//ajouter le nouveau programme
+	var programme_scolaire = '<div id="programme_scolaire" class="programme_scolaire"></div>'
+	$("#fenetre").append(programme_scolaire)
+
+
+
+	//si non eleve -> ajout/modifier/supprimer possible
+	if(!je_suis_eleve){			
+		boutons_update_programme =  liste_statuts(je_suis_eleve) + bouton_renommer_chapitre() +  bouton_supprimer_chapitre()
+		bouton_ajouter_nouveau_chapitre = '<button onclick="ajouter_un_chapitre()" class="bouton_ajout_chapitre">Ajouter un chapitre</button>'
+	}else{
+		boutons_update_programme = ""
+		bouton_ajouter_nouveau_chapitre = ""
+	}
+
+
+
+	//pas de programme
+	if(le_programme.length === 0){
+
+		$("#programme_scolaire").append('<div class="alerte_section_journee">Aucun chapitre n\'a été trouvé pour cette matière.</div>')
+
+	//avec programme
+	}else{
+
+
+		//pour chaque chapitre
+		le_programme.forEach(function(un_chapitre){
+			//afficher l'élément (+ boutons CUD)
+
+			//mettre la bonne valeur de l'état pour les élèves
+			if(je_suis_eleve) boutons_update_programme = liste_statuts(true, un_chapitre['etat'])
+
+
+			//boutons_update_programme = boutons_update_programme.replaceAll("#valeur_de_letat#",un_chapitre['etat'])
+			$("#programme_scolaire").append('<div class="un_chapitre" id="'+un_chapitre['id_chapitre']+'"><span class="titre_chapitre position_chapitre" id="position_chapitre">'+un_chapitre["position_chapitre"]+') </span><span class="titre_chapitre" id="'+un_chapitre['id_chapitre']+'">'+un_chapitre['intitule_chapitre'] +'</span>'+'<br>'+ boutons_update_programme  + "</div>" )			
+			
+			//assigner la valeur par du select (si NON élève)
+			if(!je_suis_eleve){				
+				$("[id='"+un_chapitre['id_chapitre']+"'] > select").val(un_chapitre['etat'])
+				actualiser_couleurs($("[id='"+un_chapitre['id_chapitre']+"'] > select")[0])
+			}
+
+		})
+
+		
+	}
+	
+
+	if(bouton_ajouter_nouveau_chapitre){
+		$("#fenetre").append(bouton_ajouter_nouveau_chapitre)
+		$("#fenetre")[0].style.textAlign = "center"
+	}
+
+
+	chargement(false)
+		
+}
+
+function nouvelle_position_chapitre(){
+	var liste_positions = $(".titre_chapitre.position_chapitre").text().replaceAll(")","").split(" ").map(e => Number(e))
+	return Math.max.apply(Math, liste_positions) +1
+}
+
+function bouton_renommer_chapitre(){
+	return '<img onclick="renommer_chapitre(this)" src="https://sekooly.com/assets/images/img_edit.png" alt="Renommer" class="editer">'
+}
+
+function bouton_supprimer_chapitre(){
+	return '<img onclick="supprimer_ce_chapitre(this)" src="https://sekooly.com/assets/images/img_trash.png" alt="Supprimer" class="editer">'
+}
+
+function liste_statuts(je_suis_eleve, etat_si_eleve){
+
+	if(!je_suis_eleve){
+		resultat = `
+			<select class="etat_chapitre" onchange="changer_statut_chapitre(this)">
+				<option value="Non commencé" id="Non commencé">Non commencé</option>
+				<option value="En cours" id="En cours">En cours</option>
+				<option value="Terminé" id="Terminé">Terminé</option>
+				<option value="Annulé" id="Annulé">Annulé</option>  
+			</select>
+			`
+	}else{
+		resultat = '<span style="background: '+couleur_de_letat(etat_si_eleve)+';" class="etat_chapitre">'+etat_si_eleve+'</span>'
+	}
+
+	return resultat
+}
+
+function couleur_de_letat(etat){
+	var couleur = etat === "Non commencé" ? "#848484" :
+					etat === "En cours" ? "#ffae59" :
+					etat === "Terminé" ? "#5d9140" :
+					etat === "Annulé" ? "#df756a" :
+					""
+
+	return couleur
+}
+
+function ajouter_un_chapitre(){
+
+	intitule_chapitre = prompt("Indiquez le nom du nouveau chapitre: ")
+	if(!intitule_chapitre) return false
+
+	donnees_chapitre = {
+		id_chapitre : creer_uuid(),
+		ID_URL : programme_ID_URL_actuel(),
+		Classe_Matiere : programme_classe_matiere_actuel(),
+		intitule_chapitre : intitule_chapitre,
+		position_chapitre : nouvelle_position_chapitre(),
+		etat : "Non commencé"
+	}
+
+	ajouter_un_element("Programme",donnees_chapitre).then(() => maj_matiere())
+}
+
+function programme_ID_URL_actuel(){
+	return $("#ID_URL")[0].value
+}
+
+function programme_classe_matiere_actuel(){
+	return $("#ID_URL option:selected").text();
+}
+
+
+function donnees_programme(ID_URL){
+	return get_resultat(racine_data + "Programme?ID_URL=eq." + ID_URL + "&order=position_chapitre.asc&" + apikey)
+}
+
+function renommer_chapitre(ceci){
+
+
+	var id_chapitre = le_id_chapitre(ceci)
+	var ancien_nom = $(".titre_chapitre[id='"+id_chapitre+"']")[0].innerText
+	
+	nouveau_nom = prompt("Indiquez le nouveau nom du chapitre: ", ancien_nom)
+	if(nouveau_nom && nouveau_nom !== ancien_nom) modifier_chapitre(id_chapitre, "intitule_chapitre", nouveau_nom)
+}
+
+function changer_statut_chapitre(ceci){
+
+	//changer la couleur
+	actualiser_couleurs(ceci)
+
+	//console.log("on doit changer le statut") //todo
+	var id_chapitre = le_id_chapitre(ceci)
+	modifier_chapitre(id_chapitre, "etat", ceci.value)
+
+}
+
+function actualiser_couleurs(ceci){
+
+
+	var la_couleur = couleur_de_letat($("[id='"+ceci.value+"']")[0].value) //$("[id='"+ceci.value+"']")[0].getAttribute("couleur")
+	//console.log(la_couleur)
+	ceci.style.background = la_couleur;	
+
+}
+
+function supprimer_ce_chapitre(ceci){
+
+	var id_chapitre = le_id_chapitre(ceci)
+	//console.log(id_chapitre)
+	var confirmation = confirm("Voulez-vous vraiment supprimer ce chapitre ? Cette action est irréversible. ("+id_chapitre+")")
+	if(confirmation){
+		supprimer("Programme","id_chapitre",id_chapitre).then(() => maj_matiere())
+	}
+}
+
+function le_id_chapitre(ceci){
+	return ceci.parentNode.id
+}
+
+function modifier_chapitre(id_chapitre, champ_du_chapitre, valeur_du_chapitre){
+	var donnees_chapitre = {
+		id_chapitre: id_chapitre,
+		[champ_du_chapitre]: valeur_du_chapitre
+	}
+	actualiser("Programme", "id_chapitre", id_chapitre, donnees_chapitre).then(() => maj_matiere())
+}
+
+
+
+
+
+

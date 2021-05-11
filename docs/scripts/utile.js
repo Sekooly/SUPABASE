@@ -242,12 +242,12 @@ function nouvel_id(nom_table, nom_champ_id){
 
 function supprimer(nom_table,nom_champ_reference,valeur_champ_reference){
   url = racine_data + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+apikey
-  delete_resultat_asynchrone(url)
+  return delete_resultat_asynchrone(url)
 }
 
 function supprimer_tout(nom_table){
   url = racine_data + nom_table + "?"+apikey
-  delete_resultat_asynchrone(url)
+  return delete_resultat_asynchrone(url)
 }
 
 function nom_des_champs(nom_table){
