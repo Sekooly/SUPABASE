@@ -13065,7 +13065,7 @@ function maj_matiere(){
 
 	//effacer le programme précédent
 	$("#programme_scolaire").remove()
-	$(".bouton_ajout_chapitre").remove()
+	$(".conteneur_bouton_ajout_chapitre").remove()
 
 	//ajouter le nouveau programme
 	var programme_scolaire = '<div id="programme_scolaire" class="programme_scolaire"></div>'
@@ -13076,7 +13076,7 @@ function maj_matiere(){
 	//si non eleve -> ajout/modifier/supprimer possible
 	if(!je_suis_eleve){			
 		boutons_update_programme =  liste_statuts(je_suis_eleve) + bouton_renommer_chapitre() +  bouton_supprimer_chapitre()
-		bouton_ajouter_nouveau_chapitre = '<button onclick="ajouter_un_chapitre()" class="bouton_ajout_chapitre">Ajouter un chapitre</button>'
+		bouton_ajouter_nouveau_chapitre = '<div class="conteneur_bouton_ajout_chapitre"><button onclick="ajouter_un_chapitre()" class="bouton_ajout_chapitre">Ajouter un chapitre</button></div>'
 	}else{
 		boutons_update_programme = ""
 		bouton_ajouter_nouveau_chapitre = ""
