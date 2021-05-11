@@ -3134,6 +3134,8 @@ function charger_dossier(id_dossier,final_booleen,titre){
 
 	//le dossier est déjà chargé
 	if (id_dossier !== "" && id_dossier !== null) {
+
+		//todo: récupérer le programme de cette matière
 		
 		$('#accueil_utilisateur').off('click');
 
@@ -5891,7 +5893,10 @@ $(function charger_fichiers(e){
 
 			if(!e.target.id.toLowerCase().includes("devoir") && !e.target) afficher_fenetre_rendudevoir(false);
 
-			if(e.target.nodeName === "BODY" || e.target.id === "gros_conteneur" || e.target.id ===  "liste_matieres") fermer_side_bar()
+			if(e.target.nodeName === "BODY" || e.target.id === "gros_conteneur" || e.target.id ===  "liste_matieres" || e.target.id.includes("drive_")) {
+				masquer_config_mode()
+				fermer_side_bar()
+			}
 		}
 
 
@@ -5902,6 +5907,7 @@ $(function charger_fichiers(e){
 				afficher_fenetre_rendudevoir(false);
 				virer_le_pannel_notifs();
 				afficher_ou_non_choix_fichier(false);
+				masquer_config_mode()
 			}
 		});
 
@@ -13253,4 +13259,39 @@ function modifier_chapitre(id_chapitre, champ_du_chapitre, valeur_du_chapitre){
 
 
 
+
+
+
+//par défaut: date heure pour le moment
+choisir_ce_mode($("#par_date_heure")[0])
+
+
+function choisir_ce_mode(ceci){
+	$(".mode_affichage_fichiers")[0].className = "mode_affichage_fichiers"
+	$(".mode_affichage_fichiers")[1].className = "mode_affichage_fichiers"
+
+	//todo
+	//changer le filtre date VS filtre chapitre
+
+	ceci.className = "mode_affichage_fichiers mode_choisi"
+	masquer_config_mode()
+}
+
+function afficher_config_mode(){
+	$(".gear-container")[0].style.display = "block"
+}
+
+function masquer_config_mode(){
+	$(".gear-container")[0].style.display = ""
+}
+
+function switch_config_mode(){
+	deja_visible = $(".gear-container")[0].style.display === "block"
+
+	if(deja_visible){
+		masquer_config_mode()
+	}else{
+		afficher_config_mode()
+	}
+}
 

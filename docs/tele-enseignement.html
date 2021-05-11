@@ -59,6 +59,45 @@
 
 	<style>
 
+		.mode_affichage_fichiers {
+			cursor: pointer;
+		}
+
+		.mode_choisi{
+			background: #ff6c00;
+		}
+
+		.mode_affichage_fichiers:hover {
+			background: #4a4a4a;
+		}
+
+		.gear-container {
+			position: fixed;
+			width: -moz-fit-content;
+			top: -70px;
+			left: -30%;
+			text-align: center;
+			padding: 4%;
+			border-radius: 20px;
+			background: black;
+			display: none;
+		}
+
+		.gear:hover .gear-container  {
+		    display: block;
+		}
+
+		.gear{
+			position: relative;
+			width: 20px;
+			height: 20px;
+			top: 5px;
+		}
+
+		.dark-mode .gear{			
+			filter: invert(1);
+		}
+
 		.conteneur_bouton_ajout_chapitre{
 			text-align: center;
 		}
@@ -1937,6 +1976,14 @@
 		
 		
 	<span id="span_date_effet" class="span_date_effet">
+		<!--
+		<div class="gear-container"><b>Mode d'affichage</b>
+		  <div id="par_date_heure" class="mode_affichage_fichiers" onclick="choisir_ce_mode(this)">Date et heure d'effet</div>
+		  <div id="par_chapitre" class="mode_affichage_fichiers" onclick="choisir_ce_mode(this)">Chapitre</div>
+		</div>
+		<img onclick="switch_config_mode()" class="gear" alt="CONFIG" src="images/img_gear.svg">
+		-->
+
 		<select id="la_date_effet" class="la_date_effet"></select>
 	</span>
 
