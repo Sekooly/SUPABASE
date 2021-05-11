@@ -12713,7 +12713,7 @@ function recuperer_tous_les_msgs(id_conv, forcing){
 	$("#fenetre").append(zone_envoi(id_conv))
 
 	//focus sur la zone de texte
-	$("#Message").focus()
+	//$("#Message").focus()
 
 
 }
@@ -12923,7 +12923,7 @@ async function envoyer_mon_message(id_conv){
 			$("#Message")[0].value = ""
 
 			//focus
-			$("#Message").focus()
+			//$("#Message").focus()
 
 			//j'ai lu
 			jai_lu(id_msg, true)
