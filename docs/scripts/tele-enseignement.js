@@ -4,7 +4,7 @@ var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","UR
 								"Matiere_bis", "classe_id", "classe_bis", "type", "Derniere_consultation_notifs",
 								"id_formulaire_remediation", "id_fiche", "URL_Mapping","niveau",
 								"classe_bis", "id_dossier_cycle", "dossier_rendus_cycle", "liste_notifs_lues", "nombre_avis", "Numero_telephone",
-								"id", "Id_classe_matiere", "id_notif", "Id_source", "id_fichier", "id_dossier", "id_devoir", "id_dossier_sujetdevoir", "id_fichier_sujetdevoir", "Id_topic", "id_com", "ID_FICHIER"
+								"id", "Id_classe_matiere", "id_notif", "Id_source", "id_fichier", "id_dossier", "id_devoir", "id_dossier_sujetdevoir", "id_fichier_sujetdevoir", "Id_topic", "id_com", "ID_FICHIER", "id_msg","id_conv"
 								]
 
 var elements_menu_haut_avec_modifs = ["Classes","Matieres","Eleves","Profs","Administration"]
