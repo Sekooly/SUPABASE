@@ -12730,7 +12730,7 @@ function recuperer_tous_les_msgs(id_conv, forcing){
 
 
 function zone_envoi(id_conv){
-	return '<div id="nouveau_msg_convo"><textarea id="Message" name="Message" placeholder="Ecrivez votre message..."></textarea><button class="bouton_envoi" onclick="envoyer_mon_message(\''+id_conv+'\')"><img alt="Envoyer" class="pp" src="images/img_send.png" style="width: 30px;height: 30px;filter: invert(1);"></button></div>'
+	return '<div id="nouveau_msg_convo"><textarea id="Message" name="Message" placeholder="Ecrivez votre message..."></textarea><button class="bouton_envoi" onclick="envoyer_mon_message(\''+id_conv+'\')"><img alt="Envoyer" class="pp" src="https://sekooly.github.io/SUPABASE/images/img_send.png" style="width: 30px;height: 30px;filter: invert(1);"></button></div>'
 }
 
 function afficher_msg_conversation(le_msg){
