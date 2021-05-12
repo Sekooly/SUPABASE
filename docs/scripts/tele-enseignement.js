@@ -9906,8 +9906,13 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 
 		//obliger la saisie de tous les non disabled
 		if (formulaire_rempli("donnees_saisies") === false){
-			alert("Merci de remplir tous les champs.")
-			return -1;
+
+			if(plateforme_prete() === true){
+
+				alert("Merci de remplir tous les champs.")
+				return -1;
+
+			}
 
 		}
 
