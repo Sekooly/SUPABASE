@@ -13283,11 +13283,11 @@ function choisir_ce_mode(ceci){
 }
 
 function afficher_config_mode(){
-	$(".gear-container")[0].style.display = "block"
+	if($(".gear-container")) $(".gear-container")[0].style.display = "block"
 }
 
 function masquer_config_mode(){
-	$(".gear-container")[0].style.display = ""
+	if($(".gear-container")) $(".gear-container")[0].style.display = ""
 }
 
 function switch_config_mode(){
