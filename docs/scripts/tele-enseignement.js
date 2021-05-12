@@ -35,7 +35,7 @@ var mes_discussions = []
 var mes_coms = []
 var mes_visios = []
 
-var mes_fichiers = recuperer_mes_fichiers(true)
+var mes_fichiers = []
 
 
 var liste_notifs_lues = ""
@@ -2725,6 +2725,7 @@ function chargement_a_larrivee(){
 	}
 
 	mettre_en_place_les_notifications();
+	mes_fichiers = recuperer_mes_fichiers(true)
 
 	//affichage de logs SSI avec les droits
 	var mes_droits = JSON.parse(recuperer('mes_donnees'))['Droits_modifs'];
