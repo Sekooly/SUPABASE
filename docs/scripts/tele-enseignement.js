@@ -13344,7 +13344,7 @@ function faire_la_recherche_fichier(){
 	var zone_recherche = '<input id="rechercher" class="barre_recherche" name="rechercher" placeholder="Rechercher un fichier par mot(s)-clé(s)...">'
 
 	$("#mini_popup").remove()
-	creer_mini_popup("<b>Quel recherchez-vous?</b>"+zone_recherche, "<div class='liste_resultats' id='liste_resultats'></div>","Rechercher","afficher_resultats_recherche()")
+	creer_mini_popup("<b>Que recherchez-vous?</b>"+zone_recherche, "<div class='liste_resultats' id='liste_resultats'></div>","Rechercher","afficher_resultats_recherche()")
 
 	
 }
