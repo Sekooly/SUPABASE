@@ -1601,7 +1601,7 @@ GRANT ALL ON TABLE public.bulletins_classe TO service_role;
 CREATE OR REPLACE VIEW public."Trombinoscope"
  AS
 SELECT * FROM "Eleves" left join "Fichiers" on "Eleves"."Identifiant" = "Fichiers".proprietaire
-ORDER BY "Eleves"."Cycle", "Eleves"."Classe", "Eleves"."Identifiant"
+ORDER BY "Eleves"."Cycle", "Eleves"."Classe", "Eleves"."Identifiant";
 
 
 
@@ -1622,7 +1622,7 @@ ORDER BY "Eleves"."Cycle", "Eleves"."Classe", "Eleves"."Identifiant"
 CREATE OR REPLACE VIEW public."Trombinoscope_profs"
 AS
 SELECT * FROM "Profs" left join (select * from "Fichiers" where categorie_fichier = 'Profil') as intermediaire on "Profs"."Identifiant" = intermediaire.proprietaire
-ORDER BY "Profs"."Cycle", "Profs"."Classe", "Profs"."Identifiant"
+ORDER BY "Profs"."Cycle", "Profs"."Classe", "Profs"."Identifiant";
 
 
 
@@ -1636,7 +1636,7 @@ ORDER BY "Profs"."Cycle", "Profs"."Classe", "Profs"."Identifiant"
 CREATE OR REPLACE VIEW public."Trombinoscope_admin"
 AS
 SELECT * FROM "Administration" left join (select * from "Fichiers" where categorie_fichier = 'Profil') as intermediaire on "Administration"."Identifiant" = intermediaire.proprietaire
-ORDER BY "Administration"."Cycle", "Administration"."Classe", "Administration"."Identifiant"
+ORDER BY "Administration"."Cycle", "Administration"."Classe", "Administration"."Identifiant";
 
 
 
