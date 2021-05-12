@@ -59,6 +59,28 @@
 
 	<style>
 
+		select#ID_URL{
+			max-width: 75%;
+		}
+
+		.liste_resultats{
+			overflow-y: scroll;
+			width: 100%;
+			max-height: 350px;
+		}
+
+		.barre_recherche{
+			border-radius: 20px;
+			padding: 1%;
+			width: 90%;
+		    position: relative;
+		    float: right;
+		    margin: 1%;
+		    display: block;
+		    z-index: 1;
+		    overflow-wrap: anywhere;
+		}
+
 		.mode_affichage_fichiers {
 			cursor: pointer;
 		}
@@ -968,7 +990,7 @@
 		@media screen and (max-width: 600px) {
 		  .navbar > font {
 		    font-size: 15px;
-		    max-width: 50%;
+		    max-width: 45%;
 		  }
 		    
   		  .sidebar > div{
@@ -1274,6 +1296,7 @@
 			display: block;
 			z-index: 1;
 			filter: invert();
+			overflow-wrap: anywhere;
 		}
 
 
@@ -1919,6 +1942,12 @@
 		
 
 
+		
+		<span>
+			<img id="recup_msgs" position="50px" alt="RECHERCHE" class="icone_navbar" onclick="faire_la_recherche_fichier()" src="images/img_search.svg">		
+		</span>
+
+
 		<!--
 		<span>
 			<img id="recup_edt" position="50px" alt="EDT" class="icone_navbar" onclick="recuperer_edt()" src="images/img_edt.png">
@@ -1939,7 +1968,6 @@
 
 		<font id="accueil_utilisateur" ></font>
 
-		
 
 
 	</div>
@@ -1947,7 +1975,8 @@
 
 
 
-	<div class="sidebar left" onclick="fermer_side_bar()">
+	<div class="sidebar left" onclick="fermer_si_non_recherche(event)">
+
 		<div onclick="afficher_modif_profil()">Mon profil</div>
 		<div onclick="edt()">Emploi du temps</div>
 		<div onclick="ma_journee()">Ma journée</div>

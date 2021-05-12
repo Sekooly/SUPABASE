@@ -35,7 +35,7 @@ var mes_discussions = []
 var mes_coms = []
 var mes_visios = []
 
-var mes_fichiers = []
+var mes_fichiers = recuperer_mes_fichiers(true)
 
 
 var liste_notifs_lues = ""
@@ -10965,7 +10965,9 @@ function fermer_side_bar(){
 	$('.sidebar.top').sidebar({side: "top"}).trigger('sidebar:close');
 }
 
-
+function fermer_si_non_recherche(e){
+	if(e.target.id !== "rechercher") fermer_side_bar()
+}
 
 function en_cours(){
 
@@ -11679,27 +11681,8 @@ function details_tdb_3(ceci){
 
 function tdb_recuperer_fichiers_a_consulter(ne_pas_arreter_chargement,aujourdhui){
 	document.getElementById('tdb-4').innerHTML = ""
-	var mes_matieres = JSON.parse(recuperer('mes_matieres'));
-	var les_id_dossier_classe = '("'+mes_matieres.map(e => e['ID_URL']).join('","') + '")'
-	
 
-	//prof ou eleve
-	if(!recuperer('mon_type').includes('Admin')){
-		url = racine_data + 'Fichiers?' +apikey 
-		url += '&id_dossier=in.' + les_id_dossier_classe
-	
-	//admin
-	}else{
-		url = racine_data + 'Fichiers?' +apikey 
-	}
-
-	url += '&order=date_effet.asc,heure_effet.asc,id_dossier.asc'
-
-	//console.log(les_id_dossier_classe)
-	//console.log(url)
-	mes_fichiers = get_resultat(url)
-	mes_fichiers = mes_fichiers.filter(e => les_id_dossier_classe.includes(e["id_dossier"]))
-
+	mes_fichiers = recuperer_mes_fichiers(true)
 	//console.log(mes_fichiers)
 
 	//pour chaque categorie de fichier
@@ -11713,6 +11696,43 @@ function tdb_recuperer_fichiers_a_consulter(ne_pas_arreter_chargement,aujourdhui
 	creer_chart(4,mes_series,null,"Part des catégories sur "+mes_fichiers.length+" fichiers")
 
 	if(!ne_pas_arreter_chargement) chargement(false)
+}
+
+
+function recuperer_mes_fichiers(forcing){
+
+
+	//si on force OU on n'a pas encore les fichiers
+	if(forcing || !recuperer("mes_fichiers")){
+
+
+		var mes_matieres = JSON.parse(recuperer('mes_matieres'));
+		var les_id_dossier_classe = '("'+mes_matieres.map(e => e['ID_URL']).join('","') + '")'
+
+		//prof ou eleve
+		if(!recuperer('mon_type').includes('Admin')){
+			url = racine_data + 'Fichiers?' +apikey 
+			url += '&id_dossier=in.' + les_id_dossier_classe
+		
+		//admin
+		}else{
+			url = racine_data + 'Fichiers?' +apikey 
+		}
+
+		url += '&order=date_effet.asc,heure_effet.asc,id_dossier.asc'
+
+		//console.log(les_id_dossier_classe)
+		//console.log(url)
+		mes_fichiers = get_resultat(url)
+		mes_fichiers = mes_fichiers.filter(e => les_id_dossier_classe.includes(e["id_dossier"]))
+
+		
+		return mes_fichiers
+
+	}else{
+		return JSON.parse(recuperer("mes_fichiers"))
+	}
+
 }
 
 function details_tdb_4(ceci){
@@ -13283,20 +13303,119 @@ function choisir_ce_mode(ceci){
 }
 
 function afficher_config_mode(){
-	if($(".gear-container")) $(".gear-container")[0].style.display = "block"
+	if($(".gear-container")[0]) $(".gear-container")[0].style.display = "block"
 }
 
 function masquer_config_mode(){
-	if($(".gear-container")) $(".gear-container")[0].style.display = ""
+	if($(".gear-container")[0]) $(".gear-container")[0].style.display = ""
 }
 
 function switch_config_mode(){
-	deja_visible = $(".gear-container")[0].style.display === "block"
 
-	if(deja_visible){
-		masquer_config_mode()
-	}else{
-		afficher_config_mode()
+	if($(".gear-container")[0]){
+
+		deja_visible = $(".gear-container")[0].style.display === "block"
+
+		if(deja_visible){
+			masquer_config_mode()
+		}else{
+			afficher_config_mode()
+		}
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function faire_la_recherche_fichier(){
+
+	var zone_recherche = '<input id="rechercher" class="barre_recherche" name="rechercher" placeholder="Rechercher un fichier par mot(s)-clé(s)...">'
+
+	$("#mini_popup").remove()
+	creer_mini_popup("<b>Quel recherchez-vous?</b>"+zone_recherche, "<div class='liste_resultats' id='liste_resultats'></div>","Rechercher","afficher_resultats_recherche()")
+
+	
+}
+
+function afficher_resultats_recherche(){
+
+	var mot_cle = $("#rechercher")[0].value.trim().toLowerCase().replaceAll(" ","")
+	//console.log(mot_cle)
+
+	if(!mot_cle){
+		alert("Merci de d'abord saisir un mot-clé.")
+		return false
+	} 
+
+	//ignorer les fichiers de photos de profil
+	var mes_fichiers_initiaux = mes_fichiers.filter(e => e['categorie_fichier'] !== "Profil")
+	var mes_matieres = JSON.parse(recuperer("mes_matieres"))
+	
+
+	//rassembler les fichiers avec le nom des matieres (inner join avec ID_URL)
+	//console.log(mes_fichiers_initiaux)
+	mes_fichiers_intermediaires = mes_fichiers_initiaux.map(e =>   Object.assign({}, ...[e, mes_matieres.find(matiere => matiere['ID_URL'] === e["id_dossier"] ) ])       )
+	//console.log(mes_fichiers_intermediaires)
+
+	var fichiers_trouves = mes_fichiers_intermediaires.filter(function(un_fichier, index){
+
+		//console.log("\n\n\n\non a ça: " + index)
+
+		//chercher dans la Classe_Matiere
+		dans_classe_matiere = un_fichier['Classe_Matiere'].toLowerCase().replaceAll(" ","").includes(mot_cle)
+		/*
+		console.log(un_fichier['Classe_Matiere'])
+		console.log(dans_classe_matiere)
+		*/
+
+		//chercher dans categorie_fichier
+		dans_categorie_fichier = un_fichier['categorie_fichier'].toLowerCase().replaceAll(" ","").includes(mot_cle)
+		/*
+		console.log(un_fichier['categorie_fichier'])
+		console.log(dans_categorie_fichier)
+		*/
+
+		//chercher dans nom_fichier
+		dans_nom_fichier = un_fichier['nom_fichier'].toLowerCase().replaceAll(" ","").includes(mot_cle)
+		/*
+		console.log(un_fichier['nom_fichier'])
+		console.log(dans_nom_fichier)
+		*/
+
+		return dans_classe_matiere || dans_categorie_fichier || dans_nom_fichier
+
+	})
+
+	//console.log(fichiers_trouves)
+
+	//on affiche
+	var liste_des_resultats = ""
+	if(fichiers_trouves.length === 0) {
+		liste_des_resultats = "<div class=\"alerte_section_journee\">Aucun résultat trouvé pour ce(s) mot(s)-clé(s), merci de réessayer.</div>"
+	}else{
+		fichiers_trouves.forEach(function(le_fichier){
+			liste_des_resultats += creer_element_journee(le_fichier['Classe'] + " " + le_fichier['Matiere'],le_fichier['nom_fichier'],le_fichier['date_effet'],le_fichier['heure_effet'],le_fichier["id_fichier"],le_fichier["ID_URL"],"fichier",false,false,false)
+		})		
+	}
+
+	$("#nb_resultats").remove()
+	$("#liste_resultats")[0].innerHTML = ""
+	$("#liste_resultats").append(liste_des_resultats)
+
+	$("#mini_popup").append('<div id="nb_resultats"><b>'+fichiers_trouves.length +' résultats trouvés<b></div>')
+
+}
+
 
