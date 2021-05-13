@@ -2197,7 +2197,7 @@ function recuperer_admin(sans_fenetre){
 			afficher_fenetre(true);
 
 			//avec les rôles pour admin
-			traitement_trombino(snapshot,false, true);
+			traitement_trombino(snapshot,true, true);
 			chargement(false);
 		}
 
