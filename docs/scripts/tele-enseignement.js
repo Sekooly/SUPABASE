@@ -10963,12 +10963,12 @@ function fermer_side_bar(){
 	/*gauche*/
 	$(".sidebar.left")[0].style.display = "none"
 	$(".sidebar.left")[0].isOpen = false;
-	$('.sidebar.left').sidebar({side: "left"}).trigger('sidebar:close');
+	$('.sidebar.left').trigger('sidebar:close');
 
 	/*droite*/	
 	$(".sidebar.top")[0].style.display = "none"
 	$(".sidebar.top")[0].isOpen = false;
-	$('.sidebar.top').sidebar({side: "top"}).trigger('sidebar:close');
+	$('.sidebar.top').trigger('sidebar:close');
 }
 
 function fermer_si_non_recherche(e){
