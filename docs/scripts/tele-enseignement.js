@@ -10949,13 +10949,13 @@ function switch_side_bar_top(){
 function ouvrir_side_bar(){
 	$(".sidebar.left")[0].style.display = "block"
 	$(".sidebar.left")[0].isOpen = true;
-	$('.sidebar.left').sidebar({side: "left"}).trigger('sidebar:open');
+	$('.sidebar.left').trigger('sidebar:open');
 }
 
 function ouvrir_side_bar_top(){
 	$(".sidebar.top")[0].style.display = "block"
 	$(".sidebar.top")[0].isOpen = true;
-	$('.sidebar.top').sidebar({side: "top"}).trigger('sidebar:open');
+	$('.sidebar.top').trigger('sidebar:open');
 
 }
 
