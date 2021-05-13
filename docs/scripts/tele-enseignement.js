@@ -13134,7 +13134,7 @@ function maj_matiere(){
 
 
 			//boutons_update_programme = boutons_update_programme.replaceAll("#valeur_de_letat#",un_chapitre['etat'])
-			$("#programme_scolaire").append('<div class="un_chapitre" id="'+un_chapitre['id_chapitre']+'"><span class="titre_chapitre position_chapitre" id="position_chapitre">'+un_chapitre["position_chapitre"]+') </span><span class="titre_chapitre" id="'+un_chapitre['id_chapitre']+'">'+un_chapitre['intitule_chapitre'] +'</span>'+'<br>'+ boutons_update_programme  + "</div>" )			
+			$("#programme_scolaire").append('<div class="un_chapitre" id="'+un_chapitre['id_chapitre']+'"><!--<span class="titre_chapitre position_chapitre" id="position_chapitre">'+un_chapitre["position_chapitre"]+') </span>--><span class="titre_chapitre" id="'+un_chapitre['id_chapitre']+'">'+un_chapitre['intitule_chapitre'] +'</span>'+'<br>'+ boutons_update_programme  + "</div>" )			
 			
 			//assigner la valeur par du select (si NON élève)
 			if(!je_suis_eleve){				
