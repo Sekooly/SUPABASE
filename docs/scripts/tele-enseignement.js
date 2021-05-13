@@ -13264,7 +13264,7 @@ function renommer_chapitre(ceci){
 	var ancien_nom = $(".titre_chapitre[id='"+id_chapitre+"']")[0].innerText
 	
 	nouveau_nom = prompt("Indiquez le nouveau nom du chapitre: ", ancien_nom)
-	if(nouveau_nom && nouveau_nom !== ancien_nom) modifier_chapitre(id_chapitre, "intitule_chapitre", nouveau_nom, maj_matiere())
+	if(nouveau_nom && nouveau_nom !== ancien_nom) modifier_chapitre(id_chapitre, "intitule_chapitre", nouveau_nom, maj_matiere)
 }
 
 function changer_statut_chapitre(ceci){
@@ -13274,7 +13274,7 @@ function changer_statut_chapitre(ceci){
 
 	//console.log("on doit changer le statut") //todo
 	var id_chapitre = le_id_chapitre(ceci)
-	modifier_chapitre(id_chapitre, "etat", ceci.value, maj_matiere())
+	modifier_chapitre(id_chapitre, "etat", ceci.value, maj_matiere)
 
 }
 
