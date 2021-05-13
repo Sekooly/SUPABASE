@@ -13144,6 +13144,34 @@ function maj_matiere(){
 
 		})
 
+
+
+		$("#programme_scolaire").sortable({
+
+		    update: function mettre_a_jour_position() {
+
+		    	var liste_des_chapitres = []
+
+		    	//récupérer tous les chapitres de la matière
+		    	//mettre à jour toutes les positions
+		    	$(".un_chapitre.ui-sortable-handle").each(function(position_finale,element){
+					/*
+					console.log(position_finale+1);
+					console.log(element.children[0].innerText)
+					*/
+
+					nouvelle_position_chapitre_drag = position_finale+1
+					modifier_chapitre(element.id, "position_chapitre", nouvelle_position_chapitre_drag, false)
+					
+
+				})
+
+				maj_matiere()
+
+
+		    }
+		})
+
 		
 	}
 	
@@ -13236,7 +13264,7 @@ function renommer_chapitre(ceci){
 	var ancien_nom = $(".titre_chapitre[id='"+id_chapitre+"']")[0].innerText
 	
 	nouveau_nom = prompt("Indiquez le nouveau nom du chapitre: ", ancien_nom)
-	if(nouveau_nom && nouveau_nom !== ancien_nom) modifier_chapitre(id_chapitre, "intitule_chapitre", nouveau_nom)
+	if(nouveau_nom && nouveau_nom !== ancien_nom) modifier_chapitre(id_chapitre, "intitule_chapitre", nouveau_nom, maj_matiere())
 }
 
 function changer_statut_chapitre(ceci){
@@ -13246,7 +13274,7 @@ function changer_statut_chapitre(ceci){
 
 	//console.log("on doit changer le statut") //todo
 	var id_chapitre = le_id_chapitre(ceci)
-	modifier_chapitre(id_chapitre, "etat", ceci.value)
+	modifier_chapitre(id_chapitre, "etat", ceci.value, maj_matiere())
 
 }
 
@@ -13273,12 +13301,12 @@ function le_id_chapitre(ceci){
 	return ceci.parentNode.id
 }
 
-function modifier_chapitre(id_chapitre, champ_du_chapitre, valeur_du_chapitre){
+function modifier_chapitre(id_chapitre, champ_du_chapitre, valeur_du_chapitre, callback){
 	var donnees_chapitre = {
 		id_chapitre: id_chapitre,
 		[champ_du_chapitre]: valeur_du_chapitre
 	}
-	actualiser("Programme", "id_chapitre", id_chapitre, donnees_chapitre).then(() => maj_matiere())
+	actualiser("Programme", "id_chapitre", id_chapitre, donnees_chapitre).then(() => callback ? callback() : "")
 }
 
 
