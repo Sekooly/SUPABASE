@@ -9096,7 +9096,7 @@ function fonction_td_modifiable(e, sans_suite){
 		*/
 
 		var nom_champ_dblclic = $(".header_table.entete_sticky")[e.target.cellIndex].innerText
-		console.log(nom_champ_dblclic)
+		//console.log(nom_champ_dblclic)
 		formulaire_choix_checkbox(nom_champ_dblclic, e, ancienne_valeur, e.target.parentNode.id,["oui","non"],ancienne_valeur,true)
 
 	}else{
