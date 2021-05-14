@@ -9058,14 +9058,14 @@ function fonction_td_modifiable(e, sans_suite){
 				les_matieres = JSON.parse(recuperer('Matieres'))
 
 				valeurs_possibles = valeurs_possibles_modification_classes(e, id_parametre, les_matieres)
-				formulaire_choix_checkbox(e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'))
+				formulaire_choix_checkbox(e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'),id_parametre === "Administration")
 
 			})
 
 			
 		}else{
 			valeurs_possibles = valeurs_possibles_modification_classes(e, id_parametre, les_matieres)
-			formulaire_choix_checkbox(e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'))
+			formulaire_choix_checkbox(e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'),id_parametre === "Administration")
 
 		}
 		
@@ -9075,6 +9075,10 @@ function fonction_td_modifiable(e, sans_suite){
 	}else if(liste_index_params_auto.includes(','+ e.target.cellIndex +',')){
 		alert("Impossible de modifier ce paramètre car c'est une valeur automatiquement attribuée par Sekooly.")
 		return false
+
+	//couleurs
+	}else if(liste_couleurs.includes(ancienne_valeur)){
+		formulaire_choix_checkbox(e, ancienne_valeur, e.target.parentNode.id,liste_couleurs,ancienne_valeur,true)
 
 	}else{
 		var nouvelle_valeur = prompt("Indiquez la nouvelle valeur",ancienne_valeur);
@@ -9200,7 +9204,7 @@ function suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur){
 
 
 
-function formulaire_choix_checkbox(e, ancienne_valeur, identifiant, liste_en_array, liste_deja_cochés){
+function formulaire_choix_checkbox(e, ancienne_valeur, identifiant, liste_en_array, liste_deja_cochés, un_seul_choix){
 	
 	$("#mini_popup").remove()
 
@@ -9212,7 +9216,8 @@ function formulaire_choix_checkbox(e, ancienne_valeur, identifiant, liste_en_arr
 	for (var i = 0; i <liste_en_array.length;i++) {
 		est_coché = liste_deja_cochés ? (liste_deja_cochés.indexOf(liste_en_array[i]) >=0 ? "checked" : "" ): ""
 		classe_initiale = est_coché === "checked" ? "en_gras" : ""
-		les_elements = les_elements+'<div class="'+classe_initiale+'"><input class="choix_liste_matiere" type="checkbox" id="'+liste_en_array[i]+'" name="choix_liste_matiere" '+est_coché+'><label>'+liste_en_array[i]+'</label></div>'
+		type_element = un_seul_choix ? "radio" : "checkbox"
+		les_elements = les_elements+'<div class="'+classe_initiale+'"><input class="choix_liste_matiere" type="'+type_element+'" id="'+liste_en_array[i]+'" name="choix_liste_matiere" '+est_coché+'><label>'+liste_en_array[i]+'</label></div>'
 
 	}
 
