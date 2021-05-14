@@ -106,7 +106,7 @@ function rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_
 
 async function chercher_lien_script(id_script){
   var url = racine_initiale + "Scripts?id_script=eq." + id_script + "&" + api_initial
-  console.log(url)
+  //console.log(url)
   return get_resultat_asynchrone(url).then(e => e[0]['lien_script'])
 
 }
