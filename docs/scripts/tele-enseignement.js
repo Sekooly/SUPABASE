@@ -11016,10 +11016,64 @@ function choix_classe_edt(){
 	}
 	elements_html += "</select>"
 	
+
 	creer_mini_popup("Choisissez la classe à consulter",elements_html, "Voir l'emploi du temps","voir_edt_classe_choisie()")
+	
+
+
+	//si je suis admin avec des droits
+	var mes_droits = JSON.parse(recuperer('mes_donnees'))['Droits_modifs'];
+	//console.log("mes_droits: " + mes_droits);
+	
+
+	if(recuperer("mon_type").includes("Admin") && mes_droits === "oui"){
+		$("#ask_edt").remove()
+		$("#mini_popup").append('<div id="ask_edt"><button id="bouton_ask_edt" onclick="demander_edt()" class="demander_edt">Demander l\'édition des emplois du temps</button></div></div>')
+	}
+	
+		
+	
+
 
 }
 
+async function demander_edt(){
+
+	//si edt_envoi_mail = faux
+	if(!data_etablissement['edt_envoi_mail']){
+
+		//lister les url des edts 
+		var liste_initiale = await rechercher_tout("Classes")
+		liste_classes = liste_initiale.map(e => e["cycle"] + " " + e["Classe"])
+		liste_id_calendar = liste_initiale.map(e => e["id_googlecalendar"])
+
+		//les envoyer au script google pour l'envoi de mail
+		var url = await chercher_lien_script(1)
+		url += "?ask_edt=true"  
+		url += "&nom_prenom_responsable="  + data_etablissement["identite_responsable"]
+		url += "&liste_classes="  + JSON.stringify(liste_classes)
+		url += "&liste_id_calendar="  + JSON.stringify(liste_id_calendar)
+		url += "&contact_etablissement="  + data_etablissement["contact_etablissement"]
+		url += "&nom_etablissement="  + data_etablissement["nom_etablissement"]
+
+
+		//console.log(url)
+		envoyer_mail = get_resultat_asynchrone(url)
+
+		//mettre edt_envoi_mail = vrai
+		//enlever le bouton ask_edt en alertant que tout est bon
+		$("#ask_edt")[0].innerHTML = edt_deja_envoye()
+		
+
+
+	}else{
+		$("#ask_edt")[0].innerHTML = edt_deja_envoye()
+	}
+}
+
+function edt_deja_envoye(){
+	return "<vert>✔La liste des liens pour éditer les emplois du temps vous sera envoyée par mail dans un instant (<b>" + data_etablissement["contact_etablissement"] +  "</b>).</vert><br><br><i>Si vous n'avez plus accès à cette adresse mail, merci de mettre à jour l'adresse mail de votre établissement dans <b>Paramètres > Infos établissement > Contact de l'Administration</b>, puis re-demandez à nouveau ici votre liste.</i>"
+}
 
 function voir_edt_classe_choisie(){
 	recuperer_edt($("#classe_edt")[0].value)
