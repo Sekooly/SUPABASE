@@ -13,7 +13,7 @@ nom_etablissement = data_etablissement['nom_etablissement']
 
 
 var champs_avec_listes_dynamiques = ['Classe','classe_bis','Classe_principale','Cycle','cycle','Matiere','Matiere_bis']
-var champs_oui_ou_non = ['Est_délégué','code_hash','Reponse_sondage','Ecolage_OK','Droits_modifs', 'Droit_acces_anticipe_examen','Droit_changer_ecolage','commun_au_cycle','droit_hors_maintenance','Est_délégué']
+var champs_oui_ou_non = ['Est_délégué','Reponse_sondage','Ecolage_OK','Droits_modifs', 'Droit_acces_anticipe_examen','Droit_changer_ecolage','commun_au_cycle','droit_hors_maintenance','Est_délégué']
 var liste_couleurs = ['blanc','bleu ciel', 'bleu foncé', 'gris','jaune','marron','noir','orange','rose','rouge','vert clair','vert foncé', 'violet']
 
 
@@ -9030,14 +9030,19 @@ function rendre_td_modifiable(){
 
 function fonction_td_modifiable(e, sans_suite){
 
+	console.log(e.target.cellIndex)
+
 	//si double clic sur un champ contenant ";" -> on fait une liste des Cycles (admin) OU Matieres (profs) en check box
 	//si parmi les parametres auto -> interdire
 	//sinon: saisie libre
 	
 	var ancienne_valeur = e.target.innerText;
 	var id_parametre = $(".un_menu_orange")[0].id 
+
+
 	var liste_index_params_auto = ',' + parametres_automatiques.map(e => $('[id="'+e+'"].header_table.entete_sticky:visible')).filter(e => e.length > 0).map(e => e[0].cellIndex).join(',') +','
-	//console.log(liste_index_params_auto)
+	var liste_index_oui_non = ',' + champs_oui_ou_non.map(e => $('[id="'+e+'"].header_table.entete_sticky:visible')).filter(e => e.length > 0).map(e => e[0].cellIndex).join(',') +','
+	//console.log(liste_index_oui_non)
 
 	var est_classe = $("#Classe")[0] ? e.target.cellIndex === $("#Classe")[0].cellIndex : false
 	var est_classe_principale = $("#Classe_principale")[0] ? e.target.cellIndex === $("#Classe_principale")[0].cellIndex : false
@@ -9058,14 +9063,14 @@ function fonction_td_modifiable(e, sans_suite){
 				les_matieres = JSON.parse(recuperer('Matieres'))
 
 				valeurs_possibles = valeurs_possibles_modification_classes(e, id_parametre, les_matieres)
-				formulaire_choix_checkbox(e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'),id_parametre === "Administration")
+				formulaire_choix_checkbox("Classe(s)",e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'),id_parametre === "Administration")
 
 			})
 
 			
 		}else{
 			valeurs_possibles = valeurs_possibles_modification_classes(e, id_parametre, les_matieres)
-			formulaire_choix_checkbox(e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'),id_parametre === "Administration")
+			formulaire_choix_checkbox("Classe(s)",e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'),id_parametre === "Administration")
 
 		}
 		
@@ -9078,7 +9083,21 @@ function fonction_td_modifiable(e, sans_suite){
 
 	//couleurs
 	}else if(liste_couleurs.includes(ancienne_valeur)){
-		formulaire_choix_checkbox(e, ancienne_valeur, e.target.parentNode.id,liste_couleurs,ancienne_valeur,true)
+		formulaire_choix_checkbox("Couleur", e, ancienne_valeur, e.target.parentNode.id,liste_couleurs,ancienne_valeur,true)
+
+	//oui ou non
+	}else if(liste_index_oui_non.includes(','+ e.target.cellIndex +',')){
+		/*
+		console.log("\n\n\n")
+		console.log(champs_oui_ou_non)
+		console.log(liste_index_oui_non)
+		console.log(e.target.cellIndex)
+		console.log(champs_oui_ou_non[e.target.cellIndex])
+		*/
+
+		var nom_champ_dblclic = $(".header_table.entete_sticky")[e.target.cellIndex].innerText
+		console.log(nom_champ_dblclic)
+		formulaire_choix_checkbox(nom_champ_dblclic, e, ancienne_valeur, e.target.parentNode.id,["oui","non"],ancienne_valeur,true)
 
 	}else{
 		var nouvelle_valeur = prompt("Indiquez la nouvelle valeur",ancienne_valeur);
@@ -9089,7 +9108,7 @@ function fonction_td_modifiable(e, sans_suite){
 
 
 function valeurs_possibles_modification_classes(e, id_parametre, les_matieres){
-	console.log(e.target)
+	//console.log(e.target)
 
 	var valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Classe_Matiere")
 	
@@ -9204,12 +9223,12 @@ function suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur){
 
 
 
-function formulaire_choix_checkbox(e, ancienne_valeur, identifiant, liste_en_array, liste_deja_cochés, un_seul_choix){
+function formulaire_choix_checkbox(nom_champ, e, ancienne_valeur, identifiant, liste_en_array, liste_deja_cochés, un_seul_choix){
 	
 	$("#mini_popup").remove()
 
 	var entetes = '<div id="mini_popup" style="overflow: hidden auto;"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="https://sekooly.github.io/SUPABASE/images/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div>'
-	var titre_formulaire = '<div>Classe(s) pour <b>'+identifiant+'</b></div><div id="liste_classe_matieres" style="padding-top: 4%;padding-bottom: 4%;text-align: left;"><div>'
+	var titre_formulaire = '<div>'+nom_champ+' pour <b>'+identifiant+'</b></div><div id="liste_classe_matieres" style="padding-top: 4%;padding-bottom: 4%;text-align: left;"><div>'
 	
 	//pour chaque element de la liste
 	var les_elements = ""
