@@ -646,9 +646,14 @@ function convertir_csv(arr, entetes_seulement){
 
 
 
+
   //si c'est encore un object -> on concat
   }else{
-    const array = [Object.keys(arr[0])].concat(arr);
+
+
+    //NOUVEAU
+    var array = garder_les_colonnes_non_automatiques(arr)
+    array = [Object.keys(arr[0])].concat(array);
 
     if(entetes_seulement){
       return array[0].join(separateur);
@@ -663,6 +668,21 @@ function convertir_csv(arr, entetes_seulement){
   
 
 
+}
+
+
+function garder_les_colonnes_non_automatiques(arr){
+
+  //pour chaque ligne
+  arr.forEach(function(valeur,index){    
+    //pour chaque colonne AUTOMATIQUE
+    parametres_automatiques.forEach(function(nom_parametre){
+      //si ce parametre auto existe dans le arr -> on le supprime
+      if(valeur[nom_parametre]) delete valeur[nom_parametre]
+    })
+  })
+
+  return arr
 }
 
 

@@ -9597,10 +9597,11 @@ function importer_parametres(){
   			//aucun champ IDENTIFIANT déjà existant tenté d'être rajouté (todo?)
   			//fenêtre de résumé: OK ou pas OK
   			var nombre_lignes = Number(json_final.length) 
-  			var liste_champs = Object.keys(json_final[0])
+  			//la liste des champs doit être récupérée depuis le serveur
+  			var liste_champs =  champs_initiaux
   			
   			var avec_s = nombre_lignes>1?'s':''
-  			confirmation = confirm('Nous avons détecté ' + nombre_lignes + ' ligne'+avec_s+' avec ' + champs_initiaux.length + ' champs. Voulez-vous importer ces données ?')
+  			confirmation = confirm('Nous avons détecté ' + nombre_lignes + ' ligne'+avec_s+' avec ' + Object.keys(json_final[0]).length + ' champs. Voulez-vous importer ces données ?')
   			if(confirmation){
   				chargement(true)
   				
