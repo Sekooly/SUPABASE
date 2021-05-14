@@ -9030,7 +9030,7 @@ function rendre_td_modifiable(){
 
 function fonction_td_modifiable(e, sans_suite){
 
-	console.log(e.target.cellIndex)
+	//console.log(e.target.cellIndex)
 
 	//si double clic sur un champ contenant ";" -> on fait une liste des Cycles (admin) OU Matieres (profs) en check box
 	//si parmi les parametres auto -> interdire
@@ -10052,6 +10052,10 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 		$(".donnee[id='code_hash']")[0].value = "nok"
 		$(".donnee[id='Reponse_sondage']")[0].value = "non"
 		$(".donnee[id='droit_hors_maintenance']")[0].value = "non"
+
+		$(".donnee[id='liste_notifs_lues']")[0].value = ","
+		if($(".donnee[id='Numero_telephone']")[0]) $(".donnee[id='Numero_telephone']")[0].value = "123456"
+		
 			
 	}
 
