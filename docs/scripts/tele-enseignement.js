@@ -104,15 +104,33 @@ function recuperer_la_fiche_conseil(classe){
 	vider_fenetre(titre);
 	afficher_fenetre(true);
 	chargement(true);
-	var url = "https://script.google.com/macros/s/AKfycbw4QT4HwGTQR_rgw_ucwjBmUIaeuT_lf3ufHDWu1nQmEHOpIseM/exec?classe="+classe;
+	//var url = "https://script.google.com/macros/s/AKfycbw4QT4HwGTQR_rgw_ucwjBmUIaeuT_lf3ufHDWu1nQmEHOpIseM/exec?classe="+classe;
+
+	
+	var url = racine_data + "Eleves?Classe=eq." + classe + "&" + apikey
+	//console.log(url)
+	liste_eleves = get_resultat(url)
+
+	//trier par order alphabetique du Identifiant
+	liste_eleves = liste_eleves.sort(function(a, b){
+	    if(a.Identifiant < b.Identifiant) { return -1; }
+	    if(a.Identifiant > b.Identifiant) { return 1; }
+	    return 0;
+	});
+
+
+	var id_classe = JSON.parse(recuperer("mes_matieres")).find(e => e['Classe'] === classe)["classe_id"]
+	url = racine_data + "Fiches?id_classe=eq."+id_classe+"&" + apikey
+	//console.log(url)
 
 	$.ajax({
 	    url: url,
-	    type: "POST",
+	    type: "GET",
 		success: function (data) {
-			chargement(false);
+			chargement(false);			
+			data = data[0]
 			//console.log(data);
-			afficher_fenetre_conseil_de_classe(data['resultats'],titre);
+			afficher_fenetre_conseil_de_classe([[data['id_fiche'],data['nom_fiche']], liste_eleves],titre,classe);
 
 	    },
 	    error: function(data){
@@ -125,12 +143,12 @@ function recuperer_la_fiche_conseil(classe){
 
 }
 
-function afficher_fenetre_conseil_de_classe(data,titre){
+function afficher_fenetre_conseil_de_classe(data,titre,classe){
 	//data[0]: [id fiche, nom fiche]
 	afficher_visualisation_fiche(data[0],titre);
 
 	//data[1]: [eleve1, eleve2, eleve3, ...]
-	lister_les_eleves(data[1]);
+	lister_les_eleves(data[1],classe);
 
 
 }
@@ -147,7 +165,7 @@ function afficher_visualisation_fiche(id_et_nom_fiche,titre){
 
 }
 
-function lister_les_eleves(liste_eleves){
+function lister_les_eleves(liste_eleves,classe){
 	var liste_eleves_html = '<div id="liste_eleves" class="liste_eleves_conseil"></div>'
 	$("#liste_eleves").remove();
 	$("#fenetre").append(liste_eleves_html);
@@ -175,7 +193,7 @@ function lister_les_eleves(liste_eleves){
 		//observations sur l'élève -> ajout ou modif ou suppression
 		var mon_type = recuperer('mon_type');
 		if(mon_type!=="Eleves"){
-			var mode_edition_html = '<span><img id="mini-image" alt="remarque" class="envoi_remarque" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png" onclick="emettre_avis(\''+identifiant_eleve+'\')"></span>';
+			var mode_edition_html = '<span><img id="mini-image" alt="remarque" class="envoi_remarque" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png" onclick="emettre_avis(\''+identifiant_eleve+'\',\''+classe+'\')"></span>';
 			var mode_edition = document.createElement('div');
 			mode_edition.innerHTML = mode_edition_html;
 			while(mode_edition.firstChild) identifiant_eleve_bloc.appendChild(mode_edition.firstChild);
@@ -258,10 +276,10 @@ function actualiser_bilan(identifiant_eleve){
 
 
 
-function emettre_avis(identifiant_eleve){
-	console.log("emettre_avis: " + identifiant_eleve);
+function emettre_avis(identifiant_eleve, classe){
+	//console.log("emettre_avis: " + identifiant_eleve);
 
-	var pop_up_html  = '<div id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X"  src="https://sekooly.github.io/SUPABASE/images/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Vos observations sur <b>'+identifiant_eleve+'</b>:</div><textarea id="observation" style="width: 80%;resize: none;font-size: 13px;margin-bottom: 5%;"></textarea><div style="">Passage de <b>'+identifiant_eleve+'</b> en classe supérieure:</div><select style="width: 80%;border-color: red;border-style: solid;margin-bottom: 5%;" id="avis_passage" value=""><option value=""></option><option value="Favorable">Favorable</option><option value="Non favorable">Non favorable</option></select><button type="button" class="rendre" onclick="envoyer_avis_conseil(\''+identifiant_eleve+'\')">Envoyer l\'avis</button></div>';
+	var pop_up_html  = '<div id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X"  src="https://sekooly.github.io/SUPABASE/images/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Vos observations sur <b>'+identifiant_eleve+'</b>:</div><textarea id="observation" style="width: 80%;resize: none;font-size: 13px;margin-bottom: 5%;"></textarea><div style="">Passage de <b>'+identifiant_eleve+'</b> en classe supérieure:</div><select style="width: 80%;border-color: red;border-style: solid;margin-bottom: 5%;" id="avis_passage" value=""><option value=""></option><option value="Favorable">Favorable</option><option value="Non favorable">Non favorable</option></select><button type="button" class="rendre" onclick="envoyer_avis_conseil(\''+identifiant_eleve+'\',\''+classe+'\')">Envoyer l\'avis</button></div>';
 
 	var pop_up = document.createElement('div');
 	pop_up.innerHTML = pop_up_html;
@@ -278,7 +296,7 @@ function emettre_avis(identifiant_eleve){
 
 }
 
-function envoyer_avis_conseil(identifiant_eleve){
+function envoyer_avis_conseil(identifiant_eleve, classe){
 
 
 	var avis_passage = $("#avis_passage")[0].value;
@@ -287,66 +305,79 @@ function envoyer_avis_conseil(identifiant_eleve){
 	if(avis_passage==="") return -1;
 
 
-	console.log("Observation: " + avis_passage);
-	console.log("avis_passage: " + observation);
+	//console.log("Observation: " + avis_passage);
+	//console.log("avis_passage: " + observation);
 
 	var matieres = JSON.parse(recuperer('mes_matieres'));
 
 	//la classe actuellement ouverte OU celle de l'élève
-	var classe = element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
 	var mon_type = recuperer('mon_type');				
-	if(mon_type.includes("Eleves"))
-		var classe = JSON.parse(recuperer('mes_donnees'))['Classe'];
+	if(mon_type.includes("Eleves"))	var classe = JSON.parse(recuperer('mes_donnees'))['Classe'];
 
 	var id_classe_eleve = "";
+	var ma_matiere = ""
 	matieres.some(function(valeur,index){				  
 	    if(valeur['Classe'] === classe){
 	        id_classe_eleve = valeur['classe_id']
+	        ma_matiere = valeur['Matiere']
 	        return -1;
 	    }
 	});
 
+	console.log(ma_matiere)
+
 	var identifiant_courant = recuperer('identifiant_courant').toLowerCase().trim();
 	identifiant_eleve = identifiant_eleve.toLowerCase().trim();
 
-	var url = "https://script.google.com/macros/s/AKfycbw4QT4HwGTQR_rgw_ucwjBmUIaeuT_lf3ufHDWu1nQmEHOpIseM/exec?classe="+classe+"&id_classe_eleve="+id_classe_eleve+"&avis_passage="+avis_passage+"&identifiant_remarque="+identifiant_courant+"&identifiant_eleve="+identifiant_eleve+"&observation="+observation;
+
+	nouvel_avis_conseil = {
+		Classe: classe,
+		id_classe_eleve: id_classe_eleve,
+		avis_passage: avis_passage,
+		identifiant_remarque: identifiant_courant,
+		identifiant_eleve: identifiant_eleve,
+		observation: observation,
+		matiere: ma_matiere,
+		horodateur: maintenant()
+	}
+
+	ajouter_un_element("Conseil", nouvel_avis_conseil).then(() => {
+
+		//rajouter un avis dans la table Eleves
+		url = racine_data + "Eleves?Identifiant=eq." + identifiant_eleve +"&"+ apikey	
+		nb_actuel = get_resultat(url)[0]['nombre_avis']
+		nouvelle_donnee_eleve = {
+			nombre_avis: nb_actuel+1
+		}
+
+		actualiser("Eleves", "Identifiant", identifiant_eleve, nouvelle_donnee_eleve).then(() => {				
+
+			$('#mini_popup').remove()
+			recuperer_la_fiche_conseil(classe)
+			chargement(false)
+		})
 
 
-	chargement(true);
-	//console.log(url);
-
-	$.ajax({
-	    url: url,
-	    type: "POST",
-		success: function (data) {
-			recuperer_la_fiche_conseil(classe);
-			chargement(false);
-			$('#mini_popup').remove();
-			
-			var msg_alerte = element_DOM("snackbar");
-			// on affiche l'alerte
-			msg_alerte.innerText = data;
-			msg_alerte.className = "show";
-			//dans 3 secondes, on masque l'alerte
-			setTimeout(function(){
-				msg_alerte.className = "";
-			}, 3000);
+	})
 
 
-	    },
-	    error: function(data){
-	    	chargement(false);
-			//console.log(data);
-			alert('Vérifiez que vous êtes toujours connecté à internet.');
-			
-	    }
-	});
+
 }
 
 
-function recuperer_autres_avis(identifiant_eleve){
+async function recuperer_autres_avis(identifiant_eleve){
 	//console.log("recuperer_autres_avis: " + identifiant_eleve);
-	chargement(true);
+	//chargement(true);
+
+
+	var resultats = await rechercher("Conseil", "identifiant_eleve", identifiant_eleve.toLowerCase(), "")
+	//console.log(resultats)
+
+
+	if(resultats.length > 0) afficher_toutes_les_observations(resultats, identifiant_eleve)
+
+
+	/*
 	var url = "https://script.google.com/macros/s/AKfycbw4QT4HwGTQR_rgw_ucwjBmUIaeuT_lf3ufHDWu1nQmEHOpIseM/exec?identifiant_eleve="+identifiant_eleve.toLowerCase()+"&toutes_les_remarques=oui";
 
 	$.ajax({
@@ -364,7 +395,7 @@ function recuperer_autres_avis(identifiant_eleve){
 			alert('Vérifiez que vous êtes toujours connecté à internet.');
 			
 	    }
-	});
+	});*/
 
 }
 
@@ -379,11 +410,14 @@ function afficher_toutes_les_observations(les_observations,identifiant_eleve){
 	//console.log(les_observations)
 
 	//dans l'ordre chronologique DECROISSANT
-	les_observations = les_observations.sort(function tri_ordre_chrono_croissant(a, b) {
-		return new Date(a.horodateur).getTime() - new Date(b.horodateur).getTime();
+	les_observations = les_observations.sort(function tri_ordre_chrono_decroissant(a, b) {
+		return convertir_en_date(a.horodateur) - convertir_en_date(b.horodateur)
 	});
 
+
+
 	les_observations.forEach(function(valeur,index){
+		console.log(valeur)
 		var signe_avis_passage = valeur["avis_passage"] === "Favorable" ? "✅" : "❌"
 		var vient_de_moi = valeur['identifiant_remarque'].toUpperCase() === recuperer('identifiant_courant').toUpperCase() ? " (Vous)"
 							: valeur['matiere'] ? " ("+valeur['matiere']+")" : "" ;
@@ -11056,13 +11090,17 @@ function choix_classe_edt(){
 
 	if(recuperer("mon_type").includes("Admin") && mes_droits === "oui"){
 		$("#ask_edt").remove()
-		$("#mini_popup").append('<div id="ask_edt"><button id="bouton_ask_edt" onclick="demander_edt()" class="demander_edt">Demander l\'édition des emplois du temps</button></div></div>')
+		$("#mini_popup").append('<div id="ask_edt">'+bouton_demander()+'</div></div>')
 	}
 	
 		
 	
 
 
+}
+
+function bouton_demander(){
+	return (data_etablissement['edt_envoi_mail']) ? edt_deja_envoye() : '<button id="bouton_ask_edt" onclick="demander_edt()" class="demander_edt">Demander l\'édition des emplois du temps</button>'
 }
 
 async function demander_edt(){
@@ -11089,6 +11127,8 @@ async function demander_edt(){
 		envoyer_mail = get_resultat_asynchrone(url)
 
 		//mettre edt_envoi_mail = vrai
+		data_etablissement['edt_envoi_mail'] = true
+
 		//enlever le bouton ask_edt en alertant que tout est bon
 		$("#ask_edt")[0].innerHTML = edt_deja_envoye()
 		
@@ -11100,7 +11140,7 @@ async function demander_edt(){
 }
 
 function edt_deja_envoye(){
-	return "<vert>✔La liste des liens pour éditer les emplois du temps vous sera envoyée par mail dans un instant (<b>" + data_etablissement["contact_etablissement"] +  "</b>).</vert><br><br><i>Si vous n'avez plus accès à cette adresse mail, merci de mettre à jour l'adresse mail de votre établissement dans <b>Paramètres > Infos établissement > Contact de l'Administration</b>, puis re-demandez à nouveau ici votre liste.</i>"
+	return "<vert>✔La liste des liens pour éditer les emplois du temps a été envoyée par mail (<b>" + data_etablissement["contact_etablissement"] +  "</b>).</vert><br><br><i>Si vous n'avez plus accès à cette adresse mail, merci de mettre à jour l'adresse mail de votre établissement dans <b>Paramètres > Infos établissement > Contact de l'Administration</b>, puis re-demandez à nouveau ici votre liste.</i>"
 }
 
 function voir_edt_classe_choisie(){
