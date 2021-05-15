@@ -324,7 +324,7 @@ function envoyer_avis_conseil(identifiant_eleve, classe){
 	    }
 	});
 
-	console.log(ma_matiere)
+	//console.log(ma_matiere)
 
 	var identifiant_courant = recuperer('identifiant_courant').toLowerCase().trim();
 	identifiant_eleve = identifiant_eleve.toLowerCase().trim();
@@ -417,7 +417,7 @@ function afficher_toutes_les_observations(les_observations,identifiant_eleve){
 
 
 	les_observations.forEach(function(valeur,index){
-		console.log(valeur)
+		//console.log(valeur)
 		var signe_avis_passage = valeur["avis_passage"] === "Favorable" ? "✅" : "❌"
 		var vient_de_moi = valeur['identifiant_remarque'].toUpperCase() === recuperer('identifiant_courant').toUpperCase() ? " (Vous)"
 							: valeur['matiere'] ? " ("+valeur['matiere']+")" : "" ;
