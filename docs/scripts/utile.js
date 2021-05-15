@@ -1036,7 +1036,7 @@ function changer_mode(sans_changer){
 
   if($("#mode")[0]){
     var mode = mode_nuit_oui_final === "oui" ? "night" :  "day" 
-    $("#mode")[0].src = "images/img_"+mode+".png"
+    $("#mode")[0].src = "https://raw.githubusercontent.com/Sekooly/SUPABASE/main/docs/images/img_"+mode+".png"
   }
 
 }
