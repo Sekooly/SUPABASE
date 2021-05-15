@@ -12112,25 +12112,7 @@ function langues(){
 
 
 
-function mettre_mon_mode(){
-	changer_mode(true)
-}
 
-
-function changer_mode(sans_changer){
-
-	est_deja_mode_nuit = recuperer("mode_nuit_oui") === "oui"
-	if(sans_changer) est_deja_mode_nuit = !est_deja_mode_nuit
-
-	texte_final_mode_nuit_oui = est_deja_mode_nuit ? "" : " ✓"
-	classe_finale_body = est_deja_mode_nuit ? "" : "dark-mode"
-	mode_nuit_oui_final = est_deja_mode_nuit ? "non" : "oui"
-
-	stocker('mode_nuit_oui',mode_nuit_oui_final)
-	$("#mode_nuit_oui")[0].innerText = texte_final_mode_nuit_oui
-	$("body")[0].className = classe_finale_body
-
-}
 
 
 //au clic d'un élément du side bar -> le side bar disparait

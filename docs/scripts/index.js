@@ -406,6 +406,7 @@ function initialisation(){
   //sinon -> normal
 
   chargement(false)
+  mettre_mon_mode()
   actualiser_remarque("")
   sans_donnees_initiales()
   mettre_le_bon_focus()
@@ -413,6 +414,7 @@ function initialisation(){
   sur_valider_se_connecter()
   aucun_API()
   sans_logo_vide()
+
 
 }
 

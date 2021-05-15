@@ -25,6 +25,20 @@
 
 
 	<style>
+
+		.dark-mode {
+			background-color: rgb(56, 66, 77);
+			color: white;
+		}
+
+		.dark-mode #mode{
+			filter: invert(1);
+		}
+
+		#mode{
+			width: 25px;
+			height: 25px;
+		}
 		
 		a{
 			text-decoration: none;
@@ -64,7 +78,7 @@
 			margin-top: 20px;
 			width: 100px;
 			height: 25px;
-
+			background: #FF6C00;
 		}
 
 		.bas_de_page{
@@ -83,6 +97,8 @@
 
 	</style>
 
+	<div onclick="changer_mode()" style="text-align: end;"><img alt="MODE-NUIT" id="mode" src="images/img_day.png"></div>
+
 	<iframe class="mon_log" src="" id="mon_log" style='display: none;'></iframe> 
 	<div style="text-align: center;">
 		<a href="https://sekooly.com">
@@ -96,12 +112,12 @@
 	<div class="mon_formulaire">
 		<div>
 			<label for="Identifiant">Identifiant:</label><br>
-			<input type="text" id="Identifiant" name="identifiant" autocomplete="off"  autocapitalize="none"><br>
+			<input type="text" id="Identifiant" name="identifiant" autocomplete="off"  autocapitalize="none" placeholder="Identifiant"><br>
 		</div>
 		
 		<div>
 			<label for="Code">Code d'accès:</label><br>
-			<input type="password" id="Code" name="code" autocomplete="off"  autocapitalize="none"> <br>
+			<input type="password" id="Code" name="code" autocomplete="off"  autocapitalize="none" placeholder="Code d'accès"> <br>
 	  	</div>
 
 		<input id="connect" class="bouton_connexion" type="submit" value="Se connecter">
