@@ -10944,7 +10944,8 @@ function rendre_riche(id_text_area ){
 
 
 function recuperer_html_saisie_riche(){
-	return $(".ck.ck-content.ck-editor__editable.ck-rounded-corners.ck-editor__editable_inline.ck-blurred")[0].innerHTML
+	//return $(".ck.ck-content.ck-editor__editable.ck-rounded-corners.ck-editor__editable_inline.ck-blurred")[0].innerHTML
+	return $("[contenteditable]")[0].innerHTML
 }
 
 
