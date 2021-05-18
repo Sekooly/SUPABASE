@@ -13612,8 +13612,16 @@ async function emettre_avis_sekooly(){
 	accepter_cgu_avis()
 }
 
+function avis_good(){
+	return "❤️Ce que vous aimez le plus"
+}
+
+function avis_bad(){
+	return "😕Ce que vous aimez moins<br>(ou une fonctionnalité que vous aimeriez avoir)"
+}
+
 function afficher_avis(mon_avis){
-	return un_element_avis("Note globale",mon_avis['note_globale'],"note_globale") + un_element_avis("❤️Ce que vous aimez le plus",mon_avis['commentaire'],"commentaire") + un_element_avis("😕Ce que vous aimez le moins",mon_avis['ameliorations'],"ameliorations") 
+	return un_element_avis("Note globale",mon_avis['note_globale'],"note_globale") + un_element_avis(avis_good(),mon_avis['commentaire'],"commentaire") + un_element_avis(avis_bad(),mon_avis['ameliorations'],"ameliorations") 
 
 }
 
@@ -13627,8 +13635,8 @@ function formulaire_avis(){
 		<p>Nous serions honorés de <span class="titre_chapitre">connaître en détails</span> ce qui vous plaît! (et même ce qui vous plaît moins 😉)</p>
 		<form onsubmit="event.preventDefault();" id="avis">
 			<div>Note globale pour Sekooly (sur 5):`+liste_notes_possibles()+`</div>
-			<div>❤️Ce que vous aimez le plus:<textarea id="commentaire" class="texte_avis"></textarea></div>
-			<div>😕Ce que vous aimez le moins:<textarea id="ameliorations" class="texte_avis"></textarea></div>
+			<div>`+avis_good()+`:<textarea id="commentaire" class="texte_avis"></textarea></div>
+			<div>`+avis_bad()+`:<textarea id="ameliorations" class="texte_avis"></textarea></div>
 		</form>
 		<div>
 			<label for="cgu_avis"><input onchange="accepter_cgu_avis()" id="cgu_avis" type="checkbox">J'accepte les <a class="titre_chapitre" onclick="alert(CGU_avis(event))">Conditions d'Utilisation</a> du système d'avis de la plateforme.</label>
