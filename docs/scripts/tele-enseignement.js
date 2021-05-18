@@ -13589,7 +13589,7 @@ function afficher_resultats_recherche(){
 
 
 /******************* AVIS SUR SEKOOLY ***********************/
-async function emettre_avis(){
+async function emettre_avis_sekooly(){
 
 	var mon_avis = await mon_avis_actuel()
 	//console.log(mon_avis)
@@ -13679,7 +13679,7 @@ function fermer_emettre_avis(){
 
 		//supprimer mon avis
 		//émettre un nouvel avis
-		supprimer_initial("Avis","identifiant",recuperer("identifiant_courant")).then(() => emettre_avis())
+		supprimer_initial("Avis","identifiant",recuperer("identifiant_courant")).then(() => emettre_avis_sekooly())
 		
 	}
 	
@@ -13723,5 +13723,5 @@ async function envoyer_avis(){
 		horodateur: maintenant(),
 	}
 
-	return ajouter_un_element_racine("Avis", nouvel_avis).then(() => emettre_avis())
+	return ajouter_un_element_racine("Avis", nouvel_avis).then(() => emettre_avis_sekooly())
 }
