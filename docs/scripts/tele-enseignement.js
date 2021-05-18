@@ -13559,3 +13559,169 @@ function afficher_resultats_recherche(){
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/******************* AVIS SUR SEKOOLY ***********************/
+async function emettre_avis(){
+
+	var mon_avis = await mon_avis_actuel()
+	//console.log(mon_avis)
+
+	var deja_avec_avis = mon_avis.length > 0
+
+	var nom_bouton = deja_avec_avis ? "Modifier mon avis" : " Envoyer mon avis "
+	var fonction_bouton = deja_avec_avis ? "fermer_emettre_avis()" : "envoyer_avis()"
+
+	//si déjà un avis -> on affiche juste l'avis
+	//si pas encore d'avis -> afficher le formulaire
+	var elements_html = deja_avec_avis ? "<div>"+afficher_avis(mon_avis[0]) +"</div>" : formulaire_avis()
+	
+
+	//créer le popup
+	//creer_mini_popup(titre,elements_html,nom_bouton,fonction_bouton,valeur_actuelle,id_element_valeur_actuelle, valeur_actuelle_bis, id_element_valeur_actuelle_bis,taille_du_titre)
+	creer_mini_popup("Mon avis sur Sekooly",elements_html, nom_bouton, fonction_bouton,false,false,false,false,25)
+	
+	//clic d'envoi par défaut INACTIF
+	accepter_cgu_avis()
+}
+
+function afficher_avis(mon_avis){
+	return un_element_avis("Note globale",mon_avis['note_globale'],"note_globale") + un_element_avis("❤️Ce que vous aimez le plus",mon_avis['commentaire'],"commentaire") + un_element_avis("😕Ce que vous aimez le moins",mon_avis['ameliorations'],"ameliorations") 
+
+}
+
+
+function un_element_avis(titre_element,valeur_element,id_element){
+	return '<div><b class="titre_chapitre">'+titre_element+':</b><div class="element_avis" id="'+id_element+'">'+valeur_element + '</div></div>'
+}
+
+function formulaire_avis(){
+	return `<div id="nouvel_avis"><br>		
+		<p>Nous serions honorés de <span class="titre_chapitre">connaître en détails</span> ce qui vous plaît! (et même ce qui vous plaît moins 😉)</p>
+		<form onsubmit="event.preventDefault();" id="avis">
+			<div>Note globale pour Sekooly (sur 5):`+liste_notes_possibles()+`</div>
+			<div>❤️Ce que vous aimez le plus:<textarea id="commentaire" class="texte_avis"></textarea></div>
+			<div>😕Ce que vous aimez le moins:<textarea id="ameliorations" class="texte_avis"></textarea></div>
+		</form>
+		<div>
+			<label for="cgu_avis"><input onchange="accepter_cgu_avis()" id="cgu_avis" type="checkbox">J'accepte les <a class="titre_chapitre" onclick="alert(CGU_avis(event))">Conditions d'Utilisation</a> du système d'avis de la plateforme.</label>
+		</div>
+		</div>
+		`
+}
+
+function CGU_avis(e){
+	e.preventDefault()
+	return `
+	En cochant cette case, vous acceptez de:
+
+	1° Mettre en avant votre avis sur sekooly.com sans aucune réserve
+	2° Donner l'autorisation totale à Sekooly d'utiliser le nom de votre établissement, votre rôle et vos initiales pour la mise en avant de la plateforme
+	3° Céder à Sekooly le droit de diffuser votre avis, dans les termes du point n°2
+	4° Supprimer par vous-même votre avis en cas de besoin, depuis votre espace utilisateur.
+
+	`
+}
+
+
+function liste_notes_possibles(){
+	var la_liste_de_notes = '<select id="note_globale" value=5>'
+
+	for(la_note = 5; la_note>0; la_note = la_note-0.1){
+		la_note = la_note.toFixed(2)
+		la_liste_de_notes += une_note_possible(la_note)
+	}
+
+	la_liste_de_notes += "</select>"
+
+	return la_liste_de_notes
+}
+
+function une_note_possible(la_note){
+	return '<option value="'+la_note+'">'+la_note+'</option>'
+}
+
+function fermer_emettre_avis(){
+
+	var confirmation = confirm("⚠️Cela supprimera votre ancien avis, et cette action est irréversible. Voulez-vous continuer ?")
+
+	if(confirmation){
+
+
+		$("#mini_popup").remove()
+
+		//supprimer mon avis
+		//émettre un nouvel avis
+		supprimer_initial("Avis","identifiant",recuperer("identifiant_courant")).then(() => emettre_avis())
+		
+	}
+	
+	
+}
+
+async function mon_avis_actuel(){
+	return await get_resultat_asynchrone(racine_initiale + "Avis?identifiant=eq."+recuperer("identifiant_courant")+"&"+api_initial)
+}
+
+
+function accepter_cgu_avis(){
+	//quand il ne coche pas -> on masque le bouton envoyer
+	//quand il coche -> on affiche le bouton envoyer
+	if($("#cgu_avis").length > 0){
+
+		var on_va_afficher_bouton = $("#cgu_avis")[0].checked
+		afficher_bouton_envoyer_avis(on_va_afficher_bouton)
+
+	}
+
+
+}
+
+function afficher_bouton_envoyer_avis(oui){
+	$("[onclick='envoyer_avis()']")[0].style.display = oui ? "" : "none"
+}
+
+async function envoyer_avis(){
+	var note_globale = $("#note_globale")[0].value
+
+	//on envoie dans la bdd
+	var nouvel_avis = {
+		identifiant: recuperer("identifiant_courant"),
+		nom_etablissement: data_etablissement['nom_etablissement'],
+		mon_type: mon_role,
+		note_globale: note_globale,
+		commentaire: $("#commentaire")[0].value,
+		ameliorations: $("#ameliorations")[0].value,
+		est_visible: false,
+		horodateur: maintenant(),
+	}
+
+	return ajouter_un_element_racine("Avis", nouvel_avis).then(() => emettre_avis())
+}

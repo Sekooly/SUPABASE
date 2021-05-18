@@ -66,6 +66,26 @@
 
 	<style>
 
+		#nouvel_avis {
+			overflow-y: scroll;
+			height: 400px;
+		}
+
+		.element_avis{
+
+		}
+
+
+		.texte_avis{
+			height: 50px;
+			width: 250px;
+			resize: none;
+		}
+
+		#avis > div {
+			padding: 5%;
+		}
+
 		.dark-mode .envoi_remarque {
 			filter: invert(1);
 		}
@@ -2012,7 +2032,11 @@
 		<div onclick="retourner_site()">Aide (tutoriels)</div>
 		<!--<div onclick="langues()" SOON>Langue</div>-->
 		<div onclick="changer_mode()">Mode nuit<span id="mode_nuit_oui"></span></div>
-		<div><a style="color:white;" href="https://sekooly.com" target="_blank">Site de Sekooly</a></div>
+		<div onclick="emettre_avis()">⭐ Mon avis sur Sekooly</div>
+
+		<!--
+			<div><a style="color:white;" href="https://sekooly.com" target="_blank">Site de Sekooly</a></div>
+		-->
 	</div>
 
 

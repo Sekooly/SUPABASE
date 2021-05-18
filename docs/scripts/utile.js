@@ -253,6 +253,14 @@ function supprimer(nom_table,nom_champ_reference,valeur_champ_reference){
   return delete_resultat_asynchrone(url)
 }
 
+
+
+function supprimer_initial(nom_table,nom_champ_reference,valeur_champ_reference){
+  url = racine_initiale + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+api_initial
+  return delete_resultat_asynchrone(url)
+}
+
+
 function supprimer_tout(nom_table){
   url = racine_data + nom_table + "?"+apikey
   return delete_resultat_asynchrone(url)
@@ -298,6 +306,13 @@ function ajouter_un_element(nom_table, nouveau_data){
 
 }
 
+function ajouter_un_element_racine(nom_table,nouveau_data){
+
+  url = racine_initiale + nom_table + "?"+api_initial
+  //console.log(url)
+  return post_resultat_asynchrone(url,nouveau_data)
+
+}
 
 
 
