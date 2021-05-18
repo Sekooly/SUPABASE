@@ -13601,7 +13601,7 @@ async function emettre_avis_sekooly(){
 
 	//si déjà un avis -> on affiche juste l'avis
 	//si pas encore d'avis -> afficher le formulaire
-	var elements_html = deja_avec_avis ? "<div>"+afficher_avis(mon_avis[0]) +"</div>" : formulaire_avis()
+	var elements_html = deja_avec_avis ? '<div id="avis">'+afficher_avis(mon_avis[0]) +"</div>" : formulaire_avis()
 	
 
 	//créer le popup
