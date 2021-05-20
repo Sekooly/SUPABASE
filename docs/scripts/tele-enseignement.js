@@ -13833,9 +13833,9 @@ async function gerer_sondage(){
 	}else{
 		var mes_donnees = get_resultat(racine_data + recuperer("mon_type") + "?Identifiant=eq." + recuperer("identifiant_courant") + "&" + apikey)[0]
 		//console.log(mes_donnees)
+		var donnees_actuelles =  JSON.parse(recuperer("mes_donnees"))
 
-
-		if(!mes_donnees || mes_donnees["Code"] !== JSON.parse(recuperer("mes_donnees"))["Code"]){
+		if(!mes_donnees || (mes_donnees["Code"] !== donnees_actuelles["Code"] && mes_donnees["Code"] !== hasher(donnees_actuelles["Code"])) ){
 			//deconnexion directe
 			console.log("usurpation d'identité.")
 			await tout_quitter()	
