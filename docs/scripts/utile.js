@@ -658,7 +658,7 @@ function transformer_en_array_de_JSON(json){
 
 
 
-var separateur = '\t'
+var separateur = ','
 
 // JSON à CSV
 function convertir_csv(arr, entetes_seulement){
