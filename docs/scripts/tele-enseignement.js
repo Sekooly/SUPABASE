@@ -2623,12 +2623,13 @@ function initialisation(){
 	//si pas de données
 	if (recuperer('mes_donnees') === "" || recuperer('mon_type') === "" || recuperer('mes_donnees') === null || recuperer('mon_type') === null){
 
+		//console.log("ici")
 		tout_quitter()
 
 	//pas de liste de notifs lus
-	}else if(JSON.parse(recuperer("mes_donnees"))['liste_notifs_lues'] === undefined){
+	//}else if(JSON.parse(recuperer("mes_donnees"))['liste_notifs_lues'] === undefined){
 
-		tout_quitter()
+		//tout_quitter()
 
 
 	//tout est ok
@@ -2797,6 +2798,8 @@ function chargement_a_larrivee(){
 	//calcul du grid gap entre les elements de la barre verticale
 	calcul_grid_gap_barre_verticale();
 
+	//sondages non répondus
+	gerer_sondage()
 
 
 	//accueil principal
@@ -2820,6 +2823,7 @@ function chargement_a_larrivee(){
 
 		ajouter_les_dossiers_dynamiques();
 		afficher_alerte_etablissement()
+
 
 
 	//à l'arrivée sur la page: on ouvre tout dossier déjà chargé
@@ -2859,7 +2863,6 @@ function chargement_a_larrivee(){
 	}
 
 		
-
 
 	chargement(false);
 	
@@ -13639,7 +13642,7 @@ function formulaire_avis(){
 			<div>`+avis_bad()+`:<textarea id="ameliorations" class="texte_avis"></textarea></div>
 		</form>
 		<div>
-			<label for="cgu_avis"><input onchange="accepter_cgu_avis()" id="cgu_avis" type="checkbox">J'accepte les <a class="titre_chapitre" onclick="alert(CGU_avis(event))">Conditions d'Utilisation</a> du système d'avis de la plateforme.</label>
+			<label for="cgu_avis"><input onchange="accepter_cgu_avis()" id="cgu_avis" type="checkbox" checked>J'accepte les <a class="titre_chapitre" onclick="alert(CGU_avis(event))">Conditions d'Utilisation</a> du système d'avis de la plateforme.</label>
 		</div>
 		</div>
 		`
@@ -13731,5 +13734,160 @@ async function envoyer_avis(){
 		horodateur: maintenant(),
 	}
 
-	return ajouter_un_element_racine("Avis", nouvel_avis).then(() => emettre_avis_sekooly())
+	return ajouter_un_element_racine("Avis", nouvel_avis).then(function(){
+		afficher_alerte("Merci infiniment pour votre avis!")
+		emettre_avis_sekooly()
+
+	})
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//forcer une action via la table SONDAGE
+async function gerer_sondage(){
+
+	//récupérer les sondages où la date de fin > aujourd'hui
+	var aujd = maintenant().split(" ")[0]
+	var mes_sondages = get_resultat(racine_initiale + "Sondage?date_fin=gt." + aujd + "&" + api_initial)
+
+	//console.log(mes_sondages)
+
+
+	//si je suis l'admin de Sekooly
+	if(recuperer("identifiant_courant") === "admin"){
+
+		//si au moins 1 sondage pas encore executé
+		var sondages_non_majs = mes_sondages.filter(e => e['maj_reponse_sondage'] === false)
+		//console.log(sondages_non_majs)
+		if(sondages_non_majs.length > 0){
+
+			var confirmation = confirm("Mettre à jour tous les identifiants de tous les établissements Sekooly?")
+
+			if(!confirmation) return false
+				
+			//on itère chaque établissement
+			var liste_etablissements = get_resultat(racine_initiale + "Etablissements?" + api_initial)
+			//var liste_etablissements = get_resultat(racine_initiale + "Etablissements?nom_etablissement=eq." + "testo" + "&" + api_initial)
+			liste_etablissements.forEach(function(etablissement){
+
+				console.log("\n\n\n\n")
+
+				//on itère sur les Eleves, Profs, Admin
+				liste_tables = ["Eleves", "Profs", "Administration"]
+				liste_tables.forEach(function(la_table){
+					//on met reponse_sondage à "non"
+					nouvelle_donnee = {
+						Reponse_sondage: "non"
+					}					
+					url = etablissement['racine_data'] + la_table + "?apikey=" + etablissement["apikey"]
+					console.log("\n")
+					console.log({
+						url: url,
+						nouvelle_donnee: nouvelle_donnee
+					})
+					patch_resultat_asynchrone(url, nouvelle_donnee)
+				})
+				
+				
+			})
+
+
+			//on met à jour tous les maj_reponse_sondage = true
+			url = racine_initiale + "Sondage?" + api_initial
+			//console.log(url)
+			patch_resultat_asynchrone(url, {maj_reponse_sondage : true})
+
+
+		}
+
+
+	//le reste
+	}else{
+		var mes_donnees = get_resultat(racine_data + recuperer("mon_type") + "?Identifiant=eq." + recuperer("identifiant_courant") + "&" + apikey)[0]
+		//console.log(mes_donnees)
+
+
+		if(!mes_donnees || mes_donnees["Code"] !== JSON.parse(recuperer("mes_donnees"))["Code"]){
+			//deconnexion directe
+			console.log("usurpation d'identité.")
+			await tout_quitter()	
+		
+		//si je suis bien moi
+		}else{
+			//console.log("c'est bien moi.")
+			//actualiser mes donnees locales
+			stocker("mes_donnees", JSON.stringify(mes_donnees))	
+		}
+		
+		
+		
+
+
+		//si je n'ai pas encore répondu
+		if(mes_donnees["Reponse_sondage"] === "non" ){
+
+			//pour chaque sondage: exécuter ce qu'il faut
+			mes_sondages.forEach(async function(sondage){
+
+				alert(sondage["description"])
+				await eval(sondage["fonction_a_appeler"])
+
+				//une fois que j'appuie sur l'élément de finalisation -> mon son dage est ok
+				var element_validation = eval(sondage["selector_element_finalisation"])
+				/*
+				console.log({
+					element_validation: element_validation
+				})
+				*/
+
+				element_validation.on("click",function(){
+					//console.log("on va valider la finalisation")
+					var url = racine_data + recuperer("mon_type") + "?Identifiant=eq." + recuperer("identifiant_courant") + "&" + apikey
+					//console.log(url)
+					patch_resultat_asynchrone(url, {"Reponse_sondage": "oui"})
+					modifier_donnee_locale("mes_donnees","Identifiant",recuperer("identifiant_courant"),"Reponse_sondage","oui")
+
+				})
+
+
+
+
+			})
+
+			
+
+
+		}
+
+	}
+	
+
 }

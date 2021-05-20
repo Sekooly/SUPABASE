@@ -1061,3 +1061,24 @@ function changer_mode(sans_changer){
 function mettre_mon_mode(){
   changer_mode(true)
 }
+
+
+function modifier_donnee_locale(nom_item, champ_reference, valeur_reference, champ_a_actualiser, nouvelle_valeur){
+
+  var donnees = JSON.parse(recuperer(nom_item))
+
+
+  //si c'est 1 seul et unique élément
+  if(donnees[champ_reference]) donnees = [donnees]
+
+  //il faut que ce soit un array
+  donnees.forEach(function(valeur){
+    if(valeur[champ_reference] === valeur_reference){
+      valeur[champ_a_actualiser] = nouvelle_valeur
+    }
+  })
+
+  stocker(nom_item, JSON.stringify(donnees[0]))
+  return recuperer(nom_item)
+
+}
