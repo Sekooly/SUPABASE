@@ -13520,23 +13520,25 @@ function switch_config_mode(){
 function faire_la_recherche_fichier(){
 
 	var zone_recherche = '<input id="rechercher" class="barre_recherche" name="rechercher" placeholder="Rechercher un fichier par mot(s)-clé(s)...">'
-	var contenu_alerte = `Un fichier peut être recherché par des mots-clés liés à :
-	• la matière dans laquelle il est publié
-	• le nom que l'enseignant lui a donné
-	• son extension (pdf,png,youtube...)
-	• sa catégorie (cours, devoir, ...).
-	Exemple: devoir
-
-	`
+	
 
 	$("#mini_popup").remove()
-	creer_mini_popup(help(contenu_alerte)+"<b>Que recherchez-vous?</b>"+zone_recherche, "<div class='liste_resultats' id='liste_resultats'></div>","Rechercher","afficher_resultats_recherche()")
+	var bouton_aide = help("aide_recherche()")
+	//console.log(bouton_aide)
+	creer_mini_popup( bouton_aide+"<b>Que recherchez-vous?</b>"+zone_recherche, "<div class='liste_resultats' id='liste_resultats'></div>","Rechercher","afficher_resultats_recherche()")
 
 	
 }
 
-function help(contenu_alerte){
-	return `<rouge id="mini-image" onclick="alert(\"`+contenu_alerte+`\")">Besoin d'aide?</rouge>`
+function help(fonction_aide){
+	//console.log(contenu_alerte)
+	return '<rouge id="mini-image" onclick="'+fonction_aide+'">Besoin d\'aide?</rouge>'
+}
+
+
+function aide_recherche(){	
+	var contenu_alerte = "Un fichier peut être recherché par des mots-clés liés à :\n\t• la matière dans laquelle il est publié\n\t• le nom que l'enseignant lui a donné\n\t• son extension (pdf,png,youtube...)\n\t• sa catégorie (cours, devoir, ...).\nExemple: devoir"
+ 	alert(contenu_alerte)
 }
 
 function afficher_resultats_recherche(){
