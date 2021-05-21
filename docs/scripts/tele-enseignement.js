@@ -13536,7 +13536,7 @@ function faire_la_recherche_fichier(){
 }
 
 function help(contenu_alerte){
-	return `<rouge id="mini-image" onclick="alert('`+contenu_alerte+`')">Besoin d'aide?</rouge>`
+	return `<rouge id="mini-image" onclick="alert(\"`+contenu_alerte+`\")">Besoin d'aide?</rouge>`
 }
 
 function afficher_resultats_recherche(){
