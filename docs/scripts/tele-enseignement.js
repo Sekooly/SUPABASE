@@ -5951,7 +5951,7 @@ $(function charger_fichiers(e){
 
 		//au clic de l'icône: si la main est dispo: on ouvre si c'est fermé, on ferme sinon
 		function charger_les_topics(forcing){
-			if (impossible_de_cliquer()) return -1;
+			if (impossible_de_cliquer() && !forcing) return -1;
 
 			est_deja_ouvert = element_DOM('fenetre').style.visibility === 'visible';
 			if(forcing) est_deja_ouvert = false;
@@ -6078,7 +6078,7 @@ $(function charger_fichiers(e){
 
 			//ajouter visuellement le commentaire
 			//console.log("on ajoute le commentaire");
-			ajouter_un_commentaire(mon_identifiant,mon_role,contenu_poste_bis,date);
+			ajouter_un_commentaire(mon_identifiant,mon_role,contenu_poste_bis,date,"nouveau_com");
 			//console.log("c'est ajouté");
 
 			//on enlève et on remet le bloc commentaire
@@ -6296,7 +6296,7 @@ $(function charger_fichiers(e){
 		}
 
 
-		function charger_question(id_topic,forcing){
+		function charger_question(id_topic,forcing, scroller_en_bas){
 
 			if(id_topic){
 
@@ -6304,14 +6304,17 @@ $(function charger_fichiers(e){
 
 				//on récupère tous les commentaires du topic
 				//console.log('on recupere les coms du topic n° ' + id_topic + '...');
-				recuperer_les_coms(id_topic, forcing);
+				recuperer_les_coms(id_topic, forcing,scroller_en_bas);
+
 				
 
 			}
 
+			return true
+
 		}
 
-		function recuperer_les_coms(id_topic_long, forcing){
+		function recuperer_les_coms(id_topic_long, forcing, scroller_en_bas){
 
 			chargement(true);
 
@@ -6352,7 +6355,7 @@ $(function charger_fichiers(e){
 					
 						stocker("topic_chargé",id_topic.toString());
 						stocker("les_coms",JSON.stringify(les_coms));
-						traitement_coms(id_topic);
+						traitement_coms(id_topic, scroller_en_bas);
 					}
 					
 				})
@@ -6360,7 +6363,7 @@ $(function charger_fichiers(e){
 			}else{
 				//on traite directement
 				//console.log('on n\'actualise pas');
-				traitement_coms(id_topic);
+				traitement_coms(id_topic, scroller_en_bas);
 			}
 
 			chargement(false)
@@ -6397,12 +6400,12 @@ $(function charger_fichiers(e){
 			entete.innerHTML = entete_poste;
 			element_DOM('fenetre').appendChild(entete);
 
-			var bloc_poste = '<div id="bloc_poste" style="padding: 2%;display: block;overflow-wrap: anywhere;border-bottom-style: solid;"><div id="auteur_du_poste" style="font-weight: bold;color: #FF6C00;">' + auteur_poste +' (' + role_auteur_poste + ')</div><h id="contenu_poste" style=""> '+ contenu_poste+'</h><h style="color: #B5B3B8;" id="date_poste"> ' + date + '</h></div>';
+			var bloc_poste = '<div id="bloc_poste" style="padding: 2%;display: block;overflow-wrap: anywhere;border-bottom-style: solid;"><div id="auteur_du_poste" >' + auteur_poste +' (' + role_auteur_poste + ')</div><h id="contenu_poste" style=""> '+ contenu_poste+'</h><h style="color: #B5B3B8;" id="date_poste"> ' + date + '</h></div>';
 
 
 
 
-			var emplacement_commentaire = '<div id="emplacement_commentaire" style="padding: 2%;display: block;overflow-wrap: anywhere;"></div>';
+			var emplacement_commentaire = '<div id="emplacement_commentaire"></div>';
 
 			
 
@@ -6426,7 +6429,7 @@ $(function charger_fichiers(e){
 
 			if (oui){
 
-				var bloc_commenter = '<div id="bloc_commenter" style="padding: 2%;display: block;text-align: end;"><textarea id="mon_com" style="display:inline-block; width:100%; resize: unset; min-height:200px; overflow-y:hidden;" placeholder="Votre commentaire..." maxlength="1500"></textarea><button id="envoicommentaire" onclick="'+fonction_ajout_commentaire+'" style="height: 30px;background-color: #FF6C00;">'+intitule_bouton+'</button></div>';
+				var bloc_commenter = '<div id="bloc_commenter"><textarea id="mon_com" style="display:inline-block; width:100%; resize: unset; min-height:200px; overflow-y:hidden;" placeholder="Votre commentaire..." maxlength="1500"></textarea><button id="envoicommentaire" onclick="'+fonction_ajout_commentaire+'" style="height: 30px;background-color: #FF6C00;">'+intitule_bouton+'</button></div>';
 
 				//ajouter le bloc COMMENTER dans le DOM
 				var le_bloc = document.createElement('div');
@@ -6444,7 +6447,7 @@ $(function charger_fichiers(e){
 		}
 
 
-		function traitement_coms(id_topic_str){
+		function traitement_coms(id_topic_str, scroller_en_bas){
 
 			chargement(true);
 
@@ -6462,27 +6465,37 @@ $(function charger_fichiers(e){
 			});
 			//console.log(les_coms)
 
-
+			var id_com = 0
 			les_coms.forEach(function(valeur){
 				if (valeur !== null){
+					//console.log(valeur)
 					var auteur_poste = valeur['Identifiant'].toUpperCase();
 					var role_auteur_poste = valeur['Role'];
 					var contenu_poste = valeur['Votre_commentaire'];
 					var date = afficher_date(valeur['Horodateur']);
-					ajouter_un_commentaire(auteur_poste,role_auteur_poste,contenu_poste,date);
+					id_com = valeur['id_com'];
+
+					ajouter_un_commentaire(auteur_poste,role_auteur_poste,contenu_poste,date,id_com);
 				}
 			});
 
-			
+			if(scroller_en_bas){
+				//scroller tout en bas
+				var position_scroll = $("#bloc_commenter")[0].offsetTop - $("#bloc_commenter")[0].offsetHeight;
+				console.log(position_scroll)
+				$("#liste_des_coms").scrollTop(position_scroll)
+
+				changer_couleur_temporairement(id_com,"un_commentaire","#5e5e5e",700);	
+			}
 
 			chargement(false);
 		}
 
-		function ajouter_un_commentaire(auteur_poste,role_auteur_poste,contenu_poste,date){
+		function ajouter_un_commentaire(auteur_poste,role_auteur_poste,contenu_poste,date,id_com){
 
 			contenu_poste = decodage(contenu_poste);
 
-			var un_com = '<div id="un_commentaire" style="display: block;overflow-wrap: anywhere;border-bottom-style:inset;border-width:1px; padding:1%;"><div id="auteur_du_poste" style="font-weight: bold;color: #FF6C00;">'+ auteur_poste + ' ('+  role_auteur_poste  +')</div><h id="contenu_poste" style=""> ' + contenu_poste + '</h><h style="color: #B5B3B8;" id="date_poste"> '+ date + '</h></div>';
+			var un_com = '<div id="'+id_com+'" class="un_commentaire"><div id="auteur_du_poste" style="font-weight: bold;color: #FF6C00;">'+ auteur_poste + ' ('+  role_auteur_poste  +')</div><h id="contenu_poste" style=""> ' + contenu_poste + '</h><h style="color: #B5B3B8;" id="date_poste"> '+ date + '</h></div>';
 
 			//ajouter le commentaire au DOM
 			var nouveau_com = document.createElement('div');
@@ -6539,7 +6552,7 @@ $(function charger_fichiers(e){
 		    	nom_champ_a_chercher = ""
 
 		    	//console.log("Récupérons d'abord...")
-		    	rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher).then(les_topics => {
+		    	return rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher).then(les_topics => {
 		    		//console.log(les_topics)
 		    		les_topics.sort(function tri_ordre_chrono_decroissant(a, b) {
 						//return moment(b.Horodateur, "DD/MM/YYYY HH:mm:ss")  - moment(a.Horodateur, "DD/MM/YYYY HH:mm:ss")
@@ -6548,7 +6561,7 @@ $(function charger_fichiers(e){
 		    		//console.log(les_topics)
 
 		    		stocker("les_topics",JSON.stringify(les_topics));
-		    		traitement();
+		    		traitement_topics();
 		    		chargement(false);
 	    		}).catch(e => {
 	    			console.error(e)
@@ -6561,14 +6574,16 @@ $(function charger_fichiers(e){
 			}else{
 				//console.log("traitement direct")
 				//on traite direct les données
-				traitement();
-				chargement(false);				
+				traitement_topics();
+				chargement(false);
+				return true
+
 			}
 
 			
 		}
 
-		function traitement(){
+		function traitement_topics(){
 
 			stocker("les_coms","")
 
@@ -7031,7 +7046,13 @@ function ajouter_la_notif(la_notif,index){
 	var Role_derniere_modif=la_notif['Role_derniere_modif'];
 	
 
+	var Horodateur=afficher_date(la_notif['Horodateur']);
 	var Date_derniere_modif=afficher_date(la_notif['Date_derniere_modif']);
+
+	//si discussion et Horodateur !== Date_derniere_modif -> faudra ouvrir le topic
+	
+	var ouvrir_topic = Type_notif==="discussion" && Horodateur !== Date_derniere_modif	
+
 
 	var la_matiere_concernee = la_notif['Classe_matiere'].substring(la_notif['Classe_matiere'].lastIndexOf("|") + 1, la_notif['Classe_matiere'].lastIndexOf(")"));
 	var la_classe_concernee = recuperer('mon_type') !== "Eleves" ? la_notif['Classe_matiere'].substring(la_notif['Classe_matiere'].lastIndexOf("(") + 1, la_notif['Classe_matiere'].lastIndexOf("|")) : "";
@@ -7046,23 +7067,21 @@ function ajouter_la_notif(la_notif,index){
 	ma_notif.setAttribute('id_notif',id_notif.toString());
 	ma_notif.onclick = function(e){
 		chargement(true);
-		clic_de_notif(Type_notif,ma_notif.id,id_dossier,ma_notif.getAttribute('id_notif'));
+		clic_de_notif(Type_notif,ma_notif.id,id_dossier,ma_notif.getAttribute('id_notif'),ouvrir_topic);
 	};
 
 
-	//surbrillance si pas encore lu (OLD)
-	/*
-	if(index<Number($("#bulle_notif")[0].innerText)){
-		ma_notif.className = "non_lu";
-	}*/
+	//si PAS listé ou DATE > ma derniere date de consultation
+	la_date_derniere_modif = convertir_en_date(la_notif['Date_derniere_modif'])
+	ma_date_consultation = convertir_en_date(recuperer("ma_date_consultation"))
 
 
-	ma_notif.className = liste_notifs_lues.includes("," + id_notif + ",") ? "une_notif" : "non_lu"
+	ma_notif.className =( liste_notifs_lues.includes("," + id_notif + ",") && la_date_derniere_modif <= ma_date_consultation ) ? "une_notif" : "non_lu"
 
 
 
 	var identifiant_notif = '<b style="color: #FF6C00;">' + Identifiant_derniere_modif + ' ('+Role_derniere_modif+') </b>';
-	var contenu_notif = contenu_notification(Type_notif,la_matiere_concernee,la_classe_concernee,Identifiant_originaire,Identifiant_derniere_modif);
+	var contenu_notif = contenu_notification(Type_notif,la_matiere_concernee,la_classe_concernee,Identifiant_originaire,Identifiant_derniere_modif, {'Horodateur':Horodateur,'Date_derniere_modif':Date_derniere_modif});
 	var intitule = ' - <i><b style="color:#c65e46">'+intitule_notif  +'</b></i>'
 	var icone_notif = '<span> <img src=' +  choix_image(Type_notif)  + ' class="icone_notif"> </span>'
 	var date_grise = '<div> '+icone_notif+' <i style="color: #bfbfbf;"> ' + Date_derniere_modif+ '  </i></div>';
@@ -7075,7 +7094,7 @@ function ajouter_la_notif(la_notif,index){
 
 }
 
-function clic_de_notif(type_notif,id_source,id_dossier,id_notif){
+function clic_de_notif(type_notif,id_source,id_dossier,id_notif,ouvrir_topic){
 	
 	//commenter
 	envoyer_ma_date_de_consultation()
@@ -7103,7 +7122,7 @@ function clic_de_notif(type_notif,id_source,id_dossier,id_notif){
 		if(type_notif === "fichier"){
 			notif_fichier(id_source,id_dossier);
 		}else if(type_notif === "discussion"){
-			notif_discussion(id_source,id_dossier);
+			notif_discussion(id_source,id_dossier,ouvrir_topic);
 		}else if(type_notif === "devoir"){
 			notif_devoir(id_source,id_dossier);
 		};
@@ -7127,7 +7146,7 @@ function notif_fichier(id_source,id_dossier){
 	window.location.href = window.location.href;			
 }
 
-function notif_discussion(id_source,id_dossier){
+function notif_discussion(id_source,id_dossier,ouvrir_topic){
 	
 	//charger dossier à charger
 	stocker_temp('dossier_chargé',id_dossier);
@@ -7137,20 +7156,32 @@ function notif_discussion(id_source,id_dossier){
 	//actualiser
 	initialisation().then(function(){
 		
+		//console.log("initialisation terminée")
 		
 		//ouvrir les topics
-		charger_les_topics(true).then(function(){
-
+		charger_les_topics(true).then(async function(){
+			//console.log("charger_les_topics OK")
 			if($('#'+id_source+'.bloc_topic').length>0){
 				
 				//console.log('on y est!!!')
+
+
 				//nouvelle couleur topic (temporaire)
-				changer_couleur_temporairement(id_source,"bloc_topic","#b9e5de",1000);
+				if(!ouvrir_topic){
+					//var position_scroll = $('#'+id_source+'.bloc_topic').offset().top;
+					var position_scroll = $("#"+id_source+".bloc_topic")[0].offsetTop - $("#"+id_source+".bloc_topic")[0].offsetHeight;
+					$("#div_liste_topics").scrollTop(position_scroll);
+					await changer_couleur_temporairement(id_source,"bloc_topic","#ce7470",700);	
+				}else{
 
-				//var position_scroll = $('#'+id_source+'.bloc_topic').offset().top;
-				var position_scroll = $("#"+id_source+".bloc_topic")[0].offsetTop - $("#"+id_source+".bloc_topic")[0].offsetHeight;
-				$("#div_liste_topics").scrollTop(position_scroll);
+					//ouvrir le topic
+					//le false = pas de forcing
+					//le true = scroller tout en bas
+					await charger_question(id_source,false,true);
 
+
+				}
+				
 			
 			}else{
 
@@ -7217,10 +7248,12 @@ function choix_image(type_notif){
 	: type_notif==="devoir" ? "https://sekooly.github.io/SUPABASE/images/img_devoirs.png" : "";
 }
 
-function contenu_notification(type_notif,la_matiere_concernee,la_classe_concernee,Identifiant_originaire,Identifiant_derniere_modif){
+function contenu_notification(type_notif,la_matiere_concernee,la_classe_concernee,Identifiant_originaire,Identifiant_derniere_modif, objet_dates){
 	//console.log(type_notif);
 
-	var phrase_discussion = Identifiant_originaire===Identifiant_derniere_modif ? " a créé ou commenté une discussion dans " : " a récemment commenté dans "
+	//si horodateur identique -> création
+	//si différents -> commentaires
+	var phrase_discussion = objet_dates['Horodateur']===objet_dates['Date_derniere_modif'] ? " a créé une discussion dans " : " a récemment commenté dans "
 
 	var phrase_devoir = Identifiant_originaire===Identifiant_derniere_modif ? " a rendu un devoir dans " : " a laissé une remarque sur un devoir dans "
 
@@ -7607,7 +7640,9 @@ function afficher_bulle_notifs(){
 		//return Date_derniere_modif > Date_consultation;
 
 		//nouvellement aux clics des notifs 1 par 1
-		return !liste_notifs_lues.includes("," + valeur['id_notif'] + ",")
+		//OU
+		//si PAS listé ou DATE > ma derniere date de consultation
+		return (!liste_notifs_lues.includes("," + valeur['id_notif'] + ",") || Date_derniere_modif > Date_consultation)
 		
 	});
 
@@ -13485,11 +13520,23 @@ function switch_config_mode(){
 function faire_la_recherche_fichier(){
 
 	var zone_recherche = '<input id="rechercher" class="barre_recherche" name="rechercher" placeholder="Rechercher un fichier par mot(s)-clé(s)...">'
+	var contenu_alerte = `Un fichier peut être recherché par des mots-clés liés à :
+	• la matière dans laquelle il est publié
+	• le nom que l'enseignant lui a donné
+	• son extension (pdf,png,youtube...)
+	• sa catégorie (cours, devoir, ...).
+	Exemple: devoir
+
+	`
 
 	$("#mini_popup").remove()
-	creer_mini_popup("<b>Que recherchez-vous?</b>"+zone_recherche, "<div class='liste_resultats' id='liste_resultats'></div>","Rechercher","afficher_resultats_recherche()")
+	creer_mini_popup(help(contenu_alerte)+"<b>Que recherchez-vous?</b>"+zone_recherche, "<div class='liste_resultats' id='liste_resultats'></div>","Rechercher","afficher_resultats_recherche()")
 
 	
+}
+
+function help(contenu_alerte){
+	return `<rouge id="mini-image" onclick="alert('`+contenu_alerte+`')">Besoin d'aide?</rouge>`
 }
 
 function afficher_resultats_recherche(){

@@ -50,10 +50,14 @@ function maintenant(){
 
 	}catch(e){
     console.error("erreur pour trouver la date et l'heure.")
-		return (new Date()).toLocaleDateString() + " " + (new Date()).toLocaleTimeString()		
+		maintenant_local()
 	}
 			
 		
+}
+
+function maintenant_local(){
+  return (new Date()).toLocaleDateString() + " " + (new Date()).toLocaleTimeString() 
 }
 
 function maintenant_sans_caracteres_speciaux(){
