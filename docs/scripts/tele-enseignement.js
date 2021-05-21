@@ -1670,7 +1670,8 @@ function envoyer_pp(identifiant_courant){
 					id_dossier: "pp",
 					est_telechargeable: "non",
 					date_publication: date_heure_aujourdhui,
-					taille_fichier: $("[id='pp-"+identifiant_courant+"']")[0].files[0].size
+					taille_fichier: $("[id='pp-"+identifiant_courant+"']")[0].files[0].size,
+					
 				}
 
 				var url = racine_data + nom_table + "?" + apikey
@@ -1896,6 +1897,44 @@ function filtrer_date_effet(){
 	masquer_drive_vide();
 }
 
+function filtrer_chapitre(){
+
+	//console.log("on filtre par chapitre!")
+
+	//on affiche TOUT LES DRIVES
+	afficher_tous_les_fichiers_deja_recup();
+
+
+	var condition_filtre = element_DOM('filtre_id_chapitre').value;
+
+	$(".span_un_fichier").filter(function(index,valeur){
+
+		//masquer tout ce qui ne respecte pas la condition ID_CHAPITRE
+		var le_id_chapitre = $(this)[0].attributes['id_chapitre'].value;
+		var id_ok = le_id_chapitre.includes(condition_filtre) ;
+		var mode_affichage = id_ok || condition_filtre === "Tous" ? "grid" : "none";
+
+		/*
+		console.log("\n\n\n")
+		console.log({le_id_chapitre:le_id_chapitre, id_ok:id_ok,mode_affichage:mode_affichage})
+		
+		console.log(valeur)
+		console.log(valeur.style.display)
+		*/
+
+		valeur.style.display = mode_affichage
+
+		return valeur.innerHTML.includes(condition_filtre);
+	
+	});
+
+
+	afficher_le_drive(true);
+	garder_les_manuels(); //NEW
+	masquer_drive_vide();
+
+}
+
 
 
 function rfc3986EncodeURIComponent (str) {  
@@ -1992,6 +2031,8 @@ function afficher_ou_non_choix_fichier(oui,forcing){
 		element_DOM('heure_effet').value="" //par défaut vide
 
 		element_DOM("lheure_limite").value = "";
+
+		element_DOM("id_chapitre").value = "--";
 		
 		//par défaut: choix fichier et non youtube ni extrait
 		element_DOM('est_video_youtube').checked = false;	
@@ -2060,6 +2101,9 @@ function deconnexion(){
 	effacer('mes_msgs')
 	effacer('msg_chargé')
 
+
+	effacer('mes_chapitres')
+	effacer('mode_prefere')
 
 	image_temporaire = ""
 	nom_image_temporaire = ""
@@ -2758,6 +2802,9 @@ function chargement_a_larrivee(){
 		return initialisation_de_la_plateforme()
 
 	}
+	
+	effacer("nb_clics")
+	effacer("numero_etape")
 
 	mettre_en_place_les_notifications();
 	mes_fichiers = recuperer_mes_fichiers(true)
@@ -3173,13 +3220,27 @@ function charger_dossier(id_dossier,final_booleen,titre){
 	//le dossier est déjà chargé
 	if (id_dossier !== "" && id_dossier !== null) {
 
-		//todo: récupérer le programme de cette matière
+
+		//on a chargé un dossier: changement de la variable locale
+		stocker_temp('dossier_chargé',id_dossier);
+
+		//par défaut: filtrer par la date d'effet pour le moment (à modifier en fonction des préférences de l'utilisateur)
+		var mode_prefere = recuperer("mode_prefere") || "par_la_date_effet"
+		choisir_ce_mode($("#" + mode_prefere)[0])
+
+		//on récupère les chapitres du dossier chargé 
+		chercher_mes_chapitres(true)
 		
 		$('#accueil_utilisateur').off('click');
 
 		$('#la_date_effet').on('change click',function(e){		
 			filtrer_date_effet();						
 		});
+
+		$('#filtre_id_chapitre').on('change click',function(e){		
+			filtrer_chapitre();						
+		});
+
 
 		//on enleve les topics et les coms de la matiere
 		stocker('les_topics','');
@@ -3251,8 +3312,7 @@ function charger_dossier(id_dossier,final_booleen,titre){
 
 		
 		
-		//on a chargé un dossier: changement de la variable locale
-		stocker_temp('dossier_chargé',id_dossier);
+
 		
 		//on recupere les fichiers deja en ligne
 		//console.log("on va recuperer les fichiers");
@@ -3262,7 +3322,91 @@ function charger_dossier(id_dossier,final_booleen,titre){
 
 }
 
+function chercher_mes_chapitres(forcing){
 
+
+
+	if(forcing) stocker("mes_chapitres","[]")
+
+
+	//si pas de mes_chapitres OU id_dossier pas trouvé dans mes chapitres OU par forcing
+	var mes_chapitres = JSON.parse(recuperer("mes_chapitres"))
+	var id_dossier_actuel = recuperer("dossier_chargé")
+	//console.log({id_dossier_actuel:id_dossier_actuel})
+	if(!mes_chapitres || !mes_chapitres[id_dossier_actuel]){
+
+
+		//on les récupère
+		var url = racine_data + "Programme?ID_URL=eq." + id_dossier_actuel + "&limit=150&order=intitule_chapitre.asc" + "&" + apikey
+		//console.log(url)
+		mes_chapitres = get_resultat(url)
+		//console.log({mes_chapitres:mes_chapitres})
+
+		//on les affiche
+		//console.log(mes_chapitres)
+
+		//on les stocke
+		mes_chapitres_str = JSON.stringify(mes_chapitres)
+		chapitre_a_rajouter = {[id_dossier_actuel]: mes_chapitres_str}
+		chapitre_a_rajouter_str =  JSON.stringify(chapitre_a_rajouter) 
+
+		if(mes_chapitres.length > 0) stocker('mes_chapitres', chapitre_a_rajouter_str)
+
+		
+
+	}
+
+	var mes_chapitres_locaux = recuperer_chapitres_locaux(id_dossier_actuel)
+	//console.log({mes_chapitres_locaux:mes_chapitres_locaux})
+	mettre_la_liste_de_chapitres()
+	return mes_chapitres_locaux
+
+}
+
+function recuperer_chapitres_locaux(id_dossier){
+	try{
+		var resultat = JSON.parse(JSON.parse(recuperer("mes_chapitres"))[id_dossier])	
+	}catch(e){
+		var resultat = []
+	}
+	
+
+	return resultat
+
+}
+
+
+
+function mettre_la_liste_de_chapitres(sans_append){
+	var id_dossier_actuel =  recuperer("dossier_chargé")
+	var mes_chapitres = recuperer_chapitres_locaux(id_dossier_actuel)
+
+	//rajouter les nouveaux chapitres
+	var liste_de_mes_chapitres = ""
+	mes_chapitres.forEach(function(chapitre){
+		liste_de_mes_chapitres += un_chapitre_liste(chapitre)
+	})
+
+	//ajouter "Nouvelle valeur"
+	if(sans_append){
+		return '<option value="--">(Aucun chapitre)</option>' + liste_de_mes_chapitres
+	}else{
+
+		//retirer les anciens chapitres
+		$(".un_chapitre_dans_la_liste").remove()
+
+		liste_de_mes_chapitres_filtre = liste_de_mes_chapitres + '<option class="un_chapitre_dans_la_liste" value="Tous">Tous les fichiers</option>'
+		liste_de_mes_chapitres += '<option class="un_chapitre_dans_la_liste" onclick="creer_chapitre()" style="font-style: oblique;">Nouveau chapitre</option>'
+		$("select#id_chapitre").append(liste_de_mes_chapitres)
+		$("select#filtre_id_chapitre").append(liste_de_mes_chapitres_filtre)
+	}
+	
+
+}
+
+function un_chapitre_liste(chapitre){
+	return '<option class="un_chapitre_dans_la_liste" value='+chapitre["id_chapitre"]+'>'+chapitre["intitule_chapitre"]+'</option>'
+}
 
 
 function recuperer_les_fichiers(id_dossier){
@@ -3320,8 +3464,16 @@ function dossier_vide(garder_liste){
 	alerte.id = "alerte_vide";
 	alerte.style.top = "80px";
 	alerte.style.position = "relative";
-	var la_date_choisie = $("#la_date_effet").find("option[value='" + $("#la_date_effet").val() + "']").text();
-	alerte.innerHTML = '<i style="width: max-content;color: #d9d8db;">Il n\'y a pas encore de fichiers pour ' + la_date_choisie + '.</i>';
+
+
+	var la_date_choisie = $("#la_date_effet").find(":selected").text();
+	var le_chapitre_choisi = $("#filtre_id_chapitre").find(":selected").text();
+
+	//en fonction du mode
+	var mode_date = $(".mode_choisi")[0].id === "par_la_date_effet"
+	var element_choisi = mode_date ? la_date_choisie : le_chapitre_choisi
+
+	alerte.innerHTML = '<i style="width: max-content;color: #d9d8db;">Il n\'y a pas encore de fichiers pour ' + element_choisi + '.</i>';
 
 	afficher_le_drive(false);
 	document.body.insertBefore(alerte,element_DOM('gros_conteneur')); 
@@ -3443,13 +3595,15 @@ function traitement_fichiers_recus(){
 			//console.log(nom_drive)
 
 			//console.log(valeur['heure_effet']);
-			ajouter_un_fichier(valeur['id_fichier'],nom_fichier,nom_drive,extension_fichier, valeur['date_effet'], valeur['heure_effet'], valeur['est_telechargeable'], valeur['coefficient_rendu'], valeur['la_date_limite'], valeur['lheure_limite'], valeur['periode_bulletin'], valeur['destinataire_par_page'] );
+			ajouter_un_fichier(valeur['id_fichier'],nom_fichier,nom_drive,extension_fichier, valeur['date_effet'], valeur['heure_effet'], valeur['est_telechargeable'], valeur['coefficient_rendu'], valeur['la_date_limite'], valeur['lheure_limite'], valeur['periode_bulletin'], valeur['destinataire_par_page'], valeur['id_chapitre'] );
 
 		});
 
 		
-		//n'afficher que les fichiers dont la date d'effet = date actuelle et drive vide masqué
-		filtrer_date_effet();
+		//n'afficher que les fichiers qui correspondent au filtre courant
+		var id_mode = id_mode_affichage()
+		filtrer_avec_le_bon_filtre(id_mode)
+
 
 		chargement(false);
 
@@ -3462,6 +3616,10 @@ function traitement_fichiers_recus(){
 
 	chargement(false);
 
+}
+
+function id_mode_affichage(){
+	return recuperer("mode_prefere").replace("par_","")
 }
 
 function garder_les_manuels(){	
@@ -3519,7 +3677,7 @@ function masquer_drive_vide(){
 }
 
 
-function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,date_effet,heure_effet,est_telechargeable,coefficient_rendu, date_limite, heure_limite, periode_bulletin, destinataire_par_page){
+function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,date_effet,heure_effet,est_telechargeable,coefficient_rendu, date_limite, heure_limite, periode_bulletin, destinataire_par_page,id_chapitre){
 
 
 
@@ -3538,7 +3696,8 @@ function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,d
 	var telecharger_le_fichier = est_telechargeable === "oui" ? '<img alt="télécharger" src="https://sekooly.github.io/SUPABASE/images/img_download.png" onclick="telecharger_fichier(event,this)" id="telecharger" class="download_fichier">' : ""
 	var periode_bulletin = periode_bulletin ? " periode_bulletin='"+periode_bulletin+"'" : ""
 	var destinataire_par_page = destinataire_par_page ? " destinataire_par_page='"+destinataire_par_page+"'" : ""
-	var code_html = '<span oncontextmenu="autoriser_clic_droit_supprimer_et_renommer(event,this)" onclick="ouvrir_fichier(this)" class="span_un_fichier" id="' + id_fichier + '" ma_date_effet="'+ la_date_yyyy_mm_dd(date_effet)+'" mon_heure_effet="'+ heure_effet + '" ma_date_limite="'+ la_date_yyyy_mm_dd(date_limite)+'" mon_heure_limite="'+ heure_limite +'" est_telechargeable="'+est_telechargeable+'"    coefficient_rendu='+ coefficient_rendu + periode_bulletin  + destinataire_par_page + '    >' + telecharger_le_fichier + '<img id="' + id_fichier + '" src="'+ image_fichier +'" class="un_fichier" '+padding_yt+'>' + nom_fichier +'</span>';
+	var id_chapitre = id_chapitre ? " id_chapitre='" + id_chapitre + "'" : ""
+	var code_html = '<span oncontextmenu="autoriser_clic_droit_supprimer_et_renommer(event,this)" onclick="ouvrir_fichier(this)" class="span_un_fichier" id="' + id_fichier + '" ma_date_effet="'+ la_date_yyyy_mm_dd(date_effet)+'" mon_heure_effet="'+ heure_effet + '" ma_date_limite="'+ la_date_yyyy_mm_dd(date_limite)+'" mon_heure_limite="'+ heure_limite +'" est_telechargeable="'+est_telechargeable+'"    coefficient_rendu='+ coefficient_rendu + periode_bulletin  + destinataire_par_page + id_chapitre +'    >' + telecharger_le_fichier + '<img id="' + id_fichier + '" src="'+ image_fichier +'" class="un_fichier" '+padding_yt+'>' + nom_fichier +'</span>';
 
 	//console.log(code_html);
 
@@ -3756,12 +3915,13 @@ function autoriser_clic_droit_supprimer_et_renommer(e,ceci){
 
 	
 	ajouter_fonction_clic_droit(e,ceci,0,"renommer_fichier","Renommer",id_fichier);
-	ajouter_fonction_clic_droit(e,ceci,1,"recategoriser_fichier","Recatégoriser",id_fichier);
-	ajouter_fonction_clic_droit(e,ceci,2,"changer_date_effet","Date d\'effet",id_fichier);
+	ajouter_fonction_clic_droit(e,ceci,1,"changer_chapitre_fichier","Assigner un chapitre",id_fichier);
+	ajouter_fonction_clic_droit(e,ceci,2,"recategoriser_fichier","Recatégoriser",id_fichier);
+	ajouter_fonction_clic_droit(e,ceci,3,"changer_date_effet","Date d\'effet",id_fichier);
 
 	//si devoir UNIQUEMENT -> on peut changer la date limite aussi -> offset = 1, sinon 0
 	if($("#"+ceci.id)[0].parentNode.id === "drive_devoirs"){
-		ajouter_fonction_clic_droit(e,ceci,3,"changer_date_limite_rendu","Date limite de rendu",id_fichier);
+		ajouter_fonction_clic_droit(e,ceci,4,"changer_date_limite_rendu","Date limite de rendu",id_fichier);
 		mon_offset = 1	
 	}else{
 		mon_offset = 0
@@ -3769,16 +3929,16 @@ function autoriser_clic_droit_supprimer_et_renommer(e,ceci){
 
 	//si c'est un bulletin -> on peut changer 1) la période du bulletin 2) la correspondance page -> élève 
 	if($("#"+ceci.id)[0].parentNode.id  === "drive_bulletins"){
-		ajouter_fonction_clic_droit(e,ceci,3,"changer_periode_bulletin","Période du bulletin",id_fichier);
+		ajouter_fonction_clic_droit(e,ceci,4,"changer_periode_bulletin","Période du bulletin",id_fichier);
 		//ajouter_fonction_clic_droit(e,ceci,4,"changer_eleve_par_page_bulletin","Ré-assigner pages",id_fichier);
 		mon_offset = mon_offset === 1 ? 2 : 1
 	}
 	
 	//ajouter l'offset
 
-	ajouter_fonction_clic_droit(e,ceci,3+mon_offset,"changer_coef","Coefficient",id_fichier,null,$("#"+id_fichier)[0].getAttribute("coefficient_rendu"));
-	ajouter_fonction_clic_droit(e,ceci,4+mon_offset,"changer_telechargeable","Téléchargeable ou non",id_fichier);
-	ajouter_fonction_clic_droit(e,ceci,5+mon_offset,"supprimer_fichier","Supprimer",id_fichier);
+	ajouter_fonction_clic_droit(e,ceci,4+mon_offset,"changer_coef","Coefficient",id_fichier,null,$("#"+id_fichier)[0].getAttribute("coefficient_rendu"));
+	ajouter_fonction_clic_droit(e,ceci,5+mon_offset,"changer_telechargeable","Téléchargeable ou non",id_fichier);
+	ajouter_fonction_clic_droit(e,ceci,6+mon_offset,"supprimer_fichier","Supprimer",id_fichier);
 
 	//au clic de n'importe où : ça enleve le clic droit
 	$(document).click(function() {
@@ -3789,7 +3949,32 @@ function autoriser_clic_droit_supprimer_et_renommer(e,ceci){
 
 }
 
+function changer_chapitre_fichier(id_fichier,nom_fichier){
 
+	var elements_html = '<select id="nouveau_chapitre">'
+	elements_html += mettre_la_liste_de_chapitres(true)
+	elements_html += '</select>'
+	var ancien_chapitre = $(".span_un_fichier[id='"+id_fichier+"']")[0].getAttribute("id_chapitre")
+	creer_mini_popup("Chapitre de <b>" + nom_fichier + '</b>', elements_html, "Assigner le chapitre", "changer_chapitre(\'"+id_fichier+"\')", ancien_chapitre, "nouveau_chapitre" )
+
+
+
+}
+
+function changer_chapitre(id_fichier){
+	nouveau_chapitre = $("#nouveau_chapitre")[0].value
+	//console.log(nouveau_chapitre)
+
+	nouvelle_donnee = {
+		id_fichier: id_fichier,
+		id_chapitre: nouveau_chapitre
+	}
+
+	var url = racine_data + "Fichiers?id_fichier=eq."+id_fichier + "&" + apikey
+
+	patch_resultat_asynchrone(url, nouvelle_donnee)
+	afficher_alerte("Le chapitre du fichier a bien été actualisé.", true)
+}
 
 
 function changer_eleve_par_page_bulletin(id_fichier,ancien_destinataire_par_page){
@@ -5142,7 +5327,8 @@ function switch_affichage_youtube(){
 					"heure_effet": heure_effet,
 					"est_telechargeable" : "non",
 					"coefficient_rendu" : le_coef,
-					"taille_fichier" : 0
+					"taille_fichier" : 0,
+					"id_chapitre": $("select#id_chapitre")[0].value
 				}
 				ajouter_un_element("Fichiers",nouveau_fichier, id_fichier)
 
@@ -13327,6 +13513,7 @@ function maj_matiere(){
 
 
 	chargement(false)
+	return true
 		
 }
 
@@ -13371,7 +13558,7 @@ function couleur_de_letat(etat){
 	return couleur
 }
 
-function ajouter_un_chapitre(){
+async function ajouter_un_chapitre(){
 
 	intitule_chapitre = prompt("Indiquez le nom du nouveau chapitre: ")
 	if(!intitule_chapitre) return false
@@ -13385,7 +13572,11 @@ function ajouter_un_chapitre(){
 		etat : "Non commencé"
 	}
 
-	ajouter_un_element("Programme",donnees_chapitre).then(() => maj_matiere())
+	return await ajouter_un_element("Programme",donnees_chapitre).then(function() {
+		maj_matiere();
+		return donnees_chapitre;
+		
+	})
 }
 
 function programme_ID_URL_actuel(){
@@ -13460,11 +13651,11 @@ function modifier_chapitre(id_chapitre, champ_du_chapitre, valeur_du_chapitre, c
 
 
 
-//par défaut: date heure pour le moment
-//choisir_ce_mode($("#par_date_heure")[0])
 
 
 function choisir_ce_mode(ceci){
+
+	//console.log(ceci)
 
 	if($(".mode_affichage_fichiers")){
 
@@ -13472,12 +13663,47 @@ function choisir_ce_mode(ceci){
 		$(".mode_affichage_fichiers")[0].className = "mode_affichage_fichiers"
 		$(".mode_affichage_fichiers")[1].className = "mode_affichage_fichiers"
 
-		//todo
 		//changer le filtre date VS filtre chapitre
+		var id_mode = ceci.id.replace("par_","")
+		var id_autre_mode = id_autre(id_mode)
+		
+		/*
+		console.log({
+			id_mode: id_mode,
+			id_autre_mode: id_autre_mode
+		})*/
+		
+
+		$("#" + id_mode)[0].style.display = ""
+		$("#" + id_autre_mode)[0].style.display = "none"
 
 		ceci.className = "mode_affichage_fichiers mode_choisi"
 		masquer_config_mode()
+
+		//enregistrer la préférence
+		stocker("mode_prefere",ceci.id)
+
+		
+		filtrer_avec_le_bon_filtre(id_mode)
+
 	}
+
+
+
+}
+
+function filtrer_avec_le_bon_filtre(id_mode){
+
+		if(id_mode === "la_date_effet"){
+			filtrer_date_effet()
+		}else if(id_mode === "filtre_id_chapitre"){
+			filtrer_chapitre()
+		}
+}
+
+function id_autre(id_actuel){
+	var resultat = id_actuel === "la_date_effet" ? "filtre_id_chapitre" : "la_date_effet"
+	return resultat
 }
 
 function afficher_config_mode(){
@@ -13501,6 +13727,42 @@ function switch_config_mode(){
 		}
 	}
 }
+
+
+
+
+//todo
+function creer_chapitre(){
+
+	recuperer_programme()
+	afficher_fenetre(false)
+	$("select[id='ID_URL']")[0].value =  recuperer("dossier_chargé")
+	ajouter_un_chapitre().then(async function(data) {
+		//console.log(data)	
+		if(data){
+
+			//rajouter dans mes chapitres locaux
+			//actualiser ma liste de chapitres lors de l'ajout de fichier
+			await chercher_mes_chapitres(true)
+
+			//mettre la valeur
+			$("select#id_chapitre")[0].value = data['id_chapitre']
+		}else{
+			element_DOM("id_chapitre").value = "--"
+		}
+	})
+
+
+}
+
+
+
+
+
+
+
+
+
 
 
 

@@ -97,11 +97,12 @@ function rechercher_tout(nom_table){
 }
 
 //on renvoie un array vide si non trouvé, la valeur sinon
-function rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher, nombrelimite){
+function rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher, nombrelimite, orderby){
 
   url = racine_data + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+apikey + ordonner(nom_table)
   url = nom_champ_a_chercher ? url+"&select="+nom_champ_a_chercher : url
   url = nombrelimite ? url+"&limit="+nombrelimite : url
+  url = orderby ? url+"&order="+orderby : url
   
   //console.log(url)
   return get_resultat_asynchrone(url)

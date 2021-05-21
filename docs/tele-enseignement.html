@@ -69,6 +69,17 @@
 
 	<style>
 
+		.choix_chapitre {
+			padding: 5%;
+			font-size: 14px;
+			display: grid;
+			font-weight: bold;
+		}
+
+		.un_chapitre_dans_la_liste{
+
+		}
+
 		#emplacement_commentaire{
 			padding: 2%;
 			display: block;
@@ -149,6 +160,7 @@
 
 		.mode_affichage_fichiers {
 			cursor: pointer;
+			padding: 10%;
 		}
 
 		.mode_choisi{
@@ -162,8 +174,7 @@
 		.gear-container {
 			position: fixed;
 			width: -moz-fit-content;
-			top: -70px;
-			left: -30%;
+			top: -120px;
 			text-align: center;
 			padding: 4%;
 			border-radius: 20px;
@@ -1336,7 +1347,7 @@
 			position: fixed;
 			text-align: center;
 			color: white;
-			display: block;
+			display: none;
 			top: 92%;
 			z-index: 3;
 			left: 50%;
@@ -1511,6 +1522,7 @@
 			box-shadow: 1px 0px 10px 1px;
 			z-index: 1; /*utile pour pas se superposer avec les fichiers*/
 			max-height: 400px
+			overflow: hidden auto;
 		}
 
 
@@ -2076,15 +2088,18 @@
 		
 		
 	<span id="span_date_effet" class="span_date_effet">
-		<!--
+		
 		<div class="gear-container"><b>Mode d'affichage</b>
-		  <div id="par_date_heure" class="mode_affichage_fichiers" onclick="choisir_ce_mode(this)">Date et heure d'effet</div>
-		  <div id="par_chapitre" class="mode_affichage_fichiers" onclick="choisir_ce_mode(this)">Chapitre</div>
+		  <div id="par_la_date_effet" class="mode_affichage_fichiers" onclick="choisir_ce_mode(this)">Date d'effet</div>
+		  <div id="par_filtre_id_chapitre" class="mode_affichage_fichiers" onclick="choisir_ce_mode(this)">Chapitre</div>
 		</div>
 		<img onclick="switch_config_mode()" class="gear" alt="CONFIG" src="images/img_gear.svg">
-		-->
+		
 
 		<select id="la_date_effet" class="la_date_effet"></select>
+		<select style="display: none;"  class="la_date_effet" id="filtre_id_chapitre">
+			<option value="--">(Aucun chapitre)</option>
+		</select>
 	</span>
 
 
@@ -2256,11 +2271,27 @@
 		
 		<input class="mon_file" id="file" value="" type="file" style="width: inherit;">
 
+
+
+		<div id="choix_chapitre" class="choix_chapitre">
+			<span id="titre_chapitre">Chapitre correspondant		
+				<rouge id="mini-image" onclick="alert('Choisir le chapitre permet de mieux retrouver votre fichier.\nPour gérer les chapitres de votre matière, vous pouvez aller en haut à gauche -> Programme scolaire.')">(?)</rouge>
+			</span>
+			<select id="id_chapitre" value="--">				
+				<option value="--" selected>(Aucun chapitre)</option>
+			</select>
+		</div>
+
+
+
 		<div id="choix_date_effet" class="choix_date_effet">
 			<span id="titre_date">Date d'effet:</span>
 			<input type="date" id="date_effet_fichier" class="date_effet_fichier">
 			<input id="heure_effet" class="la_date_limite" type="time" style="display: none;">
 		</div>
+
+
+
 
 		<div id="choix_date" class="choix_date">
 			Date limite de rendu:
