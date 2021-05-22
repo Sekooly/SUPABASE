@@ -3401,6 +3401,7 @@ function mettre_la_liste_de_chapitres(sans_append){
 		$("select#filtre_id_chapitre").append(liste_de_mes_chapitres_filtre)
 
                 //Au changement, si c'est un nouveau chapitre : prompt
+                $("select#id_chapitre").off("change")
                 $("select#id_chapitre").on("change",function(e){
                     if(e.target.value === "new") creer_chapitre()
                 })
