@@ -1033,7 +1033,7 @@ function create_id_conv(destinataire, id_conv_initial){
 
 
 function recuperer_destinataire(id_conv){
-  resultat = id_conv.replaceAll('-','').replaceAll(recuperer("identifiant_courant"),"").toUpperCase()
+  resultat = id_conv.replaceAll(recuperer("identifiant_courant"),"").replaceAll('-','').toUpperCase()
   if(!resultat) resultat = recuperer("identifiant_courant").toUpperCase()
   return resultat
 }
