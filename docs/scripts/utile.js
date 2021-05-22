@@ -153,7 +153,7 @@ function ordonner(nom_table){
     return "&order=Cycle.desc,Identifiant.asc"
   } else if(nom_table==="Logs" || nom_table==="Visio"){
     return "&order=id.desc"
-  } else if(nom_table==="Notifs" || nom_table==="Topic" || nom_table==="Coms"){
+  } else if(nom_table==="Notifs" || nom_table==="Topic" || nom_table==="Coms" || nom_table==="Conversations"){
     return "&order=Horodateur.desc"
   }else if(nom_table==="Fichiers" || nom_table==="Rendus"){
     return "&order=date_publication.desc"
