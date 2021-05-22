@@ -7552,7 +7552,7 @@ function contenu_notification(type_notif,la_matiere_concernee,la_classe_concerne
 function vider_les_notifs(){
 
 	var tout_marquer_html = '<div style="display: flex;"><span class="tout_marquer" id="rien_lire" onclick="executer_ne_rien_lire()">Tout marquer comme NON LU❌</span><span class="tout_marquer" id="tout_lire" onclick="executer_tout_lire()">Tout marquer comme LU✅</span></div>'
-	element_DOM('pannel_notif').innerHTML= tout_marquer_html+'<div class="filtres_notifs un_filtre_notif" height="50px" style=""><div class="un_filtre_notif"  id="filtre_tous">Tous</div><div class="un_filtre_notif"><img alt="Discussions" src="https://sekooly.github.io/SUPABASE/images/question.png" class="icone_filtre_notif"></div><div class="un_filtre_notif"><img alt="Devoirs" src="https://sekooly.github.io/SUPABASE/images/img_devoirs.png" class="icone_filtre_notif"></div><div class="un_filtre_notif"><img alt="Fichiers" src="https://sekooly.github.io/SUPABASE/images/img_ajout.png" class="icone_filtre_notif"></div></div>';
+	element_DOM('pannel_notif').innerHTML= tout_marquer_html+'<div class="filtres_notifs un_filtre_notif" height="50px" style=""><div class="un_filtre_notif"  id="filtre_tous">Tous</div><div class="un_filtre_notif"><img alt="Discussions" src="https://sekooly.github.io/SUPABASE/images/question.png" class="icone_filtre_notif"></div><div class="un_filtre_notif" style=""><img alt="Visio" class="icone_filtre_notif" style="" src="https://sekooly.github.io/SUPABASE/images/img_visio.png"></div><div class="un_filtre_notif"><img alt="Devoirs" src="https://sekooly.github.io/SUPABASE/images/img_devoirs.png" class="icone_filtre_notif"></div><div class="un_filtre_notif"><img alt="Fichiers" src="https://sekooly.github.io/SUPABASE/images/img_ajout.png" class="icone_filtre_notif"></div></div>';
 
 		
 
@@ -7682,6 +7682,7 @@ function activer_filtre(element_filtre){
 	var condition_filtre = nom_filtre.includes('question.png') ? 'question.png'
 	: nom_filtre.includes('img_devoirs') ? 'img_devoirs'
 	: nom_filtre.includes('img_ajout') ? 'img_ajout'
+	: nom_filtre.includes('img_visio') ? 'img_visio'
 	: "div"; //on recuperera tout
 
 	var nouvelle_liste_notifs = $(".non_lu, .une_notif").filter(function(valeur){
@@ -8181,13 +8182,40 @@ function creer_une_visio(largeur, hauteur,moi,classe,id_div_visio, id_matiere_vi
 		}
 		
 		if(confirmation || (!est_premier_visio && recuperer("quitter_multi_visio") === "true")){
-			//je notifie via formulaire
+			//je notifie
 			envoyer_mon_log_visio(moi.toLowerCase(), classe, "fin",mon_role, id_matiere_visio);
 			api.dispose();			
 			quitter_previsualisation();
 		}
 
 	})
+
+
+	//si professeur
+	//si je reste plus de 5 secondes : notifier que je suis présent			
+	setTimeout(function(){
+		//console.log("je suis resté plus de 5 secondes.")
+		var date_heure_actuelle = maintenant()
+
+		var nouvelle_notif = {
+			"id_notif": recuperer("dossier_chargé") + "----" +date_heure_actuelle,
+			"Horodateur": date_heure_actuelle,
+			"Type_notif" : "devoir",
+			"Id_source" : id_fichier_sujetdevoir,
+			"Intitulé" : nom_fichier,
+			"Identifiant_originaire": recuperer('identifiant_courant'),
+			"Role_originaire": "Eleve",
+			"Identifiant_derniere_modif" : recuperer('identifiant_courant'),
+			'Role_derniere_modif' : "Eleve",
+			'Classe' : mes_donnees['Classe'],
+			'Classe_matiere' : "(" + mes_donnees['Classe'] + "|" + la_matiere + ")" ,
+			'Id_classe_matiere' : recuperer("dossier_chargé"),
+			'Date_derniere_modif' : date_heure_actuelle,
+			'Cycle' : mes_donnees['Cycle']
+		}
+		//ajouter_un_element("Notifs",nouvelle_notif)
+
+	}, 5000);
 
 }
 
@@ -8537,7 +8565,7 @@ afficher_formulaire_sondage();
 /***************** REMEDIATIONS **********************/
 function resultats_remed(){
 
-	var mon_type = recuperer("mon_type");
+	var mon_type = recuperer("mon_type").includes("Admin") ? "Administration" : recuperer("mon_type");
 	var id_formulaire = '1FAIpQLSc-oT2cW_UP9ve6nZnIFPvymmcVR-058klZPdLFDKFXlW7LvQ';
 	var identifiant_courant = recuperer("identifiant_courant");
 
@@ -14234,14 +14262,16 @@ async function gerer_sondage(){
 
 	//le reste
 	}else{
-		var mes_donnees = get_resultat(racine_data + recuperer("mon_type") + "?Identifiant=eq." + recuperer("identifiant_courant") + "&" + apikey)[0]
+
+		var mon_type = recuperer("mon_type").split("_")[0]
+		var mes_donnees = get_resultat(racine_data + mon_type + "?Identifiant=eq." + recuperer("identifiant_courant") + "&" + apikey)[0]
 		//console.log(mes_donnees)
 		var donnees_actuelles =  JSON.parse(recuperer("mes_donnees"))
 
 		if(!mes_donnees || (mes_donnees["Code"] !== donnees_actuelles["Code"] && mes_donnees["Code"] !== hasher(donnees_actuelles["Code"])) ){
 			//deconnexion directe
 			console.log("usurpation d'identité.")
-			await tout_quitter()	
+			//await tout_quitter()	
 		
 		//si je suis bien moi
 		}else{
