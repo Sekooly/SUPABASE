@@ -64,7 +64,7 @@ function charger_classe_conseil(oui){
 
 		//la classe actuellement ouverte OU celle de l'élève
 		var classe = element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
-		var mon_type = recuperer('mon_type');
+		var mon_type = recuperer('mon_type').split("_")[0];
 		
 		if(mon_type.includes("Eleves")){
 			var classe = JSON.parse(recuperer('mes_donnees'))['Classe']
@@ -191,7 +191,7 @@ function lister_les_eleves(liste_eleves,classe){
 		//on ajoute le mode edition -> popup contenant:
 		//avis favorable ou non (liste déroulante): pas encore d'avis // favorable // non favorable
 		//observations sur l'élève -> ajout ou modif ou suppression
-		var mon_type = recuperer('mon_type');
+		var mon_type = recuperer('mon_type').split("_")[0]
 		if(mon_type!=="Eleves"){
 			var mode_edition_html = '<span><img id="mini-image" alt="remarque" class="envoi_remarque" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png" onclick="emettre_avis(\''+identifiant_eleve+'\',\''+classe+'\')"></span>';
 			var mode_edition = document.createElement('div');
@@ -311,7 +311,7 @@ function envoyer_avis_conseil(identifiant_eleve, classe){
 	var matieres = JSON.parse(recuperer('mes_matieres'));
 
 	//la classe actuellement ouverte OU celle de l'élève
-	var mon_type = recuperer('mon_type');				
+	var mon_type = recuperer('mon_type').split("_")[0]
 	if(mon_type.includes("Eleves"))	var classe = JSON.parse(recuperer('mes_donnees'))['Classe'];
 
 	var id_classe_eleve = "";
@@ -3766,7 +3766,7 @@ function bool_examen_terminé(drive_parent, le_span_un_fichier){
 }
 
 function fichier_ouvrable(id_fichier,bouton_telecharger,ceci_bouton_telecharger){
-	var mon_type = recuperer('mon_type');
+	var mon_type = recuperer('mon_type').split("_")[0]
 
 	if(bouton_telecharger) {
 		id_fichier = ceci_bouton_telecharger.parentNode.id;
@@ -7711,7 +7711,7 @@ function recuperer_notifs(){
 
 	var ma_classe = JSON.parse(recuperer('mes_donnees'))['Classe'];
 	var identifiant = recuperer('identifiant_courant');
-	var mon_type = recuperer('mon_type');
+	var mon_type = recuperer('mon_type').split("_")[0]
 	if(mon_type.includes('Administration')) mon_type = 'Administration';
 
 
@@ -7833,7 +7833,7 @@ function recuperer_ma_date_de_consultation(){
 	chargement(true);
 	var lien_script = "https://script.google.com/macros/s/AKfycbxgtxDhZ9g8-lo5e4aux1otiYyWsgg38TXmZunQ1VnPZ7JpjzA/exec";
 	var identifiant = recuperer('identifiant_courant');
-	var mon_type = recuperer('mon_type');
+	var mon_type = recuperer('mon_type').split("_")[0]
 
 	var url = lien_script + '?method=POST&identifiant=' + identifiant + '&mon_type=' + mon_type + '&ma_consultation=true';
 	return $.ajax({
@@ -8063,7 +8063,7 @@ function mettre_en_place_les_notifications(){
 
 function rejoindre_visio(id_matiere_visio,sans_alerte,valeur_id_div_visio,pas_de_initialisation){
 
-	var mon_type = recuperer('mon_type');
+	var mon_type = recuperer('mon_type').split("_")[0]
 
 	if(impossible_de_cliquer() && !sans_alerte) return -1;
 	/*
@@ -8449,7 +8449,7 @@ function afficher_formulaire_sondage(par_clic){
 	if (recuperer('mes_donnees')){
 		var mes_donnees = JSON.parse(recuperer('mes_donnees'));
 		ma_classe = mes_donnees['Classe'];
-		var mon_type = recuperer('mon_type');
+		var mon_type = recuperer('mon_type').split("_")[0]
 
 
 		/*
@@ -8525,7 +8525,7 @@ function repondre_sondage(oui){
 	var lien_script = "https://script.google.com/macros/s/AKfycbxPZ5wQLxdBqB8m2Mri7fZZ5xJtEeTR8MKI30CFTXeUDgE1cH0/exec";
 	var mes_donnees = JSON.parse(recuperer('mes_donnees'));
 	var mon_identifiant = mes_donnees['Identifiant'];
-	var mon_type = recuperer('mon_type');
+	var mon_type = recuperer('mon_type').split("_")[0]
 
 
 	var identifiant = "?identifiant=" + mon_identifiant;
@@ -11793,7 +11793,7 @@ function tableau_de_bord(){
 	$("#fenetre").append('<div id="previsualisation" style="width: 100%;height: 85%;overflow-y:auto;text-align: center;"></div>');
 
 
-	var mon_type = recuperer("mon_type")
+	var mon_type = recuperer('mon_type').split("_")[0]
 
 	elements_tdb =  mon_type === "Eleves" ? ["Présence sur la plateforme", "Devoirs rendus", "Participations", "Fichiers à consulter"] :
 					mon_type === "Profs" ? ["Présence sur la plateforme", "Devoirs corrigés", "Participations", "Fichiers en ligne"] :
@@ -12213,7 +12213,7 @@ function details_tdb_4(ceci){
 
 	var elements_html = ""
 	var mes_matieres = JSON.parse(recuperer("mes_matieres"))
-	var mon_type = recuperer("mon_type")
+	var mon_type = recuperer('mon_type').split("_")[0]
 
 
 	//mes fichiers en ligne (à consulter si eleve, à évaluer si prof/admin)
@@ -13223,7 +13223,7 @@ function afficher_msg_conversation(le_msg){
 
 
 async function liste_de_mes_destinataires(){
-	var mon_type = recuperer('mon_type')
+	var mon_type = recuperer('mon_type').split("_")[0]
 	var liste_eleves = await recuperer_eleves(true)
 	var liste_profs = await recuperer_profs(true)
 	var liste_admins = await recuperer_admin(true)
