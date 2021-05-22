@@ -1574,7 +1574,7 @@ function changer_pp(identifiant_courant){
 	identifiant_courant = identifiant_courant ? identifiant_courant : ""
 
 	//on crée le popup d'édition
-	creer_mini_popup("","<div id='nouvelle_pp' style='overflow: hidden;width: 200px;height:300px;'></div>","Valider la photo","envoyer_pp('"+identifiant_courant+"')")
+	creer_mini_popup("","<div id='nouvelle_pp' style='overflow: hidden;width: 300px;height:300px;'></div>","Valider la photo","envoyer_pp('"+identifiant_courant+"')")
 	
 	//on déclare l'endroit où on fera l'édition
 	basic_croppie = $('#nouvelle_pp').croppie({
@@ -1584,7 +1584,7 @@ function changer_pp(identifiant_courant){
 	        type: 'circle'
 	    },
 	    boundary: {
-	        width: 200,
+	        width: 300,
 	        height: 200
 	    },
 		
