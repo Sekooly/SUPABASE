@@ -14283,7 +14283,7 @@ async function gerer_sondage(){
 		
 		
 		
-		console.log(mes_donnees)
+		//console.log(mes_donnees)
 
 		//si je n'ai pas encore répondu
 		if(mes_donnees["Reponse_sondage"] === "non" ){

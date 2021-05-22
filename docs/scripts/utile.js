@@ -524,7 +524,7 @@ function get_resultat_asynchrone(url){
   return $.ajax({
     type: 'GET',
     url: url,
-    headers: { 'Prefer': 'count=exact' }
+    //headers: { 'Prefer': 'count=exact' }
   }).done(function(data) {
     return data
   });
