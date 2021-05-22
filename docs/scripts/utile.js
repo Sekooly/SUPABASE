@@ -481,12 +481,18 @@ function element_DOM(nom_element){
 }
 
 
+function nombre_de_rows(xmlHttp){
+  var contentRange = xmlHttp.getResponseHeader("content-range")
+  return contentRange ? Number(contentRange.split('/')[1]) : 0
+}
 
 
 function get_resultat(url){
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.open( "GET", url, false ); // false for synchronous request
-    xmlHttp.send( null );
+    //xmlHttp.setRequestHeader("Prefer", "count=exact")
+    xmlHttp.send( null ); 
+    //console.log(nombre_de_rows(xmlHttp))
     return JSON.parse(xmlHttp.responseText);
 }
 
@@ -494,7 +500,9 @@ function get_resultat(url){
 function get_resultat_initial(url){
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.open( "GET", url, false ); // false for synchronous request
+    //xmlHttp.setRequestHeader("Prefer", "count=exact")
     xmlHttp.send();
+    //console.log(nombre_de_rows(xmlHttp))
     return xmlHttp.response;  
 }
 
@@ -502,7 +510,9 @@ function get_resultat_initial(url){
 function get_resultat_brut(url){
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.open( "GET", url, false ); // false for synchronous request
+    //xmlHttp.setRequestHeader("Prefer", "count=exact")
     xmlHttp.send( null );
+    //console.log(nombre_de_rows(xmlHttp))
     return xmlHttp.responseText;  
 }
 
@@ -514,6 +524,7 @@ function get_resultat_asynchrone(url){
   return $.ajax({
     type: 'GET',
     url: url,
+    headers: { 'Prefer': 'count=exact' }
   }).done(function(data) {
     return data
   });

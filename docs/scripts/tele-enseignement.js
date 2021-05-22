@@ -5768,6 +5768,9 @@ $(function charger_fichiers(e){
     
     $('#categorie_choisie').on("change", function() {
 
+    	afficher_eventuelle_alerte_effet()
+    	afficher_eventuelle_alerte_limite()
+
 		//si c'est un devoir alors ajouter un délai
 		if($('#categorie_choisie')[0].value === "Devoirs"){
 			afficher_choix_date(true);			
@@ -5813,7 +5816,22 @@ $(function charger_fichiers(e){
 		if($('#date_effet_fichier')[0].value === "")
 			$('#date_effet_fichier')[0].value = moment().format('yyyy-MM-DD');
 
+		afficher_eventuelle_alerte_effet()
+
+
     });
+
+
+	$('#la_date_limite').on("change", function() {
+
+		afficher_eventuelle_alerte_limite()
+
+    });
+	
+
+
+
+
 
     $('#heure_effet').on("change", function() {
 
@@ -6084,6 +6102,69 @@ $(function charger_fichiers(e){
 });
 
 
+function fichier_devoir_ou_examen(){
+	var categorie_fichier = $("#categorie_choisie")[0].value
+	return (categorie_fichier === "Devoirs" || categorie_fichier === "Examens")
+}
+
+function afficher_eventuelle_alerte_effet(){
+	//si c'est un devoir ou un examen
+	if(fichier_devoir_ou_examen()){
+		//récupérer le nombre de devoirs de la classe pour cette date
+		//si nombre de devoirs > 0: afficher
+		afficher_les_devoirs_de_la_date('date_effet', $('#date_effet_fichier')[0].value, 'mere_effet','nb_devoirs_effet')
+		
+	}	
+	
+}
+
+function afficher_eventuelle_alerte_limite(){
+	//si c'est un devoir ou un examen
+	if(fichier_devoir_ou_examen()){
+		//récupérer le nombre de devoirs de la classe pour cette date
+		//si nombre de devoirs > 0: afficher
+		afficher_les_devoirs_de_la_date('la_date_limite', $('#la_date_limite')[0].value, 'mere_limite','nb_devoirs_limite')
+		
+	}	
+}
+
+
+
+
+
+//afficher_les_devoirs_de_la_date('date_effet', '2021-05-22', 'mere_effet','nb_devoirs_effet')
+//afficher_les_devoirs_de_la_date('la_date_limite', '2021-05-22', 'mere_limite','nb_devoirs_limite')
+async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_champ_date_reference, id_mere, id_nb_devoirs){
+
+
+	//récupérer TOUTES les matières de la classe
+	var classe_id = JSON.parse(recuperer("mes_matieres")).find(e => e['ID_URL'] === recuperer("dossier_chargé"))['classe_id']
+	//console.log(classe_id)
+	var toutes_les_matieres = await rechercher("Matieres","classe_id",classe_id,"ID_URL")
+	//console.log(toutes_les_matieres)
+
+	//récupérer TOUS LES DEVOIRS/EXAMENS de ces matières	
+	les_id_dossier_classe = '("'+toutes_les_matieres.map(e => e['ID_URL']).join('","') + '")'
+	url = racine_data + 'Fichiers?' +apikey 
+	url += '&categorie_fichier=in.("Devoirs","Examens")'
+	url += '&'+champ_date_reference+'=eq.' + valeur_champ_date_reference
+	url += '&id_dossier=in.' + les_id_dossier_classe
+	
+	//console.log(url)
+	var nb_devoirs = get_resultat(url).length
+	//console.log(nb_devoirs)
+
+	if(nb_devoirs > 0){
+		$("[id='"+id_nb_devoirs+"']")[0].innerText = nb_devoirs
+		$("#"+id_mere)[0].style.display = "block"
+	}else{
+		//masquer par défaut 
+		//si pas de devoirs
+		$("#"+id_mere)[0].style.display = ""
+	}
+
+
+}
 
 
 

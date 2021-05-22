@@ -69,6 +69,11 @@
 
 	<style>
 
+		.remarque_nb_devoirs{
+			font-size: 10px;
+			display: none;
+		}
+
 		.choix_chapitre {
 			padding: 5%;
 			font-size: 14px;
@@ -2288,8 +2293,9 @@
 
 		<div id="choix_date_effet" class="choix_date_effet">
 			<span id="titre_date">Date d'effet:</span>
-			<input type="date" id="date_effet_fichier" class="date_effet_fichier">
+			<input type="date" id="date_effet_fichier" class="date_effet_fichier">			
 			<input id="heure_effet" class="la_date_limite" type="time" style="display: none;">
+			<rouge id="mere_effet" class="remarque_nb_devoirs">Cette classe a déjà <span id="nb_devoirs_effet">0</span> devoirs pour cette date d'effet.</rouge>
 		</div>
 
 
@@ -2299,6 +2305,7 @@
 			Date limite de rendu:
 			<input type="date" id="la_date_limite" class="la_date_limite">
 			<input id="lheure_limite" class="la_date_limite" type="time">
+			<rouge id="mere_limite" class="remarque_nb_devoirs">Cette classe a déjà <span id="nb_devoirs_limite">0</span> devoirs pour cette date limite de rendu.</rouge>
 		</div>
 
 		<div id="coef_rendu" class="coef_rendu">Coefficient du rendu: <input id="coef" value="0" style="width: 30px;text-align: right;" class="element_yt">
