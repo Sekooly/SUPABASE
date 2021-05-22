@@ -76,6 +76,18 @@ function hasher(valeur) {
   
 }
 
+function supprimer_element_de_la_liste(liste,nom_element){
+  
+    var index = liste.indexOf(nom_element);
+    while (index > -1) {
+        liste.splice(index, 1);
+        index = liste.indexOf(nom_element);
+    }
+
+    return liste
+
+}
+
 
 function actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouveau_data){
   

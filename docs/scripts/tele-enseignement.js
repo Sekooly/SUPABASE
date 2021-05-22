@@ -3477,7 +3477,7 @@ function dossier_vide(garder_liste){
 	var le_chapitre_choisi = $("#filtre_id_chapitre").find(":selected").text();
 
 	//en fonction du mode
-	var mode_date = $(".mode_choisi")[0].id === "par_la_date_effet"
+	var mode_date = $(".mode_choisi").length > 0 ? $(".mode_choisi")[0].id === "par_la_date_effet" : true
 	var element_choisi = mode_date ? la_date_choisie : le_chapitre_choisi
 
 	alerte.innerHTML = '<i style="width: max-content;color: #d9d8db;">Il n\'y a pas encore de fichiers pour ' + element_choisi + '.</i>';
@@ -7359,7 +7359,7 @@ function ajouter_la_notif(la_notif,index){
 
 
 	var identifiant_notif = '<b style="color: #FF6C00;">' + Identifiant_derniere_modif + ' ('+Role_derniere_modif+') </b>';
-	var contenu_notif = contenu_notification(Type_notif,la_matiere_concernee,la_classe_concernee,Identifiant_originaire,Identifiant_derniere_modif, {'Horodateur':Horodateur,'Date_derniere_modif':Date_derniere_modif});
+	var contenu_notif = contenu_notification(Type_notif,la_matiere_concernee,la_classe_concernee,Identifiant_originaire,Identifiant_derniere_modif, {'Horodateur':Horodateur,'Date_derniere_modif':Date_derniere_modif},intitule_notif);
 	var intitule = ' - <i><b style="color:#c65e46">'+intitule_notif  +'</b></i>'
 	var icone_notif = '<span> <img src=' +  choix_image(Type_notif)  + ' class="icone_notif"> </span>'
 	var date_grise = '<div> '+icone_notif+' <i style="color: #bfbfbf;"> ' + Date_derniere_modif+ '  </i></div>';
@@ -7376,12 +7376,15 @@ function clic_de_notif(type_notif,id_source,id_dossier,id_notif,ouvrir_topic){
 	
 	//commenter
 	envoyer_ma_date_de_consultation()
+
+
 	
 	//envoyer cet ID
 	//console.log("on va cliquer sur " + id_notif)
 	if(id_notif) jai_lu(id_notif, true)
 	//console.log("on a cliqué sur "+ id_notif)
-
+	
+	//console.log(id_notif)
 
 	//pas de minipopup tdb
 	$("#mini_popup").remove()
@@ -7403,6 +7406,8 @@ function clic_de_notif(type_notif,id_source,id_dossier,id_notif,ouvrir_topic){
 			notif_discussion(id_source,id_dossier,ouvrir_topic);
 		}else if(type_notif === "devoir"){
 			notif_devoir(id_source,id_dossier);
+		}else if(type_notif === "visio"){
+			notif_visio(id_source);
 		};
 
 
@@ -7412,6 +7417,14 @@ function clic_de_notif(type_notif,id_source,id_dossier,id_notif,ouvrir_topic){
 	},500)
 
 
+}
+
+async function notif_visio(id_source){
+	//charger si pas encore ouvert
+	stocker_temp('dossier_chargé',id_source);
+	init = await initialisation()
+	//console.log(init)
+	rejoindre_visio()
 }
 
 function notif_fichier(id_source,id_dossier){
@@ -7523,10 +7536,11 @@ function changer_couleur_temporairement(id_element,class_element,couleur_clignot
 function choix_image(type_notif){
 	return type_notif==="fichier" ? "https://sekooly.github.io/SUPABASE/images/img_ajout.png"
 	: type_notif==="discussion" || type_notif==="commentaire" ? "https://sekooly.github.io/SUPABASE/images/question.png"
+	: type_notif==="visio" || type_notif==="commentaire" ? "https://sekooly.github.io/SUPABASE/images/img_visio.png"
 	: type_notif==="devoir" ? "https://sekooly.github.io/SUPABASE/images/img_devoirs.png" : "";
 }
 
-function contenu_notification(type_notif,la_matiere_concernee,la_classe_concernee,Identifiant_originaire,Identifiant_derniere_modif, objet_dates){
+function contenu_notification(type_notif,la_matiere_concernee,la_classe_concernee,Identifiant_originaire,Identifiant_derniere_modif, objet_dates, intitule_notif){
 	//console.log(type_notif);
 
 	//si horodateur identique -> création
@@ -7538,7 +7552,7 @@ function contenu_notification(type_notif,la_matiere_concernee,la_classe_concerne
 	var phrase = type_notif==="fichier" ? " a publié un nouveau fichier dans "
 	: type_notif==="discussion" ? phrase_discussion
 	: type_notif==="devoir" ? phrase_devoir
-	: type_notif==="visio" ? " a intéragi en visioconférence dans "
+	: type_notif==="visio" ? (Identifiant_derniere_modif.includes(",") ? " ont " : " a ")  + (intitule_notif === "debut" ? "rejoint" : "quitté") +" une visioconférence dans "
 	: " a récemment intéragi dans ";
 
 	if (la_classe_concernee) la_classe_concernee = " (" + la_classe_concernee + ")";
@@ -7586,6 +7600,7 @@ function executer_tout_lire(){
 
 	apres_maj_lecture_notifs()
 
+
 }
 
 function executer_ne_rien_lire(){
@@ -7601,6 +7616,7 @@ function apres_maj_lecture_notifs(){
 
 	//envoyer au serveur
 	envoyer_ce_que_jai_lu()
+	envoyer_ma_date_de_consultation()
 
 	//récupérer la nouvelle valeur de liste
 	recuperer_liste_notifs_lues()
@@ -7643,7 +7659,10 @@ function jai_lu(id_notif, envoyer_cette_lecture, une_notif){
 
 
 	//envoyer cette notif 
-	if(envoyer_cette_lecture) envoyer_ce_que_jai_lu()
+	if(envoyer_cette_lecture) {
+		envoyer_ce_que_jai_lu()
+		envoyer_ma_date_de_consultation()
+	} 
 
 
 }
@@ -8117,6 +8136,7 @@ function initialiser_visio(valeur_id_div_visio){
 	var id_div_visio = valeur_id_div_visio ? valeur_id_div_visio : "visio"
 	var visio_html = '<div id="'+id_div_visio+'" style="display:none;" class="previz"></div>';
 
+
 	var visio = document.createElement('div');
 	visio.innerHTML = visio_html;
 	element_DOM('fenetre').appendChild(visio.firstChild);
@@ -8168,6 +8188,10 @@ function creer_une_visio(largeur, hauteur,moi,classe,id_div_visio, id_matiere_vi
 	api.executeCommand('subject', nom_etablissement.toUpperCase() + " - " + classe);
 	envoyer_mon_log_visio(moi.toLowerCase(), classe.toLowerCase(), "debut",mon_role, id_matiere_visio);
 	
+
+	var id_notif_visio = recuperer("dossier_chargé")+ "-visio"
+
+
 	
 	//au clic de quitter : confirmer
 	$("#bye_prev").on('click',function(e){
@@ -8184,6 +8208,54 @@ function creer_une_visio(largeur, hauteur,moi,classe,id_div_visio, id_matiere_vi
 		if(confirmation || (!est_premier_visio && recuperer("quitter_multi_visio") === "true")){
 			//je notifie
 			envoyer_mon_log_visio(moi.toLowerCase(), classe, "fin",mon_role, id_matiere_visio);
+
+			//je retire mon nom des participants si la notif de visio existe et que j'y suis
+			var visio_existante = la_visio_existante(id_notif_visio)
+			if(visio_existante){
+
+				visio_existante = visio_existante[0]
+
+				//je notifie SSI je suis le dernier participant
+				var je_suis_dernier_participant = api.getNumberOfParticipants() === 1
+				if(je_suis_dernier_participant){
+
+					nouvelle_notif = {
+						"id_notif": id_notif_visio,
+						"Intitulé" : "fin",
+						"Identifiant_derniere_modif" : recuperer('identifiant_courant'),
+						'Role_derniere_modif' : mon_role,
+
+					}
+					actualiser("Notifs","id_notif",id_notif_visio,nouvelle_notif)
+
+				//pas le dernier participant -> je me retire de la liste
+				}else{
+
+					if(visio_existante['Identifiant_derniere_modif'].includes(recuperer("identifiant_courant"))){
+						
+						participants_tableau = visio_existante['Identifiant_derniere_modif'].split(",")
+						//alert(visio_existante['Identifiant_derniere_modif'])
+
+
+
+						var participants = supprimer_element_de_la_liste(participants_tableau,recuperer("identifiant_courant")).join(',')
+						//alert(participants)
+
+
+						nouvelle_notif = {
+							"id_notif": id_notif_visio,
+							"Intitulé" : "debut",
+							"Identifiant_derniere_modif" : participants,
+							'Role_derniere_modif' : mon_role,
+						}
+						actualiser("Notifs","id_notif",id_notif_visio,nouvelle_notif)
+					}
+
+				}
+
+			}
+
+
 			api.dispose();			
 			quitter_previsualisation();
 		}
@@ -8196,73 +8268,88 @@ function creer_une_visio(largeur, hauteur,moi,classe,id_div_visio, id_matiere_vi
 	setTimeout(function(){
 		//console.log("je suis resté plus de 5 secondes.")
 		var date_heure_actuelle = maintenant()
+		var date_actuelle = date_heure_actuelle.split(" ")[0]
+		var mon_cycle = JSON.parse(recuperer("mes_donnees"))['Cycle']
+		var les_matieres = JSON.parse(recuperer("mes_matieres"))
+		var la_classe_matiere = les_matieres.filter(e => e['ID_URL'] === recuperer("dossier_chargé"))[0]["Classe_Matiere"]
+		
 
 		var nouvelle_notif = {
-			"id_notif": recuperer("dossier_chargé") + "----" +date_heure_actuelle,
+			"id_notif": id_notif_visio,
 			"Horodateur": date_heure_actuelle,
-			"Type_notif" : "devoir",
-			"Id_source" : id_fichier_sujetdevoir,
-			"Intitulé" : nom_fichier,
+			"Type_notif" : "visio",
+			"Id_source" : recuperer("dossier_chargé"),
+			"Intitulé" : "debut",
 			"Identifiant_originaire": recuperer('identifiant_courant'),
-			"Role_originaire": "Eleve",
+			"Role_originaire": mon_role,
 			"Identifiant_derniere_modif" : recuperer('identifiant_courant'),
-			'Role_derniere_modif' : "Eleve",
-			'Classe' : mes_donnees['Classe'],
-			'Classe_matiere' : "(" + mes_donnees['Classe'] + "|" + la_matiere + ")" ,
+			'Role_derniere_modif' : mon_role,
+			'Classe' : la_classe_matiere.split('|')[0].replace("(",""),
+			'Classe_matiere' : la_classe_matiere,
 			'Id_classe_matiere' : recuperer("dossier_chargé"),
 			'Date_derniere_modif' : date_heure_actuelle,
-			'Cycle' : mes_donnees['Cycle']
+			'Cycle' : mon_cycle
 		}
-		//ajouter_un_element("Notifs",nouvelle_notif)
+
+		//console.log(nouvelle_notif)
+		//si la notif de la classe existe déjà:
+		var visio_existante = la_visio_existante(id_notif_visio)
+		var visio_deja_existante = visio_existante.length > 0
+		
+		//alert(url + ": " +visio_deja_existante)
+		if(visio_deja_existante){
+
+			visio_existante = visio_existante[0]
+
+			//on modifie donc pas de Horodateur, Type_notif, id_source, identifiant_originaire, role originaire, classe, clasee matiere, id classe matiere, cycle
+			delete nouvelle_notif["Horodateur"];	
+			delete nouvelle_notif["Type_notif"];	
+			delete nouvelle_notif["Id_source"];	
+			delete nouvelle_notif["Identifiant_originaire"];	
+			delete nouvelle_notif["Role_originaire"];	
+			delete nouvelle_notif["Classe"];	
+			delete nouvelle_notif["Classe_matiere"];	
+			delete nouvelle_notif["Id_classe_matiere"];
+			delete nouvelle_notif["Cycle"];
+
+			//si initialement, c'était FIN: c'est moi uniquement le participant
+			//si c'était DEBUT: je m'ajoute SSI je n'y suis pas déjà
+			//rajouter mon nom dans identifiant derniere modif
+			nouvelle_notif['Identifiant_derniere_modif'] = visio_existante['Intitulé'] === "fin" ? recuperer("identifiant_courant") : (visio_existante['Identifiant_derniere_modif'].includes(recuperer("identifiant_courant")) ? visio_existante['Identifiant_derniere_modif'] : visio_existante['Identifiant_derniere_modif'] + "," + recuperer("identifiant_courant"))
+
+			//nom_table, nom_champ_reference, valeur_champ_reference, nouveau_data
+			actualiser("Notifs","id_notif",id_notif_visio,nouvelle_notif)
+			//console.log(nouvelle_notif)
+
+		}else{
+			//si personne n'a jamais créé de notif visio pour aujourdhui pour cette classe-matiere -> on la crée
+			//console.log(nouvelle_notif)
+			ajouter_un_element("Notifs",nouvelle_notif)
+		}
+		
+
+		//ajouter le watermark quand c'est prêt
+		$(".mon_logo_jitsi").remove()
+		$('<a target="_blank" class="mon_logo_jitsi" href="https://sekooly.com"></a>').insertBefore( "#visio > " )
+		
 
 	}, 5000);
 
 }
 
+function la_visio_existante(id_notif_visio){
+	var url = racine_data + "Notifs?Type_notif=eq.visio&id_notif=eq." + id_notif_visio + "&" + apikey
+	return get_resultat(url)
+}
 
 function visio_prete(id_div_visio){
 
 	chargement(false);
 	element_DOM(id_div_visio).style.display="block";
 
+	
+
 }
-
-
-
-function notif_visio(id_classe_matiere, statut_visio, identifiant){
-		
-	chargement(true);
-	
-	var lien_script = "https://script.google.com/macros/s/AKfycbxgtxDhZ9g8-lo5e4aux1otiYyWsgg38TXmZunQ1VnPZ7JpjzA/exec";
-
-	var id_classe_matiere = "?&id_classe_matiere=" + id_classe_matiere;
-	var statut_visio = "&statut_visio=" + statut_visio;
-	var identifiant = "&identifiant=" + identifiant;
-
-	var url = lien_script + id_classe_matiere + statut_visio +identifiant;
-
-	//console.log(url)
-
-	return $.ajax({
-		type: "POST",
-	    url: url,
-
-	    success: function(data){
-	    	console.log(data);
-	    },
-
-		error: function(data){
-	    	console.log('erreur! ' + data);
-			alert('Vérifiez que vous êtes toujours connecté à internet.');
-	    },
-
-	    complete:function(){
-	    	chargement(false);
-	
-	    }
-
-	});
-	}
 
 
 function envoyer_mon_log_visio(mon_identifiant, ma_classe, mon_statut, mon_role, id_classe_matiere){
@@ -8316,7 +8403,7 @@ function envoyer_mon_log_visio(mon_identifiant, ma_classe, mon_statut, mon_role,
 		"Id_classe_matiere" : id_classe_matiere,
 		"Classe_matiere" : la_classe_matiere
 	}
-	console.log(nouveau_visio)
+	//console.log(nouveau_visio)
 	ajouter_un_element(nom_table, nouveau_visio)
 
 
