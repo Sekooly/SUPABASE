@@ -3401,7 +3401,7 @@ function mettre_la_liste_de_chapitres(sans_append){
 		$("select#filtre_id_chapitre").append(liste_de_mes_chapitres_filtre)
 
                 //Au changement, si c'est un nouveau chapitre : prompt
-                $("select#id_chapitre").on("change",function(e){
+                $("select#id_chapitre").one("change",function(e){
                     if(e.target.value === "new") creer_chapitre()
                 })
 
@@ -9283,7 +9283,7 @@ function supprimer_tous_les_parametres(){
 
 
 function rendre_td_modifiable(){
-	$(document).on('dblclick','tbody', function(e){
+	$(document).one('dblclick','tbody', function(e){
 
 		fonction_td_modifiable(e)
 		
