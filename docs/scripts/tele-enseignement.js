@@ -3396,9 +3396,15 @@ function mettre_la_liste_de_chapitres(sans_append){
 		$(".un_chapitre_dans_la_liste").remove()
 
 		liste_de_mes_chapitres_filtre = liste_de_mes_chapitres + '<option class="un_chapitre_dans_la_liste" value="Tous">Tous les fichiers</option>'
-		liste_de_mes_chapitres += '<option class="un_chapitre_dans_la_liste" onclick="creer_chapitre()" style="font-style: oblique;">Nouveau chapitre</option>'
+		liste_de_mes_chapitres += '<option class="un_chapitre_dans_la_liste" value="new" style="font-style: oblique;">Nouveau chapitre</option>'
 		$("select#id_chapitre").append(liste_de_mes_chapitres)
 		$("select#filtre_id_chapitre").append(liste_de_mes_chapitres_filtre)
+
+                //Au changement, si c'est un nouveau chapitre : prompt
+                $("select#id_chapitre").on("change",function(e){
+                    if(e.target.value === "new") creer_chapitre()
+                })
+
 	}
 	
 
