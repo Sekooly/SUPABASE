@@ -6114,7 +6114,9 @@ function afficher_eventuelle_alerte_effet(){
 		//si nombre de devoirs > 0: afficher
 		afficher_les_devoirs_de_la_date('date_effet', $('#date_effet_fichier')[0].value, 'mere_effet','nb_devoirs_effet')
 		
-	}	
+	}else{
+		$("#mere_effet")[0].style.display = ""
+	}
 	
 }
 
@@ -6125,7 +6127,9 @@ function afficher_eventuelle_alerte_limite(){
 		//si nombre de devoirs > 0: afficher
 		afficher_les_devoirs_de_la_date('la_date_limite', $('#la_date_limite')[0].value, 'mere_limite','nb_devoirs_limite')
 		
-	}	
+	}else{
+		$("#mere_limite")[0].style.display = ""
+	}
 }
 
 
