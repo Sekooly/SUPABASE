@@ -6760,7 +6760,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 			if(scroller_en_bas){
 				//scroller tout en bas
 				var position_scroll = $("#bloc_commenter")[0].offsetTop - $("#bloc_commenter")[0].offsetHeight;
-				console.log(position_scroll)
+				//console.log(position_scroll)
 				$("#liste_des_coms").scrollTop(position_scroll)
 
 				changer_couleur_temporairement(id_com,"un_commentaire","#5e5e5e",700);	
