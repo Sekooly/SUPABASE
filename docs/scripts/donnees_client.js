@@ -27,3 +27,22 @@ if(data_etablissement){
 }
 
 //pour savoir comment fonctionne l'api, faire get_resultat_asynchrone(racine_data+"?"+apikey)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

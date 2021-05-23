@@ -39,6 +39,18 @@ var mes_fichiers = []
 
 
 var liste_notifs_lues = ""
+var mySubscription_notif = null
+var mySubscription_conv = null
+
+
+const { createClient } = supabase
+supabase = createClient(racine_data.replace("/rest/v1/",""),  data_etablissement["apikey"])
+
+
+
+
+
+
 
 /*********************** CONSEIL DE CLASSE ***********************************/
 function afficher_conseil_de_classe(oui){
@@ -1409,7 +1421,7 @@ function afficher_alerte(contenu,actualiser){
 	var msg_alerte = element_DOM("snackbar");
 
 	// on affiche l'alerte
-	msg_alerte.innerText = contenu;
+	msg_alerte.innerHTML = contenu;
 	msg_alerte.className = "show";
 
 	//dans 3 secondeds, on masque l'alerte 
@@ -2778,6 +2790,7 @@ function chargement_a_larrivee(){
 	rendre_td_modifiable();
 	mettre_les_soons()
 	ajouter_multi_visio_si_non_eleve()
+	notifs_reelles_ou_non()
 
 	//todo : pas de lien sur l'alerte pour les primaires
 	var mon_cycle = JSON.parse(recuperer('mes_donnees'))['Cycle'];
@@ -4607,7 +4620,7 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 	//console.log(pas_de_telechargement)
 	//console.log(est_youtube(extension))
 	//si c'est un mode_extrait_png_div -> div
-	if ((pas_de_telechargement && est_youtube(extension)===false ) || mode_extrait_png_div) previsualisation = '<div id=previsualisation class="responsive-container">'
+	if ((pas_de_telechargement && est_youtube(extension)===false && est_image(extension)===false ) || mode_extrait_png_div) previsualisation = '<div id=previsualisation class="responsive-container">'
 
 	
 	//console.log(previsualisation)
@@ -7716,7 +7729,7 @@ function activer_filtre(element_filtre){
 
 
 
-function recuperer_notifs(){
+function recuperer_notifs(sans_msgs){
 
 	chargement(true);
 
@@ -7725,7 +7738,7 @@ function recuperer_notifs(){
 
 
 	//notifs des messages
-	recuperer_msgs(true,true)
+	if(!sans_msgs) recuperer_msgs(true,true)
 
 
 	var ma_classe = JSON.parse(recuperer('mes_donnees'))['Classe'];
@@ -7761,7 +7774,7 @@ function recuperer_notifs(){
 	//limité à 150
 	if(mon_type.includes('Profs')){
 
-		rechercher_notifs_prof(valeur_champ_reference, 150).then(les_notifs => {
+		return rechercher_notifs_prof(valeur_champ_reference, 150).then(les_notifs => {
 			mes_notifs = les_notifs.filter(function(valeur,index){
 				return valeur['Identifiant_derniere_modif'] !== recuperer('identifiant_courant')
 			})
@@ -7778,7 +7791,7 @@ function recuperer_notifs(){
 	}else{
 
 		//limité à 150
-		rechercher(nom_table, nom_champ_reference, valeur_champ_reference, "",150).then(les_notifs => {
+		return rechercher(nom_table, nom_champ_reference, valeur_champ_reference, "",150).then(les_notifs => {
 			mes_notifs = les_notifs.filter(function(valeur,index){
 				return valeur['Identifiant_derniere_modif'] !== recuperer('identifiant_courant')
 			})
@@ -7795,7 +7808,7 @@ function recuperer_notifs(){
 			stocker_mes_notifications(mes_notifs);
 			
 			//affiche la bulle SSI nouvelles notifs stockées
-			afficher_bulle_notifs();		
+			afficher_bulle_notifs();
 		})
 
 
@@ -8054,6 +8067,8 @@ function mettre_en_place_les_notifications(){
 
 	recuperer_notifs();
 
+	positionner_bulle_notif();
+	positionner_pannel_notif();
 
 	$(window).on('resize', function(){
 
@@ -13033,8 +13048,12 @@ function recuperer_msgs(forcing, sans_fenetre){
 	chargement(true);
 	
 
-	vider_fenetre("");
-	element_DOM('fenetre').innerHTML += html_boutons_fenetre("recuperer_msgs(true)","ajouter_un_tout_nouveau_msg()","Pour répondre, cliquez sur le message en question.<br>" +alerte_conv());
+	if(!sans_fenetre) {
+		vider_fenetre("");
+		element_DOM('fenetre').innerHTML += html_boutons_fenetre("recuperer_msgs(true)","ajouter_un_tout_nouveau_msg()","Pour répondre, cliquez sur le message en question.<br>" +alerte_conv());
+	}else{
+
+	}
 
 
     if (forcing || recuperer("mes_msgs") === null || recuperer("mes_msgs") === ''){
@@ -13141,58 +13160,8 @@ function traitement_msgs(){
 		//console.log(liste_des_msgs)
 		
 		liste_des_msgs.forEach(function (valeur){
-			var id_topic = valeur['id_conv'] ;
-			//console.log("on va ajouter " + id_topic);
-
-
-
-
-			//nb de msgs non lus
-			//console.log("pour " +valeur['id_msg'])
-			var nb_non_lus = liste_des_msgs.filter(e => e['id_conv'] === valeur['id_conv'] && !liste_notifs_lues.includes("," + e["id_msg"] +",")).length
-			//console.log("	nb_non_lus:" + nb_non_lus)
-
-
-			//rassembler les msgs de la meme conversation
-			//on zappe si c'est déjà présent
-			//console.log("[id='"+id_topic+"']")
-			if($("[id='"+id_topic+"']").length > 0) return true
-
-			var titre = recuperer_destinataire(valeur['id_conv']);
-			element_contenu = document.createElement('div')
-			element_contenu.innerHTML = valeur['Message'];
-			var contenu = element_contenu.innerText
 			
-			//on récupère la date du dernier message
-			var horodateur_max =  moment.max( liste_des_msgs.filter(e => e['id_conv'] === valeur['id_conv']).map(e => e.Horodateur).map(e => moment(e)) ).format("DD/MM/YYY HH:mm")
-			//console.log(horodateur_max)
-			var date = afficher_date(horodateur_max);
-			var nb_coms = liste_des_msgs.filter(e => e['id_conv'] === valeur['id_conv']).length
-			if(nb_coms === undefined) nb_coms = 0;
-
-
-			var icone_poubelle = "" //'<span id="bye' + id_topic + '"><img alt="supprimer" class="byebye" onclick="supprimer_conversation(this)" src="https://sekooly.github.io/SUPABASE/images/img_trash.png" style="width: 20px;position: relative;float: right;" id="bye' + id_topic + '"></span>';
-
-			//si élève/prof et le topic n'est pas le sien: pas d'icone poubelle
-			if(!recuperer('mon_type').includes("Administration") && valeur['Identifiant'] !== recuperer('identifiant_courant').trim()) icone_poubelle = "";
-
-			//console.log("l'icone poubelle = " + icone_poubelle + "\n")
-
-			var img_pp = ma_photo(titre.toLowerCase(), true) //pas de modifs de la pp
-
-			var span_nb_non_lus = nb_non_lus > 0 ? '<div class="msg_non_lu">'+nb_non_lus+'</div>' : ""
-			var dans_fenetre_str = '<ul class="bloc_msg" onclick="clic_de_msg(this.id)" id="' + id_topic + '"> '+ img_pp + '<span id="details_conv">' + icone_poubelle + ' <p id="' + id_topic + '" style="font-size: 25px; margin:0px;"> <b class="contenu_question" id="' + id_topic + '"> '  + titre +'  </b> <p id="' + id_topic + '" class="contenu_question"> ' + contenu + '</p><i class="petite_ecriture"> <h id="' + id_topic + '"><u id="' + id_topic + '"> Nombre de messages</u>: <u class="nb_com_actuel" id="' + id_topic + '">' + nb_coms + '</u> </h> <h id="' + id_topic + '">  &emsp; <u id="' + id_topic + '"> Dernier message le</u>: ' + date + ' </h><h id="' + id_topic + '"></h></i></span> '+span_nb_non_lus+' </ul>';
-			
-			//console.log("dans_fenetre: " + dans_fenetre_str)
-			
-
-
-
-			//ajouter la fenetre au DOM	
-			var un_msg = document.createElement('div');
-			un_msg.innerHTML += dans_fenetre_str;
-			while(un_msg.firstChild) ma_liste.appendChild(un_msg.firstChild);
-
+			ajouter_msg(liste_des_msgs,ma_liste,valeur)
 
 
 		});
@@ -13202,6 +13171,63 @@ function traitement_msgs(){
 }
 
 
+
+function ajouter_msg(liste_des_msgs,ma_liste,valeur){
+
+	var id_topic = valeur['id_conv'] ;
+			//console.log("on va ajouter " + id_topic);
+
+
+
+
+	//nb de msgs non lus
+	//console.log("pour " +valeur['id_msg'])
+	var nb_non_lus = liste_des_msgs.filter(e => e['id_conv'] === valeur['id_conv'] && !liste_notifs_lues.includes("," + e["id_msg"] +",")).length
+	//console.log("	nb_non_lus:" + nb_non_lus)
+
+
+	//rassembler les msgs de la meme conversation
+	//on zappe si c'est déjà présent
+	//console.log("[id='"+id_topic+"']")
+	if($("[id='"+id_topic+"']").length > 0) return true
+
+	var titre = recuperer_destinataire(valeur['id_conv']);
+	element_contenu = document.createElement('div')
+	element_contenu.innerHTML = valeur['Message'];
+	var contenu = element_contenu.innerText
+	
+	//on récupère la date du dernier message
+	var horodateur_max =  moment.max( liste_des_msgs.filter(e => e['id_conv'] === valeur['id_conv']).map(e => e.Horodateur).map(e => moment(e)) ).format("DD/MM/YYY HH:mm")
+	//console.log(horodateur_max)
+	var date = afficher_date(horodateur_max);
+	var nb_coms = liste_des_msgs.filter(e => e['id_conv'] === valeur['id_conv']).length
+	if(nb_coms === undefined) nb_coms = 0;
+
+
+	var icone_poubelle = "" //'<span id="bye' + id_topic + '"><img alt="supprimer" class="byebye" onclick="supprimer_conversation(this)" src="https://sekooly.github.io/SUPABASE/images/img_trash.png" style="width: 20px;position: relative;float: right;" id="bye' + id_topic + '"></span>';
+
+	//si élève/prof et le topic n'est pas le sien: pas d'icone poubelle
+	if(!recuperer('mon_type').includes("Administration") && valeur['Identifiant'] !== recuperer('identifiant_courant').trim()) icone_poubelle = "";
+
+	//console.log("l'icone poubelle = " + icone_poubelle + "\n")
+
+	var img_pp = ma_photo(titre.toLowerCase(), true) //pas de modifs de la pp
+
+	var span_nb_non_lus = nb_non_lus > 0 ? '<div class="msg_non_lu">'+nb_non_lus+'</div>' : ""
+	var dans_fenetre_str = '<ul class="bloc_msg" onclick="clic_de_msg(this.id)" id="' + id_topic + '"> '+ img_pp + '<span id="details_conv">' + icone_poubelle + ' <p id="' + id_topic + '" style="font-size: 25px; margin:0px;"> <b class="contenu_question" id="' + id_topic + '"> '  + titre +'  </b> <p id="' + id_topic + '" class="contenu_question"> ' + contenu + '</p><i class="petite_ecriture"> <h id="' + id_topic + '"><u id="' + id_topic + '"> Nombre de messages</u>: <u class="nb_com_actuel" id="' + id_topic + '">' + nb_coms + '</u> </h> <h id="' + id_topic + '">  &emsp; <u id="' + id_topic + '"> Dernier message le</u>: ' + date + ' </h><h id="' + id_topic + '"></h></i></span> '+span_nb_non_lus+' </ul>';
+	
+	//console.log("dans_fenetre: " + dans_fenetre_str)
+	
+
+
+
+	//ajouter la fenetre au DOM	
+	var un_msg = document.createElement('div');
+	un_msg.innerHTML += dans_fenetre_str;
+	while(un_msg.firstChild) ma_liste.appendChild(un_msg.firstChild);
+
+
+}
 
 
 
@@ -13226,14 +13252,24 @@ function recuperer_tous_les_msgs(id_conv, forcing){
 	var mes_msgs = JSON.parse(recuperer("mes_msgs"))
 
 	//ordre croissant ici
-	mes_msgs = mes_msgs.sort((a,b) => a.Horodateur > b.Horodateur)
+	//mes_msgs = mes_msgs.sort((a,b) => a.Horodateur > b.Horodateur)
+	mes_msgs = mes_msgs.sort(function tri_ordre_chrono_decroissant(a, b) {
+		return convertir_en_date(a.Horodateur) - convertir_en_date(b.Horodateur)
+	});
 
 
 	//console.log("récupérer toute cette conv: " + id_conv)
 	var nom_destinataire = mes_msgs.find(e => e['id_conv'].includes(id_conv))['id_conv']
 	nom_destinataire = recuperer_destinataire(nom_destinataire)
 	//console.log(nom_destinataire)
-	var src_pp = $("[id='pp_" + nom_destinataire.toLowerCase() +"']")[0].src
+
+
+	try{
+		var src_pp = $("[id='pp_" + nom_destinataire.toLowerCase() +"']")[0].src	
+	}catch(e){
+		var src_pp = $("#entete_convo > .retour_msgs")[1].src
+	}
+	
 
 	var entete_convo = '<span id="entete_convo"><img id="<<" class="retour_msgs" src="https://sekooly.github.io/SUPABASE/images/img_retour.png" onclick="recuperer_msgs(true)"> <img class="retour_msgs" src="'+src_pp+'"><div id="Destinataire" class="titre_du_poste">'+nom_destinataire+'</div></span>';
 	//console.log(entete_convo)
@@ -13258,6 +13294,9 @@ function recuperer_tous_les_msgs(id_conv, forcing){
 
 	//console.log(mes_msgs)
 	var une_conversation = "<div id='conversation' class='conversation'>"
+
+
+
 	//console.log(liste_notifs_lues)
 	mes_msgs.forEach(function(le_msg){
 		//console.log(le_msg)
@@ -14412,3 +14451,273 @@ async function gerer_sondage(){
 	
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/***************************************************** SUPABASE POUR LES NOTIFS IRL *******************************************************************/
+
+
+function gerer_notifs_irl(sans_changer){
+
+	var coche_actuelle = $("#notifs_sans_actualiser")[0].innerText
+	var valeur_finale_notifs_reelles = ""
+	var phrase_finale = ""
+
+
+	//si c'est coché -> on décoche
+	if(coche_actuelle.length > 0){
+
+		valeur_finale_notifs_reelles = ""
+		phrase_finale = "Notifications et messages en temps réel <b><rouge>désactivés</rouge></b> sur cet appareil."
+
+		fermer_la_subscription()
+		
+	//si c'est décoché -> on coche SSI confirmation
+	} else{
+		var confirmation = confirm("🔔 En activant les notifications et messages privés en temps réel sur cet appareil, vous risquez d'augmenter votre consommation de données.\n\nVoulez-vous continuer?")
+		if(confirmation){
+			
+			valeur_finale_notifs_reelles = " ✓"
+			phrase_finale = "Notifications et messages en temps réel <b><rouge>activés</rouge></b> sur cet appareil."
+
+			//c'est du IRL -> notifier
+			ouvrir_la_subscription()
+		}
+
+	}
+
+	stocker("notifs_sans_actualiser", valeur_finale_notifs_reelles)
+	$("#notifs_sans_actualiser")[0].innerText = valeur_finale_notifs_reelles
+	if(phrase_finale) afficher_alerte(phrase_finale)
+
+}
+
+function notifs_reelles_ou_non(){
+	var valeur_finale_notifs_reelles = ""
+
+
+	if(recuperer("notifs_sans_actualiser")){
+		valeur_finale_notifs_reelles = " ✓"
+		ouvrir_la_subscription()
+	}else{
+		valeur_finale_notifs_reelles = ""
+		fermer_la_subscription()
+	}
+
+	$("#notifs_sans_actualiser")[0].innerText = valeur_finale_notifs_reelles
+}
+
+
+function ouvrir_la_subscription(){
+
+
+	//Eleve: dès que ça concerne ma classe OU classe = mon cycle
+	//Prof: dès que la classe_matiere inclut une classe_matiere que j'enseigne
+	//Admin: dès que le cycle est le mien
+	var mon_type = recuperer("mon_type").split("_")[0]
+	var conditions_notifs = mon_type === "Eleves" ? "" :
+							mon_type === "Profs" ? "" :
+							mon_type.includes("Admin") ? "" : ""
+							
+
+	mySubscription_notif = supabase
+	  .from('Notifs:Identifiant_derniere_modif=neq.' + recuperer("identifiant_courant"))
+	  .on('*', function(payload){
+	  	console.log('nouvelle notif!', payload)
+	    //si cette nouvelle me concerne
+	    //actualiser mes notifs
+	    recuperer_notifs(true)
+	    
+
+	  })
+	  .subscribe()
+
+	//console.log(mySubscription_notif)
+
+
+	//dès que je suis destinataire: me notifier
+	mySubscription_conv = supabase
+	  .from('Conversations:Destinataire=eq.' + recuperer("identifiant_courant"))
+	  .on('*', async function(payload){
+	    //console.log('nouveau msg!', payload)
+
+
+	    //si la fenetre est NON visible
+	    //ET
+	    //si la conversation n'est pas encore ouverte
+	    var fenetre_visible = element_DOM("fenetre").style.visibility === "visible"
+	    var conversation_visible = element_DOM("entete_convo") ? element_DOM("entete_convo").style.visibility === "visible" : false
+	    //console.log(conversation_visible)
+
+	    if(!fenetre_visible && !conversation_visible){
+
+		    //actualiser mes notifs
+		    await recuperer_msgs(true,true)
+		    afficher_bulle_notifs()
+
+		//si la conversation est déjà ouverte
+	    }else{
+
+	    	//si juste en mode affichage
+	    	if(!element_DOM("conversation")){
+
+	    		//actualiser localement
+	    		await recuperer_msgs(true)
+		    	afficher_bulle_notifs()
+
+	    	}else{
+
+		    	//console.log(payload)
+			    //actualiser mes notifs
+			    await recuperer_msgs(true,true)
+		    	$("#conversation").append(afficher_msg_conversation(payload.new))
+		    	element_DOM(payload.new.id_msg).scrollIntoView()
+		    	jai_lu(payload.new.id_msg, true)
+	    	}
+
+	    }
+
+	    
+
+
+	  })
+	  .subscribe()
+	
+	//console.log(mySubscription_conv)
+
+	
+	//avant de quitter: fermer la souscription
+	$(window).bind('beforeunload', function(){
+		//alert("vous quittez?")
+		fermer_la_subscription()
+	})
+
+
+}
+
+
+function fermer_la_subscription(){
+	if(mySubscription_notif) supabase.removeSubscription(mySubscription_notif)
+	if(mySubscription_conv) supabase.removeSubscription(mySubscription_conv)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
