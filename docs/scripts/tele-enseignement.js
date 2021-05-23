@@ -2790,7 +2790,7 @@ function chargement_a_larrivee(){
 	rendre_td_modifiable();
 	mettre_les_soons()
 	ajouter_multi_visio_si_non_eleve()
-	notifs_reelles_ou_non()
+	//notifs_reelles_ou_non()
 
 	//todo : pas de lien sur l'alerte pour les primaires
 	var mon_cycle = JSON.parse(recuperer('mes_donnees'))['Cycle'];
@@ -14672,8 +14672,13 @@ function ouvrir_la_subscription(){
 			    //actualiser mes notifs
 			    await recuperer_msgs(true,true)
 
+			    /*
 			    //si c'est pas un msg à moi même
 			    if(payload.new.Expediteur !== recuperer("identifiant_courant")){
+		    	*/
+
+		    	//si le message n'existe pas encore
+		    	if(!$("[id='"+payload.new.id_msg+"']")){
 
 			    	$("#conversation").append(afficher_msg_conversation(payload.new))
 			    	element_DOM(payload.new.id_msg).scrollIntoView()
