@@ -14670,9 +14670,15 @@ function ouvrir_la_subscription(){
 		    	//console.log(payload)
 			    //actualiser mes notifs
 			    await recuperer_msgs(true,true)
-		    	$("#conversation").append(afficher_msg_conversation(payload.new))
-		    	element_DOM(payload.new.id_msg).scrollIntoView()
-		    	jai_lu(payload.new.id_msg, true)
+
+			    //si c'est pas un msg à moi même
+			    if(payload.new.Expediteur !== recuperer("identifiant_courant")){
+
+			    	$("#conversation").append(afficher_msg_conversation(payload.new))
+			    	element_DOM(payload.new.id_msg).scrollIntoView()
+			    	jai_lu(payload.new.id_msg, true)
+			    }
+
 	    	}
 
 	    }
