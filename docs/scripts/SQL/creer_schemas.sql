@@ -1795,7 +1795,8 @@ COMMENT ON COLUMN public."Programme"."Classe_Matiere"
 
 
 
-
+alter publication supabase_realtime add table "Notifs";
+alter publication supabase_realtime add table "Conversations" 
 
 
 
