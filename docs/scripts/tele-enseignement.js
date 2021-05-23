@@ -14569,17 +14569,20 @@ function gerer_notifs_irl(sans_changer){
 	if(coche_actuelle.length > 0){
 
 		valeur_finale_notifs_reelles = ""
-		phrase_finale = "Notifications et messages en temps réel <b><rouge>désactivés</rouge></b> sur cet appareil."
+		//phrase_finale = "Notifications et messages en temps réel <b><rouge>désactivés</rouge></b> sur cet appareil."
+		phrase_finale = "Messages privés en temps réel <b><rouge>désactivés</rouge></b> sur cet appareil."
 
 		fermer_la_subscription()
 		
 	//si c'est décoché -> on coche SSI confirmation
 	} else{
-		var confirmation = confirm("🔔 En activant les notifications et messages privés en temps réel sur cet appareil, vous risquez d'augmenter votre consommation de données.\n\nVoulez-vous continuer?")
+		//var confirmation = confirm("🔔 En activant les notifications et messages privés en temps réel sur cet appareil, vous risquez d'augmenter votre consommation de données.\n\nVoulez-vous continuer?")
+		var confirmation = confirm("🔔 En activant les messages privés en temps réel sur cet appareil, vous risquez d'augmenter votre consommation de données.\n\nVoulez-vous continuer?")
 		if(confirmation){
 			
 			valeur_finale_notifs_reelles = " ✓"
-			phrase_finale = "Notifications et messages en temps réel <b><rouge>activés</rouge></b> sur cet appareil."
+			//phrase_finale = "Notifications et messages en temps réel <b><rouge>activés</rouge></b> sur cet appareil."
+			phrase_finale = "Messages privés en temps réel <b><rouge>activés</rouge></b> sur cet appareil."
 
 			//c'est du IRL -> notifier
 			ouvrir_la_subscription()
