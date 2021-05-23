@@ -1110,3 +1110,10 @@ function modifier_donnee_locale(nom_item, champ_reference, valeur_reference, cha
   return recuperer(nom_item)
 
 }
+
+
+
+
+String.prototype.replaceAll = function(search, replace) {
+    return this.split(search).join(replace);
+};
