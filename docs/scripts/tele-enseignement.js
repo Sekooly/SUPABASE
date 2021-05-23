@@ -13091,6 +13091,7 @@ function recuperer_msgs(forcing, sans_fenetre){
 
 		}).catch(e => {
 			console.error(e)
+			alert(e)
 			alert("Impossible de récupérer vos messages. Vérifiez que vous êtes toujours connecté à internet, ou réessayer plus tard.")
 			chargement(false);
 			return false
