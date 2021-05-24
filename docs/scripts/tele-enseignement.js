@@ -7799,6 +7799,11 @@ function recuperer_notifs(sans_msgs){
 	//limité à 150
 	if(mon_type.includes('Profs')){
 
+		//n'utiliser que les ID url!!!
+		mes_matieres = JSON.parse(recuperer("mes_matieres"))
+		valeur_champ_reference = valeur_champ_reference.split(";").map(e => mes_matieres.find(m => m["Classe_Matiere"] === e)['ID_URL'] ).join(";")
+		//console.log(valeur_champ_reference)
+		
 		return rechercher_notifs_prof(valeur_champ_reference, 150).then(les_notifs => {
 			mes_notifs = les_notifs.filter(function(valeur,index){
 				return valeur['Identifiant_derniere_modif'] !== recuperer('identifiant_courant')
@@ -7824,19 +7829,13 @@ function recuperer_notifs(sans_msgs){
 				mes_notifs = mes_notifs.filter(function(valeur,index){
 					//si je ne suis pas originaire ET c'est un devoir -> on ne garde pas
 					return !(valeur['Identifiant_originaire'] !== recuperer('identifiant_courant') && valeur['Type_notif'] ==='devoir' )
-				})	
+				})
 
 				
-				//si eleves : rajouter les 50 dernières notifs du comment
-				var notifs_supplementaires = await rechercher(nom_table, nom_champ_reference, JSON.parse(recuperer("mes_donnees"))["Cycle"], "",50)
-
-				//console.log(notifs_supplementaires)
-				mes_notifs = [...mes_notifs, ...notifs_supplementaires]
-
-				//trier par derniere modification
-				mes_notifs = mes_notifs.sort(tri_ordre_chrono_decroissant_Date_derniere_modif)
 
 			}
+
+			mes_notifs = await rajouter_les_notifs_communes(mon_role, mes_notifs)
 
 
 			//console.log(mes_notifs)
@@ -7852,6 +7851,24 @@ function recuperer_notifs(sans_msgs){
 
 
 
+
+}
+
+async function rajouter_les_notifs_communes(mon_role, mes_notifs){
+
+	if(mon_role === "Eleve"){
+
+		//si eleves : rajouter les 50 dernières notifs du comment
+		var notifs_supplementaires = await rechercher(nom_table, nom_champ_reference, JSON.parse(recuperer("mes_donnees"))["Cycle"], "",50)
+
+		//console.log(notifs_supplementaires)
+		mes_notifs = [...mes_notifs, ...notifs_supplementaires]
+
+		//trier par derniere modification
+		mes_notifs = mes_notifs.sort(tri_ordre_chrono_decroissant_Date_derniere_modif)
+	}
+
+	return mes_notifs
 
 }
 
@@ -7955,6 +7972,7 @@ function afficher_bulle_notifs(){
 
 	/********************************** NOTIFS STANDARD ***********************************/
 	var mes_notifs = JSON.parse(recuperer('mes_notifs'));
+	//console.log(mes_notifs)
 	var ma_date_consultation = recuperer('ma_date_consultation');
 
 
@@ -14666,34 +14684,47 @@ function notifs_reelles_ou_non(){
 }
 
 
-function la_notif_me_concerne(mon_type,nouvelle_notif){
+function la_notif_me_concerne(mon_type,payload){
 	//alert(JSON.stringify(nouvelle_notif))
 
+	if(payload.eventType === "UPDATE" || payload.eventType === "INSERT"){
 
-	var mes_matieres = JSON.parse(recuperer("mes_matieres"))
-	var de_moimeme = nouvelle_notif['Identifiant_derniere_modif'].includes(recuperer("identifiant_courant"))
-	var resultat_1 = mon_type.includes("Profs") && mes_matieres.filter(e => e['ID_URL'] === nouvelle_notif["Id_classe_matiere"]).length > 0
-	var resultat_2 = !mon_type.includes("Profs")
 
-	/*
-	console.log({
-		resultat_1:resultat_1,
-		resultat_2:resultat_2
-	
-	})
-	*/
 
-	//si je suis prof ET la classe me concerne
-    // OU
-    //hors prof, la classe me concernera sûrement
-    return !de_moimeme &&  (resultat_1 || resultat_2)
+
+		var nouvelle_notif = payload.new
+
+		var mes_matieres = JSON.parse(recuperer("mes_matieres"))
+		var de_moimeme = nouvelle_notif['Identifiant_derniere_modif'].includes(recuperer("identifiant_courant"))
+		var resultat_1 = mon_type.includes("Profs") && mes_matieres.filter(e => e['ID_URL'] === nouvelle_notif["Id_classe_matiere"]).length > 0
+		var resultat_2 = mon_type.includes("Eleves") && mes_matieres.filter(e => e['ID_URL'] === nouvelle_notif["Id_classe_matiere"]).length > 0
+		var resultat_3 = mon_type.includes("Admin")
+
+
+		/*
+		console.log({
+			resultat_1:resultat_1,
+			resultat_2:resultat_2,
+			resultat_3:resultat_3
+		
+		})
+		*/
+
+		//si je suis prof ET la classe me concerne
+	    // OU
+	    //hors prof, la classe me concernera sûrement
+	    return !de_moimeme &&  (resultat_1 || resultat_2 || resultat_3)
+
+	}else{
+		return false
+	}
+
+
+
+
 }
 
 
-function si_notif_supprimee(){
-
-
-}
 
 
 function ouvrir_la_subscription(){
@@ -14706,13 +14737,14 @@ function ouvrir_la_subscription(){
 	var conditions_notifs = "Notifs"
 
 
+	/*
 	nom_champ_reference = mon_type.includes("Admin") || mon_type.includes("Profs") ? "Cycle" : "Classe"
 	valeur_champ_reference = JSON.parse(recuperer("mes_donnees"))[nom_champ_reference]
 
-
-
 	conditions_notifs += ":"+nom_champ_reference+"=eq." + valeur_champ_reference
-	console.log(conditions_notifs)			
+	*/
+
+	//console.log(conditions_notifs)			
 
 	mySubscription_notif = supabase
 	  //.from('Notifs:Identifiant_derniere_modif=neq.' + recuperer("identifiant_courant"))
@@ -14723,7 +14755,7 @@ function ouvrir_la_subscription(){
 	    //si je suis prof ET la classe me concerne
 	    // OU
 	    //hors prof, la classe me concernera sûrement
-	    if(la_notif_me_concerne(mon_type,payload.new)){
+	    if(la_notif_me_concerne(mon_type,payload)){
 
 	    	//alert("ça me concerne.")
 	    	//alert(JSON.stringify(payload))

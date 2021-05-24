@@ -140,7 +140,7 @@ function rechercher_notifs_prof(liste_classes_matieres, nombrelimite){
   //Notifs?Classe_matiere=in.("(Divers|Salle%20des%20profs)")
 
 
-  url = racine_data + "Notifs?Classe_matiere=in.(\""+liste_classes_matieres+ "\")&"+apikey
+  url = racine_data + "Notifs?Id_classe_matiere=in.(\""+liste_classes_matieres+ "\")&"+apikey
   url = url + '&order=Horodateur.desc' 
   url = nombrelimite ? url+"&limit="+nombrelimite : url
 
