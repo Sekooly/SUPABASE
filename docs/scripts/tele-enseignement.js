@@ -12137,7 +12137,7 @@ function details_tdb_2(ceci){
 	//si rendu -> on affiche (avec eventuellement les remarques)
 
 	elements_html = ""
-
+	var titre_mini_popup = ""
 	//pour chaque fichier devoir
 	mes_devoirs_a_faire.forEach(function(le_devoir,index){
 
