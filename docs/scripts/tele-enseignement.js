@@ -8163,6 +8163,9 @@ function initialiser_visio(valeur_id_div_visio){
 
 function creer_une_visio(largeur, hauteur,moi,classe,id_div_visio, id_matiere_visio, sans_alerte){
 	chargement(true)
+
+	id_matiere_visio = id_matiere_visio ? id_matiere_visio : recuperer("dossier_chargé")
+
 	//ajouter le kick out si administrateur
 	var enlever_kickout= !recuperer('mon_type').includes('Admin');
 	const domain = 'meet.jit.si';
@@ -8176,7 +8179,7 @@ function creer_une_visio(largeur, hauteur,moi,classe,id_div_visio, id_matiere_vi
 		         disableKick: enlever_kickout
 		    }
 		},
-	    roomName: id_matiere_visio ? id_matiere_visio : recuperer("dossier_chargé"),
+	    roomName: id_matiere_visio,
 	    width: "100%",
 	    height: "100%",
 	    parentNode: document.querySelector('#'+id_div_visio+''),
@@ -8289,6 +8292,8 @@ function creer_une_visio(largeur, hauteur,moi,classe,id_div_visio, id_matiere_vi
 		var date_actuelle = date_heure_actuelle.split(" ")[0]
 		var mon_cycle = JSON.parse(recuperer("mes_donnees"))['Cycle']
 		var les_matieres = JSON.parse(recuperer("mes_matieres"))
+
+		//alert(id_matiere_visio)
 		var la_classe_matiere = les_matieres.filter(e => e['ID_URL'] === id_matiere_visio)[0]["Classe_Matiere"]
 		
 
