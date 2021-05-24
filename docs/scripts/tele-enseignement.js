@@ -2820,7 +2820,7 @@ function chargement_a_larrivee(){
 	effacer("numero_etape")
 
 	mettre_en_place_les_notifications();
-	mes_fichiers = recuperer_mes_fichiers(true)
+	
 
 	//affichage de logs SSI avec les droits
 	var mes_droits = JSON.parse(recuperer('mes_donnees'))['Droits_modifs'];
@@ -3993,7 +3993,7 @@ function changer_chapitre(id_fichier){
 	var url = racine_data + "Fichiers?id_fichier=eq."+id_fichier + "&" + apikey
 
 	patch_resultat_asynchrone(url, nouvelle_donnee)
-	afficher_alerte("Le chapitre du fichier a bien été actualisé.", true)
+	afficher_alerte("Le chapitre du fichier a bien été actualisé.",true)
 }
 
 
@@ -8204,7 +8204,7 @@ function creer_une_visio(largeur, hauteur,moi,classe,id_div_visio, id_matiere_vi
 	envoyer_mon_log_visio(moi.toLowerCase(), classe.toLowerCase(), "debut",mon_role, id_matiere_visio);
 	
 
-	var id_notif_visio = recuperer("dossier_chargé")+ "-visio"
+	var id_notif_visio = id_matiere_visio+ "-visio"
 
 
 	
@@ -8226,12 +8226,12 @@ function creer_une_visio(largeur, hauteur,moi,classe,id_div_visio, id_matiere_vi
 
 			//je retire mon nom des participants si la notif de visio existe et que j'y suis
 			var visio_existante = la_visio_existante(id_notif_visio)
-			if(visio_existante){
+			if(visio_existante.length > 0){
 
 				visio_existante = visio_existante[0]
 
 				//je notifie SSI je suis le dernier participant
-				var je_suis_dernier_participant = api.getNumberOfParticipants() === 1
+				var je_suis_dernier_participant = api.getNumberOfParticipants() <= 1
 				if(je_suis_dernier_participant){
 
 					nouvelle_notif = {
@@ -8286,14 +8286,14 @@ function creer_une_visio(largeur, hauteur,moi,classe,id_div_visio, id_matiere_vi
 		var date_actuelle = date_heure_actuelle.split(" ")[0]
 		var mon_cycle = JSON.parse(recuperer("mes_donnees"))['Cycle']
 		var les_matieres = JSON.parse(recuperer("mes_matieres"))
-		var la_classe_matiere = les_matieres.filter(e => e['ID_URL'] === recuperer("dossier_chargé"))[0]["Classe_Matiere"]
+		var la_classe_matiere = les_matieres.filter(e => e['ID_URL'] === id_matiere_visio)[0]["Classe_Matiere"]
 		
 
 		var nouvelle_notif = {
 			"id_notif": id_notif_visio,
 			"Horodateur": date_heure_actuelle,
 			"Type_notif" : "visio",
-			"Id_source" : recuperer("dossier_chargé"),
+			"Id_source" : id_matiere_visio,
 			"Intitulé" : "debut",
 			"Identifiant_originaire": recuperer('identifiant_courant'),
 			"Role_originaire": mon_role,
@@ -8301,7 +8301,7 @@ function creer_une_visio(largeur, hauteur,moi,classe,id_div_visio, id_matiere_vi
 			'Role_derniere_modif' : mon_role,
 			'Classe' : la_classe_matiere.split('|')[0].replace("(",""),
 			'Classe_matiere' : la_classe_matiere,
-			'Id_classe_matiere' : recuperer("dossier_chargé"),
+			'Id_classe_matiere' : id_matiere_visio,
 			'Date_derniere_modif' : date_heure_actuelle,
 			'Cycle' : mon_cycle
 		}
@@ -12161,7 +12161,7 @@ function details_tdb_2(ceci){
 		//console.log(elements_html + "\n\n")
 	})
 	
-
+	if(!titre_mini_popup) titre_mini_popup = "Devoirs à faire"
 
 	creer_mini_popup(titre_mini_popup,elements_html,"    OK    ","$('#mini_popup').remove();",null,null,null,null,25)
 	//ordonner_elements(".contenu_section_journee",'innerText')
@@ -12287,12 +12287,12 @@ function recuperer_mes_fichiers(forcing){
 
 		//prof ou eleve
 		if(!recuperer('mon_type').includes('Admin')){
-			url = racine_data + 'Fichiers?' +apikey 
+			url = racine_data + 'Fichiers_tout?' +apikey 
 			url += '&id_dossier=in.' + les_id_dossier_classe
 		
 		//admin
 		}else{
-			url = racine_data + 'Fichiers?' +apikey 
+			url = racine_data + 'Fichiers_tout?' +apikey 
 		}
 
 		url += '&order=date_effet.asc,heure_effet.asc,id_dossier.asc'
@@ -14053,7 +14053,7 @@ function help(fonction_aide){
 
 
 function aide_recherche(){	
-	var contenu_alerte = "Un fichier peut être recherché par des mots-clés liés à :\n\t• la matière dans laquelle il est publié\n\t• le nom que l'enseignant lui a donné\n\t• son extension (pdf,png,youtube...)\n\t• sa catégorie (cours, devoir, ...).\nExemple: devoir"
+	var contenu_alerte = "Un fichier peut être recherché par des mots-clés liés à :\n\t• la matière dans laquelle il est publié\n\t• le nom que l'enseignant lui a donné\n\t• son extension (pdf,png,youtube...)\n\t• sa catégorie (cours, devoir, ...)\n\t• l'intitulé de son chapitre.\nExemple: aucun chapitre"
  	alert(contenu_alerte)
 }
 
@@ -14068,6 +14068,7 @@ function afficher_resultats_recherche(){
 	} 
 
 	//ignorer les fichiers de photos de profil
+	mes_fichiers = recuperer_mes_fichiers(true)
 	var mes_fichiers_initiaux = mes_fichiers.filter(e => e['categorie_fichier'] !== "Profil")
 	var mes_matieres = JSON.parse(recuperer("mes_matieres"))
 	
@@ -14102,7 +14103,12 @@ function afficher_resultats_recherche(){
 		console.log(dans_nom_fichier)
 		*/
 
-		return dans_classe_matiere || dans_categorie_fichier || dans_nom_fichier
+
+		//chercher dans le chapitre (si null === "(Aucun chapitre)")
+		intitule_chapitre = un_fichier['intitule_chapitre'] === null ? "(Aucun chapitre)" :  un_fichier['intitule_chapitre']
+		dans_intitule_chapitre = intitule_chapitre.toLowerCase().replaceAll(" ","").includes(mot_cle)
+
+		return dans_classe_matiere || dans_categorie_fichier || dans_nom_fichier || dans_intitule_chapitre
 
 	})
 
@@ -14111,7 +14117,7 @@ function afficher_resultats_recherche(){
 	//on affiche
 	var liste_des_resultats = ""
 	if(fichiers_trouves.length === 0) {
-		liste_des_resultats = "<div class=\"alerte_section_journee\">Aucun résultat trouvé pour ce(s) mot(s)-clé(s), merci de réessayer.</div>"
+		liste_des_resultats = "<div class=\"alerte_section_journee\">Aucun résultat trouvé pour <b>"+mot_cle+"</b>.<br>Merci de réessayer.</div>"
 	}else{
 		fichiers_trouves.forEach(function(le_fichier){
 			liste_des_resultats += creer_element_journee(le_fichier['Classe'] + " " + le_fichier['Matiere'],le_fichier['nom_fichier'],le_fichier['date_effet'],le_fichier['heure_effet'],le_fichier["id_fichier"],le_fichier["ID_URL"],"fichier",false,false,false)
