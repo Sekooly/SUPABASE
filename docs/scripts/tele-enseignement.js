@@ -7802,9 +7802,7 @@ function recuperer_notifs(sans_msgs){
 		return rechercher_notifs_prof(valeur_champ_reference, 150).then(les_notifs => {
 			mes_notifs = les_notifs.filter(function(valeur,index){
 				return valeur['Identifiant_derniere_modif'] !== recuperer('identifiant_courant')
-			})
-
-			
+			})			
 
 			//console.log(mes_notifs)
 			stocker_mes_notifications(mes_notifs);
@@ -7816,7 +7814,7 @@ function recuperer_notifs(sans_msgs){
 	}else{
 
 		//limité à 150
-		return rechercher(nom_table, nom_champ_reference, valeur_champ_reference, "",150).then(les_notifs => {
+		return rechercher(nom_table, nom_champ_reference, valeur_champ_reference, "",150).then(async function(les_notifs){
 			mes_notifs = les_notifs.filter(function(valeur,index){
 				return valeur['Identifiant_derniere_modif'] !== recuperer('identifiant_courant')
 			})
@@ -7828,6 +7826,16 @@ function recuperer_notifs(sans_msgs){
 					return !(valeur['Identifiant_originaire'] !== recuperer('identifiant_courant') && valeur['Type_notif'] ==='devoir' )
 				})	
 			}
+
+
+			//si eleves : rajouter les 50 dernières notifs du comment
+			var notifs_supplementaires = await rechercher(nom_table, nom_champ_reference, JSON.parse(recuperer("mes_donnees"))["Cycle"], "",50)
+
+			//console.log(notifs_supplementaires)
+			mes_notifs = [...mes_notifs, ...notifs_supplementaires]
+
+			//trier par derniere modification
+			mes_notifs = mes_notifs.sort(tri_ordre_chrono_decroissant_Date_derniere_modif)
 
 			//console.log(mes_notifs)
 			stocker_mes_notifications(mes_notifs);
