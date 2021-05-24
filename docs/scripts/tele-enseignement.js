@@ -2565,8 +2565,9 @@ function traitement_trombino(resultats, sans_ecolage, avec_role){
 	//on ajoute la taille de la classe entre parenthèses
 	element_DOM('titre_fenetre').innerHTML += ' (' + resultats.length + ')';
 
+	//dans le cas des leves
 	//si NON ADMIN, on n'affiche rien si finalement y a pas de dossier chargé
-	if (!recuperer('mon_type').includes("Administration") && (recuperer('dossier_chargé') === "" || recuperer('dossier_chargé') === null))  decharger_dossier_final();
+	if ((!recuperer('mon_type').includes("Administration") && (recuperer('dossier_chargé') === "" || recuperer('dossier_chargé') === null)) && !sans_ecolage)  decharger_dossier_final();
 }
 
 
