@@ -14698,7 +14698,7 @@ function la_notif_me_concerne(mon_type,payload){
 		var de_moimeme = nouvelle_notif['Identifiant_derniere_modif'].includes(recuperer("identifiant_courant"))
 		var resultat_1 = mon_type.includes("Profs") && mes_matieres.filter(e => e['ID_URL'] === nouvelle_notif["Id_classe_matiere"]).length > 0
 		var resultat_2 = mon_type.includes("Eleves") && mes_matieres.filter(e => e['ID_URL'] === nouvelle_notif["Id_classe_matiere"]).length > 0
-		var resultat_3 = mon_type.includes("Admin")
+		var resultat_3 = mon_type.includes("Admin") && nouvelle_notif["Cycle"] === JSON.parse(recuperer("mes_donnees"))['Cycle']
 
 
 		/*
