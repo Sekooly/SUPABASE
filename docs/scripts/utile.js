@@ -1091,13 +1091,13 @@ function mettre_mon_mode(){
 }
 
 
-function modifier_donnee_locale(nom_item, champ_reference, valeur_reference, champ_a_actualiser, nouvelle_valeur){
+function modifier_donnee_locale(nom_item, champ_reference, valeur_reference, champ_a_actualiser, nouvelle_valeur, plusieurs_elements, fonction_ordonner){
 
   var donnees = JSON.parse(recuperer(nom_item))
-
+  //alert(recuperer(nom_item))
 
   //si c'est 1 seul et unique élément
-  if(donnees[champ_reference]) donnees = [donnees]
+  if(donnees[champ_reference] && !plusieurs_elements) donnees = [donnees]
 
   //il faut que ce soit un array
   donnees.forEach(function(valeur){
@@ -1106,13 +1106,37 @@ function modifier_donnee_locale(nom_item, champ_reference, valeur_reference, cha
     }
   })
 
-  stocker(nom_item, JSON.stringify(donnees[0]))
+  //console.log(donnees.map(e => e['Date_derniere_modif']))
+  if(fonction_ordonner){
+    donnees = donnees.sort(fonction_ordonner)
+  }
+  //console.log(donnees.map(e => e['Date_derniere_modif']))
+
+  if(plusieurs_elements){
+    stocker(nom_item, JSON.stringify(donnees))
+  }else{
+    stocker(nom_item, JSON.stringify(donnees[0]))  
+  }
+  
   return recuperer(nom_item)
 
 }
 
+function supprimer_donnee_locale(nom_item, champ_reference, valeur_reference){
+  var donnees = JSON.parse(recuperer(nom_item))
+  donnees_finales = donnees.filter(function(valeur){
+    return valeur[champ_reference] !== valeur_reference
+  })
+
+  stocker(nom_item, JSON.stringify(donnees_finales))
+  return recuperer(nom_item)
+}
 
 
+
+function tri_ordre_chrono_decroissant_Date_derniere_modif(a, b) {
+  return convertir_en_date(b.Date_derniere_modif) - convertir_en_date(a.Date_derniere_modif)
+}
 
 String.prototype.replaceAll = function(search, replace) {
     return this.split(search).join(replace);
@@ -1120,13 +1144,21 @@ String.prototype.replaceAll = function(search, replace) {
 
 
 
-function ajouter_donnee_locale(nom_item, nouvel_item, nom_champ_id){
+function ajouter_donnee_locale(nom_item, nouvel_item, nom_champ_id, audebut){
   var donnees = JSON.parse(recuperer(nom_item))
   if(!donnees) donnees = []
 
   //on n'ajoute que s'il existe pas encore
   //la référence doit être résente dans le nouvel élément à rajouter
-  if(!donnees.find(e => e[nom_champ_id] === nouvel_item[nom_champ_id])) donnees.push(nouvel_item)
+  if(!donnees.find(e => e[nom_champ_id] === nouvel_item[nom_champ_id])){
+
+    if(audebut){
+      donnees.unshift(nouvel_item)
+    }else{
+      donnees.push(nouvel_item)
+    }
+
+  } 
 
 
   stocker(nom_item, JSON.stringify(donnees))

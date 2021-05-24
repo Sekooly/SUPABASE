@@ -3064,6 +3064,9 @@ function ajout_dossiers_matieres(mes_matieres){
 		    if (ma_classe !==undefined && ma_matiere !== undefined){
 				
 			    var mon_url_matiere = arrayItem.URL;
+
+			    //alert(mon_url_matiere)
+
 			    var mon_ID_matiere = mon_url_matiere.split("/").pop();
 
 			    /*
@@ -3170,9 +3173,14 @@ function ajouter_listener_dossier(id){
 
 	
 	element_DOM(id).addEventListener('click', function(e) {
-	  //console.log ("on a cliqué: " + e.target.id);
+	  //alert("on a cliqué: " + e.target.id);
 
-	  charger_dossier(e.target.id,true, element_DOM(id).innerText);
+	  //vider les notifs pour éviter d'avoir le meme ID
+	  $("#pannel_notif")[0].innerHTML=''
+
+	  var titre = $("span[id='"+e.target.id+"']").text().trim() //e.target.innerText
+	  //alert(titre)
+	  charger_dossier(e.target.id,true, titre);
 
 	});
 
@@ -3182,6 +3190,7 @@ function ajouter_listener_dossier(id){
 
 function creer_nouveau_dossier() {
     var mon_div=document.createElement("div");
+    //mon_div.className = "une_matiere_en_dossier"
     element_DOM('liste_matieres').appendChild(mon_div);
     return mon_div;
 }
@@ -3202,7 +3211,7 @@ function creer_span_div(mon_div,URL_classe_matiere,la_classe,la_matiere,couleur_
 
 
      // var quizDiv = element_DOM("quizDiv");
-     mon_div.innerHTML = '<a href="javascript:void(0)" > <span id="' + URL_classe_matiere + '"> <img class = image_centre id="'+ URL_classe_matiere + '" src="'+ icone +'">  ' + nom_classe + la_matiere + ' </a> </span>';
+     mon_div.innerHTML = '<a class="une_matiere_en_dossier" id="' + URL_classe_matiere + '" href="javascript:void(0)" > <span id="' + URL_classe_matiere + '"> <img class = image_centre id="'+ URL_classe_matiere + '" src="'+ icone +'">  ' + nom_classe + la_matiere + ' </a> </span>';
      
  }
 
@@ -3230,6 +3239,13 @@ function ajouter_date_filtre(id_date,valeur_date,valeur_aujd){
 }
 
 function charger_dossier(id_dossier,final_booleen,titre){
+	/*
+	console.log({
+		id_dossier:id_dossier,
+		final_booleen:final_booleen,
+		titre:titre
+	})
+	*/
 
 	$("#barre_verticale")[0].style.display = "grid"
 
@@ -7941,7 +7957,7 @@ function afficher_bulle_notifs(){
 
 
 	//on filtre pour afficher dans la bulle que celles dont date modif > date dernière consultation
-	//console.log(mes_notifs)
+	//alert(JSON.stringify(mes_notifs))
 	nouvelles_notifs = mes_notifs.filter(function(valeur){
 
 
@@ -13390,6 +13406,7 @@ async function liste_de_mes_destinataires(){
 
 
 	stocker("mes_destinataires",mes_destinataires)
+	return mes_destinataires
 
 
 }
@@ -14596,15 +14613,15 @@ function gerer_notifs_irl(sans_changer){
 	if(coche_actuelle.length > 0){
 
 		valeur_finale_notifs_reelles = ""
-		//phrase_finale = "Notifications et messages en temps réel <b><rouge>désactivés</rouge></b> sur cet appareil."
-		phrase_finale = "Messages privés en temps réel <b><rouge>désactivés</rouge></b> sur cet appareil."
+		phrase_finale = "Notifications et messages en temps réel <b><rouge>désactivés</rouge></b> sur cet appareil."
+		//phrase_finale = "Messages privés en temps réel <b><rouge>désactivés</rouge></b> sur cet appareil."
 
 		fermer_la_subscription()
 		
 	//si c'est décoché -> on coche SSI confirmation
 	} else{
-		//var confirmation = confirm("🔔 En activant les notifications et messages privés en temps réel sur cet appareil, vous risquez d'augmenter votre consommation de données.\n\nVoulez-vous continuer?")
-		var confirmation = confirm("🔔 En activant les messages privés en temps réel sur cet appareil, vous risquez d'augmenter votre consommation de données.\n\nVoulez-vous continuer?")
+		var confirmation = confirm("🔔 En activant les notifications et messages privés en temps réel sur cet appareil, vous risquez d'augmenter votre consommation de données.\n\nVoulez-vous continuer?")
+		//var confirmation = confirm("🔔 En activant les messages privés en temps réel sur cet appareil, vous risquez d'augmenter votre consommation de données.\n\nVoulez-vous continuer?")
 		if(confirmation){
 			
 			valeur_finale_notifs_reelles = " ✓"
@@ -14639,6 +14656,36 @@ function notifs_reelles_ou_non(){
 }
 
 
+function la_notif_me_concerne(mon_type,nouvelle_notif){
+	//alert(JSON.stringify(nouvelle_notif))
+
+
+	var mes_matieres = JSON.parse(recuperer("mes_matieres"))
+	var de_moimeme = nouvelle_notif['Identifiant_derniere_modif'].includes(recuperer("identifiant_courant"))
+	var resultat_1 = mon_type.includes("Profs") && mes_matieres.filter(e => e['ID_URL'] === nouvelle_notif["Id_classe_matiere"]).length > 0
+	var resultat_2 = !mon_type.includes("Profs")
+
+	/*
+	console.log({
+		resultat_1:resultat_1,
+		resultat_2:resultat_2
+	
+	})
+	*/
+
+	//si je suis prof ET la classe me concerne
+    // OU
+    //hors prof, la classe me concernera sûrement
+    return !de_moimeme &&  (resultat_1 || resultat_2)
+}
+
+
+function si_notif_supprimee(){
+
+
+}
+
+
 function ouvrir_la_subscription(){
 
 
@@ -14646,18 +14693,65 @@ function ouvrir_la_subscription(){
 	//Prof: dès que la classe_matiere inclut une classe_matiere que j'enseigne
 	//Admin: dès que le cycle est le mien
 	var mon_type = recuperer("mon_type").split("_")[0]
-	var conditions_notifs = mon_type === "Eleves" ? "" :
-							mon_type === "Profs" ? "" :
-							mon_type.includes("Admin") ? "" : ""
-							
+	var conditions_notifs = "Notifs"
+
+
+	nom_champ_reference = mon_type.includes("Admin") || mon_type.includes("Profs") ? "Cycle" : "Classe"
+	valeur_champ_reference = JSON.parse(recuperer("mes_donnees"))[nom_champ_reference]
+
+
+
+	conditions_notifs += ":"+nom_champ_reference+"=eq." + valeur_champ_reference
+	console.log(conditions_notifs)			
 
 	mySubscription_notif = supabase
-	  .from('Notifs:Identifiant_derniere_modif=neq.' + recuperer("identifiant_courant"))
+	  //.from('Notifs:Identifiant_derniere_modif=neq.' + recuperer("identifiant_courant"))
+	  .from(conditions_notifs)
 	  .on('*', function(payload){
 	  	console.log('nouvelle notif!', payload)
-	    //si cette nouvelle me concerne
-	    //actualiser mes notifs
-	    recuperer_notifs(true)
+
+	    //si je suis prof ET la classe me concerne
+	    // OU
+	    //hors prof, la classe me concernera sûrement
+	    if(la_notif_me_concerne(mon_type,payload.new)){
+
+	    	//alert("ça me concerne.")
+	    	//alert(JSON.stringify(payload))
+	    	var notifs_actuelles = JSON.parse(recuperer("mes_notifs"))
+		    //si cette nouvelle me concerne
+		    //actualiser mes notifs
+
+
+		    //mode MODIFIER si update ET notif existante
+		    //sinon : ajouter
+
+	    	//ajouter en local la notif
+	    	//ajouter dans mes notifs si c'est une nouvelle notif
+	    	//modifier sinon
+	    	if(payload.eventType === "UPDATE" && notifs_actuelles.filter(e => (e["id_notif"] === payload.new["id_notif"])).length > 0 ){
+
+	    		var liste_champs_a_maj = ["Intitulé","Role_derniere_modif","Identifiant_derniere_modif","Date_derniere_modif"]
+	    		
+	    		liste_champs_a_maj.forEach(function (champ_ref){
+	    			//console.log(champ_ref)
+	    			//console.log(payload.new["id_notif"])
+	    			modifier_donnee_locale("mes_notifs", "id_notif", payload.new["id_notif"], champ_ref, payload.new[champ_ref],true,tri_ordre_chrono_decroissant_Date_derniere_modif)	
+	    		})
+	    		
+
+	    	}else if(payload.eventType === "INSERT" || payload.eventType === "UPDATE"){
+	    		ajouter_donnee_locale("mes_notifs", payload.new, "id_notif",true)	
+	    	}
+		    
+		    afficher_bulle_notifs()
+		    //alert(recuperer("mes_notifs"))
+
+
+	    }else{
+	    	//alert("ça me concerne PAS.")	
+	    }
+	    
+
 	    
 
 	  })
@@ -14677,12 +14771,43 @@ function ouvrir_la_subscription(){
 	    //ET
 	    //si la conversation n'est pas encore ouverte
 	    var fenetre_visible = element_DOM("fenetre").style.visibility === "visible"
-	    var conversation_visible = element_DOM("entete_convo") ? element_DOM("entete_convo").style.visibility === "visible" : false
+	    var liste_msgs_visible = fenetre_visible ? ($("#div_liste_msgs").length > 0 ? true : false) : false // si la fenetre est visible, on regarde son existence, sinon c'est inexistant
+	    var conversation_visible = $("#Destinataire.titre_du_poste").length > 0 ? $("#Destinataire.titre_du_poste")[0].innerHTML === payload.new['Expediteur'].toUpperCase() : false
 	    //console.log(conversation_visible)
+
+	    /*
+	    console.log({
+	    	fenetre_visible: fenetre_visible,
+	    	liste_msgs_visible: liste_msgs_visible,
+	    	conversation_visible: conversation_visible
+	    })
+	    */
+
+
+	    if(conversation_visible){
+
+    		//alert("conversation en temps réel")
+	    	//console.log(payload)
+		    //actualiser mes notifs			    
+		    ajouter_donnee_locale("mes_msgs", payload.new, "id_msg")
+
+		    //si ce msg n'est pas encore présent
+			if($("[id='"+payload.new.id_msg+"']").length === 0 ){			    
+	    	
+
+		    	$("#conversation").append(afficher_msg_conversation(payload.new))
+		    	element_DOM(payload.new.id_msg).scrollIntoView()
+		    	jai_lu(payload.new.id_msg, true)
+		    }
+
+	    }
 
 
 	    //rien de visible
-	    if(!fenetre_visible && !conversation_visible){
+	    //if(!fenetre_visible && !liste_msgs_visible && !conversation_visible){
+    	else if(!liste_msgs_visible){
+    		
+    		//alert("mode bulle uniquement")
 
 		    //actualiser mes notifs
 		    ajouter_donnee_locale("mes_msgs", payload.new, "id_msg")		    
@@ -14691,31 +14816,15 @@ function ouvrir_la_subscription(){
 		//si la conversation est déjà ouverte
 	    }else{
 
-	    	//si juste en mode affichage (fenetre)
-	    	if(!element_DOM("conversation")){
+	    		
+    		//alert("mode affichage de liste des conversations")
 
-	    		//actualiser localement
-	    		ajouter_donnee_locale("mes_msgs", payload.new, "id_msg")
-	    		recuperer_msgs(false)
-		    	afficher_bulle_notifs()
+    		//actualiser localement
+    		ajouter_donnee_locale("mes_msgs", payload.new, "id_msg")
+    		recuperer_msgs(false)
+	    	afficher_bulle_notifs()
 
-		    //on a la conversation ouverte
-	    	}else{
-
-		    	//console.log(payload)
-			    //actualiser mes notifs			    
-			    ajouter_donnee_locale("mes_msgs", payload.new, "id_msg")
-
-			    //si ce msg n'est pas encore présent
-				if($("[id='"+payload.new.id_msg+"']").length === 0 ){			    
-		    	
-
-			    	$("#conversation").append(afficher_msg_conversation(payload.new))
-			    	element_DOM(payload.new.id_msg).scrollIntoView()
-			    	jai_lu(payload.new.id_msg, true)
-			    }
-
-	    	}
+		  
 
 	    }
 
