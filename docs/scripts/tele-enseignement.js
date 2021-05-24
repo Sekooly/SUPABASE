@@ -2991,6 +2991,8 @@ function valeursUniquesDeCetteKey(array, key){
 function ajouter_les_dossiers_dynamiques(){
 //charger dynamiquement les dossiers avec l'ID = ID DOSSIER SUR DRIVE
 
+	if($("#liste_matieres")[0].children.length > 0) return true
+
 	afficher_le_drive(false);
 
 	var mes_matieres = JSON.parse(recuperer('mes_matieres'));	
@@ -5073,11 +5075,12 @@ function decharger_dossier_final(){
 
 	$("#barre_verticale")[0].style.display = ""
 
-	//on enlève tout SSI admin
+	//on enlève tout SSI admin OU pas encore d'éléments
 	if(recuperer("mon_type").includes("Admin")){
 		element_DOM('liste_matieres').innerHTML = "";
-		ajouter_les_dossiers_dynamiques();
 	}
+
+	ajouter_les_dossiers_dynamiques();
 	afficher_les_dossiers_dynamiques(true);
 	
 	//masquer la fenêtre
@@ -7463,7 +7466,7 @@ function notif_discussion(id_source,id_dossier,ouvrir_topic){
 	//actualiser
 	initialisation().then(function(){
 		
-		console.log("initialisation terminée")
+		//console.log("initialisation terminée")
 		
 		//ouvrir les topics
 		charger_les_topics(true).then(async function(){
@@ -7511,6 +7514,8 @@ function notif_devoir(id_source,id_dossier){
 
 	//actualiser et attendre le chargement
 	initialisation().then(function(){
+
+		//console.log("initialisation terminée")
 
 		//cliquer sur l'icône rendu de devoir
 		recuperer_devoirs(true);
