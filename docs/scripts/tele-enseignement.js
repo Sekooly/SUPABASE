@@ -5073,9 +5073,11 @@ function decharger_dossier_final(){
 
 	$("#barre_verticale")[0].style.display = ""
 
-	//on enlève tout
-	element_DOM('liste_matieres').innerHTML = "";
-	ajouter_les_dossiers_dynamiques();
+	//on enlève tout SSI admin
+	if(recuperer("mon_type").includes("Admin")){
+		element_DOM('liste_matieres').innerHTML = "";
+		ajouter_les_dossiers_dynamiques();
+	}
 	afficher_les_dossiers_dynamiques(true);
 	
 	//masquer la fenêtre
@@ -7425,7 +7427,8 @@ function clic_de_notif(type_notif,id_source,id_dossier,id_notif,ouvrir_topic){
 
 
 		//on affiche tous les fichiers avec le bon filtre
-		filtrer_date_effet();
+		var id_mode = id_mode_affichage()
+		filtrer_avec_le_bon_filtre(id_mode)
 		chargement(false)
 	},500)
 
@@ -7460,7 +7463,7 @@ function notif_discussion(id_source,id_dossier,ouvrir_topic){
 	//actualiser
 	initialisation().then(function(){
 		
-		//console.log("initialisation terminée")
+		console.log("initialisation terminée")
 		
 		//ouvrir les topics
 		charger_les_topics(true).then(async function(){
