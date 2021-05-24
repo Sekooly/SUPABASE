@@ -14665,7 +14665,6 @@ function ouvrir_la_subscription(){
 	    if(!fenetre_visible && !conversation_visible){
 
 		    //actualiser mes notifs
-		    //await recuperer_msgs(true,true)
 		    ajouter_donnee_locale("mes_msgs", payload.new, "id_msg")		    
 		    afficher_bulle_notifs()
 
@@ -14676,7 +14675,6 @@ function ouvrir_la_subscription(){
 	    	if(!element_DOM("conversation")){
 
 	    		//actualiser localement
-	    		//await recuperer_msgs(true)
 	    		ajouter_donnee_locale("mes_msgs", payload.new, "id_msg")
 	    		recuperer_msgs(false)
 		    	afficher_bulle_notifs()
@@ -14686,14 +14684,7 @@ function ouvrir_la_subscription(){
 
 		    	//console.log(payload)
 			    //actualiser mes notifs			    
-			    //await recuperer_msgs(true,true)
 			    ajouter_donnee_locale("mes_msgs", payload.new, "id_msg")
-
-
-		    	//console.log(payload.new)
-			    
-			    //si c'est pas un msg à moi même			    
-			    //if(payload.new.Expediteur !== recuperer("identifiant_courant")){
 
 			    //si ce msg n'est pas encore présent
 				if($("[id='"+payload.new.id_msg+"']").length === 0 ){			    
