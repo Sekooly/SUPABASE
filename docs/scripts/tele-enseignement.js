@@ -7798,16 +7798,12 @@ function recuperer_notifs(sans_msgs){
 	//si prof -> les notifs de ses matieres issues du champ Classe
 	//limité à 150
 	if(mon_type.includes('Profs')){
-
-		//n'utiliser que les ID url!!!
-		mes_matieres = JSON.parse(recuperer("mes_matieres"))
-		valeur_champ_reference = valeur_champ_reference.split(";").map(e => mes_matieres.find(m => m["Classe_Matiere"] === e)['ID_URL'] ).join(";")
-		//console.log(valeur_champ_reference)
 		
-		return rechercher_notifs_prof(valeur_champ_reference, 150).then(les_notifs => {
+		return rechercher_notifs_prof(150).then(les_notifs => {
 			mes_notifs = les_notifs.filter(function(valeur,index){
 				return valeur['Identifiant_derniere_modif'] !== recuperer('identifiant_courant')
-			})			
+			})
+
 
 			//console.log(mes_notifs)
 			stocker_mes_notifications(mes_notifs);
@@ -14757,6 +14753,9 @@ function ouvrir_la_subscription(){
 	    //hors prof, la classe me concernera sûrement
 	    if(la_notif_me_concerne(mon_type,payload)){
 
+	    	recuperer_notifs()
+
+	    	/*
 	    	//alert("ça me concerne.")
 	    	//alert(JSON.stringify(payload))
 	    	var notifs_actuelles = JSON.parse(recuperer("mes_notifs"))
@@ -14787,6 +14786,8 @@ function ouvrir_la_subscription(){
 		    
 		    afficher_bulle_notifs()
 		    //alert(recuperer("mes_notifs"))
+
+		    */
 
 
 	    }else{
