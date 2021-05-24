@@ -7825,17 +7825,19 @@ function recuperer_notifs(sans_msgs){
 					//si je ne suis pas originaire ET c'est un devoir -> on ne garde pas
 					return !(valeur['Identifiant_originaire'] !== recuperer('identifiant_courant') && valeur['Type_notif'] ==='devoir' )
 				})	
+
+				
+				//si eleves : rajouter les 50 dernières notifs du comment
+				var notifs_supplementaires = await rechercher(nom_table, nom_champ_reference, JSON.parse(recuperer("mes_donnees"))["Cycle"], "",50)
+
+				//console.log(notifs_supplementaires)
+				mes_notifs = [...mes_notifs, ...notifs_supplementaires]
+
+				//trier par derniere modification
+				mes_notifs = mes_notifs.sort(tri_ordre_chrono_decroissant_Date_derniere_modif)
+
 			}
 
-
-			//si eleves : rajouter les 50 dernières notifs du comment
-			var notifs_supplementaires = await rechercher(nom_table, nom_champ_reference, JSON.parse(recuperer("mes_donnees"))["Cycle"], "",50)
-
-			//console.log(notifs_supplementaires)
-			mes_notifs = [...mes_notifs, ...notifs_supplementaires]
-
-			//trier par derniere modification
-			mes_notifs = mes_notifs.sort(tri_ordre_chrono_decroissant_Date_derniere_modif)
 
 			//console.log(mes_notifs)
 			stocker_mes_notifications(mes_notifs);
