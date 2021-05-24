@@ -136,7 +136,7 @@ function rechercher_notifs_prof(nombrelimite){
 
   //n'utiliser que les ID url!!!
   mes_matieres = JSON.parse(recuperer("mes_matieres"))
-  liste_classes_matieres = valeur_champ_reference.split(";").map(e => mes_matieres.find(m => m["Classe_Matiere"] === e)['ID_URL'] ).join(";")
+  liste_classes_matieres = liste_classes_matieres = mes_matieres.map(m => m["ID_URL"]).join(";") //valeur_champ_reference.split(";").map(e => mes_matieres.find(m => m["Classe_Matiere"] === e)['ID_URL'] ).join(";")
   //alert(liste_classes_matieres)
 
   liste_classes_matieres = liste_classes_matieres.replaceAll(';','","')
