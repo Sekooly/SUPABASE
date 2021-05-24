@@ -1117,3 +1117,18 @@ function modifier_donnee_locale(nom_item, champ_reference, valeur_reference, cha
 String.prototype.replaceAll = function(search, replace) {
     return this.split(search).join(replace);
 };
+
+
+
+function ajouter_donnee_locale(nom_item, nouvel_item, nom_champ_id){
+  var donnees = JSON.parse(recuperer(nom_item))
+  if(!donnees) donnees = []
+
+  //on n'ajoute que s'il existe pas encore
+  //la référence doit être résente dans le nouvel élément à rajouter
+  if(!donnees.find(e => e[nom_champ_id] === nouvel_item[nom_champ_id])) donnees.push(nouvel_item)
+
+
+  stocker(nom_item, JSON.stringify(donnees))
+  return recuperer(nom_item)
+}

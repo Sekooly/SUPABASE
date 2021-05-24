@@ -13111,6 +13111,15 @@ function recuperer_msgs(forcing, sans_fenetre){
 	}
 
 
+
+
+
+
+
+
+
+}
+
 function alerte_conv(){
 	//return "Les messages que vous échangez avec d\'autres utilisateurs sont susceptibles d\'être vus par les membres de l\'Administration de votre établissement."
 	return ""
@@ -13137,16 +13146,16 @@ function traitement_msgs(){
 		var liste_des_msgs = JSON.parse(recuperer("mes_msgs"));
 	
 		//pour chaque topic, l'afficher en mode bg dans la fenetre
-		if(!element_DOM('div_liste_topics')){
+		if(!element_DOM('div_liste_msgs')){
 			var ma_liste = document.createElement('div');
 			ma_liste.style.overflowX = "hidden";
 			ma_liste.style.overflowY = "auto";
-			ma_liste.id = "div_liste_topics";
+			ma_liste.id = "div_liste_msgs";
 			ma_liste.style.height = '90%';
 			element_DOM('fenetre').appendChild(ma_liste);
 		}else{
 			//si la liste existe déjà
-			var ma_liste = element_DOM('div_liste_topics');
+			var ma_liste = element_DOM('div_liste_msgs');
 		}
 
 		//trier du plus récent au plus ancien (Horodateur)
@@ -13233,8 +13242,6 @@ function ajouter_msg(liste_des_msgs,ma_liste,valeur){
 
 
 
-}
-
 //récupérer mes messages (get)
 function clic_de_msg(id_conv){
 	//console.log(id_conv)
@@ -13275,7 +13282,7 @@ function recuperer_tous_les_msgs(id_conv, forcing){
 	var entete_convo = '<span id="entete_convo"><img id="<<" class="retour_msgs" src="https://sekooly.github.io/SUPABASE/images/img_retour.png" onclick="recuperer_msgs(true)"> <img class="retour_msgs" src="'+src_pp+'"><div id="Destinataire" class="titre_du_poste">'+nom_destinataire+'</div></span>';
 	//console.log(entete_convo)
 
-	$("#div_liste_topics").remove()
+	$("#div_liste_msgs").remove()
 	vider_fenetre(entete_convo)
 	
 
@@ -14653,31 +14660,37 @@ function ouvrir_la_subscription(){
 	    var conversation_visible = element_DOM("entete_convo") ? element_DOM("entete_convo").style.visibility === "visible" : false
 	    //console.log(conversation_visible)
 
+
+	    //rien de visible
 	    if(!fenetre_visible && !conversation_visible){
 
 		    //actualiser mes notifs
-		    await recuperer_msgs(true,true)
+		    //await recuperer_msgs(true,true)
+		    ajouter_donnee_locale("mes_msgs", payload.new, "id_msg")		    
 		    afficher_bulle_notifs()
 
 		//si la conversation est déjà ouverte
 	    }else{
 
-	    	//si juste en mode affichage
+	    	//si juste en mode affichage (fenetre)
 	    	if(!element_DOM("conversation")){
 
 	    		//actualiser localement
-	    		await recuperer_msgs(true)
+	    		//await recuperer_msgs(true)
+	    		ajouter_donnee_locale("mes_msgs", payload.new, "id_msg")
+	    		recuperer_msgs(false)
 		    	afficher_bulle_notifs()
 
+		    //on a la conversation ouverte
 	    	}else{
 
 		    	//console.log(payload)
-			    //actualiser mes notifs
-			    await recuperer_msgs(true,true)
+			    //actualiser mes notifs			    
+			    //await recuperer_msgs(true,true)
+			    ajouter_donnee_locale("mes_msgs", payload.new, "id_msg")
 
 
 		    	//console.log(payload.new)
-
 			    
 			    //si c'est pas un msg à moi même			    
 			    //if(payload.new.Expediteur !== recuperer("identifiant_courant")){
