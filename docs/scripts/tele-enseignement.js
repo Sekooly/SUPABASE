@@ -13036,11 +13036,16 @@ window.addEventListener('beforeinstallprompt', (e) => {
 	
 	// Prevent Chrome 67 and earlier from automatically showing the prompt
 	e.preventDefault();
+
+
 	// Stash the event so it can be triggered later.
 	deferredPrompt = e;
 	// Update UI to notify the user they can add to home screen
 	addBtn.style.display = 'block';
 	$("#mynavbar")[0].style.top = "20px"
+
+	//décaler l'alerte
+	$('.alerte#alerte')[0].style.top = "90px"
 
 });
 
@@ -13052,6 +13057,9 @@ function ajouter_a_laccueil(){
 	// hide our user interface that shows our A2HS button
 	$("#a2hs")[0].style.display = 'none';
 	$("#mynavbar")[0].style.top = ""
+
+	//décaler l'alerte
+	$('#alerte')[0].style.top = ""
 
 	// Show the prompt
 	deferredPrompt.prompt();
