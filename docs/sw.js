@@ -19,20 +19,11 @@ self.addEventListener('install', function(e) {
     e.waitUntil(
         caches.open(cacheName).then(function(cache) {
 
-            try{
+            //always use absolute urls
+            return cache.addAll(liste_des_caches_absolu).then(function() {
+                self.skipWaiting();
+            });
 
-                return cache.addAll(liste_des_caches).then(function() {
-                    self.skipWaiting();
-                });
-
-            }catch(error){
-
-
-                return cache.addAll(liste_des_caches_absolu).then(function() {
-                    self.skipWaiting();
-                });
-
-            }
         })
     );
 });
