@@ -1,5 +1,5 @@
 // use a cacheName for cache versioning
-var cacheName = 'v2.5:static';
+var cacheName = 'v2.6:static';
 var liste_des_caches = [
                 'scripts/aes.js',
                 'scripts/hash.js',
