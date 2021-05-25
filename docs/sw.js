@@ -1,5 +1,5 @@
 // use a cacheName for cache versioning
-var cacheName = 'v2:static';
+var cacheName = 'v2.5:static';
 var liste_des_caches = [
                 'scripts/aes.js',
                 'scripts/hash.js',
@@ -10,8 +10,7 @@ var liste_des_caches = [
                 'scripts/thenBy.js'               
             ]
 var url_prefix = 'https://sekooly.github.io/SUPABASE/'
-
-if(!window.location.href.includes("hibiscus")) liste_des_caches = liste_des_caches.map(e => url_prefix + e)
+var liste_des_caches_absolu = liste_des_caches.map(e => url_prefix + e)
 
 
 // during the install phase you usually want to cache static assets
@@ -19,9 +18,21 @@ self.addEventListener('install', function(e) {
     // once the SW is installed, go ahead and fetch the resources to make this work offline
     e.waitUntil(
         caches.open(cacheName).then(function(cache) {
-            return cache.addAll(liste_des_caches).then(function() {
-                self.skipWaiting();
-            });
+
+            try{
+
+                return cache.addAll(liste_des_caches).then(function() {
+                    self.skipWaiting();
+                });
+
+            }catch(error){
+
+
+                return cache.addAll(liste_des_caches_absolu).then(function() {
+                    self.skipWaiting();
+                });
+
+            }
         })
     );
 });
