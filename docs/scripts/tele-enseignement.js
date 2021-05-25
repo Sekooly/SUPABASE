@@ -2820,8 +2820,9 @@ function chargement_a_larrivee(){
 	effacer("nb_clics")
 	effacer("numero_etape")
 
+	//alert("avant notifs")
 	mettre_en_place_les_notifications();
-	
+	//alert("apres notifs")
 
 	//affichage de logs SSI avec les droits
 	var mes_droits = JSON.parse(recuperer('mes_donnees'))['Droits_modifs'];
@@ -7821,17 +7822,18 @@ function recuperer_notifs(sans_msgs){
 			})
 
 			//si eleve -> on vire les autres devoirs des eleves
+			//alert(mon_role)
 			if(mon_role === "Eleve"){
 				mes_notifs = mes_notifs.filter(function(valeur,index){
 					//si je ne suis pas originaire ET c'est un devoir -> on ne garde pas
 					return !(valeur['Identifiant_originaire'] !== recuperer('identifiant_courant') && valeur['Type_notif'] ==='devoir' )
-				})
+				})				
 
-				
-
+				//alert(mes_notifs.length)
+				mes_notifs = await rajouter_les_notifs_communes(mon_role, mes_notifs)
+				//alert(mes_notifs.length)
 			}
 
-			mes_notifs = await rajouter_les_notifs_communes(mon_role, mes_notifs)
 
 
 			//console.log(mes_notifs)
@@ -7854,18 +7856,23 @@ async function rajouter_les_notifs_communes(mon_role, mes_notifs){
 
 	if(mon_role === "Eleve"){
 
-		//si eleves : rajouter les 50 dernières notifs du comment
-		var notifs_supplementaires = await rechercher(nom_table, nom_champ_reference, JSON.parse(recuperer("mes_donnees"))["Cycle"], "",50)
-
+		//si eleves : rajouter les 50 dernières notifs du commun
+		var notifs_supplementaires = await rechercher("Notifs", "Classe", JSON.parse(recuperer("mes_donnees"))["Cycle"], "",50)
+		//alert(notifs_supplementaires)
 		//console.log(notifs_supplementaires)
 		mes_notifs = [...mes_notifs, ...notifs_supplementaires]
 
 		//trier par derniere modification
 		mes_notifs = mes_notifs.sort(tri_ordre_chrono_decroissant_Date_derniere_modif)
+
+
+	}else{
+		var notifs_supplementaires = []
+		//alert("????" + notifs_supplementaires)
 	}
 
+	
 	return mes_notifs
-
 }
 
 function stocker_mes_notifications(mes_notifs){
