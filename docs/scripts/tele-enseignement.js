@@ -13045,7 +13045,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 	$("#mynavbar")[0].style.top = "20px"
 
 	//décaler l'alerte
-	$('.alerte#alerte')[0].style.top = "90px"
+	$('.alerte#alerte')[0].style.top = "95px"
 
 });
 
