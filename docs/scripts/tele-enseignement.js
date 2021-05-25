@@ -13059,7 +13059,7 @@ function ajouter_a_laccueil(){
 	$("#mynavbar")[0].style.top = ""
 
 	//décaler l'alerte
-	$('#alerte')[0].style.top = ""
+	$('.alerte#alerte')[0].style.top = ""
 
 	// Show the prompt
 	deferredPrompt.prompt();
