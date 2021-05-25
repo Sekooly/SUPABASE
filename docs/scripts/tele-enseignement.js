@@ -75,7 +75,7 @@ function charger_classe_conseil(oui){
 	if(oui){
 
 		//la classe actuellement ouverte OU celle de l'élève
-		var classe = element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
+		var classe = la_matiere_chargee("Classe") //element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
 		var mon_type = recuperer('mon_type').split("_")[0];
 		
 		if(mon_type.includes("Eleves")){
@@ -1231,7 +1231,7 @@ function mettre_devoir_en_ligne(lien_script,params, nom_fichier, extension,id_do
 				date_heure_actuelle = maintenant()
 				nom_table = "Rendus"
 				id_devoir = id_fichier_sujetdevoir+suite_notif()
-				la_matiere = $("#accueil_utilisateur")[0].innerText.trim()
+				la_matiere = la_matiere_chargee("Matiere") // $("#accueil_utilisateur")[0].innerText.trim()
 				//coefficient_rendu = post_resultat_asynchrone(racine_data + 'rpc/maj_coef_rendu?' + apikey,{"valeur_id_devoir":id_devoir})
 
 				//console.log(coefficient_rendu)
@@ -2317,7 +2317,7 @@ function recuperer_eleves(sans_fenetre){
 	chargement(true);
 
 	//la classe actuellement ouverte
-	var classe = recuperer('mon_type').includes('Eleves') ? JSON.parse(recuperer("mes_donnees"))['Classe'] : element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
+	var classe = recuperer('mon_type').includes('Eleves') ? JSON.parse(recuperer("mes_donnees"))['Classe'] : la_matiere_chargee("Classe") //element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
 	//si on est admin et à la première page: on récupère tout
 	if (recuperer('mon_type') === "Administration") classe = "Tous";
 
@@ -2390,7 +2390,7 @@ function recuperer_logs(){
 		var titre_fenetre = "Historique des connexions";
 	//profs
 	}else{
-		var classe = element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
+		var classe = la_matiere_chargee("Classe") // element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
 		var nom_variable = "classe"; //uniquement la liste des élèves
 		var titre_fenetre = "Liste des élèves en " + classe;
 	}
@@ -3055,6 +3055,7 @@ function ajouter_les_dossiers_dynamiques(){
 function ajout_dossiers_matieres(mes_matieres){
 
 	mes_matieres.some(function (arrayItem) {
+		//console.log(arrayItem)
 
 		if (arrayItem !== null){
 
@@ -3097,7 +3098,7 @@ function ajouter_le_dossier(classe_matiere,URL_classe_matiere,type_identifiant, 
 
 	//console.log($("#"+URL_classe_matiere).length)
 	//n'ajouter que si le dossier n'est pas encore existant
-	if($("#"+URL_classe_matiere).length > 0 ) return -1
+	if($("une_matiere_en_dossier#"+URL_classe_matiere).length > 0 ) return -1
 
 	if (type_identifiant === "Profs" || type_identifiant === "Administration_bis"){
 		var la_classe = classe_matiere.substring(classe_matiere.lastIndexOf("(") + 1, classe_matiere.lastIndexOf("|"));
@@ -5296,6 +5297,9 @@ function mode_fichier_initialement(){
 	afficher_choix_extrait_manuel(false);
 }
 
+
+
+
 function switch_affichage_youtube(){
 
 	//element_DOM('est_video_youtube').checked = false;
@@ -5351,8 +5355,8 @@ function switch_affichage_youtube(){
 
 				date_heure_actuelle = maintenant()
 				mes_donnees = JSON.parse(recuperer('mes_donnees'))
-				la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
-				la_matiere = recuperer('mon_type') === "Eleves" ? $("#accueil_utilisateur")[0].innerText : $("#accueil_utilisateur")[0].innerText.replace(la_classe,"").trim()
+				la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : la_matiere_chargee("Classe")
+				la_matiere = recuperer('mon_type') === "Eleves" ? $("#accueil_utilisateur")[0].innerText : la_matiere_chargee("Matiere")
 
 				le_coef =  Number($("#coef")[0].value)
 				console.log("le_coef: " + le_coef)
@@ -6028,8 +6032,8 @@ $(function charger_fichiers(e){
 					date_heure_actuelle = maintenant()
 					mes_donnees = JSON.parse(recuperer('mes_donnees'))
 					//mon_role = recuperer('mon_type').includes("Administration") ? mes_donnees['Role'] : recuperer('mon_type').replace("s","")
-					la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
-					la_matiere = recuperer('mon_type') === "Eleves" ? $("#accueil_utilisateur")[0].innerText : $("#accueil_utilisateur")[0].innerText.replace(la_classe,"").trim()
+					la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : la_matiere_chargee("Classe") //element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
+					la_matiere = recuperer('mon_type') === "Eleves" ? $("#accueil_utilisateur")[0].innerText :  la_matiere_chargee("Matiere") //  $("#accueil_utilisateur")[0].innerText.replace(la_classe,"").trim()
 					est_telechargeable = $("#est_telechargeable")[0].checked ? "oui" : "non"
 
 					//stocker la donnée dans la BDD
@@ -6497,8 +6501,8 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 
 				nom_table = "Notifs"
 				mes_donnees = JSON.parse(recuperer('mes_donnees'))
-				la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
-				la_matiere = recuperer('mon_type') === "Eleves" ? $("#accueil_utilisateur")[0].innerText : $("#accueil_utilisateur")[0].innerText.replace(la_classe,"").trim()
+				la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : la_matiere_chargee("Classe") //element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
+				la_matiere = recuperer('mon_type') === "Eleves" ? $("#accueil_utilisateur")[0].innerText : la_matiere_chargee("Matiere") //$("#accueil_utilisateur")[0].innerText.replace(la_classe,"").trim()
 				id_notif = id_topic
 
 				nouvelle_notif = {
@@ -7223,7 +7227,7 @@ function recuperer_edt(nom_classe_fournie){
 
 	var nom_classe = "Tous";
 	if(recuperer('mon_type') === "Administration_bis" || recuperer('dossier_chargé'))
-		nom_classe = element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
+		nom_classe = la_matiere_chargee("Classe") //element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
 
 	if(recuperer('mon_type') === "Eleves")
 		nom_classe = JSON.parse(recuperer('mes_donnees'))['Classe'];
@@ -7241,6 +7245,14 @@ function recuperer_edt(nom_classe_fournie){
 	nom_champ_reference = "Classe"
 	valeur_champ_reference = nom_classe
 	nom_champ_a_chercher = "id_googlecalendar"
+
+	console.log({
+		nom_table:nom_table,
+		nom_champ_reference:nom_champ_reference,
+		valeur_champ_reference:valeur_champ_reference,
+		nom_champ_a_chercher:nom_champ_a_chercher		
+	})
+
 	rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher).then(id_googlecalendar => {
 		id_googlecalendar = id_googlecalendar[0]['id_googlecalendar']
 		var la_source = "https://calendar.google.com/calendar/embed?wkst=2&bgcolor=%23ffffff&ctz=Africa%2FNairobi&src=" + id_googlecalendar + "&color=%234285F4&showPrint=0&showTabs=0&showCalendars=0&showTitle=1&mode=WEEK&showTz=0";
@@ -8525,7 +8537,7 @@ function commencer_multi_visio(){
 	chargement(true)
 	var liste_classe_multi_visio = $("#classe_multi_visio").val()
 	
-
+	//alert(liste_classe_multi_visio)
 	vider_fenetre('Multi-visioconférence',true)
 	
 	if (liste_classe_multi_visio.length === 1){

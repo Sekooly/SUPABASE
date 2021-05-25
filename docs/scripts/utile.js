@@ -1170,3 +1170,47 @@ function ajouter_donnee_locale(nom_item, nouvel_item, nom_champ_id, audebut){
   stocker(nom_item, JSON.stringify(donnees))
   return recuperer(nom_item)
 }
+
+
+
+
+
+
+
+
+
+
+
+//nom_du_champ = Classe
+//OU
+//nom_du_champ = Matiere
+function la_matiere_chargee(nom_du_champ){
+  //return element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
+  //return $("#accueil_utilisateur")[0].innerText.replace(la_classe,"").trim()
+
+
+  //si NON admin bis
+  if(!recuperer('mon_type').includes("Administration_bis")){
+
+    var dossier_chargé = recuperer("dossier_chargé")
+    var mes_matieres = JSON.parse(recuperer("mes_matieres"))
+    
+    if(dossier_chargé){
+      var la_classe_matiere = mes_matieres.find(e => e['ID_URL'] === dossier_chargé)
+      if(la_classe_matiere){
+        return la_classe_matiere[nom_du_champ]
+      }else{
+        return "classe_matiere_introuvable" 
+      }
+    }else{
+      return "classe_matiere_introuvable"
+    }
+
+  }else{
+
+    //si classe
+    //chercher la classe directement depuis accueil utilisateur
+    if(nom_du_champ === "Classe") return $("#accueil_utilisateur")[0].innerText.trim()
+
+  }
+}
