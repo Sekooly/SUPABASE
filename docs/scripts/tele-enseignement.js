@@ -8938,9 +8938,9 @@ async function un_menu_clic(id_parametre){
 		    elements_menu_haut_avec_tout_voir = elements_menu_haut_avec_tout_voir ?  elements_menu_haut_avec_tout_voir.split(",") : []
 			//if(elements_menu_haut_avec_tout_voir.indexOf(id_parametre + ":") === -1){
 			if (elements_menu_haut_avec_tout_voir.some(e => e.includes(id_parametre+":"))){
-				autoriser_tout_voir(false)
-			}else{
 				autoriser_tout_voir(true)
+			}else{
+				autoriser_tout_voir(false)
 			}
 		}
 	    
