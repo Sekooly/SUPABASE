@@ -104,7 +104,7 @@ function actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouv
 //limité à 5000
 function rechercher_tout(nom_table){
   //url = racine_data + nom_table + "?" + apikey + "&limit=5000" + ordonner(nom_table)
-  url = entete_heroku + convertir_db(racine_data) + '/SELECT * FROM "'+nom_table+'"'
+  url = entete_heroku + convertir_db(racine_data) + '/SELECT * FROM "'+nom_table+'" ' + transformer_en_sql(ordonner(nom_table))
   //console.log(url)
   return get_resultat_asynchrone(url)
 }
@@ -183,6 +183,18 @@ function ordonner(nom_table){
 
 
 }
+
+function transformer_en_sql(orderby){
+  var resultat = ""
+  if(orderby){
+    resultat = orderby.replace('&','').replace('=',' BY "').replace('.','" ').replaceAll(',',',"').replaceAll('.','".').replaceAll(".", " ")
+  }
+
+  return resultat
+}
+
+
+
 
 function convertir_en_date(date_str_initiale){
 
@@ -913,10 +925,12 @@ function masquer_colonne(id_colonne,non_plutot_afficher){
 
     visibilite =  non_plutot_afficher ? "" : "none"    
 
-    numero_colonne = $("[id='"+id_colonne+"'].header_table.entete_sticky")[0].cellIndex
-    //console.log("masquer la colonne " + numero_colonne)
 
-    $("[id='"+id_colonne+"'].header_table.entete_sticky")[0].style.display = visibilite
+    if($("[id='"+id_colonne+"'].header_table.entete_sticky")[0]) {
+      $("[id='"+id_colonne+"'].header_table.entete_sticky")[0].style.display = visibilite
+    }else{
+      return true
+    }
     
 
     //si non visible -> l'enregistrer dans les préfs de l'user
@@ -955,8 +969,11 @@ function masquer_colonne(id_colonne,non_plutot_afficher){
 
     }*/
 
-    numero_colonne += 1
+    var numero_colonne = $("[id='"+id_colonne+"'].header_table.entete_sticky")[0].cellIndex +1
+    //console.log("masquer la colonne " + numero_colonne)
+    
     if(visibilite === "none"){
+      autoriser_tout_voir(true)
       $('td:nth-child('+numero_colonne+'),th:nth-child('+numero_colonne+')').hide();  
     }else{
       $('td:nth-child('+numero_colonne+'),th:nth-child('+numero_colonne+')').show();  

@@ -8910,7 +8910,7 @@ async function un_menu_clic(id_parametre){
 	    mettre_en_forme_onglet_clicked(id_parametre);
 	    actualiser_filtre_onglet(id_parametre);
 	    await actualiser_details_parametre(id_parametre);
-		mettre_etat_espace(id_parametre)
+		await mettre_etat_espace(id_parametre)
 		
 	    
 	    //pas de modifs à faire
@@ -9422,7 +9422,10 @@ function mettre_etat_espace(id_parametre, valeur_recherchee){
 			if(id_parametre === "Espace etablissement restant") mettre_la_somme(valeur_recherchee)
 		})
 
+		return true
 	}
+
+	return false
 
 }
 
@@ -9855,7 +9858,7 @@ function actualiser_json_local_et_drive(nom_table, table, champ_actualise, ancie
 		stocker(nom_table,JSON.stringify(table));
 
 	}else{
-		
+
 	}
 
 
