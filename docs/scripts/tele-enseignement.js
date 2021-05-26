@@ -8894,7 +8894,7 @@ function appliquer_filtre_choisi(nom_champ_reference, valeur_champ_reference){
 
 
 
-function un_menu_clic(id_parametre){
+async function un_menu_clic(id_parametre){
 
 
 	//si c'est une analyse -> on va direct dans le nouvel onglet
@@ -8909,7 +8909,7 @@ function un_menu_clic(id_parametre){
 		$("#mini_popup").remove()
 	    mettre_en_forme_onglet_clicked(id_parametre);
 	    actualiser_filtre_onglet(id_parametre);
-	    actualiser_details_parametre(id_parametre);
+	    await actualiser_details_parametre(id_parametre);
 		mettre_etat_espace(id_parametre)
 		
 	    
@@ -8932,7 +8932,6 @@ function un_menu_clic(id_parametre){
 		}
 
 		//pas de "tout voir" à faire
-
 		if($("#boutons_params")){
 			elements_menu_haut_avec_tout_voir = recuperer("liste_params_colonnes_masquees")
 
@@ -9093,13 +9092,14 @@ function modifier_info(ceci){
 }
 
 function actualiser_details_parametre(id_parametre){
+	chargement(true)
 	$("#menu_details")[0].innerHTML = "";
 
 	//liste ARRAY (1 élement)
 	if (id_parametre === "Maintenance"){
 		mettre_details_maintenance()
 		$("#nombre_elements_param")[0].innerText = 1
-
+		return true
 
 	//si infos établissements
 	}else if(id_parametre === "Infos établissement"){
@@ -9113,7 +9113,7 @@ function actualiser_details_parametre(id_parametre){
 		
 		
 		$("#menu_details").append(info_etablissement_html)
-		
+		return true
 
 
 	//LISTE JSON
@@ -9133,6 +9133,7 @@ function actualiser_details_parametre(id_parametre){
 		//console.log(identifiant_table)
 
 		//si le local existe déjà -> on récupère celui la
+		/*
 		liste_deja_stockee_JSON = false//recuperer(id_parametre)
 		if(liste_deja_stockee_JSON){
 
@@ -9141,33 +9142,49 @@ function actualiser_details_parametre(id_parametre){
 			$("#nombre_elements_param")[0].innerText = liste_JSON.length
 			affichage_par_defaut(id_parametre);
 			masquer_params_auto()
+
+			au_changement_du_filtre()
+			return liste_JSON
 				
 		}else{
-			rechercher_tout(id_parametre).then(function(snapshot){
+			*/
 
+
+			return rechercher_tout(id_parametre).then(function(snapshot){
+				//console.log("recu: " + snapshot.length + " éléments")
 				liste_JSON = snapshot
 				//liste_JSON = ordonner(id_parametre,liste_JSON)
-				stocker(id_parametre, JSON.stringify(liste_JSON ? liste_JSON : ""))
+				//stocker(id_parametre, JSON.stringify(liste_JSON ? liste_JSON : ""))
 				traiter_liste_JSON(id_parametre,liste_JSON, identifiant_table)
 				$("#nombre_elements_param")[0].innerText = liste_JSON.length
 				affichage_par_defaut(id_parametre);
 				masquer_params_auto()
 
+
+				au_changement_du_filtre()
+				return liste_JSON
+
+
 			});
-		}
+
+		//}
 
 
 
 
 	}
 
+
+
+}
+
+function au_changement_du_filtre(){
 	//changement de filtre -> actualisation du nombre d'elements
 	$("#filtre_parametre").on('change',function(e){
 		compter_nombre_de_lignes()
 	})
 
-
-
+	chargement(false)
 }
 
 function compter_nombre_de_lignes(){
@@ -9383,11 +9400,14 @@ function mettre_etat_espace(id_parametre, valeur_recherchee){
 
 
 		//au bout de 1 seconde
+		/*
 		setTimeout(function(){
 
 			mettre_la_somme(valeur_recherchee)
 
 		}, 1000);
+		*/
+		mettre_la_somme(valeur_recherchee)
 
 
 

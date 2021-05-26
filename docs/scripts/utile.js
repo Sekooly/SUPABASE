@@ -1,5 +1,5 @@
 var mon_role = "";
-
+var entete_heroku = "https://sekooly-server.herokuapp.com/"
 
 function se_deconnecter(){
   /*
@@ -103,7 +103,8 @@ function actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouv
 
 //limité à 5000
 function rechercher_tout(nom_table){
-  url = racine_data + nom_table + "?" + apikey + "&limit=5000" + ordonner(nom_table)
+  //url = racine_data + nom_table + "?" + apikey + "&limit=5000" + ordonner(nom_table)
+  url = entete_heroku + convertir_db(racine_data) + '/SELECT * FROM "'+nom_table+'"'
   //console.log(url)
   return get_resultat_asynchrone(url)
 }
@@ -913,6 +914,7 @@ function masquer_colonne(id_colonne,non_plutot_afficher){
     visibilite =  non_plutot_afficher ? "" : "none"    
 
     numero_colonne = $("[id='"+id_colonne+"'].header_table.entete_sticky")[0].cellIndex
+    //console.log("masquer la colonne " + numero_colonne)
 
     $("[id='"+id_colonne+"'].header_table.entete_sticky")[0].style.display = visibilite
     
@@ -945,12 +947,21 @@ function masquer_colonne(id_colonne,non_plutot_afficher){
 
 
     //pour chaque ligne, on masque la numero_colonne-ème colonne
+    /*
     for (numero_ligne = 1 ; numero_ligne < $("tr").length ; numero_ligne++){
 
       //console.log('$("tr")['+numero_ligne+'].children['+numero_colonne+'] à masquer: ' + visibilite)
       $("tr")[numero_ligne].children[numero_colonne].style.display = visibilite
 
+    }*/
+
+    numero_colonne += 1
+    if(visibilite === "none"){
+      $('td:nth-child('+numero_colonne+'),th:nth-child('+numero_colonne+')').hide();  
+    }else{
+      $('td:nth-child('+numero_colonne+'),th:nth-child('+numero_colonne+')').show();  
     }
+    
 
     
   }
@@ -1213,4 +1224,11 @@ function la_matiere_chargee(nom_du_champ){
     if(nom_du_champ === "Classe") return $("#accueil_utilisateur")[0].innerText.trim()
 
   }
+}
+
+
+
+
+function convertir_db(racine_data){
+  return 'db.'+racine_data.replace('https://',"").split("/rest/v1")[0]
 }
