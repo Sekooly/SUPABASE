@@ -176,6 +176,8 @@ function ordonner(nom_table){
     return "&order=Horodateur.desc"
   }else if(nom_table==="Fichiers" || nom_table==="Rendus"){
     return "&order=date_publication.desc"
+  }else if(nom_table==="Fichiers_tout"){
+    return '&order=date_effet.asc,heure_effet.asc,id_dossier.asc'
   }else{
     return ""
   

@@ -12357,10 +12357,10 @@ function details_tdb_3(ceci){
 
 
 
-function tdb_recuperer_fichiers_a_consulter(ne_pas_arreter_chargement,aujourdhui){
+async function tdb_recuperer_fichiers_a_consulter(ne_pas_arreter_chargement,aujourdhui){
 	document.getElementById('tdb-4').innerHTML = ""
 
-	mes_fichiers = recuperer_mes_fichiers(true)
+	mes_fichiers = await recuperer_mes_fichiers(true)
 	//console.log(mes_fichiers)
 
 	//pour chaque categorie de fichier
@@ -12377,7 +12377,7 @@ function tdb_recuperer_fichiers_a_consulter(ne_pas_arreter_chargement,aujourdhui
 }
 
 
-function recuperer_mes_fichiers(forcing){
+function recuperer_mes_fichiers_old(forcing){
 
 
 	//si on force OU on n'a pas encore les fichiers
@@ -12412,6 +12412,48 @@ function recuperer_mes_fichiers(forcing){
 	}
 
 }
+
+
+
+async function recuperer_mes_fichiers(forcing){
+
+
+	//si on force OU on n'a pas encore les fichiers
+	if(forcing || !recuperer("mes_fichiers")){
+
+
+		var mes_matieres = JSON.parse(recuperer('mes_matieres'));
+		var les_id_dossier_classe = '("'+mes_matieres.map(e => e['ID_URL']).join('","') + '")'
+
+		nom_table = 'Fichiers_tout'
+		url = nom_table
+
+		//prof ou eleve (PAS pour admin car trop de matieres)
+		if(!recuperer('mon_type').includes('Admin')){
+			url += 'WHERE ' + les_id_dossier_classe + "~ (';' || id_dossier || ';')"
+		}
+
+		//console.log(les_id_dossier_classe)
+		//console.log(url)
+		return rechercher_tout(url).then(function(mes_fichiers){
+			//console.log(mes_fichiers)
+			//refaire le filtre en local pour ADMIN
+			mes_fichiers = mes_fichiers.filter(e => les_id_dossier_classe.includes(e["id_dossier"]))
+
+			
+			return mes_fichiers
+		})
+		
+
+
+	}else{
+		return JSON.parse(recuperer("mes_fichiers"))
+	}
+
+}
+
+
+
 
 function details_tdb_4(ceci){
 
@@ -14168,7 +14210,7 @@ function aide_recherche(){
  	alert(contenu_alerte)
 }
 
-function afficher_resultats_recherche(){
+async function afficher_resultats_recherche(){
 
 	var mot_cle = $("#rechercher")[0].value.trim().toLowerCase().replaceAll(" ","")
 	//console.log(mot_cle)
@@ -14179,7 +14221,7 @@ function afficher_resultats_recherche(){
 	} 
 
 	//ignorer les fichiers de photos de profil
-	mes_fichiers = recuperer_mes_fichiers(true)
+	mes_fichiers = await recuperer_mes_fichiers(true)
 	var mes_fichiers_initiaux = mes_fichiers.filter(e => e['categorie_fichier'] !== "Profil")
 	var mes_matieres = JSON.parse(recuperer("mes_matieres"))
 	
