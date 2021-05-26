@@ -758,24 +758,32 @@ function garder_les_colonnes_non_automatiques(arr){
 
 function csv_en_JSON(contenu){
   var toutes_les_lignes = contenu.split('\r\n')
+  //console.log(toutes_les_lignes)
   var entete = toutes_les_lignes[0].split(separateur)
   //console.log(entete)
 
   var json_final = []
 
   //pour chaque ligne, on créer un seul et unique objet {} avec les clés et valeurs qu'il faut
-  for (var i = 1; i< toutes_les_lignes.length;i++){
-    //console.log(toutes_les_lignes[i].split(',')[0])
+  toutes_les_lignes.forEach(function(valeur,index){
+    if(index === 0) return true
+    //console.log({[index]: toutes_les_lignes[index].split(separateur)})
     var nouvel_objet = {}
 
     for (var numero_colonne = 0; numero_colonne < entete.length ; numero_colonne++){
       //console.log(numero_colonne + " " + entete[numero_colonne])
-      nouvel_objet[entete[numero_colonne]] = toutes_les_lignes[i].split(separateur)[numero_colonne]
+      nouvel_objet[entete[numero_colonne]] = toutes_les_lignes[index].split(separateur)[numero_colonne]
     }
-    
-    //console.log(nouvel_objet)
-    if(nouvel_objet[entete[0]]) json_final.push(nouvel_objet)
-  }
+
+    /*
+    console.log(nouvel_objet)
+    console.log(entete[0])
+    */
+
+
+    //if(nouvel_objet[entete[0]] > 0) json_final.push(nouvel_objet)
+    if(nouvel_objet !== {}) json_final.push(nouvel_objet)
+  })
 
   return json_final
 

@@ -10108,12 +10108,12 @@ function telecharger_donnees_parametres(id_parametre){
 }
 
 
-function telecharger_parametre(id_parametre){
+async function telecharger_parametre(id_parametre){
 
 	if(!id_parametre) id_parametre = $(".un_menu_orange")[0].id
 
 	var entetes_seulement = $("#choix_download_param")[0].value === "En-têtes"
-	var contenu_recup =  recuperer(id_parametre) ? JSON.parse(recuperer(id_parametre)) : nom_des_champs(id_parametre)
+	var contenu_recup = entetes_seulement ? nom_des_champs(id_parametre) : await rechercher_tout(id_parametre) // recuperer(id_parametre) ? JSON.parse(recuperer(id_parametre)) : nom_des_champs(id_parametre)
 	//console.log(contenu_recup)
 	var contenu = convertir_csv(contenu_recup, entetes_seulement)
 	//console.log(contenu)
@@ -10173,7 +10173,7 @@ function importer_parametres(){
 			var contenu = reader.result
 			var json_final = csv_en_JSON(contenu)
 
-  			//console.log(json_final)
+  			console.log(json_final)
 
   			//au moins une donnée
   			if(json_final.length === 0){
