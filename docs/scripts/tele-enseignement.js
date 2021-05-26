@@ -9842,23 +9842,28 @@ function retourner_les_cochés(){
 
 
 function actualiser_json_local_et_drive(nom_table, table, champ_actualise, ancienne_valeur, nouvelle_valeur, valeur_champ_reference){
-	table.some(function(valeur,index){
-		if(valeur[champ_actualise] === ancienne_valeur){
-			valeur[champ_actualise] = nouvelle_valeur
-			return true;
-		}
-	})
 
-	stocker(nom_table,JSON.stringify(table));
+	if(table){
+
+		table.some(function(valeur,index){
+			if(valeur[champ_actualise] === ancienne_valeur){
+				valeur[champ_actualise] = nouvelle_valeur
+				return true;
+			}
+		})
+
+		stocker(nom_table,JSON.stringify(table));
+
+	}else{
+		
+	}
+
 
 	//si modif de (Classe dans Classes ou Matiere dans Matieres): renommer le dossier sur le drive + autres
 	if (champ_actualise === nom_table.slice(0, -1)){
 		var id_dossier = valeur_champ_reference
 		var nom_final = nouvelle_valeur		
 		renommer_sur_drive(id_dossier, nom_final)
-
-
-
 	}
 
 
