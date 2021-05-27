@@ -15238,9 +15238,9 @@ async function valider_suppression_via_mail_si_besoin(){
 
 			/*********************************** supprimer le projet sur supabase (TODO) *******************************************/
 
+			/*********************************** supprimer le record sur namecheap (TODO) *******************************************/
 
-
-			/*********************************** supprimer le repo + rediriger vers sekooly.com (todo) *******************************************/
+			/*********************************** supprimer le repo git + rediriger vers sekooly.com (todo) *******************************************/
 			setTimeout(function(){
 				window.location.href = "https://sekooly.com"
 			},3000)
