@@ -1259,3 +1259,169 @@ function la_matiere_chargee(nom_du_champ){
 function convertir_db(racine_data){
   return 'db.'+racine_data.replace('https://',"").split("/rest/v1")[0]
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/************************************************* utile pour rassembler des images (+dom to image) ********************************************/
+
+async function telecharger_tout(sans_enregistrer){
+  if(tous_avec_un_fichier("soumettre_devoir")){
+
+    var img = ""
+    try{
+      img = await domtoimage.toPng($("#tout")[0])
+    }catch(e){
+      img = ""
+      afficher_alerte("Impossible de fusionner les fichiers: ils doivent TOUS être des images.")
+    }
+
+
+    //alert(img)
+    if(!sans_enregistrer) enregistrer_image(img, "devoir-fusionné-"+ recuperer("identifiant_courant") + ".png")
+    return img
+  }else{
+    afficher_alerte("Vous n'avez pas fourni toutes les pages que vous avez demandé à ajouter.")
+    return ""
+  }
+}
+
+function vider_previz_devoir_rendu(){
+  $("#tout")[0].innerHTML = ""
+}
+
+function rassembler(sans_alerte){
+
+  var nb_fichiers = $("#soumettre_devoir > input").length  
+
+  if(tous_avec_un_fichier("soumettre_devoir")){
+    //console.log("on est dedans : " + nb_fichiers + " fichiers.")
+    vider_previz_devoir_rendu()
+
+
+    for(numero_fichier = 0; numero_fichier < nb_fichiers; numero_fichier++){
+      //console.log(".................." + numero_fichier + "..................")
+      $("#tout").append('<img id="result'+numero_fichier+'">')
+      
+      var indice_input = numero_fichier === 0 ? "" : "_" +numero_fichier 
+      var id_fichier_devoir = "file_devoir" + indice_input
+      //console.log(id_fichier_devoir)
+
+      if($("#" + id_fichier_devoir).length > 0){
+        readImage($("#" + id_fichier_devoir)[0].files[0],numero_fichier)
+        if(numero_fichier === nb_fichiers-1) return true
+      }
+    }
+
+  }else{
+    if(!sans_alerte) afficher_alerte("Vous n'avez pas fourni toutes les pages que vous avez demandé à ajouter.")
+  }
+
+}
+
+function readImage(file,numero_fichier) {
+  // Check if the file is an image.
+  if (file.type && !file.type.startsWith('image/')) {
+    erreur = '⚠️ Le fichier n°'+numero_fichier+' n\'est pas une image : il ne pourra ni être prévisualisé, ni être fusionné à d\'autres fichiers.'
+    alert(erreur)
+    console.error(erreur, file.type, file);
+    return;
+  }
+
+  //console.log(numero_fichier)
+
+  const reader = new FileReader();
+  reader.addEventListener('load', async (event) => {
+    le_resultat = $("#result" + numero_fichier)[0]
+    le_resultat.src = event.target.result;
+    //console.log(event.target)
+
+    recuperer_dimensions(reader,afficher_en_bonnes_dimensions,le_resultat)
+
+  });
+
+  reader.readAsDataURL(file);
+
+}
+
+function afficher_en_bonnes_dimensions(valeur,img){
+  //alert(valeur[0] + " et " + valeur[1])
+  //console.log(img)
+
+  img.width= valeur[0] 
+  img.height = valeur[1]
+
+  //console.log(img)
+  return valeur
+}
+
+function recuperer_dimensions(reader,callback,img){
+  var img = new Image;
+  var resultat = []
+        
+        img.onload = function() {
+    resultat.push(img.width)
+    resultat.push(img.height)
+    return callback(resultat,img)
+        };
+
+        img.src = reader.result;
+}
+
+function tous_avec_un_fichier(id_div_parent){
+
+  avec_fichier = ""
+
+  //pour chaque element fils
+  $('[id="'+id_div_parent+'"]').children('input').each(function () {
+    avec_fichier += avec_un_fichier(this).toString()
+  });
+
+
+  return !avec_fichier.includes("false")
+}
+
+function avec_un_fichier(input_file){
+  return input_file.files.length > 0
+}
+
+//utiliser: enregistrer_image(await domtoimage.toPng($("#tout")[0]),"test.png") 
+function enregistrer_image(dataUrl,nom_fichier) {
+      var link = document.createElement('a')
+      link.download = nom_fichier
+      link.href = dataUrl;
+      link.click();
+  }
+

@@ -65,12 +65,33 @@
 		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
 
+		<!-- devoirs multi pages -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+		
+
 	</head> 
 
 	<body>
 
 
 	<style>
+
+		.fichier_supplementaire{
+
+		}
+
+		#tout{
+			display: grid;
+			width: min-content;
+		}
+
+		.supprimer_page{
+			background-color: #373737;
+			height: 20px;
+			color: white;
+			margin-bottom: 20px;
+		}
+
 
 		.date_fin{
 			color: #B5B3B8;
@@ -1567,7 +1588,7 @@
 
 		.mon_file_devoir{
 			padding-top: 5%;
-			width: 50%;
+			width: 51%;
 		}
 
 		.gros_conteneur{
@@ -2354,7 +2375,17 @@
 
 		<div id="soumettre_devoir" style="overflow: hidden;">
 			<input class="mon_file_devoir" id="file_devoir" value="" type="file" accept=".txt,.bmp,.gif,.jpeg,.jpg,.png,.png,.pdf,.bmp,.xlsx,.xls,.xlsm,.ppt,.pptx,.doc,.docx,.html,.csv,.js,.rtf,.mp4,.mp3,.wav">
+
+
+			<div id="boutons_devoir">
+				<button type="button" class="supprimer_page" id="supprimer_page" onclick="supprimer_derniere_page_devoir()">Supprimer la dernière page</button>
+				<button id="ajouter_page" type="button" class="rendre" onclick="ajouter_page_devoir()"> Ajouter une page</button>
+			</div>
+
+
+
 			<button id="bouton_rendre_devoir" type="button" class="rendre" onclick="rendre_devoir()"> Rendre le devoir</button>
+			<div id="tout"><img id="result"></div>
 		</div>
 	</div>​
 	

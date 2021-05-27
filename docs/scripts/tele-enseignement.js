@@ -492,8 +492,8 @@ function aide_devoirs(){
 	alerte = "CONSIGNES POUR METTRE EN LIGNE UN DEVOIR: \n"
 	alerte = alerte + '• Vous pouvez rendre uniquement un devoir lorsque le professeur a catégorisé un fichier de "Devoir" ou "Examen".\n'
 	alerte = alerte + '• Pour rendre un devoir, choisissez le sujet que le professeur aura mis en ligne.\n'
- 	alerte = alerte + "• Pour un même devoir, si vous avez plusieurs images, convertissez l'ensemble en pdf (via ce lien par exemple : https://jpg2pdf.com/fr/)\n"
- 	alerte = alerte + "• Vérifiez bien l'ordre des images car cela sera pris en compte dans le fichier pdf généré. Vous pourrez ensuite mettre en ligne le seul fichier pdf.\n"
+ 	alerte = alerte + "• Pour un même devoir, si vous avez plusieurs images, cliquez sur 'Ajouter une page' et choissisez le fichier IMAGE à rajouter.\n"
+ 	alerte = alerte + "• Vérifiez bien l'ordre des images car cela sera pris en compte dans l'image finale générée, que pouvez voir en aperçu ci-dessous.\n"
  	alerte = alerte + "• Si vous êtes sur ordinateur, vous pouvez également créer un fichier word et y coller toutes vos images. Les fichiers word (doc / docx) sont également supportés par SEKOOLY."
  
  	alert(alerte)
@@ -544,6 +544,7 @@ function initialisation_choix_devoir(){
 
 	//on supprime toute liste antérieure
 	supprimer_rendus_devoirs_affiches();
+	
 
 	//pas d'upload possible
 	element_DOM('soumettre_devoir').style.display = 'none';
@@ -561,6 +562,7 @@ function initialisation_choix_devoir(){
 	//rien au debut
 	la_liste_devoirs.innerHTML = '<option value="--">--</option>';
 	element_DOM('devoir_choisi').style.borderColor = "";
+
 
 
 	for (var i = 0; i < les_devoirs.length; i++) {
@@ -1100,13 +1102,20 @@ function supprimer_devoir(moi, id_fichier_donné, id_devoir_donné){
 
 function supprimer_div_devoir_choisi(){
 
-	$("#file_devoir")[0].value ="";
+	//$("#file_devoir")[0].value ="";
+	$(".mon_file_devoir").each(function(index,un_fichier_devoir){
+		un_fichier_devoir.value = ""
+	})
+
 
 	if(element_DOM('mon_devoir_rendu')) element_DOM('mon_devoir_rendu').remove();
 }
 
 function supprimer_rendus_devoirs_affiches(){
 	if(element_DOM('liste_des_devoirs_rendus')) element_DOM('liste_des_devoirs_rendus').remove();
+
+	vider_previz_devoir_rendu()
+	$(".fichier_supplementaire").remove()
 
 }
 
@@ -1144,11 +1153,37 @@ function rendre_devoir(){
 
         chargement(true);
 
-        fr.onload = function(e) {
-        	var lien_script = 'https://script.google.com/macros/s/AKfycbyUa45u-TGQmKEWOYf9gz5UofPBAW7FRIpF6RNadQ5RbvT1BWrU/exec';
+        fr.onload = async function(e) {
+        	var lien_script =  await chercher_lien_script(4) // 'https://script.google.com/macros/s/AKfycbyUa45u-TGQmKEWOYf9gz5UofPBAW7FRIpF6RNadQ5RbvT1BWrU/exec';
     
         	var params = {};
-            params.file = e.target.result.replace(/^.*,/, '');
+
+        	//si c'est 1 seul et unique devoir -> pas de rassemblement
+        	//si plusieurs devoirs -> rassemblement 
+
+        	if( $("#soumettre_devoir > input").length > 1){
+
+
+	        	img_finale = await telecharger_tout(true)
+	        	img_finale = img_finale.replace(/^.*,/, '');
+	        	//console.log(img_finale)
+
+	        	if(!img_finale){
+	        		chargement(false)
+	        		return false
+	        	}else{
+	        		params.file = img_finale	
+	        	}
+	        	
+
+
+        	}else{
+
+        		params.file = e.target.result.replace(/^.*,/, '');
+        	}
+
+        	//alert(params.file)
+            
             nom_fichier = file.name;
 
             coefficient_rendu = Number($("#"+le_devoir_choisi)[0].getAttribute('coefficient_rendu'))
@@ -1208,7 +1243,9 @@ function mettre_devoir_en_ligne(lien_script,params, nom_fichier, extension,id_do
     	
     	var form = $(this);
     	var url = form.attr('action');
-    	$.ajax({ type: "POST", url: url, data: form.serialize(), // serializes the form's elements.
+
+    	// sets timeout to 10 minutes ->  600 seconds -> 600 000 ms
+    	$.ajax({ type: "POST", timeout: 600000, url: url, data: form.serialize(), // serializes the form's elements.
 
     		//affiche le resultat obtenu par le serveur (id fichier)
     		success: function(data) {
@@ -1278,8 +1315,7 @@ function mettre_devoir_en_ligne(lien_script,params, nom_fichier, extension,id_do
 					'Cycle' : mes_donnees['Cycle']
 				}
 				//console.log(nouvelle_notif)
-				ajouter_un_element(nom_table, nouvelle_notif, id_devoir)
-    			
+				ajouter_un_element(nom_table, nouvelle_notif, id_devoir) 			
 
 
 
@@ -1302,10 +1338,9 @@ function mettre_devoir_en_ligne(lien_script,params, nom_fichier, extension,id_do
 
 			error:function(data){
     			chargement(false);
-
+    			data = JSON.parse(data)
     			console.error(data);
-
-    			afficher_alerte(data,false)
+    			afficher_alerte("Votre fichier est trop lourd à mettre en ligne, merci de réduire leur taille avant de les mettre en ligne.",false)
 
 				
 			},
@@ -1313,6 +1348,8 @@ function mettre_devoir_en_ligne(lien_script,params, nom_fichier, extension,id_do
 			done: function(data){
 				chargement(false)
 			}
+
+			
 
 		});
 		
@@ -15001,6 +15038,109 @@ function fermer_la_subscription(){
 	if(mySubscription_notif) supabase.removeSubscription(mySubscription_notif)
 	if(mySubscription_conv) supabase.removeSubscription(mySubscription_conv)
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*************************** MULTI DEVOIR ********************************/
+
+function ajouter_page_devoir(){
+
+	//maximum 8 pages
+	nb_pages_devoir = $(".mon_file_devoir").length
+
+	if(nb_pages_devoir < 8){
+		var copie_fichier = element_DOM("file_devoir").cloneNode(true)
+		copie_fichier.id = "file_devoir_" + nb_pages_devoir 
+		copie_fichier.value ="";
+		copie_fichier.className ="mon_file_devoir fichier_supplementaire";
+		$("#soumettre_devoir")[0].insertBefore(copie_fichier, $("#boutons_devoir")[0]);	
+
+		$(".mon_file_devoir").off("change")
+		$(".mon_file_devoir").on("change",function(e){
+			//alert("vous avez changé le " + e.target.id)
+			actualiser_rendu()
+
+		})
+
+	}else{
+		alert("Vous ne pouvez pas envoyer un devoir de plus de 8 pages.")
+	}
+	
+}
+
+async function actualiser_rendu(sans_alerte){
+	await rassembler(sans_alerte)
+	//$('#tout').doubleScroll();
+}
+
+
+async function supprimer_derniere_page_devoir(){
+	
+	index_dernier_devoir = $(".mon_file_devoir").length-1
+
+
+	if(index_dernier_devoir > 0){
+
+		var avec_fichier_initial = $("[id='file_devoir_" + index_dernier_devoir +"']")[0].value.length > 0
+		//console.log(avec_fichier_initial)
+		
+		if(avec_fichier_initial) var confirmation = confirm("Voulez-vous vraiment supprimer la dernière page?")
+
+		if(confirmation || !avec_fichier_initial){
+			$("[id='file_devoir_" + index_dernier_devoir +"']").remove()
+			$("img#result" + index_dernier_devoir).remove()
+			await actualiser_rendu(true)
+		} 
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
