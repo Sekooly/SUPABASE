@@ -13869,9 +13869,11 @@ function maj_matiere(){
 			//mettre la bonne valeur de l'état pour les élèves
 			if(je_suis_eleve) boutons_update_programme = liste_statuts(true, un_chapitre['etat'])
 
+			date_fin_chapitre = un_chapitre['date_fin'] ? '<div class="date_fin">le '+afficher_date(un_chapitre['date_fin'])+'</div>' : ''
+
 
 			//boutons_update_programme = boutons_update_programme.replaceAll("#valeur_de_letat#",un_chapitre['etat'])
-			$("#programme_scolaire").append('<div class="un_chapitre" id="'+un_chapitre['id_chapitre']+'"><!--<span class="titre_chapitre position_chapitre" id="position_chapitre">'+un_chapitre["position_chapitre"]+') </span>--><span class="titre_chapitre" id="'+un_chapitre['id_chapitre']+'">'+un_chapitre['intitule_chapitre'] +'</span>'+'<br>'+ boutons_update_programme  + "</div>" )			
+			$("#programme_scolaire").append('<div class="un_chapitre" id="'+un_chapitre['id_chapitre']+'"><!--<span class="titre_chapitre position_chapitre" id="position_chapitre">'+un_chapitre["position_chapitre"]+') </span>--><span class="titre_chapitre" id="'+un_chapitre['id_chapitre']+'">'+un_chapitre['intitule_chapitre'] +'</span>'+'<br>'+ boutons_update_programme + date_fin_chapitre + "</div>" )			
 			
 			//assigner la valeur par du select (si NON élève)
 			if(!je_suis_eleve){				
@@ -13882,32 +13884,36 @@ function maj_matiere(){
 		})
 
 
+		//si NON eleve
+		if(!je_suis_eleve){
 
-		$("#programme_scolaire").sortable({
+			$("#programme_scolaire").sortable({
 
-		    update: function mettre_a_jour_position() {
+			    update: function mettre_a_jour_position() {
 
-		    	var liste_des_chapitres = []
+			    	var liste_des_chapitres = []
 
-		    	//récupérer tous les chapitres de la matière
-		    	//mettre à jour toutes les positions
-		    	$(".un_chapitre.ui-sortable-handle").each(function(position_finale,element){
-					/*
-					console.log(position_finale+1);
-					console.log(element.children[0].innerText)
-					*/
+			    	//récupérer tous les chapitres de la matière
+			    	//mettre à jour toutes les positions
+			    	$(".un_chapitre.ui-sortable-handle").each(function(position_finale,element){
+						/*
+						console.log(position_finale+1);
+						console.log(element.children[0].innerText)
+						*/
 
-					nouvelle_position_chapitre_drag = position_finale+1
-					modifier_chapitre(element.id, "position_chapitre", nouvelle_position_chapitre_drag, false)
+						nouvelle_position_chapitre_drag = position_finale+1
+						modifier_chapitre(element.id, "position_chapitre", nouvelle_position_chapitre_drag, false)
+						
+
+					})
+
 					
 
-				})
 
-				
+			    }
+			})
 
-
-		    }
-		})
+		}
 
 		
 	}
@@ -14016,7 +14022,10 @@ function changer_statut_chapitre(ceci){
 
 	//console.log("on doit changer le statut") //todo
 	var id_chapitre = le_id_chapitre(ceci)
-	modifier_chapitre(id_chapitre, "etat", ceci.value, maj_matiere)
+	modifier_chapitre(id_chapitre, "etat", ceci.value)
+
+	var date_fin = (ceci.value === "Terminé" || ceci.value === "Annulé" ) ? maintenant() : ""
+	modifier_chapitre(id_chapitre, "date_fin",date_fin, maj_matiere)
 
 }
 
