@@ -608,7 +608,7 @@ function suite_notif(){
 function afficher_date(date_initiale,sans_heure){
 
   if(!date_initiale) return ""
-    
+
   var formatage = sans_heure ? 'YYYY-MM-DD' :
                   date_initiale.includes('+') ? 'YYYY-MM-DD HH:mm:ssZ' :
                   "DD/MM/YYYY HH:mm:ss"
@@ -1230,8 +1230,12 @@ function la_matiere_chargee(nom_du_champ){
   //return $("#accueil_utilisateur")[0].innerText.replace(la_classe,"").trim()
 
 
+  //si admin final
+  if(recuperer("mon_type").includes("Administration_final") && nom_du_champ === "Classe" && $("#accueil_utilisateur")[0].innerText.trim().includes("Vie scolaire")){
+      return JSON.parse(recuperer("mes_donnees"))['Cycle']
+
   //si NON admin bis
-  if(!recuperer('mon_type').includes("Administration_bis")){
+  } else if(!recuperer('mon_type').includes("Administration_bis")){
 
     var dossier_chargé = recuperer("dossier_chargé")
     var mes_matieres = JSON.parse(recuperer("mes_matieres"))
