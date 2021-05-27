@@ -13655,7 +13655,7 @@ async function envoyer_mon_message(id_conv){
 	var destinataire = le_destinataire()
 	//console.log(destinataire)
 	if(!destinataire || !mes_destinataires.find(e => e.includes(destinataire)) ){
-		alert("Votre destinataire n'existe pas, merci de vérifier votre saisie.")
+		alert("Votre destinataire n'existe pas, merci de vérifier votre saisie.\nIl est possible que la personne ne soit plus inscrite sur la plateforme.")
 		chargement(false)
 		return false
 	}
