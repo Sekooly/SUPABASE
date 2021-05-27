@@ -72,8 +72,7 @@ function maintenant_sans_caracteres_speciaux(){
 
 
 function hasher(valeur) {
-  return hex_md5(valeur)
-  
+  return hex_md5(valeur)  
 }
 
 function supprimer_element_de_la_liste(liste,nom_element){
@@ -1432,3 +1431,30 @@ function enregistrer_image(dataUrl,nom_fichier) {
       link.click();
   }
 
+
+function code_ok(le_resultat,code_saisie){
+
+  //console.log(le_resultat["Code"] + " VS " + code_saisie)
+  
+  var hash = hasher(le_resultat["Code"])
+  //console.log(hash) //le hash de ce qui vient du serveur
+
+  var code_saisie_hashee = hasher(code_saisie)
+  //console.log(code_saisie_hashee) //la saisie HASHEE
+
+  var resultat_booleen = le_resultat["code_hash"] === "ok" ? code_saisie_hashee === le_resultat["Code"] : le_resultat["Code"] === code_saisie 
+
+
+  return resultat_booleen 
+}
+
+async function recuperer_mes_donnees(){
+  var mes_donnees = []
+  var mon_type = recuperer("mon_type").split("_")[0]
+  mes_donnees = await rechercher(mon_type,"Identifiant", recuperer("identifiant_courant"))
+  
+
+  if(mes_donnees) mes_donnees = mes_donnees[0]
+
+  return mes_donnees
+}

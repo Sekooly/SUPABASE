@@ -1754,25 +1754,21 @@ function calculer_mes_XP(){
 	return "En cours de construction."
 }
 
-function switch_edition(){
+async function switch_edition(){
 
 	var est_mode_edition = $("#valider_modifs")[0].innerText === "Enregistrer";
 
 	//entrer en mode édition: exiger le code d'accès
 	if(!est_mode_edition){
 		
+		var mes_donnees = await recuperer_mes_donnees()
 		var ancien_code = prompt("Indiquez votre code d'accès ACTUEL:");
-		var hash_ancien_code = hasher(ancien_code)
-		var vrai_code = JSON.parse(recuperer('mes_donnees'))['Code']
 
-		/*
-		console.log(hash_ancien_code)
-		console.log(ancien_code)
-		console.log(" VS " + vrai_code)
-		*/
+		if(!ancien_code) return afficher_alerte("Modification du profil annulée.")
+		if(!mes_donnees) return afficher_alerte("Vous devez être connecté à internet pour modifier votre profil.")
 
 		//si code ok:
-		if(ancien_code === vrai_code || hash_ancien_code === vrai_code){
+		if(code_ok(mes_donnees,ancien_code)){
 			mode_edition(true);
 		}else{
 			if(ancien_code !== null)
@@ -2961,7 +2957,7 @@ function chargement_a_larrivee(){
 		
 	}
 
-		
+	valider_suppression_via_mail_si_besoin()
 
 	chargement(false);
 	
@@ -3697,7 +3693,7 @@ function traitement_fichiers_recus(){
 }
 
 function id_mode_affichage(){
-	return recuperer("mode_prefere").replace("par_","")
+	return recuperer("mode_prefere") ? recuperer("mode_prefere").replace("par_","") : "la_date_effet"
 }
 
 function garder_les_manuels(){	
@@ -9149,6 +9145,12 @@ function actualiser_details_parametre(id_parametre){
 			info_etablissement_html += information_etablissement(info.split(':')[0], info.split(':')[1], data_etablissement[info.split(':')[0]], eval(info.split(':')[2]))	
 		})
 		
+		info_etablissement_html += `
+		<details class="un_detail" style="color: #F00;">
+		  <summary>ZONE DE DANGER</summary>
+		  <span onclick="supprimer_etablissement()">Supprimer mon établissement de Sekooly</span>
+		</details>
+		`
 		
 		$("#menu_details").append(info_etablissement_html)
 		return true
@@ -9212,6 +9214,47 @@ function actualiser_details_parametre(id_parametre){
 
 	}
 
+
+
+}
+
+async function supprimer_etablissement(){
+	var mon_type = recuperer("mon_type").split("_")[0]
+	var mes_donnees = await recuperer_mes_donnees()
+	
+
+	if(mes_donnees){
+
+		var confirmation = prompt("Merci de saisir votre code d'accès pour démarrer le processus de suppression.")
+
+		if(!confirmation) return afficher_alerte("Demande de suppression annulée.")
+		if(code_ok(mes_donnees,confirmation)){
+			//console.log("ok!")
+			var lien_script = await chercher_lien_script(5)
+			var premiere_demande  = "?premiere_demande=oui"
+			var adresse_mail_suppression = "&adresse_mail_suppression=" + data_etablissement['contact_etablissement']
+			var nom_etablissement_str = "&nom_etablissement=" + data_etablissement['nom_etablissement']
+			var id_etablissement_str = '&id_etablissement=' + data_etablissement['id_etablissement']
+
+
+
+			url = lien_script + premiere_demande + adresse_mail_suppression + nom_etablissement_str + id_etablissement_str
+			//console.log(url)
+			chargement(true)
+			
+			resultat = await post_resultat_asynchrone(url,{})
+			alert(resultat)
+			chargement(false)
+			
+
+
+		}else{
+			console.error("Code erroné.")
+		}
+
+	}else{
+		return false
+	}
 
 
 }
@@ -15154,9 +15197,71 @@ async function supprimer_derniere_page_devoir(){
 
 
 
+/****************************** SUPPRESSION D'ETABLISSEMENT **********************************/
+function mode_suppression(){
+	return recuperer("mon_type").includes("Administration") && window.location.href.endsWith("?delete=" + data_etablissement["id_etablissement"])
+}
+
+async function valider_suppression_via_mail_si_besoin(){
+	if (mode_suppression()){
+		confirmation = prompt("Vous avez demandé à supprimer Sekooly, ce qui engendre la suppression de TOUTES vos données.\n\nMerci de confirmer cette action en écrivant 'je veux supprimer " + data_etablissement["nom_etablissement"] + "'")
+
+		console.log(confirmation)	
+		if(confirmation === "je veux supprimer " + data_etablissement["nom_etablissement"]){
+			//console.log("aurevoir!")
+			chargement(true)
 
 
 
+			/*********************************** supprimer sur drive *******************************************/
+
+			var lien_script = await chercher_lien_script(5)
+			var premiere_demande  = "?confirmation="  + confirmation
+			var adresse_mail_suppression = "&adresse_mail_suppression=" + data_etablissement['contact_etablissement']
+			var nom_etablissement_str = "&nom_etablissement=" + data_etablissement['nom_etablissement']
+			var id_etablissement_str = '&id_etablissement=' + data_etablissement['id_etablissement']
+
+
+
+			url = lien_script + premiere_demande + adresse_mail_suppression + nom_etablissement_str + id_etablissement_str
+			//console.log(url)
+			chargement(true)
+			
+			resultat = await post_resultat_asynchrone(url,{})
+			
+
+
+
+			/*********************************** supprimer ma ligne dans gestion interne SUPABASE *******************************************/
+			await supprimer_initial("Etablissements","id",data_etablissement['id'])
+
+
+			/*********************************** supprimer le projet sur supabase (TODO) *******************************************/
+
+
+
+			/*********************************** supprimer le repo + rediriger vers sekooly.com (todo) *******************************************/
+			setTimeout(function(){
+				window.location.href = "https://sekooly.com"
+			},3000)
+
+
+
+
+			//alerte
+			afficher_alerte(resultat)
+
+
+			chargement(false)
+		}else{
+			afficher_alerte("Suppression de votre plateforme Sekooly annulée.")
+			setTimeout(function(){
+				window.location.href = "/tele-enseignement"
+			},3000)
+		}
+		
+	}
+}
 
 
 
