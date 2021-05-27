@@ -606,6 +606,9 @@ function suite_notif(){
 }
 
 function afficher_date(date_initiale,sans_heure){
+
+  if(!date_initiale) return ""
+    
   var formatage = sans_heure ? 'YYYY-MM-DD' :
                   date_initiale.includes('+') ? 'YYYY-MM-DD HH:mm:ssZ' :
                   "DD/MM/YYYY HH:mm:ss"
