@@ -111,8 +111,9 @@ function rechercher_tout(nom_table, avec_where){
   return get_resultat_asynchrone(url)
 }
 
-function execute_sql(racine_data, requete_sql){
-  url = entete_heroku + convertir_db(racine_data) + "/" + requete_sql
+function execute_sql(racine_data, requete_sql, coche_checked){
+  var suffix = !coche_checked ? "/False" : ""
+  url = entete_heroku + convertir_db(racine_data) + "/" + requete_sql + suffix
   return get_resultat_asynchrone(url) 
 }
 

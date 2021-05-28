@@ -6380,6 +6380,10 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 				</div>
 
 				<div class="au-centre">
+					<div>
+					  <input type="checkbox" id="mode-select" name="mode-select" checked="">
+					  <label for="mode-select">En mode SELECT</label> 
+					</div>
 					<button class="btn-exe" onclick="exe_sql()" id="exe">Exécuter le code SQL</button>
 
 					<button style="display:none;" class="btn-exe" id="deploy">Continuer</button>
@@ -6391,6 +6395,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 
 		async function exe_sql(){
 
+
 			var tous = await recherche_initiale("Etablissements")
 
 			//executer d'abord sur testo
@@ -6398,18 +6403,22 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 
 			await exe_sql_unitaire(data_testo)
 			$("#deploy").show()
+			chargement(false)	
 
 			//si tout est ok : demander la confirmation pour sur le reste
 			$("#deploy").off("click")
 			$("#deploy").one("click",function(){
 				
-				tous = tous.filter(e => e['nom_etablissement'] !== "testo")
-				tous.forEach(function(data){
-					exe_sql_unitaire(data,true)
-				})		
-
 				$("#deploy").hide()
 				$("#deploy").off("click")
+
+				tous = tous.filter(e => e['nom_etablissement'] !== "testo")
+				tous.forEach(async function(data){
+					await exe_sql_unitaire(data,true)
+				})
+
+				chargement(false)	
+
 
 			})
 
@@ -6418,11 +6427,14 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 
 		async function exe_sql_unitaire(data,mode_ajout){
 			//console.log(data)
+
+			chargement(true)
+
 			var requete_sql = element_DOM("query").value
 			var id_alerte = data['id_etablissement']
-			var retour = '<span style="background:#d79e89;">' + data["nom_etablissement"] + '</span>' + ": " 
+			var retour = '<span class="affichage_etablissement">' + data["nom_etablissement"] + '</span>' + ": " 
 			try{
-				var resultat = await execute_sql(data['racine_data'], requete_sql)
+				var resultat = await execute_sql(data['racine_data'], requete_sql, element_DOM("mode-select").checked )
 				retour += JSON.stringify(resultat)
 				var couleur_finale = "green"
 			}catch(e){
