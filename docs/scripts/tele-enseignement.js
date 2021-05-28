@@ -12531,19 +12531,21 @@ async function recuperer_mes_fichiers(forcing){
 
 
 		var mes_matieres = JSON.parse(recuperer('mes_matieres'));
-		var les_id_dossier_classe = '("'+mes_matieres.map(e => e['ID_URL']).join('","') + '")'
+		var les_id_dossier_classe = "'" +mes_matieres.map(e => e['ID_URL']).join(',') + "'"
 
-		nom_table = 'Fichiers_tout'
+		//alert(les_id_dossier_classe)
+
+		nom_table = '"Fichiers_tout"'
 		url = nom_table
 
 		//prof ou eleve (PAS pour admin car trop de matieres)
 		if(!recuperer('mon_type').includes('Admin')){
-			url += '  WHERE ' + les_id_dossier_classe + "~ (';' || id_dossier || ';')"
+			url += '  WHERE ' + les_id_dossier_classe + ' ~ id_dossier'
 		}
 
 		//console.log(les_id_dossier_classe)
 		//console.log(url)
-		return rechercher_tout(url).then(function(mes_fichiers){
+		return rechercher_tout(url,true).then(function(mes_fichiers){
 			//console.log(mes_fichiers)
 			//refaire le filtre en local pour ADMIN
 			mes_fichiers = mes_fichiers.filter(e => les_id_dossier_classe.includes(e["id_dossier"]))

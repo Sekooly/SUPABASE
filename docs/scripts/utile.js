@@ -101,10 +101,13 @@ function actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouv
 }
 
 //limité à 5000
-function rechercher_tout(nom_table){
+function rechercher_tout(nom_table, avec_where){
   //url = racine_data + nom_table + "?" + apikey + "&limit=5000" + ordonner(nom_table)
-  url = entete_heroku + convertir_db(racine_data) + '/SELECT * FROM "'+nom_table+'" ' + transformer_en_sql(ordonner(nom_table))
+  table = avec_where ? nom_table : '"'+nom_table+'"'
+  //alert(table)
+  url = entete_heroku + convertir_db(racine_data) + '/SELECT * FROM '+table+' ' + transformer_en_sql(ordonner(nom_table))
   //console.log(url)
+  //alert(url)
   return get_resultat_asynchrone(url)
 }
 
