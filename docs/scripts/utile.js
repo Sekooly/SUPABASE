@@ -111,6 +111,11 @@ function rechercher_tout(nom_table, avec_where){
   return get_resultat_asynchrone(url)
 }
 
+function execute_sql(racine_data, requete_sql){
+  url = entete_heroku + convertir_db(racine_data) + "/" + requete_sql
+  return get_resultat_asynchrone(url) 
+}
+
 //on renvoie un array vide si non trouvé, la valeur sinon
 function rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher, nombrelimite, orderby){
 
@@ -1466,4 +1471,9 @@ async function recuperer_mes_donnees(){
 
 function taille_fichier_quiz(liste_questions_str){
   return new Blob([liste_questions_str]).size;
+}
+
+
+function recherche_initiale(nom_table){
+  return get_resultat_asynchrone(racine_initiale + nom_table + "?" + api_initial)
 }

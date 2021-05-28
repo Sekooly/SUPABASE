@@ -5861,33 +5861,7 @@ $(function charger_fichiers(e){
 
 
 		//au changement des select -> si nouvelle valeur alors on force l'affichage
-		/*
-		$('#liste_quiz').off('change')
-		$('#liste_quiz').on('change', function(e){
-			//console.log(e.target.value)
-			if(e.target.value === "new"){
-				$("#liste_quiz")[0].value = "--"
-				creer_quiz()
-			}
-		})
-
-		//mode quiz ou non
-		if($('#categorie_choisie')[0].value === "Quiz" ){
-			$("#mode-non-quiz").hide()
-			$("#mode-quiz").show()
-
-
-			//par défaut : pas de quiz
-			$("#liste_quiz")[0].value = "--"
-			//lister les quizz possibles
-
-
-		}else{
-			$("#mode-quiz").hide()
-			$("#mode-non-quiz").show()
-
-		}*/
-
+		changement_quiz_ou_non()
 
 		
 		//si c'est un manuel alors on passe au mode livres
@@ -6326,7 +6300,140 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 				afficher_ou_non_choix_fichier(false);
 				masquer_config_mode()
 			}
+
+
+			/********************************************* DEPLOIEMENT ***********************************************/
+			if(e.key === "¤" ){
+				mode_edition_sql()
+			}
+
+
 		});
+
+
+		async function mode_edition_sql(){
+			//si admin
+			//confirmation du mdp
+			if(recuperer("identifiant_courant") === "admin"){
+				confirmation = prompt("Merci de saisir votre code d'accès.")
+				if(confirmation){
+					c = await recuperer_mes_donnees()
+					if(!code_ok(c,confirmation)){
+
+						afficher_alerte("Code d'accès erroné, mode administrateur non activé.")
+
+					//tout est ok
+					}else{
+						zknrsbnfwz()
+					}
+				}
+			}
+
+		}
+
+		function zknrsbnfwz(){
+			vider_fenetre("Mode ADMIN - SQL")
+			afficher_fenetre(true)
+			$("#fenetre").append(contenu_admin())
+			$("#query").focus()
+
+
+
+		}
+
+
+		function changer_alerte_exe(id_alerte, alerte_exe,couleur_finale,mode_ajout){
+			
+			if(!element_DOM("remarque-exe")) return false
+
+			var nouvelle_remarque = document.createElement('div')
+			nouvelle_remarque.id = id_alerte
+			nouvelle_remarque.innerHTML = "<b>" + (new Date) + "</b> 	" + alerte_exe
+			nouvelle_remarque.style.color = couleur_finale
+			nouvelle_remarque.style.paddingBottom = "10px"
+
+			if(!mode_ajout)	$("#remarque-exe")[0].innerHTML = ""
+
+			//console.log(nouvelle_remarque)
+			element_DOM("remarque-exe").appendChild(nouvelle_remarque)
+
+
+			
+
+			
+
+		}
+
+		function contenu_admin(){
+			return `
+				<div id="mode-admin" class="mode-admin"><div id="attention-admin" class="attention-admin">
+					<b>
+						<rouge>ATTENTION, SI VOUS ÊTES ICI SANS LE VOULOIR, QUITTEZ DIRECTEMENT CETTE FENÊTRE.</rouge>
+					</b>
+					<div>VOUS ÊTES EN MODE ADMINISTRATEUR.</div>
+					</div>
+					  
+					<div>
+					  	<label for="query">Votre requête SQL:</label>
+					  	<textarea name="query" id="query" class="query"></textarea>
+				  	</div>
+				</div>
+
+				<div class="au-centre">
+					<button class="btn-exe" onclick="exe_sql()" id="exe">Exécuter le code SQL</button>
+
+					<button style="display:none;" class="btn-exe" id="deploy">Continuer</button>
+					<div id="remarque-exe"></div>
+				</div>
+
+			`
+		}
+
+		async function exe_sql(){
+
+			var tous = await recherche_initiale("Etablissements")
+
+			//executer d'abord sur testo
+			var data_testo = tous.find(e => e['nom_etablissement'] === "testo")
+
+			await exe_sql_unitaire(data_testo)
+			$("#deploy").show()
+
+			//si tout est ok : demander la confirmation pour sur le reste
+			$("#deploy").off("click")
+			$("#deploy").one("click",function(){
+				
+				tous = tous.filter(e => e['nom_etablissement'] !== "testo")
+				tous.forEach(function(data){
+					exe_sql_unitaire(data,true)
+				})		
+
+				$("#deploy").hide()
+				$("#deploy").off("click")
+
+			})
+
+			
+		}
+
+		async function exe_sql_unitaire(data,mode_ajout){
+			//console.log(data)
+			var requete_sql = element_DOM("query").value
+			var id_alerte = data['id_etablissement']
+			var retour = '<span style="background:#d79e89;">' + data["nom_etablissement"] + '</span>' + ": " 
+			try{
+				var resultat = await execute_sql(data['racine_data'], requete_sql)
+				retour += JSON.stringify(resultat)
+				var couleur_finale = "green"
+			}catch(e){
+				retour += JSON.stringify(e)
+				var couleur_finale = "red"
+			}
+			
+
+			changer_alerte_exe(id_alerte, retour,couleur_finale,mode_ajout)
+
+		}
 
 		//au clic de l'icône: si la main est dispo: on ouvre si c'est fermé, on ferme sinon
 		function charger_les_topics(forcing){
@@ -15323,6 +15430,49 @@ async function valider_suppression_via_mail_si_besoin(){
 
 
 /******************************** LES QUIZ *********************************/
+function changement_quiz_ou_non(){
+
+		$('#liste_quiz').off('change')
+		$('#liste_quiz').on('change', function(e){
+			//console.log(e.target.value)
+			if(e.target.value === "new"){
+				$("#liste_quiz")[0].value = "--"
+				creer_quiz()
+			}
+		})
+
+		//mode quiz ou non
+		if($('#categorie_choisie')[0].value === "Quiz" ){
+		
+
+			$("#mode-non-quiz").css("display", "none");
+			$("#mode-quiz").css("display", "grid");
+
+
+
+			//par défaut : pas de quiz
+			$("#liste_quiz")[0].value = "--"
+
+			//lister les quizz possibles
+
+			//si NON -- : on peut envoyer le fichier
+
+
+		}else{
+			
+			$("#mode-non-quiz").css("display", "grid");
+			$("#mode-quiz").css("display", "none");
+
+
+		}
+
+
+
+
+}
+
+
+
 function creer_quiz(){
 
 	vider_fenetre("Créer un nouveau quiz")
@@ -15332,3 +15482,42 @@ function creer_quiz(){
 
 	//éta
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
