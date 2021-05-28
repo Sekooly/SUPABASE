@@ -76,6 +76,11 @@
 
 	<style>
 
+		#mode-quiz{
+			display: none;
+			font-size: 12px;
+		}
+
 		details{
 			cursor: pointer;
 		}
@@ -2184,6 +2189,9 @@
 		
 		<b class="titre_drive" id="titre_drive_devoirs">Devoirs</b>
 		<div class="ma_liste" id="drive_devoirs"  > </div>
+
+		<b class="titre_drive" id="titre_drive_quiz">Quiz</b>
+		<div class="ma_liste" id="drive_quiz"  > </div>
 		
 		<b class="titre_drive" id="titre_drive_corrections">Corrections</b>
 		<div class="ma_liste" id="drive_corrections"  > </div>
@@ -2289,13 +2297,16 @@
 			<option value="Devoirs">Devoirs</option>
 			
 
+			<!--<option value="Quiz">Quiz</option>-->
+			
+
 			<option value="Corrections">Corrections</option>
 			
 			<option value="Examens">Examens</option>
 
 
 			<option value="Manuels">Manuels</option>
-			
+
 
 			<option value="Autres">Autres</option>
 
@@ -2304,35 +2315,44 @@
 		</select>
 
 
-
-		<div id="choix_youtube" style="font-size: 10px;">
-	      <input id="est_video_youtube" type="checkbox" onclick="switch_affichage_youtube()">Vidéo youtube
-	    </div>
-	    <div id="choix_extrait_manuel" style="font-size: 10px;">
-	      <input id="est_extrait_manuel" type="checkbox" onclick="switch_extrait_manuel()">Extrait d'un manuel
-		    <div id="extrait_manuel">
-		    	<select id="manuel_choisi" style="display: none;">
-		    	</select>
-		    	<select id="numero-page" style="display: none;">
-		    	</select>
-		    	<div id="nom_fichier_extrait"></div>
+		<span id="mode-non-quiz">
+				
+			<div id="choix_youtube" style="font-size: 10px;">
+		      <input id="est_video_youtube" type="checkbox" onclick="switch_affichage_youtube()">Vidéo youtube
 		    </div>
-	    </div>
+		    <div id="choix_extrait_manuel" style="font-size: 10px;">
+		      <input id="est_extrait_manuel" type="checkbox" onclick="switch_extrait_manuel()">Extrait d'un manuel
+			    <div id="extrait_manuel">
+			    	<select id="manuel_choisi" style="display: none;">
+			    	</select>
+			    	<select id="numero-page" style="display: none;">
+			    	</select>
+			    	<div id="nom_fichier_extrait"></div>
+			    </div>
+		    </div>
 
 
-	    <div id="youtube" style="width: inherit;font-size: 12px;display: none;">
-	    	<div>Titre:
-	    		<input id="nom_youtube" style="width: 240px;" class="element_yt">
-	    	</div>
-	    	<div>Lien:
-	    		<input style="width: 240px;" id="lien_youtube" class="element_yt">
-	    	</div>
-		</div>
+		    <div id="youtube" style="width: inherit;font-size: 12px;display: none;">
+		    	<div>Titre:
+		    		<input id="nom_youtube" style="width: 240px;" class="element_yt">
+		    	</div>
+		    	<div>Lien:
+		    		<input style="width: 240px;" id="lien_youtube" class="element_yt">
+		    	</div>
+			</div>
+
+			<input class="mon_file" id="file" value="" type="file" style="width: inherit;">
+		</span>
+
+		<span id="mode-quiz" class="choix_chapitre">			
+			Choisissez le quiz que vous aimeriez publier:
+			<select id="liste_quiz">
+				<option value="--">--</option>
+				<option value="new">Nouveau quiz</option>
+			</select>
+		</span>
 
 		
-		<input class="mon_file" id="file" value="" type="file" style="width: inherit;">
-
-
 
 		<div id="choix_chapitre" class="choix_chapitre">
 			<span id="titre_chapitre">Chapitre correspondant		
@@ -2371,6 +2391,10 @@
 		<div style="font-size: 10px;" id="telechargeable">
 	      <input type="checkbox" id="est_telechargeable" checked>Fichier téléchargeable
 	  	</div>
+
+
+
+
 
 	</div>​
 

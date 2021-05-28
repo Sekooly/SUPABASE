@@ -5860,6 +5860,34 @@ $(function charger_fichiers(e){
 		}
 
 
+		//au changement des select -> si nouvelle valeur alors on force l'affichage
+		/*
+		$('#liste_quiz').off('change')
+		$('#liste_quiz').on('change', function(e){
+			//console.log(e.target.value)
+			if(e.target.value === "new"){
+				$("#liste_quiz")[0].value = "--"
+				creer_quiz()
+			}
+		})
+
+		//mode quiz ou non
+		if($('#categorie_choisie')[0].value === "Quiz" ){
+			$("#mode-non-quiz").hide()
+			$("#mode-quiz").show()
+
+
+			//par défaut : pas de quiz
+			$("#liste_quiz")[0].value = "--"
+			//lister les quizz possibles
+
+
+		}else{
+			$("#mode-quiz").hide()
+			$("#mode-non-quiz").show()
+
+		}*/
+
 
 		
 		//si c'est un manuel alors on passe au mode livres
@@ -12510,7 +12538,7 @@ async function recuperer_mes_fichiers(forcing){
 
 		//prof ou eleve (PAS pour admin car trop de matieres)
 		if(!recuperer('mon_type').includes('Admin')){
-			url += 'WHERE ' + les_id_dossier_classe + "~ (';' || id_dossier || ';')"
+			url += '  WHERE ' + les_id_dossier_classe + "~ (';' || id_dossier || ';')"
 		}
 
 		//console.log(les_id_dossier_classe)
@@ -15267,3 +15295,38 @@ async function valider_suppression_via_mail_si_besoin(){
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/******************************** LES QUIZ *********************************/
+function creer_quiz(){
+
+	vider_fenetre("Créer un nouveau quiz")
+	afficher_fenetre(true)
+
+	//étape 1:
+
+	//éta
+}

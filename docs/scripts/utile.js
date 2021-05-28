@@ -1458,3 +1458,9 @@ async function recuperer_mes_donnees(){
 
   return mes_donnees
 }
+
+
+
+function taille_fichier_quiz(liste_questions_str){
+  return new Blob([liste_questions_str]).size;
+}
