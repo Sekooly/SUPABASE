@@ -474,6 +474,16 @@ function effacer(nom_variable){
   window.sessionStorage.removeItem(nom_variable)  
 }
 
+//tout_effacer_sauf(["identifiant_courant", "mode_nuit_oui", "notifs_sans_actualiser", "date_heure_depassement"])
+function tout_effacer_sauf(liste_a_garder){
+
+  $.each(localStorage, function(key, value){
+
+    if(liste_a_garder.indexOf(key) === -1) effacer(key)
+
+  });
+}
+
 
 async function switcher_la_maintenance(){
   

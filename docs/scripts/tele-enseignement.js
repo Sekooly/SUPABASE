@@ -2122,6 +2122,8 @@ function deconnexion(){
 	var ma_classe = "";
 	mon_role = init_mon_role()
 
+
+	/*
 	effacer("mes_donnees");
 	effacer("mes_matieres");
 	effacer('dossier_chargé','');
@@ -2151,10 +2153,14 @@ function deconnexion(){
 	effacer('mode_prefere')
 	effacer('tmp_quiz')
 
+	effacer('liste_params_colonnes_masquees')
+	*/
+
+	tout_effacer_sauf(["identifiant_courant", "mode_nuit_oui", "notifs_sans_actualiser", "date_heure_depassement"])
+
 	image_temporaire = ""
 	nom_image_temporaire = ""
 
-	effacer('liste_params_colonnes_masquees')
 
 	supprimer_tous_les_parametres()
 
@@ -15559,17 +15565,72 @@ function creer_quiz(){
 
 	vider_fenetre("Créer un nouveau quiz (<span id='etape-quiz'>1</span>/4)",false,true)
 	afficher_fenetre(true)
+	$('#fenetre').append('<div class="setup" id="setup"></div>')
+	$('#setup').append('<div id="contenu_etape_quiz"></div>')
+	$('#setup').append('<div id="btn-quiz"></div>')
+	$('#btn-quiz').append('<button onclick="prev_step_quiz()" id="bouton_precedent" class="btn-setup">Précédent</button>')
+	$('#btn-quiz').append('<button onclick="next_step_quiz()" id="bouton_suivant" class="btn-setup">Suivant</button>')
 
-	//à chaque étape : ON STOCK EN TEMPORAIRE
 
-	//étape 1: titre et description
+	init_quiz()
 
-	//étape 2: les questions - AJOUTER/MODIFIER/SUPPRIMER
-	//2a) titre de la question
-	//2b) type de la question: choix unique, choix multiple, saisie libre
-	//2c) reponses possibles + reponse vraie
-	//2d) remarques si vrai/faux
+	
+
+	
 }
+
+//étape 1: titre et description
+function init_quiz(){
+	element_DOM("contenu_etape_quiz").innerHTML = `
+		<span>Vous êtes sur le point de créer un quiz de ` + la_matiere_chargee("Matiere")+ ` dans ` +la_matiere_chargee("Classe") + `.</span>
+		<form id="quiz-form">
+			<input name="titre" type="text" placeholder="Titre de votre quiz">
+			<textarea name="description" type="text" placeholder="Brève description de votre quiz"></textarea>
+		</form>
+	`
+}
+
+
+//étape 2: les questions - AJOUTER/MODIFIER/SUPPRIMER
+//2a) titre de la question
+//2b) type de la question: choix unique, choix multiple, saisie libre
+//2c) reponses possibles + reponse vraie
+//2d) remarques si vrai/faux
+function crud_questions(){
+
+
+}
+
+//étape 3: les denieres modifs
+function dernieres_modifs_quiz(){
+
+}
+
+//étape 4: la publication
+function publication_quiz(){
+
+
+}
+
+function go_to_step(step_number){
+
+	//avant chaque prochaine étape : ON STOCK EN TEMPORAIRE
+	resultat = recuperer("tmp_quiz") || {}	
+	stocker_quiz_local(resultat)
+	
+	if(step_number === 1){
+		init_quiz()
+	}else if(step_number === 2){
+		crud_questions()
+	}else if(step_number === 3){
+		dernieres_modifs_quiz()
+	}else if(step_number === 4){
+		publication_quiz()
+	}
+
+
+}
+
 
 function avec_sauvegarde(oui){
 	if(oui){
@@ -15581,10 +15642,16 @@ function avec_sauvegarde(oui){
 
 function next_step_quiz(){
 	element_DOM("etape-quiz").innerText++
+	if(element_DOM("etape-quiz").innerText > 4) element_DOM("etape-quiz").innerText = 4
+	var step_number = Number(element_DOM("etape-quiz").innerText)
+	go_to_step(step_number)
 }
 
-function next_step_quiz(){
+function prev_step_quiz(){
 	element_DOM("etape-quiz").innerText--
+	if(element_DOM("etape-quiz").innerText < 1) element_DOM("etape-quiz").innerText = 1
+	var step_number = Number(element_DOM("etape-quiz").innerText)
+	go_to_step(step_number)
 }
 
 
