@@ -2351,10 +2351,10 @@ function recuperer_eleves(sans_fenetre){
 
 	//la classe actuellement ouverte
 	var classe = recuperer('mon_type').includes('Eleves') ? JSON.parse(recuperer("mes_donnees"))['Classe'] : la_matiere_chargee("Classe") //element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
-	//si on est admin et à la première page: on récupère tout
-	if (recuperer('mon_type') === "Administration") classe = "Tous";
-
 	
+
+	//si on est admin et à la première page: on récupère tout
+	if (recuperer('mon_type') === "Administration" && classe ==='classe_matiere_introuvable') classe = "Tous";
 
 
 
@@ -7541,7 +7541,7 @@ function switch_pannel_notifs(){
 	
 }
 
-function ajouter_la_notif(la_notif,index){
+function ajouter_la_notif(la_notif,index,mode_notif){
 	//console.log(la_notif['Motif_notification']);
 
 	var Type_notif=la_notif['Type_notif'];
@@ -7598,6 +7598,8 @@ function ajouter_la_notif(la_notif,index){
 	ma_notif.innerHTML = identifiant_notif + contenu_notif + intitule + date_grise;
 	element_DOM('pannel_notif').appendChild(ma_notif);
 
+	if(mode_notif) return ma_notif.innerText
+
 }
 
 function clic_de_notif(type_notif,id_source,id_dossier,id_notif,ouvrir_topic){
@@ -7605,7 +7607,15 @@ function clic_de_notif(type_notif,id_source,id_dossier,id_notif,ouvrir_topic){
 	//commenter
 	envoyer_ma_date_de_consultation()
 
-
+	/*
+	console.log({
+		type_notif:type_notif,
+		id_source:id_source,
+		id_dossier:id_dossier,
+		id_notif:id_notif,
+		ouvrir_topic:ouvrir_topic
+	})
+	*/
 	
 	//envoyer cet ID
 	//console.log("on va cliquer sur " + id_notif)
@@ -13973,37 +13983,6 @@ function supprimer_conversation(ceci){
 
 
 
-/************************************ NOTIFICATION ********************************************/
-function demander_notifications(){
-
-
-	if(Notification.permission === "granted"){
-		console.log("notifications acceptées")
-	}else if(Notification.permission !== "denied"){
-		Notification.requestPermission().then(permission => console.log(permission))
-	}
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -14982,7 +14961,8 @@ function gerer_notifs_irl(sans_changer){
 	} else{
 		var confirmation = confirm("🔔 En activant les notifications et messages privés en temps réel sur cet appareil, vous risquez d'augmenter votre consommation de données.\n\nVoulez-vous continuer?")
 		//var confirmation = confirm("🔔 En activant les messages privés en temps réel sur cet appareil, vous risquez d'augmenter votre consommation de données.\n\nVoulez-vous continuer?")
-		if(confirmation){
+		if(confirmation){			
+
 			
 			valeur_finale_notifs_reelles = " ✓"
 			//phrase_finale = "Notifications et messages en temps réel <b><rouge>activés</rouge></b> sur cet appareil."
@@ -15061,12 +15041,17 @@ function la_notif_me_concerne(mon_type,payload){
 
 function ouvrir_la_subscription(){
 
+	if(mySubscription_notif && mySubscription_conv) return true
 
 	//Eleve: dès que ça concerne ma classe OU classe = mon cycle
 	//Prof: dès que la classe_matiere inclut une classe_matiere que j'enseigne
 	//Admin: dès que le cycle est le mien
 	var mon_type = recuperer("mon_type").split("_")[0]
 	var conditions_notifs = "Notifs"
+
+
+	//demander sur l'appareil
+	gerer_notifications_appareil()
 
 
 	/*
@@ -15089,7 +15074,37 @@ function ouvrir_la_subscription(){
 	    //hors prof, la classe me concernera sûrement
 	    if(la_notif_me_concerne(mon_type,payload)){
 
-	    	recuperer_notifs()
+	    	
+	    	var affichage = ajouter_la_notif(payload.new,null,true)
+	    	var id_notifs_actuels = ',' + JSON.parse(recuperer("mes_notifs")).map(e => e.id_notif).join(",") + ','
+
+
+	    	//si c'est une notif que j'ai pas encore recu
+	    	//ET si ma date de consultation < date de modification
+			la_date_derniere_modif = convertir_en_date(payload.new['Date_derniere_modif']).seconds(0).milliseconds(0).toISOString();
+			ma_date_consultation = convertir_en_date(recuperer("ma_date_consultation")).seconds(0).milliseconds(0).toISOString();
+
+			//console.log(JSON.stringify(la_date_derniere_modif))
+
+
+			/*
+			la_date_derniere_modif = String(la_date_derniere_modif).substring(0,9);
+			ma_date_consultation = String(ma_date_consultation).substring(0,9);
+			*/
+
+			/*
+	    	console.log('\n\n\n')
+	    	console.log(id_notifs_actuels + " VS " + payload.new.id_notif)
+	    	console.log(la_date_derniere_modif + " VS " + ma_date_consultation)
+	    	console.log('\n\n\n')
+	    	*/
+
+
+	    	if(! (liste_notifs_lues.includes("," + payload.new['id_notif'] + ",") && la_date_derniere_modif <= ma_date_consultation)){
+	    		afficher_notif(affichage,payload.new)	
+	    	} 
+
+			recuperer_notifs()
 
 	    	/*
 	    	//alert("ça me concerne.")
@@ -15234,7 +15249,59 @@ function fermer_la_subscription(){
 
 
 
+function gerer_notifications_appareil(){
 
+	if(mode_test_notif()){
+
+
+		//default, granted, denied
+		//si default OU denied -> demander
+		//si granted -> on continue directement
+		//console.log(Notification.permission)
+		if(Notification.permission !== "granted"){
+			Notification.requestPermission().then(function (permission){
+				afficher_notif()
+			})
+		}else{
+			//afficher_notif()
+		}
+
+		
+	}
+
+
+
+}
+
+function afficher_notif(contenu,donnees_notifs){
+	if(Notification.permission === "granted" && mode_test_notif() ){
+		popup_notification(contenu,donnees_notifs)
+	}
+}
+
+function mode_test_notif(){
+	return window.location.href.includes("testo") || window.location.href.includes("localhost")
+}
+
+
+function popup_notification(contenu,donnees_notifs){
+	var content = contenu || 'Vous avez activé les notifications Sekooly.'
+	const notification = new Notification("Sekooly | Nouvelle notification", {
+		body: content,
+		icon: 'https://sekooly.com/assets/images/logo-no-background-128x128.png',
+		vibrate: [100,50,100]
+	})
+
+	if(donnees_notifs){
+		notification.onclick = function(e){
+			//afficher_alerte("Vous avez cliqué, c'est bien.")
+			
+			clic_de_notif(donnees_notifs['Type_notif'],donnees_notifs['Id_source'],donnees_notifs['Id_classe_matiere'],donnees_notifs['id_notif'],donnees_notifs['Type_notif'] === 'discussion')
+		}
+	}else{
+
+	}
+}
 
 
 
