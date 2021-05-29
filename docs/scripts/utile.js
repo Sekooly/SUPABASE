@@ -1158,6 +1158,8 @@ function modifier_donnee_locale(nom_item, champ_reference, valeur_reference, cha
   //si c'est 1 seul et unique élément
   if(donnees[champ_reference] && !plusieurs_elements) donnees = [donnees]
 
+  console.log(donnees)
+
   //il faut que ce soit un array
   donnees.forEach(function(valeur){
     if(valeur[champ_reference] === valeur_reference){
@@ -1217,8 +1219,7 @@ function ajouter_donnee_locale(nom_item, nouvel_item, nom_champ_id, audebut){
       donnees.push(nouvel_item)
     }
 
-  } 
-
+  }
 
   stocker(nom_item, JSON.stringify(donnees))
   return recuperer(nom_item)

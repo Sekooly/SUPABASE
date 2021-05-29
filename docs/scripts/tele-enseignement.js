@@ -2149,6 +2149,7 @@ function deconnexion(){
 
 	effacer('mes_chapitres')
 	effacer('mode_prefere')
+	effacer('tmp_quiz')
 
 	image_temporaire = ""
 	nom_image_temporaire = ""
@@ -4326,7 +4327,7 @@ function creer_mini_popup(titre,elements_html,nom_bouton,fonction_bouton,valeur_
 	$("#mini_popup").remove();
 
 	//on ajoute le bouton quitter
-	var bouton_quitter = '<div id="entete-fenetre" style="display: inline-flex;float: right;"><img  alt="X" src="https://sekooly.github.io/SUPABASE/images/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div>';
+	var bouton_quitter = '<div id="entete-fenetre" style="display: inline-flex;float: right;"><img  alt="X" src="https://sekooly.github.io/SUPABASE/images/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" class="bye_prev"> </div>';
 
 	var taille = taille_du_titre ? 'style="font-size: '+taille_du_titre+'px;"' : ""
 	var titre_html = '<div '+taille+' >'+titre+'</div>'
@@ -4998,8 +4999,8 @@ function ajuster_boutons_fenetre(bis){
 			var le_top = (la_fenetre.offsetTop) + "px";
 			var le_left = (la_fenetre.offsetLeft + la_fenetre.offsetWidth - le_bouton_quittter.offsetWidth) + "px";
 
-			le_bouton_quittter.style.top = le_top;
-			le_bouton_quittter.style.left= le_left;
+			//le_bouton_quittter.style.top = le_top;
+			//le_bouton_quittter.style.left= le_left;
 			//console.log("bouton quitter OK");
 		}
 
@@ -6761,7 +6762,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 
 		}
 
-		function vider_fenetre(titre_fenetre,est_visio){
+		function vider_fenetre(titre_fenetre,est_visio, save_button){
 			element_DOM('fenetre').innerHTML = '';
 
 			//console.log("on a réaffiché");
@@ -6769,7 +6770,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 			var clique_quitter = est_visio ? '' : 'onclick="quitter_previsualisation()"';
 
 			//on ajoute le bouton quitter + en-tête
-  			var bouton_quitter = '<div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="https://sekooly.github.io/SUPABASE/images/quitter.png" id="bye_prev" '+clique_quitter+' style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;"> </div>';
+  			var bouton_quitter = '<div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="https://sekooly.github.io/SUPABASE/images/quitter.png" id="bye_prev" class="bye_prev" '+clique_quitter+' > </div>';
 
   			var le_titre = "";
   			if(titre_fenetre) le_titre = '<div class="titre_fenetre" id="titre_fenetre">'+ titre_fenetre + '</div>';
@@ -6785,6 +6786,8 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 			    element_DOM('fenetre').appendChild(elements.firstChild);
 			}
 
+			//alert(save_button)
+			avec_sauvegarde(save_button)
 
 			//faire le bon affichage de la fenêtre
 			ajuster_boutons_fenetre();
@@ -15554,14 +15557,71 @@ function changement_quiz_ou_non(){
 
 function creer_quiz(){
 
-	vider_fenetre("Créer un nouveau quiz")
+	vider_fenetre("Créer un nouveau quiz",false,true)
 	afficher_fenetre(true)
 
-	//étape 1:
+	//à chaque étape : ON STOCK EN TEMPORAIRE
 
-	//éta
+	//étape 1: titre et description
+
+	//étape 2: les questions - AJOUTER/MODIFIER/SUPPRIMER
+	//2a) titre de la question
+	//2b) type de la question: choix unique, choix multiple, saisie libre
+	//2c) reponses possibles + reponse vraie
+	//2d) remarques si vrai/faux
 }
 
+function avec_sauvegarde(oui){
+	if(oui){
+		$("#titre_fenetre").append('<img id="sauvegarder" src="images/img_save.png" alt="ENREGISTRER" onclick="sauvegarder_quiz()" class="icon-save">')	
+	}else{
+		$("#sauvegarder").remove()
+	}
+}
+
+
+function stocker_quiz_local(nouvel_item){
+
+	if(recuperer("tmp_quiz") && recuperer("tmp_quiz")["id_quiz"] === nouvel_item["id_quiz"]){	
+		Object.keys(nouvel_item).forEach(e => {
+			console.log(nouvel_item[e])	
+			modifier_donnee_locale("tmp_quiz", "id_quiz", nouvel_item["id_quiz"], e, nouvel_item[e], false)
+		})		
+	}else{
+		effacer("tmp_quiz")
+		stocker("tmp_quiz", JSON.stringify(nouvel_item))
+	}
+
+
+}
+
+
+async function sauvegarder_quiz(){
+	var texte_a_affichier = "Votre quiz a bien été sauvegardé."
+
+	if(recuperer("tmp_quiz")){
+		try{			
+			var donnees_locales = JSON.parse(recuperer("tmp_quiz"))
+			console.log(donnees_locales)
+			await stocker_quiz_server(donnees_locales) // actualiser("Quiz", "id_quiz", 0, donnees_locales)
+			effacer("tmp_quiz") // libérer la mémoire quand c'est envoyé sur le serveur
+		}catch(e){
+			texte_a_affichier = "Votre quiz n'a PAS été sauvegardé: merci de réessayer ou de vérifier votre connexion internet."
+		}
+	}else{
+		texte_a_affichier = "Aucune donnée de quiz à sauvegarder."
+	}
+
+	afficher_alerte(texte_a_affichier)
+	return true
+}
+
+
+function stocker_quiz_server(donnees_locales){
+	return supabase
+	  .from('Quiz')
+	  .upsert(donnees_locales)
+}
 
 
 
