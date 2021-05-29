@@ -10964,6 +10964,22 @@ function formulaire_rempli(nom_formulaire){
 }
 
 
+//utile pour les quiz : formulaire_rempli_ok("quiz-form")
+function formulaire_rempli_ok(nom_formulaire){
+	return !Array.from($("#"+nom_formulaire)[0].children).some(function(valeur, index, array) {
+		//console.log(valeur.name)
+		est_actif = !$("[name='"+valeur.name+"']")[0].disabled
+		est_vide = $("[name='"+valeur.name+"']")[0].value === ""
+		
+		//console.log(valeur.name + " : " + (est_actif && est_vide))
+
+		return est_actif && est_vide 
+	});
+
+
+}
+
+
 function vider_les_input(){
 	Array.from($(".donnee.donnee")).forEach(e => e.value = "")
 }
@@ -14612,12 +14628,16 @@ function CGU_avis(e){
 }
 
 
-function liste_notes_possibles(){
-	var la_liste_de_notes = '<select id="note_globale" value=5>'
+function liste_notes_possibles(negatif, default_value){
+	var la_liste_de_notes = '<select name="note_globale" id="note_globale" value=5>'
 
-	for(la_note = 5; la_note>0; la_note = la_note-0.1){
+	var note_min = negatif ? -5.1 : 0
+
+	for(la_note = 5; la_note>note_min; la_note = la_note-0.1){
 		la_note = la_note.toFixed(2)
-		la_liste_de_notes += une_note_possible(la_note)
+		//console.log(la_note + " VS " +Number(default_value).toFixed(2))
+		selected = (la_note === Number(default_value).toFixed(2)) ? " selected " : ""
+		la_liste_de_notes += une_note_possible(la_note,selected)
 	}
 
 	la_liste_de_notes += "</select>"
@@ -14625,8 +14645,8 @@ function liste_notes_possibles(){
 	return la_liste_de_notes
 }
 
-function une_note_possible(la_note){
-	return '<option value="'+la_note+'">'+la_note+'</option>'
+function une_note_possible(la_note,selected){
+	return '<option value="'+la_note+'"  '+selected+'  >'+la_note+'</option>'
 }
 
 function fermer_emettre_avis(){
@@ -15573,7 +15593,7 @@ function creer_quiz(){
 
 
 	init_quiz()
-
+	next_step_quiz()
 	
 
 	
@@ -15584,10 +15604,20 @@ function init_quiz(){
 	element_DOM("contenu_etape_quiz").innerHTML = `
 		<span>Vous êtes sur le point de créer un quiz de ` + la_matiere_chargee("Matiere")+ ` dans ` +la_matiere_chargee("Classe") + `.</span>
 		<form id="quiz-form">
-			<input name="titre" type="text" placeholder="Titre de votre quiz">
-			<textarea name="description" type="text" placeholder="Brève description de votre quiz"></textarea>
+			<input id="titre" name="titre" type="text"  value="`+valeur_par_defaut("titre")+`" placeholder="Titre de votre quiz">
+			<textarea id="description" name="description" type="text"  placeholder="Brève description de votre quiz">`+valeur_par_defaut("description")+`</textarea>
 		</form>
 	`
+
+
+}
+
+function valeur_par_defaut(nom_champ){
+	try{
+		return JSON.parse(recuperer("tmp_quiz"))[nom_champ]	
+	}catch(e){
+		return ""
+	}
 }
 
 
@@ -15598,8 +15628,114 @@ function init_quiz(){
 //2d) remarques si vrai/faux
 function crud_questions(){
 
+	//ajouter
+	element_DOM("contenu_etape_quiz").innerHTML = `
+		<form id="quiz-form">
+		</form>
+		<bleu id="add-qstn" onclick="nouvelle_question()"><img src="images/img_ajout.png" style="" class="small-icon"> Ajouter une question</bleu>
+	`
+	//modifier
+	//supprimer
+	//voir (previz)
 
 }
+
+function nouvelle_question(){
+	$("#quiz-form").append(une_question_quiz())
+
+	$("#quiz-form").sortable({
+
+	    update: function mettre_a_jour_position_questions() {
+
+	    	var liste_des_questions = []
+
+	    	//récupérer toutes les questions 
+	    	//mettre à jour toutes les positions
+	    	$(".une_question_quiz.ui-sortable-handle").each(function(position_finale,element){
+
+				nouvelle_position_question_drag = position_finale+1
+				//console.log({[element.id] : nouvelle_position_question_drag})
+				
+
+			})
+	    }
+	})
+
+}
+
+function une_question_quiz(){
+	var nouvel_id_question = $("[name='intitule_question']").length+1
+	return `
+	<div class="une_question_quiz" id="`+ nouvel_id_question +`">
+		<textarea id="intitule_question" name="intitule_question" type="text" placeholder="Intitulé de la question..."></textarea>
+		<div class="top-qstn">
+			<rouge class="foot-element" onclick="$('.une_question_quiz[id=`+nouvel_id_question+`]').remove()"><img src="images/img_trash.png" alt="SUPPRIMER" class="small-icon trash"></rouge>			
+	    </div>
+	    <div id="reponses_possibles`+nouvel_id_question+`"></div>
+    	<div class="foot-qst" style="font-size: 15px;">
+		  <bleu class="foot-element" onclick="add_response(`+nouvel_id_question+`)">Ajouter une réponse possible</bleu>
+		</div>
+	</div>
+	`
+}
+
+
+
+
+
+//en fonction du type de question
+function generer_les_reponses(e){
+	var moi = e.target
+	var type_question = e.target.value
+	//console.log(type_question)
+
+	console.log(moi.parentNode.parentNode.childNodes)
+	//si Choix multiples
+	//si Choix uniques
+	//si saisie libre
+
+}
+
+//ajouter une reponse possible à la question
+function add_response(id_question){
+
+	$("#reponses_possibles" + id_question).append(une_reponse_possible())
+
+	$("#reponses_possibles" + id_question).sortable({
+
+	    update: function mettre_a_jour_position_reponses() {
+
+	    	var liste_des_reponses = []
+
+	    	//récupérer toutes les reponses
+	    	//mettre à jour toutes les positions
+	    	$(".une_reponse_possible.ui-sortable-handle").each(function(position_finale,element){
+
+				nouvelle_position_rps_drag = position_finale+1
+				console.log({[element.id] : nouvelle_position_rps_drag})
+				
+
+			})
+	    }
+	})
+}
+
+//supprimer une reponse possible 
+function delete_resp(e){
+	//console.log(e.target)
+	//console.log(e.target.parentNode)
+	e.target.parentNode.remove()
+}
+
+function une_reponse_possible(){
+	var prochain_id = $(".une_reponse_possible").length+1
+	return 	`<span class="une_reponse_possible" id="`+prochain_id+`">
+    <input id="reponse`+prochain_id+`" name="reponse`+prochain_id+`" style="width: 59%;" placeholder="Réponse possible et le SCORE de la réponse (liste déroulante)...">`+liste_notes_possibles(true,"0")+`
+    <img class="small-icon trash" alt="SUPPRIMER" src="images/img_trash.png" onclick="delete_resp(event)">
+  </span>
+  `
+}
+
 
 //étape 3: les denieres modifs
 function dernieres_modifs_quiz(){
@@ -15614,10 +15750,26 @@ function publication_quiz(){
 
 function go_to_step(step_number){
 
+	//verifier que tout est rempli
+	if(!formulaire_rempli_ok("quiz-form")) return alert("Vous devez remplir tous les champs avant de continuer.")
+
 	//avant chaque prochaine étape : ON STOCK EN TEMPORAIRE
-	resultat = recuperer("tmp_quiz") || {}	
-	stocker_quiz_local(resultat)
+	//si on passe à l'étape 1 OU 2 : on stock un id_quiz
+	//sinon : on connait déjà
+	if(!recuperer("tmp_quiz")){
+		resultat = {"id_quiz" : creer_uuid()}
+		stocker("tmp_quiz",JSON.stringify(resultat))
+	}
+
+	resultat = objectifyForm("quiz-form")
+	resultat['id_quiz'] = JSON.parse(recuperer("tmp_quiz"))['id_quiz']
 	
+
+	
+	stocker_quiz_local(resultat)
+	//console.log(resultat)
+	//console.log(recuperer("tmp_quiz"))
+
 	if(step_number === 1){
 		init_quiz()
 	}else if(step_number === 2){
@@ -15657,16 +15809,27 @@ function prev_step_quiz(){
 
 function stocker_quiz_local(nouvel_item){
 
-	if(recuperer("tmp_quiz") && recuperer("tmp_quiz")["id_quiz"] === nouvel_item["id_quiz"]){	
+	//alert("dans la fonction")
+	
+	var tmp_quiz = recuperer("tmp_quiz")
+	if(tmp_quiz && JSON.parse(tmp_quiz)["id_quiz"] === nouvel_item["id_quiz"]){	
+
+		//console.log("c'est le bon UUID")
 		Object.keys(nouvel_item).forEach(e => {
-			console.log(nouvel_item[e])	
+			//console.log(nouvel_item[e])	
 			modifier_donnee_locale("tmp_quiz", "id_quiz", nouvel_item["id_quiz"], e, nouvel_item[e], false)
 		})		
+
+
 	}else{
+
+		//console.log("PAS le bon UUID")
 		effacer("tmp_quiz")
 		stocker("tmp_quiz", JSON.stringify(nouvel_item))
+
 	}
 
+	return recuperer("tmp_quiz")
 
 }
 
@@ -15679,12 +15842,12 @@ async function sauvegarder_quiz(){
 			var donnees_locales = JSON.parse(recuperer("tmp_quiz"))
 			console.log(donnees_locales)
 			await stocker_quiz_server(donnees_locales) // actualiser("Quiz", "id_quiz", 0, donnees_locales)
-			effacer("tmp_quiz") // libérer la mémoire quand c'est envoyé sur le serveur
+			//effacer("tmp_quiz") // libérer la mémoire quand c'est envoyé sur le serveur ? non
 		}catch(e){
 			texte_a_affichier = "Votre quiz n'a PAS été sauvegardé: merci de réessayer ou de vérifier votre connexion internet."
 		}
 	}else{
-		texte_a_affichier = "Aucune donnée de quiz à sauvegarder."
+		texte_a_affichier = "Aucune donnée de quiz à sauvegarder: appuyez sur suivant avant d'enregistrer."
 	}
 
 	afficher_alerte(texte_a_affichier)

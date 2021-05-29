@@ -76,16 +76,64 @@
 
 	<style>
 
+		.top-qstn {
+			display: inline-flex;
+		}
+
+		.dark-mode .trash{
+			filter: invert(1);
+		}
+
+		#reponses_possibles{
+			display: grid;
+		}
+
+		.une_reponse_possible{
+
+			margin: 20px;
+			display: block;
+			cursor: all-scroll
+		}
+
+		#add-qstn{
+			cursor: pointer;
+			margin: 20px;
+			display: block;
+		}
+		.une_question_quiz{
+			cursor: all-scroll;
+			border-style: double;
+		}
+
+
+		.foot-qst{
+			display: grid;
+		}
+
+		.foot-element {
+			font-size: 15px;
+			margin-bottom: 10px;
+			cursor: pointer;
+		}
+
+		.small-icon {
+			width: 20px;
+			height: 20px;
+		}
+
+		textarea#description {
+			height: 250px;
+		}
+
 		#quiz-form > input, textarea {
 			font-size: 20px;
-			width: 100%;
+			width: 80%;
 			resize: none;
 
 		}
 
 		#btn-quiz{
-			position: absolute;
-			bottom: 50px;
+
 		}
 
 		.btn-setup {
@@ -1749,6 +1797,10 @@
 			color: red;
 		}
 
+
+		bleu{
+			color: #2196f3;
+		}
 
 		#rendu_devoir{
 			visibility: hidden;

@@ -1166,9 +1166,10 @@ function modifier_donnee_locale(nom_item, champ_reference, valeur_reference, cha
   //alert(recuperer(nom_item))
 
   //si c'est 1 seul et unique élément
-  if(donnees[champ_reference] && !plusieurs_elements) donnees = [donnees]
+  if ((donnees[champ_reference] && !plusieurs_elements)) donnees = [donnees]
 
-  console.log(donnees)
+  //console.log(donnees)
+  
 
   //il faut que ce soit un array
   donnees.forEach(function(valeur){
@@ -1492,4 +1493,22 @@ function taille_fichier_quiz(liste_questions_str){
 
 function recherche_initiale(nom_table){
   return get_resultat_asynchrone(racine_initiale + nom_table + "?" + api_initial)
+}
+
+
+
+
+
+
+
+function objectifyForm(id_form) {
+
+  formArray = $("#"+id_form).serializeArray()
+
+  //serialize data function
+  var returnArray = {};
+  for (var i = 0; i < formArray.length; i++){
+      returnArray[formArray[i]['name']] = formArray[i]['value'];
+  }
+  return returnArray;
 }
