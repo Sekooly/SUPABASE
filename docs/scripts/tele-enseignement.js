@@ -234,7 +234,7 @@ function recuperer_details_plateforme(identifiant_eleve){
 }
 
 function dupliquer_visualisation(identifiant_eleve){
-	var fenetre_bis_html = '<div class="ma_fenetre" id="fenetre_bis" style="visibility: visible; opacity:95%; top: 0px; left: 0px; width: 99%; height: 99%;"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="https://sekooly.github.io/SUPABASE/images/quitter.png" id="bye_prev_bis" onclick="quitter_previsualisation_bis()" style="width: 30px; height: 30px; cursor: pointer; position: fixed; z-index: 3; top: 0px; left: 673px;"></div><div class="titre_fenetre" id="titre_fenetre_bis">Détails sur ' + identifiant_eleve + '</div><div style="position: fixed; z-index: 5; top: 616px; left: 653px;" id="conteneur_plein_ecran_bis"> <img alt="plein écran" style="position: fixed;" id="pleinecran_bis" src="https://sekooly.github.io/SUPABASE/images/img_petitecran.png" onclick="switch_mode_bis()" class="pleinecran"> </div></div>';
+	var fenetre_bis_html = '<div class="ma_fenetre" id="fenetre_bis" style="visibility: visible; opacity:95%; top: 0px; left: 0px; width: 99%; height: 99%;"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="https://sekooly.github.io/SUPABASE/images/quitter.png" id="bye_prev_bis" onclick="quitter_previsualisation_bis()" style="width: 30px; height: 30px; cursor: pointer; position: fixed; z-index: 3; top: 0px; left: 673px;"></div><div class="titre_fenetre" id="titre_fenetre_bis">Détails sur ' + identifiant_eleve + '</div><div class="fullscreen-btn" id="conteneur_plein_ecran_bis"> <img alt="plein écran" style="position: fixed;" id="pleinecran_bis" src="https://sekooly.github.io/SUPABASE/images/img_petitecran.png" onclick="switch_mode_bis()" class="pleinecran"> </div></div>';
 
 		//on rajoute tout
 		var fenetre_bis = document.createElement('div');
@@ -4990,8 +4990,8 @@ function ajuster_boutons_fenetre(bis){
 			var le_top = (la_fenetre.offsetTop + la_fenetre.offsetHeight-40) + "px";
 			var le_left = (la_fenetre.offsetLeft + la_fenetre.offsetWidth-50) + "px";
 
-			le_bouton_plein_ecran.style.top = le_top;
-			le_bouton_plein_ecran.style.left= le_left;
+			//le_bouton_plein_ecran.style.top = le_top;
+			//le_bouton_plein_ecran.style.left= le_left;
 			//console.log("bouton plein écran OK");
 		}
 
@@ -6776,7 +6776,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
   			if(titre_fenetre) le_titre = '<div class="titre_fenetre" id="titre_fenetre">'+ titre_fenetre + '</div>';
 
 			//on ajoute le bouton plein écran
-  			var plein_ecran = '<div style="position: fixed; z-index:5;" id="conteneur_plein_ecran" > <img alt="plein écran" style="position: fixed;" id="pleinecran" src="https://sekooly.github.io/SUPABASE/images/img_petitecran.png" onclick="switch_mode()" class="pleinecran"> </div>'
+  			var plein_ecran = '<div class="fullscreen-btn" id="conteneur_plein_ecran" > <img alt="plein écran" style="position: fixed;" id="pleinecran" src="https://sekooly.github.io/SUPABASE/images/img_petitecran.png" onclick="switch_mode()" class="pleinecran"> </div>'
 
   			//on rajoute tout
   			var elements = document.createElement('div');
@@ -15557,7 +15557,7 @@ function changement_quiz_ou_non(){
 
 function creer_quiz(){
 
-	vider_fenetre("Créer un nouveau quiz",false,true)
+	vider_fenetre("Créer un nouveau quiz (<span id='etape-quiz'>1</span>/4)",false,true)
 	afficher_fenetre(true)
 
 	//à chaque étape : ON STOCK EN TEMPORAIRE
@@ -15577,6 +15577,14 @@ function avec_sauvegarde(oui){
 	}else{
 		$("#sauvegarder").remove()
 	}
+}
+
+function next_step_quiz(){
+	element_DOM("etape-quiz").innerText++
+}
+
+function next_step_quiz(){
+	element_DOM("etape-quiz").innerText--
 }
 
 
