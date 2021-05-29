@@ -265,11 +265,15 @@ function reinitialiser_mdp_datenotif(){
 //on renvoie un array vide si non trouvé, la valeur sinon
 function rechercher_contenant_motif(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher, nombrelimite, champ_tri, mode_tri){
 
+  if(!valeur_champ_reference) valeur_champ_reference = '--------------------------------------------------------------------------------------------'
+
   url = racine_data + nom_table + "?"+nom_champ_reference+"=like.*"+valeur_champ_reference+ "*&"+apikey
   url = nom_champ_a_chercher ? url+"&select="+nom_champ_a_chercher : url
   url = nombrelimite ? url+"&limit="+nombrelimite : url
   url = champ_tri && mode_tri ? url+"&order="+champ_tri+"."+mode_tri : url
   
+  //console.log(url)
+
   return get_resultat_asynchrone(url)
 
 
