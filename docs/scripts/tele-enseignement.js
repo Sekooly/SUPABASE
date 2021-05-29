@@ -3131,7 +3131,7 @@ function ajouter_le_dossier(classe_matiere,URL_classe_matiere,type_identifiant, 
 
 	//console.log($("#"+URL_classe_matiere).length)
 	//n'ajouter que si le dossier n'est pas encore existant
-	if($("une_matiere_en_dossier#"+URL_classe_matiere).length > 0 ) return -1
+	if($(".une_matiere_en_dossier#"+URL_classe_matiere).length > 0 ) return -1
 
 	if (type_identifiant === "Profs" || type_identifiant === "Administration_bis"){
 		var la_classe = classe_matiere.substring(classe_matiere.lastIndexOf("(") + 1, classe_matiere.lastIndexOf("|"));
@@ -15266,7 +15266,7 @@ function gerer_notifications_appareil(){
 			//afficher_notif()
 		}
 
-		
+
 	}
 
 
