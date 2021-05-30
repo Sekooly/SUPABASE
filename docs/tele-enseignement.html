@@ -76,6 +76,24 @@
 
 	<style>
 
+		.sekooly-mode {
+			color: #ff6c00;
+		}
+
+		.reponses_possibles{
+			text-align: center;
+		}
+
+		.remarque_correction{
+			font-size: 12px;
+			border-style: inset;
+			padding: 0;
+		}
+
+		.id_question{
+			display: none;
+		}
+
 		.top-qstn {
 			display: inline-flex;
 		}
@@ -95,7 +113,7 @@
 			cursor: all-scroll
 		}
 
-		#add-qstn{
+		.quiz-options{
 			cursor: pointer;
 			margin: 20px;
 			display: block;
@@ -133,7 +151,7 @@
 		}
 
 		#btn-quiz{
-
+			margin: 5%;
 		}
 
 		.btn-setup {
@@ -219,7 +237,7 @@
 
 		.query{
 			width: 100%;
-			height: 100px;
+			height: 400px;
 			background: black;
 			resize: none;
 			color: white;
@@ -767,12 +785,12 @@
 			background-color: #937e7e;
 		}
 
-		.dark-mode > #rendu_devoir > #liste_des_devoirs_rendus > div > #mini-image{
+		.dark-mode > #rendu_devoir > #liste_des_devoirs_rendus > div > .mini-image{
 			-webkit-filter: invert(1);
    			filter: invert(1);
 		}
 
-		.dark-mode > #rendu_devoir > #liste_des_devoirs_rendus > div > a > #mini-image{
+		.dark-mode > #rendu_devoir > #liste_des_devoirs_rendus > div > a > .mini-image{
 			-webkit-filter: invert(1);
    			filter: invert(1);
 		}
@@ -1873,12 +1891,6 @@
 		}
 
 		
-		#mini-image{
-			width: 15px;
-			height: 15px;
-			cursor: pointer;
-			padding-right: 1%;
-		}
 
 		#calendrier{
 			width: 100%;

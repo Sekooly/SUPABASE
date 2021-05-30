@@ -303,6 +303,19 @@ function supprimer(nom_table,nom_champ_reference,valeur_champ_reference){
   return delete_resultat_asynchrone(url)
 }
 
+function supprimer_avec_ces_references(nom_table, champs_refs){
+
+  var references = ""
+  $.each(champs_refs, (key,valeur) => {
+    var prefix =  references.length === 0 ? "" : "&"
+    references += prefix + key+"=eq."+valeur
+  })
+
+  url = racine_data + nom_table + "?"+ references+ "&"+apikey
+  //console.log(url)
+  return delete_resultat_asynchrone(url)
+}
+
 
 
 function supprimer_initial(nom_table,nom_champ_reference,valeur_champ_reference){

@@ -194,7 +194,7 @@ function lister_les_eleves(liste_eleves,classe){
 		var identifiant_eleve_bloc = element_DOM(identifiant_eleve);
 
 		//on ajoute le bouton OEIL de l'élève -> détails via tableau software
-		var oeil_tableau_html = '<span><img id="mini-image" alt="voir" class="envoi_remarque" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" onclick="recuperer_details_plateforme(\''+identifiant_eleve+'\')"></span>';
+		var oeil_tableau_html = '<span><img alt="voir" class="envoi_remarque mini-image" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" onclick="recuperer_details_plateforme(\''+identifiant_eleve+'\')"></span>';
 		var oeil_tableau = document.createElement('div');
 		oeil_tableau.innerHTML = oeil_tableau_html;
 		while(oeil_tableau.firstChild) identifiant_eleve_bloc.appendChild(oeil_tableau.firstChild);
@@ -205,7 +205,7 @@ function lister_les_eleves(liste_eleves,classe){
 		//observations sur l'élève -> ajout ou modif ou suppression
 		var mon_type = recuperer('mon_type').split("_")[0]
 		if(mon_type!=="Eleves"){
-			var mode_edition_html = '<span><img id="mini-image" alt="remarque" class="envoi_remarque" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png" onclick="emettre_avis(\''+identifiant_eleve+'\',\''+classe+'\')"></span>';
+			var mode_edition_html = '<span><img alt="remarque" class="envoi_remarque mini-image" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png" onclick="emettre_avis(\''+identifiant_eleve+'\',\''+classe+'\')"></span>';
 			var mode_edition = document.createElement('div');
 			mode_edition.innerHTML = mode_edition_html;
 			while(mode_edition.firstChild) identifiant_eleve_bloc.appendChild(mode_edition.firstChild);
@@ -213,7 +213,7 @@ function lister_les_eleves(liste_eleves,classe){
 		
 		//on ajoute le bouton détails de l'élève -> visualiser tous les avis sur l'élève SI ILS EXISTENT
 		if (valeur['nombre_avis']>0){
-			var details_html = '<span><img id="mini-image" alt="autres avis" class="envoi_remarque" src="https://sekooly.github.io/SUPABASE/images/img_details.png" onclick="recuperer_autres_avis(\''+identifiant_eleve+'\')"></span>';
+			var details_html = '<span><img alt="autres avis" class="envoi_remarque mini-image" src="https://sekooly.github.io/SUPABASE/images/img_details.png" onclick="recuperer_autres_avis(\''+identifiant_eleve+'\')"></span>';
 			var details = document.createElement('div');
 			details.innerHTML = details_html;
 			while(details.firstChild) identifiant_eleve_bloc.appendChild(details.firstChild);
@@ -455,7 +455,7 @@ function recuperer_MA_fiche_conseil(){
 
 	//oeil -> tableau
 	var identifiant_eleve_bloc = element_DOM(identifiant_eleve);
-	var oeil_tableau_html = '<span><img alt="voir"  id="mini-image" class="envoi_remarque" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" onclick="recuperer_details_plateforme(\''+identifiant_eleve+'\')"></span>';
+	var oeil_tableau_html = '<span><img alt="voir"  class="envoi_remarque mini-image" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" onclick="recuperer_details_plateforme(\''+identifiant_eleve+'\')"></span>';
 	var oeil_tableau = document.createElement('div');
 	oeil_tableau.innerHTML = oeil_tableau_html;
 	while(oeil_tableau.firstChild) identifiant_eleve_bloc.appendChild(oeil_tableau.firstChild);
@@ -721,7 +721,7 @@ function recuperer_mon_devoir(id_fichier_sujetdevoir,proprietaire,examen_termin�
 
 				//on ne peut plus supprimer si examen terminé
 				var suppression_devoir = examen_terminé ? "" : '<img alt="supprimer"  id="'+ data +'" src="https://sekooly.github.io/SUPABASE/images/img_trash.png" style="width:15px;height:15px;cursor:pointer;" onclick="supprimer_devoir(this)">'
-				mon_devoir_rendu.innerHTML += '<div id="mon_devoir_rendu"> <div id="'+id_fichier+'">'+ data + '<img id="mini-image" onclick="visualiser(\''+titre+'\',\''+id_fichier+'\')" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" style="padding-left:1%">'+ suppression_devoir+'</div></div>';
+				mon_devoir_rendu.innerHTML += '<div id="mon_devoir_rendu"> <div id="'+id_fichier+'">'+ data + '<img class="mini-image" onclick="visualiser(\''+titre+'\',\''+id_fichier+'\')" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" style="padding-left:1%">'+ suppression_devoir+'</div></div>';
 				
 				//afficher le devoir
 				element_DOM('rendu_devoir').appendChild(mon_devoir_rendu.firstChild);
@@ -866,11 +866,11 @@ function afficher_rendus_devoirs(resultats){
 		var coefficient_rendu = resultats[i]["coefficient_rendu"]
 		var note_rendu = resultats[i]["note_rendu"]
 		
-		un_devoir_rendu.innerHTML += '<img alt="voir"  id="mini-image" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" onclick="visualiser(\''+ titre + '\',\'' + un_devoir_rendu.id +'\', \'' + nom_proprio_devoir + '\')">';
+		un_devoir_rendu.innerHTML += '<img alt="voir"  class="mini-image" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" onclick="visualiser(\''+ titre + '\',\'' + un_devoir_rendu.id +'\', \'' + nom_proprio_devoir + '\')">';
 
-		un_devoir_rendu.innerHTML += '<img alt="remarque" id="mini-image" class="envoi_remarque" onclick="mettre_remarque_devoir(this,\'' + remarque +'\',' + coefficient_rendu +','+ note_rendu + ');" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png">';
+		un_devoir_rendu.innerHTML += '<img alt="remarque" class="mini-image envoi_remarque" onclick="mettre_remarque_devoir(this,\'' + remarque +'\',' + coefficient_rendu +','+ note_rendu + ');" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png">';
 
-		un_devoir_rendu.innerHTML += '<a   id="telechargement" href = "https://drive.google.com/uc?export=download&id=' + un_devoir_rendu.id +'" download="mon_fichier.txt"><img alt="télécharger" id="mini-image" src="https://sekooly.github.io/SUPABASE/images/img_download.png"></a>';
+		un_devoir_rendu.innerHTML += '<a   id="telechargement" href = "https://drive.google.com/uc?export=download&id=' + un_devoir_rendu.id +'" download="mon_fichier.txt"><img alt="télécharger" class="mini-image" src="https://sekooly.github.io/SUPABASE/images/img_download.png"></a>';
 		
 		un_devoir_rendu.innerHTML += '<i style="color: #bfbfbf;">' + afficher_date(resultats[i]["date_publication"]) + '  </i>';
 
@@ -14443,7 +14443,7 @@ function faire_la_recherche_fichier(){
 
 function help(fonction_aide){
 	//console.log(contenu_alerte)
-	return '<rouge id="mini-image" onclick="'+fonction_aide+'">Besoin d\'aide?</rouge>'
+	return '<rouge class="mini-image" onclick="'+fonction_aide+'">Besoin d\'aide?</rouge>'
 }
 
 
@@ -14628,8 +14628,11 @@ function CGU_avis(e){
 }
 
 
-function liste_notes_possibles(negatif, default_value){
-	var la_liste_de_notes = '<select name="note_globale" id="note_globale" value=5>'
+function liste_notes_possibles(negatif, default_value,id_note_globale, callback){
+
+	var fonction_callback = callback ? ' onchange="'+callback+'(this)"  ' : ""
+
+	var la_liste_de_notes = !id_note_globale ? '<select name="note_globale" id="note_globale" value=5>' : '<select name="'+id_note_globale+'"  '+ fonction_callback +'   >'
 
 	var note_min = negatif ? -5.1 : 0
 
@@ -15581,7 +15584,7 @@ function changement_quiz_ou_non(){
 
 
 
-function creer_quiz(){
+async function creer_quiz(){
 
 	vider_fenetre("Créer un nouveau quiz (<span id='etape-quiz'>1</span>/4)",false,true)
 	afficher_fenetre(true)
@@ -15590,13 +15593,112 @@ function creer_quiz(){
 	$('#setup').append('<div id="btn-quiz"></div>')
 	$('#btn-quiz').append('<button onclick="prev_step_quiz()" id="bouton_precedent" class="btn-setup">Précédent</button>')
 	$('#btn-quiz').append('<button onclick="next_step_quiz()" id="bouton_suivant" class="btn-setup">Suivant</button>')
+	$('#btn-quiz').append('<div id="remarque-quiz"></div>')
 
 
 	init_quiz()
-	next_step_quiz()
+
+	//POUR MES TESTS LOCAUX
+	//next_step_quiz()
+	//nouvelle_question()
 	
 
+
 	
+}
+
+function afficher_donnes_quiz(questions_quiz,reponses_quiz){
+
+	//pour chaque question
+	questions_quiz.forEach((une_question) => {
+
+		var donnees_reponses = reponses_quiz.filter(e => e['id_quiz'] === get_current_quiz() && e['id_question'] === une_question['id_question'] )
+		//créer la nouvelle question avec les valeurs par défaut:
+		nouvelle_question(une_question,donnees_reponses)
+	})
+
+
+}
+
+
+
+async function saisie_des_questions_responses(){
+	
+	var les_questions = []
+	var les_reponses = []
+
+
+	//pour chaque question
+	$(".une_question_quiz").each(async (index,element) => {
+
+		//stocker: id_question ET intitule_question
+		var id_question= element.querySelector('.id_question').value
+		var intitule_question = element.querySelector('#intitule_question').value
+
+		var question_quiz = {
+			id_quiz:get_current_quiz(),
+			id_question:id_question,
+			position_question:index,
+			type_question: element_DOM("type_question"+id_question).innerText,
+			intitule_question: intitule_question
+
+		}
+
+		//console.log('\n\n\n')
+		//console.log(question_quiz)
+		/*
+		var retour = await stocker_element_server("Questions",question_quiz)
+		console.log(retour)
+		console.log("*********************** LES REPONSES **********************")
+		*/
+		les_questions.push(question_quiz)
+		
+		//pour chaque reponse de cette question (identifié par id_question)
+		$(".une_question_quiz#"+id_question+" > .ui-sortable > ").each(async (index_reponse,une_reponse) => {
+			//stocker: id_reponse, intitule_reponse, note_globale, EVENTUELLEMENT une remarque vrai/faux
+			var id_reponse = index_reponse
+			var intitule_reponse = une_reponse.querySelector('[name=reponse]').value
+			var note_globale = Number(une_reponse.querySelector('[name=note_globale]').value)
+			var remarque_correction =  une_reponse.querySelector('.remarque_correction').outerHTML
+
+			//console.log(" " + id_reponse)
+			//console.log("["+id_reponse+"]	" + intitule_reponse + ": " + note_globale)
+
+			var reponse_quiz = {
+				id_quiz:get_current_quiz(),
+				id_question:id_question,
+				id_reponse: id_reponse,
+				position_reponse: id_reponse,
+				intitule_reponse: intitule_reponse,
+				score: note_globale,
+				remarque_correction: remarque_correction
+			}
+
+			//console.log(reponse_quiz)
+			/*
+			retour = await stocker_element_server("Reponses",reponse_quiz)
+			console.log(retour)
+			*/
+
+			les_reponses.push(reponse_quiz)
+
+			//enregistrer les questions dans tmp_questions_quiz
+
+		})
+
+
+
+
+	})
+
+
+	var retour1 = await stocker_element_server('Questions', les_questions)
+	console.log(retour1)
+	var retour2 = await stocker_element_server('Reponses', les_reponses)
+	console.log(retour2)
+
+	return [les_questions,les_reponses]
+
 }
 
 //étape 1: titre et description
@@ -15626,22 +15728,49 @@ function valeur_par_defaut(nom_champ){
 //2b) type de la question: choix unique, choix multiple, saisie libre
 //2c) reponses possibles + reponse vraie
 //2d) remarques si vrai/faux
-function crud_questions(){
+async function crud_questions(){
 
 	//ajouter
 	element_DOM("contenu_etape_quiz").innerHTML = `
 		<form id="quiz-form">
 		</form>
-		<bleu id="add-qstn" onclick="nouvelle_question()"><img src="images/img_ajout.png" style="" class="small-icon"> Ajouter une question</bleu>
+		<bleu class="quiz-options" onclick="nouvelle_question()"><img src="images/img_ajout.png" style="" class="small-icon"> Ajouter une question</bleu>
+		<div onclick="run_quiz()" class="sekooly-mode quiz-options"><img src="images/img_previz.png" class="small-icon trash"> Prévisualiser le quiz</div>
 	`
 	//modifier
 	//supprimer
 	//voir (previz)
 
+
+	//afficher ce qui existe déjà sur le serveur
+	var current_quiz = get_current_quiz()
+	if(current_quiz){
+		// rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher, nombrelimite, orderby)
+		var questions_quiz = await rechercher('Questions','id_quiz',get_current_quiz(),"*",false,"position_question.asc")
+		var reponses_quiz = await rechercher('Reponses','id_quiz',get_current_quiz(),"*",false,"position_reponse.asc")
+
+		//console.log(questions_quiz)
+		//console.log(reponses_quiz)
+		afficher_donnes_quiz(questions_quiz,reponses_quiz)
+	}
+	
+
 }
 
-function nouvelle_question(){
-	$("#quiz-form").append(une_question_quiz())
+function run_quiz(id_quiz){
+
+	id_quiz = id_quiz || get_current_quiz()
+	console.log('todo')
+
+
+
+}
+
+function nouvelle_question(donnees_question,donnees_reponses){
+	var formulaire = $("#quiz-form").append(une_question_quiz(donnees_question))
+	var la_nouvelle_question = formulaire[0].lastElementChild
+
+
 
 	$("#quiz-form").sortable({
 
@@ -15654,24 +15783,52 @@ function nouvelle_question(){
 	    	$(".une_question_quiz.ui-sortable-handle").each(function(position_finale,element){
 
 				nouvelle_position_question_drag = position_finale+1
-				//console.log({[element.id] : nouvelle_position_question_drag})
-				
+				//console.log(element.getAttribute('name'))
+				//console.log({[element.name] : nouvelle_position_question_drag})
+				$(".id_question[value='"+element.getAttribute('name')+"']")[0].value = nouvelle_position_question_drag
 
 			})
 	    }
 	})
 
+
+	//si on a des données de la question: on pré-remplit
+	if(donnees_question){
+		la_nouvelle_question.querySelector("[name='type_question']").innerText = donnees_question['type_question']
+		la_nouvelle_question.querySelector("[name='intitule_question']").innerText = donnees_question['intitule_question']
+	}
+
+
+	//ajouter automatiquement une 1ère réponse SSI pas de données questions
+	//console.log(la_nouvelle_question)	
+	if(!donnees_reponses){
+		add_response(la_nouvelle_question.id)	
+	}else{
+
+		//afficher les réponses déjà pré enregistrées
+		donnees_reponses.forEach((une_reponse) => {
+			add_response(une_reponse['id_question'], une_reponse)	
+		})
+
+
+	}
 }
 
-function une_question_quiz(){
-	var nouvel_id_question = $("[name='intitule_question']").length+1
+function une_question_quiz(donnees_question){
+
+
+
+	var nouvel_id_question = donnees_question ? donnees_question['id_question'] : $("[name='intitule_question']").length+1
 	return `
-	<div class="une_question_quiz" id="`+ nouvel_id_question +`">
+	<div class="une_question_quiz" id="`+ nouvel_id_question +`"   name="`+ nouvel_id_question +`" >
+		<input type="text" value="`+nouvel_id_question+`" name="id_question" class="id_question">
+		<div><rouge class="mini-image" style="font-size: 12px;" onclick="help_quiz_resp()">Besoin d'aide?</rouge></div>
+		<div name="type_question" id="type_question`+nouvel_id_question+`"></div>
 		<textarea id="intitule_question" name="intitule_question" type="text" placeholder="Intitulé de la question..."></textarea>
 		<div class="top-qstn">
-			<rouge class="foot-element" onclick="$('.une_question_quiz[id=`+nouvel_id_question+`]').remove()"><img src="images/img_trash.png" alt="SUPPRIMER" class="small-icon trash"></rouge>			
+			<rouge class="foot-element" onclick="supprimer_question(`+nouvel_id_question+`)"><img src="images/img_trash.png" alt="SUPPRIMER" class="small-icon trash"></rouge>			
 	    </div>
-	    <div id="reponses_possibles`+nouvel_id_question+`"></div>
+	    <div class="reponses_possibles" name="reponses_possibles`+nouvel_id_question+`"></div>
     	<div class="foot-qst" style="font-size: 15px;">
 		  <bleu class="foot-element" onclick="add_response(`+nouvel_id_question+`)">Ajouter une réponse possible</bleu>
 		</div>
@@ -15679,29 +15836,63 @@ function une_question_quiz(){
 	`
 }
 
+async function supprimer_question(id_question){
 
 
+	//supprimer toutes les réponses liées
+	//PUIS supprimer la question
+	$("[name='reponses_possibles"+id_question+"'] > .une_reponse_possible > [alt='SUPPRIMER'] ").each((index,element) => {
+		//console.log(element)
+		delete_resp(element, true)
+	})
+
+	var id_quiz = get_current_quiz()
+	var references = {"id_quiz":id_quiz,"id_question":id_question}
+	retour = await supprimer_avec_ces_references("Questions", references)
+	console.log(retour)
+
+	$('.une_question_quiz[id="'+id_question+'"]').remove()
+}
 
 
-//en fonction du type de question
-function generer_les_reponses(e){
-	var moi = e.target
-	var type_question = e.target.value
-	//console.log(type_question)
+//supprimer une reponse possible 
+async function delete_resp(ceci, forcing){
+	//console.log(ceci)
+	//console.log(ceci.parentNode)
 
-	console.log(moi.parentNode.parentNode.childNodes)
-	//si Choix multiples
-	//si Choix uniques
-	//si saisie libre
+	var la_reponse_possible = ceci.parentNode.parentNode
+	//console.log(la_reponse_possible)
 
+	var pas_la_seule_reponse = la_reponse_possible.children.length > 1
+	if(pas_la_seule_reponse || forcing){
+
+		var id_quiz = get_current_quiz()
+		var id_question = la_reponse_possible.parentNode.id
+		var id_reponse = ceci.parentNode.id
+		var references = {"id_quiz":id_quiz,"id_question":id_question, "id_reponse":id_reponse}
+		//console.log(references)
+		retour = await supprimer_avec_ces_references("Reponses", references)
+		//console.log(retour)
+
+
+		ceci.parentNode.remove()	
+		mettre_type_question(la_reponse_possible.parentNode.id)
+		return true
+
+	}else{
+		alert("Vous devez donner au moins une réponse à la question.")
+		return false
+	}
+	
 }
 
 //ajouter une reponse possible à la question
-function add_response(id_question){
+function add_response(id_question,donnees_reponses){
 
-	$("#reponses_possibles" + id_question).append(une_reponse_possible())
+	var les_reponses_possibles = $("[name='reponses_possibles" + id_question + "']").append(une_reponse_possible(donnees_reponses))
+	var la_reponse = les_reponses_possibles[0].lastElementChild
 
-	$("#reponses_possibles" + id_question).sortable({
+	$("[name='reponses_possibles" + id_question + "']").sortable({
 
 	    update: function mettre_a_jour_position_reponses() {
 
@@ -15712,28 +15903,200 @@ function add_response(id_question){
 	    	$(".une_reponse_possible.ui-sortable-handle").each(function(position_finale,element){
 
 				nouvelle_position_rps_drag = position_finale+1
-				console.log({[element.id] : nouvelle_position_rps_drag})
+				//console.log({[element.id] : nouvelle_position_rps_drag})
 				
 
 			})
 	    }
 	})
+
+
+	mettre_type_question(id_question)
+	
+
+	//au changement de la note:
+	$("[name=note_globale]").off("change")
+	$("[name=note_globale]").on("change",function(e){
+		valeur = Number(e.target.value)
+		//si positif: vert		
+		//si negatif: rouge	
+		e.target.style.color = valeur < 0 ? "red" :
+								valeur > 0 ? "green" : ""
+
+		//console.log(id_question)
+		mettre_type_question(id_question)
+		remarque_par_defaut(e.target)
+	})
+
+	//on met direct la bonne remarque
+	$("[name=note_globale]").change()
+
+	//on focus sur le nouveau input (todo)
+
+
+	//on met les éléments de réponses si ça existe
+	if(donnees_reponses){
+		//console.log(la_reponse)
+		la_reponse.querySelector("[name='reponse']").value = donnees_reponses['intitule_reponse']
+		//la_reponse.querySelector("[name='note_globale']").value = donnees_reponses['score']
+		la_reponse.querySelector(".remarque_correction").outerHTML = donnees_reponses['remarque_correction']
+	} 
+	
 }
 
-//supprimer une reponse possible 
-function delete_resp(e){
-	//console.log(e.target)
-	//console.log(e.target.parentNode)
-	e.target.parentNode.remove()
+function mettre_type_question(id_question){
+
+	//console.log(id_question)
+	
+	//type_question
+	var el_type_question = element_DOM("type_question"+id_question)
+	var points_selector = $(".une_question_quiz#"+id_question+" > .reponses_possibles > .une_reponse_possible > [name='note_globale']")
+	//console.log(type_question)
+
+	//si une seule réponse: saisie libre
+	var type_question = "Question en saisie libre"
+
+	
+	var responses_wrapper = $("[name='reponses_possibles"+id_question+"']")
+	if(responses_wrapper.length ===0 ) return true
+
+	responses_wrapper = responses_wrapper[0]
+	//console.log(responses_wrapper)
+	var nb_reponses_possibles = responses_wrapper.children.length
+	//console.log({nb_reponses_possibles: nb_reponses_possibles})
+
+
+	//sinon
+	if(nb_reponses_possibles > 1){
+
+
+		//si 1 seule réponse juste: choix unique
+		type_question = "Question à choix unique"
+
+
+		//sinon: choix multiple
+		var nb_reponses_justes = points_selector.filter(function() {
+		    return Number($(this).val()) > 0
+		}).length
+		//console.log({nb_reponses_justes: nb_reponses_justes})
+
+		if(nb_reponses_justes > 1){
+			type_question = "Question à choix multiple"	
+		}
+		
+
+
+	}
+
+
+	//score total 
+	points_question = 0;
+	points_selector.each(function() {
+	    valeur = Number($(this).val());
+		if(valeur > 0) points_question += valeur
+	})
+
+	var retour_final = type_question + " sur " + points_question.toFixed(2) + " points "
+	if(el_type_question) el_type_question.innerText = retour_final
+
+	mettre_score_total(true)
+
+
+	return retour_final
+
 }
 
-function une_reponse_possible(){
-	var prochain_id = $(".une_reponse_possible").length+1
+
+function mettre_score_total(oui){
+	var total_score = 0
+
+	$("[name='note_globale']").each((e,element) => {
+		var score = Number(element.value)
+		//console.log(score)
+		if(score > 0) total_score += score
+	})
+
+	element_DOM("remarque-quiz").innerText = oui ? "Votre quiz est noté sur " + total_score : ""
+
+	return total_score
+}
+
+
+
+function une_reponse_possible(donnees_reponses){
+	var prochain_id = donnees_reponses ? donnees_reponses['id_reponse'] : $(".une_reponse_possible").length+1
+	var valeur_score = !donnees_reponses ? "0" : Number(donnees_reponses['score']).toFixed(2)
 	return 	`<span class="une_reponse_possible" id="`+prochain_id+`">
-    <input id="reponse`+prochain_id+`" name="reponse`+prochain_id+`" style="width: 59%;" placeholder="Réponse possible et le SCORE de la réponse (liste déroulante)...">`+liste_notes_possibles(true,"0")+`
-    <img class="small-icon trash" alt="SUPPRIMER" src="images/img_trash.png" onclick="delete_resp(event)">
+    <input name="reponse" style="width: 55%;" placeholder="Réponse possible et le SCORE de la réponse (liste déroulante)...">`+liste_notes_possibles(true,valeur_score,"note_globale") +`
+    <img class="small-icon trash" alt="SUPPRIMER" src="images/img_trash.png" onclick="delete_resp(this)">
+    <br>
+    <bleu onclick="focus_edit(this)" class="mini-image remarque_correction" contenteditable="true">Remarque correction</bleu>
   </span>
   `
+}
+
+function focus_edit(ceci){
+	setCaret(ceci)
+}
+
+function setCaret(el) {
+    
+	el.focus()
+}
+
+
+function remarque_par_defaut(ceci){
+	
+	//console.log(ceci)
+	var element_a_maj =  ceci.parentNode.querySelector("bleu")
+	var valeur_remarque_actuelle = element_a_maj.innerHTML
+	//console.log(valeur_remarque_actuelle)
+
+	//si pas de remarque
+	if(valeur_remarque_actuelle.length === 0 || valeur_remarque_actuelle === valeur_remarque_initiale() || valeur_remarque_actuelle === valeur_remarque_correct() || valeur_remarque_actuelle === valeur_remarque_incorrect() ){
+
+		var est_positif = Number(ceci.value) > 0 
+		//console.log(est_positif)
+
+		//si positif : ✅ Votre réponse est correcte.
+		//si <= 0 : ❌ Votre réponse est incorrecte.
+		element_a_maj.innerHTML = est_positif ? valeur_remarque_correct() : valeur_remarque_incorrect()
+		
+
+	}
+
+	element_a_maj.style.color = ceci.style.color
+}
+
+function remarque_correction(ceci){
+	//console.log(ceci)
+	if(ceci.innerText.length === 0) ceci.innerText = valeur_remarque_initiale()
+}
+
+function valeur_remarque_correct(){
+	return "✅ Votre réponse est correcte." 
+}
+
+function valeur_remarque_incorrect(){
+	return "❌ Votre réponse est incorrecte."
+}
+
+function valeur_remarque_initiale(){
+	return "Remarque correction"
+}
+
+
+function help_quiz_resp(){
+
+	if($(".une_reponse_possible").length > 0){		
+		var alerte = 'Le type de question se mettra à jour en fonction du nombre de réponses possibles ET du nombre de réponses justes.\n\n\n'
+		alerte += '• Score positif=bonne réponse\n• Score nul=mauvaise réponse\n• Score négatif=malus.\n\n\nLa remarque de correction s\'affiche lorsque l\'utilisateur choisit cette réponse, et peut se personnaliser au clic.'		
+
+		alert(alerte)	
+	}else{
+		alert("Ajoutez d'abord une réponse possible, puis recliquez à nouveau ici.")
+	}
+	
 }
 
 
@@ -15742,16 +16105,19 @@ function dernieres_modifs_quiz(){
 
 }
 
+
 //étape 4: la publication
 function publication_quiz(){
 
 
 }
 
-function go_to_step(step_number){
+function get_current_quiz(){
+	return recuperer("tmp_quiz") ? JSON.parse(recuperer("tmp_quiz"))['id_quiz'] : null
+}
 
-	//verifier que tout est rempli
-	if(!formulaire_rempli_ok("quiz-form")) return alert("Vous devez remplir tous les champs avant de continuer.")
+
+function go_to_step(step_number,prev_step){
 
 	//avant chaque prochaine étape : ON STOCK EN TEMPORAIRE
 	//si on passe à l'étape 1 OU 2 : on stock un id_quiz
@@ -15761,7 +16127,19 @@ function go_to_step(step_number){
 		stocker("tmp_quiz",JSON.stringify(resultat))
 	}
 
-	resultat = objectifyForm("quiz-form")
+	//si etape 2 : traitement spécial de resultat
+	if(prev_step === 2){
+		saisie_des_questions_responses()
+	}else{
+		//verifier que tout est rempli
+		if(!formulaire_rempli_ok("quiz-form")) return alert("Vous devez remplir tous les champs avant de continuer.")
+		resultat = objectifyForm("quiz-form")	
+	}
+	
+
+	
+
+
 	resultat['id_quiz'] = JSON.parse(recuperer("tmp_quiz"))['id_quiz']
 	
 
@@ -15793,17 +16171,19 @@ function avec_sauvegarde(oui){
 }
 
 function next_step_quiz(){
+	var prev_step = Number(element_DOM("etape-quiz").innerText)
 	element_DOM("etape-quiz").innerText++
 	if(element_DOM("etape-quiz").innerText > 4) element_DOM("etape-quiz").innerText = 4
 	var step_number = Number(element_DOM("etape-quiz").innerText)
-	go_to_step(step_number)
+	go_to_step(step_number,prev_step)
 }
 
 function prev_step_quiz(){
+	var prev_step = Number(element_DOM("etape-quiz").innerText)
 	element_DOM("etape-quiz").innerText--
 	if(element_DOM("etape-quiz").innerText < 1) element_DOM("etape-quiz").innerText = 1
 	var step_number = Number(element_DOM("etape-quiz").innerText)
-	go_to_step(step_number)
+	go_to_step(step_number,prev_step)
 }
 
 
@@ -15835,22 +16215,30 @@ function stocker_quiz_local(nouvel_item){
 
 
 async function sauvegarder_quiz(){
+
 	var texte_a_affichier = "Votre quiz a bien été sauvegardé."
 
-	if(recuperer("tmp_quiz")){
-		try{			
-			var donnees_locales = JSON.parse(recuperer("tmp_quiz"))
-			console.log(donnees_locales)
-			await stocker_quiz_server(donnees_locales) // actualiser("Quiz", "id_quiz", 0, donnees_locales)
-			//effacer("tmp_quiz") // libérer la mémoire quand c'est envoyé sur le serveur ? non
-		}catch(e){
-			texte_a_affichier = "Votre quiz n'a PAS été sauvegardé: merci de réessayer ou de vérifier votre connexion internet."
-		}
+	if($(".une_question_quiz").length > 0){
+		saisie_des_questions_responses()
 	}else{
-		texte_a_affichier = "Aucune donnée de quiz à sauvegarder: appuyez sur suivant avant d'enregistrer."
+
+		
+		if(recuperer("tmp_quiz")){
+			try{			
+				var donnees_locales = JSON.parse(recuperer("tmp_quiz"))
+				console.log(donnees_locales)
+				await stocker_quiz_server(donnees_locales) // actualiser("Quiz", "id_quiz", 0, donnees_locales)
+				//effacer("tmp_quiz") // libérer la mémoire quand c'est envoyé sur le serveur ? non
+			}catch(e){
+				texte_a_affichier = "Votre quiz n'a PAS été sauvegardé: merci de réessayer ou de vérifier votre connexion internet."
+			}
+		}else{
+			texte_a_affichier = "Aucune donnée de quiz à sauvegarder: appuyez sur suivant avant d'enregistrer."
+		}
 	}
 
 	afficher_alerte(texte_a_affichier)
+
 	return true
 }
 
@@ -15858,6 +16246,13 @@ async function sauvegarder_quiz(){
 function stocker_quiz_server(donnees_locales){
 	return supabase
 	  .from('Quiz')
+	  .upsert(donnees_locales)
+}
+
+
+function stocker_element_server(nom_table,donnees_locales){
+	return supabase
+	  .from(nom_table)
 	  .upsert(donnees_locales)
 }
 
