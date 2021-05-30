@@ -15734,8 +15734,8 @@ async function crud_questions(){
 	element_DOM("contenu_etape_quiz").innerHTML = `
 		<form id="quiz-form">
 		</form>
-		<bleu class="quiz-options" onclick="nouvelle_question()"><img src="images/img_ajout.png" style="" class="small-icon"> Ajouter une question</bleu>
-		<div onclick="run_quiz()" class="sekooly-mode quiz-options"><img src="images/img_previz.png" class="small-icon trash"> Prévisualiser le quiz</div>
+		<bleu class="quiz-options" onclick="nouvelle_question()"><img src="https://sekooly.github.io/SUPABASE/images/img_ajout.png" style="" class="small-icon"> Ajouter une question</bleu>
+		<div onclick="run_quiz(true)" class="sekooly-mode quiz-options"><img src="https://sekooly.github.io/SUPABASE/images/img_previz.png" class="small-icon trash"> Prévisualiser le quiz</div>
 	`
 	//modifier
 	//supprimer
@@ -15757,14 +15757,20 @@ async function crud_questions(){
 
 }
 
-function run_quiz(id_quiz){
+function run_quiz(preview_mode, id_quiz){
 
 	id_quiz = id_quiz || get_current_quiz()
 	console.log('todo')
 
+	if(preview_mode){
+
+	}
+
+	
 
 
 }
+
 
 function nouvelle_question(donnees_question,donnees_reponses){
 	var formulaire = $("#quiz-form").append(une_question_quiz(donnees_question))
@@ -15826,7 +15832,7 @@ function une_question_quiz(donnees_question){
 		<div name="type_question" id="type_question`+nouvel_id_question+`"></div>
 		<textarea id="intitule_question" name="intitule_question" type="text" placeholder="Intitulé de la question..."></textarea>
 		<div class="top-qstn">
-			<rouge class="foot-element" onclick="supprimer_question(`+nouvel_id_question+`)"><img src="images/img_trash.png" alt="SUPPRIMER" class="small-icon trash"></rouge>			
+			<rouge class="foot-element" onclick="supprimer_question(`+nouvel_id_question+`)"><img src="https://sekooly.github.io/SUPABASE/images/img_trash.png" alt="SUPPRIMER" class="small-icon trash"></rouge>			
 	    </div>
 	    <div class="reponses_possibles" name="reponses_possibles`+nouvel_id_question+`"></div>
     	<div class="foot-qst" style="font-size: 15px;">
@@ -15923,7 +15929,7 @@ function add_response(id_question,donnees_reponses){
 		e.target.style.color = valeur < 0 ? "red" :
 								valeur > 0 ? "green" : ""
 
-		//console.log(id_question)
+		console.log(id_question)
 		mettre_type_question(id_question)
 		remarque_par_defaut(e.target)
 	})
@@ -16028,7 +16034,7 @@ function une_reponse_possible(donnees_reponses){
 	var valeur_score = !donnees_reponses ? "0" : Number(donnees_reponses['score']).toFixed(2)
 	return 	`<span class="une_reponse_possible" id="`+prochain_id+`">
     <input name="reponse" style="width: 55%;" placeholder="Réponse possible et le SCORE de la réponse (liste déroulante)...">`+liste_notes_possibles(true,valeur_score,"note_globale") +`
-    <img class="small-icon trash" alt="SUPPRIMER" src="images/img_trash.png" onclick="delete_resp(this)">
+    <img class="small-icon trash" alt="SUPPRIMER" src="https://sekooly.github.io/SUPABASE/images/img_trash.png" onclick="delete_resp(this)">
     <br>
     <bleu onclick="focus_edit(this)" class="mini-image remarque_correction" contenteditable="true">Remarque correction</bleu>
   </span>
@@ -16164,7 +16170,7 @@ function go_to_step(step_number,prev_step){
 
 function avec_sauvegarde(oui){
 	if(oui){
-		$("#titre_fenetre").append('<img id="sauvegarder" src="images/img_save.png" alt="ENREGISTRER" onclick="sauvegarder_quiz()" class="icon-save">')	
+		$("#titre_fenetre").append('<img id="sauvegarder" src="https://sekooly.github.io/SUPABASE/images/img_save.png" alt="ENREGISTRER" onclick="sauvegarder_quiz()" class="icon-save">')	
 	}else{
 		$("#sauvegarder").remove()
 	}
