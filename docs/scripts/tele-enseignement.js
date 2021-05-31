@@ -15777,7 +15777,13 @@ async function run_quiz(preview_mode, id_quiz_initial){
 	var id_quiz = id_quiz_initial || get_current_quiz()
 	//console.log(id_quiz)
 
-	if(preview_mode) sauvegarder_quiz()
+	if(preview_mode){
+		ma_tentative.id_quiz = id_quiz
+		ma_tentative.proprietaire = recuperer("identifiant_courant")
+		ma_tentative.date_fin = ""
+		submit_quiz(true)
+		sauvegarder_quiz()
+	}
 
 
 	
@@ -15807,8 +15813,8 @@ async function next_question(nb_questions){
 
 	//if finished
 	if(element_DOM("bouton_suivant").innerHTML === btn_terminer()){		
-		await submit_quiz()
-		accueil_quiz(get_current_quiz())
+		var retour = await submit_quiz()
+		if(retour) accueil_quiz(get_current_quiz())
 	}
 
 
@@ -15869,7 +15875,8 @@ async function accueil_quiz(id_quiz, preview_mode){
 		if(total_score) total_score = eval(total_score.map(e => e.score_question).join('+')) // total_score[0]['score_question']    
 		
 		var fin_quiz = ma_tentative['date_fin'] ? "<br>Vous l'avez terminé le "  +  afficher_date(ma_tentative['date_fin']) : ""
-		var remarque_quiz = date_debut_premiere_tentative ? '<i style="color: #737373;"> Vous avez déjà fait 1 tentative le ' + afficher_date(date_debut_premiere_tentative) + ' ' + fin_quiz +' </i>': ""
+		var points = ma_tentative['corrigé'] ? "<br>Votre score: "  + calculer_mon_score(ma_tentative['reponses'])  +  "/" + total_score : ""
+		var remarque_quiz = date_debut_premiere_tentative ? '<i style="color: #737373;"> Vous avez déjà fait 1 tentative le ' + afficher_date(date_debut_premiere_tentative) + ' ' + fin_quiz + points +' </i>': ""
 
 		element_DOM("remarque-quiz").innerHTML = remarque_quiz
 
@@ -15893,6 +15900,13 @@ async function accueil_quiz(id_quiz, preview_mode){
 }
 
 
+function calculer_mon_score(mes_reponses){
+	console.log(mes_reponses)
+
+	return 10
+} 
+
+
 function initialiser_tentative(){
 	if(Object.keys(ma_tentative).length === 0){
 
@@ -15914,7 +15928,7 @@ async function go_to_question(mon_index,nb_questions){
 
 	save_current_submition()
 
-	//console.log(mon_index)
+	console.log(mon_index)
 	stocker("current_question",mon_index)
 	chargement(true)
 	await get_nth_question(mon_index,nb_questions)
@@ -15936,8 +15950,8 @@ async function submit_quiz(sans_terminer){
 
 		var confirmation = confirm("Êtes-vous sûr de vouloir terminer le quiz ? Cette action est irréversible.")
 		if(!confirmation) return false
-		ma_tentative['date_fin'] = maintenant()
-
+		ma_tentative['date_fin'] = quiz_mode_previz() ? maintenant() : ""
+		ma_tentative['est_visible'] = recuperer("mon_type") === "Eleves"
 	}
 
 
@@ -16026,7 +16040,9 @@ async function get_nth_question(position_question,nb_questions){
 
 		//bas de page SI pas encore existant
 		if(nb_questions){
-			element_DOM("remarque-quiz").innerHTML = ""
+
+			element_DOM("remarque-quiz").innerHTML =  reference_question("-1",'Accueil',nb_questions)
+
 			//console.log({nb_questions:nb_questions})
 			for (var i = 0 ; i < nb_questions; i++) {
 				element_DOM("remarque-quiz").innerHTML += reference_question(i)
@@ -16672,6 +16688,9 @@ function quiz_mode_lecture(){
 	return quiz_mode_run() && ma_tentative['date_fin'] ? true : false
 }
 
+function quiz_mode_previz(){
+	return $("[onclick='creer_quiz(1)']").length > 0
+}
 
 async function sauvegarder_quiz(){
 
@@ -16688,7 +16707,8 @@ async function sauvegarder_quiz(){
 	}else if(quiz_mode_run()){
 
 		texte_a_afficher = "Votre tentative a bien été sauvegardée."
-		save_current_submition(true)
+		save_current_submition()
+		submit_quiz(true)
 		retour = ma_tentative
 
 	//edit mode
