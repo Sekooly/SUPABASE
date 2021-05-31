@@ -557,7 +557,7 @@ async function switcher_le_champ(nom_champ, nouvelle_valeur){
 
 
 function extension_ok(extension){
-	return ",txt,bmp,gif,jpeg,jpg,png,svg,pdf,bmp,xlsx,xls,xlsm,ppt,pptx,doc,docx,html,csv,js,rtf,mp4,mp3,wav,youtube,".includes(","+extension.toLowerCase()+",")
+	return ",txt,bmp,gif,jpeg,jpg,png,svg,pdf,bmp,xlsx,xls,xlsm,ppt,pptx,doc,docx,html,csv,js,rtf,mp4,mp3,wav,youtube,quiz,".includes(","+extension.toLowerCase()+",")
 }
 
 function element_DOM(nom_element){
