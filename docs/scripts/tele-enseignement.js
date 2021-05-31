@@ -4170,8 +4170,8 @@ function changer_telechargeable(id_fichier,ancien_telechargeable){
 
 
 	//console.log(extension_fichier)
-	if(categorie_actuelle.includes("manuels")){
-		alert("Impossible de rendre un manuel téléchargeable.");
+	if(categorie_actuelle.includes("manuels") || categorie_actuelle.includes("quiz")){
+		alert("Impossible de rendre un manuel ou un quiz téléchargeable.");
 		return -1;
 	}else if(categorie_actuelle.includes("bulletins")){
 		alert("Impossible de rendre un fichier de bulletins téléchargeable.");
@@ -4221,7 +4221,7 @@ function changer_coef(id_fichier,ancien_coef){
 	//console.log(id_fichier);
 	var categorie_actuelle = $("[id="+id_fichier+'].span_un_fichier')[0].parentNode.id.split("_")[1];
 
-	if(!categorie_actuelle.includes("devoirs") && !categorie_actuelle.includes("examens")){
+	if(!categorie_actuelle.includes("devoirs") && !categorie_actuelle.includes("examens") && !categorie_actuelle.includes("quiz")){
 		alert("Impossible de changer le coefficient d'un fichier différent d'un sujet de devoir/examen.");
 		return -1;
 	}
@@ -4309,6 +4309,9 @@ function recategoriser_fichier(id_fichier,nom_fichier){
 		return -1;
 	}else if(categorie_actuelle.includes("examen")){
 		alert("Impossible de recatégoriser un examen.");
+		return -1;
+	}else if(categorie_actuelle.includes("quiz")){
+		alert("Impossible de recatégoriser un quiz.");
 		return -1;
 	}else{
 
@@ -4576,6 +4579,17 @@ function renommer_fichier(id_fichier,ancien_nom){
 					'nom_fichier' : nouveau_nom
 				}
 				actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouveau_data)
+
+
+				//si c'est un quiz
+				nom_table = "Quiz"
+				nom_champ_reference = "id_quiz"
+				valeur_champ_reference = id_fichier
+				nouveau_data = {
+					'titre' : nouveau_nom
+				}
+				actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouveau_data)
+
 
 
 				nom_table = "Notifs"
@@ -15576,19 +15590,18 @@ async function changement_quiz_ou_non(){
 				if(id_quiz !== "--"){
 					var nom_fichier = $('[value="'+id_quiz+'"]').text() +".quiz"
 					publier_quiz(id_quiz,nom_fichier)
-				}else{
-					afficher_alerte("Vous devez d'abord choisir un quiz à publier.")
-					return false
+					$("#mettre_fichier_en_ligne").off("click")
 				}
 
 			})
+
+			afficher_checkbox_fichier_telechargeable(false)
 
 		}else{
 			
 			$("#mode-non-quiz").css("display", "grid");
 			$("#mode-quiz").css("display", "none");
-
-
+			afficher_checkbox_fichier_telechargeable(true)
 		}
 
 
