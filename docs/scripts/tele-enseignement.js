@@ -15879,6 +15879,14 @@ async function get_nth_question(position_question,nb_questions){
 		element_DOM("contenu_etape_quiz").innerText = datas['intitule_question']
 		element_DOM("bouton_suivant").innerText = "Suivant"
 
+		champs_refs['id_question'] = datas['id_question']
+		var rsp = await rechercher_avec_ces_references("Reponses", champs_refs)
+		if(rsp ){
+			rsp = rsp[0]
+				
+		}
+		
+
 
 	}else{
 		//Plus de question : montrer le résumé de mes réponses
