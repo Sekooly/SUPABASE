@@ -4679,6 +4679,13 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 
 	nom_fichier = nom_fichier.toLowerCase();
 	var extension = nom_fichier.split(".").pop();
+
+
+	if(extension === "quiz") {
+		chargement(false)
+		stocker('fichier_ouvert',id_fichier);
+		return run_quiz(recuperer("mon_type")!=="Eleves",id_fichier)
+	}
 	
 	//on y met un iframe de visualisation dont la source est le fichier FORCEMENT le fichier cliqué
 	var previsualisation = '<iframe id="previsualisation" class="previz"></iframe>';
@@ -15825,7 +15832,7 @@ async function run_quiz(preview_mode, id_quiz_initial){
 		ma_tentative.id_fichier_sujetdevoir = id_quiz
 		ma_tentative.proprietaire = recuperer("identifiant_courant")
 		ma_tentative.date_publication = ""
-		submit_quiz(true)
+		//submit_quiz(true)
 		sauvegarder_quiz()
 	}
 
@@ -16082,6 +16089,7 @@ function save_current_submition(){
 	tmp_quiz_rpse[current_question] = rpse_qst
 
 	initialiser_tentative() // si besoin
+	if(!ma_tentative.reponses) ma_tentative.reponses = {}
 	ma_tentative.reponses[current_question] = rpse_qst
 
 	submit_quiz(true)
@@ -16643,7 +16651,8 @@ function help_quiz_resp(){
 
 
 function get_current_quiz(){
-	return recuperer("tmp_quiz") ? JSON.parse(recuperer("tmp_quiz"))['id_quiz'] : recuperer("fichier_ouvert")
+	return recuperer("fichier_ouvert") ? recuperer("fichier_ouvert") :
+			recuperer("tmp_quiz") ? JSON.parse(recuperer("tmp_quiz"))['id_quiz'] : null
 }
 
 
@@ -16801,7 +16810,7 @@ async function sauvegarder_quiz(){
 
 		texte_a_afficher = "Votre tentative a bien été sauvegardée."
 		save_current_submition()
-		submit_quiz(true)
+		//submit_quiz(true)
 		retour = ma_tentative
 
 	//edit mode
