@@ -317,6 +317,19 @@ function supprimer_avec_ces_references(nom_table, champs_refs){
 }
 
 
+function rechercher_avec_ces_references(nom_table, champs_refs){
+
+  var references = ""
+  $.each(champs_refs, (key,valeur) => {
+    var prefix =  references.length === 0 ? "" : "&"
+    references += prefix + key+"=eq."+valeur
+  })
+
+  url = racine_data + nom_table + "?"+ references+ "&"+apikey + "&limit=1"
+  //console.log(url)
+  return get_resultat_asynchrone(url)
+}
+
 
 function supprimer_initial(nom_table,nom_champ_reference,valeur_champ_reference){
   url = racine_initiale + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+api_initial

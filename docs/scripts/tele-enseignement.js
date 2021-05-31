@@ -15583,20 +15583,30 @@ function changement_quiz_ou_non(){
 }
 
 
+function initialiser_fenetre_quiz(preview_mode, nb_questions){
+
+	var fonction_precedent = preview_mode ? "prev_question()" : "prev_step_quiz()"
+	var fonction_suivant = preview_mode ? "next_question("+nb_questions+")" : "next_step_quiz()"
+
+
+	$('#fenetre').append('<div class="setup" id="setup"></div>')
+	$('#setup').append('<div id="contenu_etape_quiz"></div>')
+	$('#setup').append('<div id="btn-quiz"></div>')
+	$('#btn-quiz').append('<button onclick="'+fonction_precedent+'" id="btn-previous" class="btn-setup">Précédent</button>')
+	$('#btn-quiz').append('<button onclick="'+fonction_suivant+'" id="bouton_suivant" class="btn-setup">Suivant</button>')
+	$('#btn-quiz').append('<div id="remarque-quiz"></div>')
+
+
+
+}
 
 async function creer_quiz(){
 
 	vider_fenetre("Créer un nouveau quiz (<span id='etape-quiz'>1</span>/4)",false,true)
 	afficher_fenetre(true)
-	$('#fenetre').append('<div class="setup" id="setup"></div>')
-	$('#setup').append('<div id="contenu_etape_quiz"></div>')
-	$('#setup').append('<div id="btn-quiz"></div>')
-	$('#btn-quiz').append('<button onclick="prev_step_quiz()" id="bouton_precedent" class="btn-setup">Précédent</button>')
-	$('#btn-quiz').append('<button onclick="next_step_quiz()" id="bouton_suivant" class="btn-setup">Suivant</button>')
-	$('#btn-quiz').append('<div id="remarque-quiz"></div>')
 
-
-	init_quiz()
+	initialiser_fenetre_quiz()
+	init_creation_quiz()
 
 	//POUR MES TESTS LOCAUX
 	//next_step_quiz()
@@ -15702,7 +15712,7 @@ async function saisie_des_questions_responses(){
 }
 
 //étape 1: titre et description
-function init_quiz(){
+function init_creation_quiz(){
 	element_DOM("contenu_etape_quiz").innerHTML = `
 		<span>Vous êtes sur le point de créer un quiz de ` + la_matiere_chargee("Matiere")+ ` dans ` +la_matiere_chargee("Classe") + `.</span>
 		<form id="quiz-form">
@@ -15757,20 +15767,129 @@ async function crud_questions(){
 
 }
 
-function run_quiz(preview_mode, id_quiz){
+async function run_quiz(preview_mode, id_quiz_initial){
 
-	id_quiz = id_quiz || get_current_quiz()
-	console.log('todo')
+	var id_quiz = id_quiz_initial || get_current_quiz()
+	//console.log(id_quiz)
 
 	if(preview_mode){
-
+		//ajouter un bouton retour (todo)
 	}
 
-	
+	accueil_quiz(id_quiz)
+
+}
+
+function get_current_question(){
+	return recuperer("current_question") ? Number(recuperer("current_question")) : -1
+}
+
+function prev_question(){
+	//console.log("PRECEDENT")
+	var mon_index = Math.max(-1,get_current_question()-1) 
+	go_to_question(mon_index)
 
 
 }
 
+function next_question(nb_questions){
+	//console.log("SUIVANT")
+	var mon_index = Math.min(nb_questions,get_current_question()+1) 
+	go_to_question(mon_index,nb_questions)
+
+
+
+	
+}
+
+async function accueil_quiz(id_quiz){
+
+
+	var infos_quiz = await rechercher("Quiz","id_quiz", id_quiz, "*")
+	var nb_questions = await rechercher("Questions","id_quiz", id_quiz, "id_question")
+	//console.log(infos_quiz)
+	//console.log(nb_questions)
+	if(infos_quiz.length > 0 && nb_questions.length > 0){
+
+		infos_quiz = infos_quiz[0]
+		nb_questions = nb_questions.length
+
+		vider_fenetre(infos_quiz['titre'])
+		initialiser_fenetre_quiz(true,nb_questions)
+		$("#contenu_etape_quiz").append(infos_quiz['description'] + '<br><br>Ce quiz comporte ' + nb_questions + ' questions.')
+		afficher_fenetre(true)
+
+		element_DOM("bouton_suivant").innerText = "Commencer"
+		element_DOM("btn-previous").setAttribute("style","display: none;")
+	}
+
+	return true
+}
+
+async function go_to_question(mon_index,nb_questions){
+	//console.log(mon_index)
+	stocker("current_question",mon_index)
+	await get_nth_question(mon_index,nb_questions)
+}
+
+function reference_question(mon_index){
+	var index_interne = mon_index+1
+	return '<a ref="'+mon_index+'"    onclick="go_to_question('+mon_index+')"><span>[ '+index_interne+' ]</span></a> '
+}
+
+async function get_nth_question(position_question,nb_questions){
+
+
+	console.log(position_question)
+
+
+	if(position_question < 0){		
+		return accueil_quiz(get_current_quiz())
+	}else{
+		element_DOM("btn-previous").setAttribute("style","")
+				//bas de page SI pas encore existant
+		if(nb_questions){
+			element_DOM("remarque-quiz").innerHTML = ""
+			//console.log({nb_questions:nb_questions})
+			for (var i = 0 ; i < nb_questions; i++) {
+				element_DOM("remarque-quiz").innerHTML += reference_question(i)
+			}
+
+		}
+
+
+
+	}
+
+
+	$("span").removeClass("current-qst")
+	if($("a[ref='"+position_question+"']")[0]) $("a[ref='"+position_question+"']")[0].children[0].className = "current-qst"
+
+
+
+	var champs_refs = {
+		"id_quiz" : get_current_quiz(),
+		"position_question" : position_question
+	}
+	var datas = await rechercher_avec_ces_references("Questions", champs_refs)
+
+	if(datas.length > 0){
+		//console.log(datas)
+		datas = datas[0]
+		element_DOM("contenu_etape_quiz").innerText = datas['intitule_question']
+		element_DOM("bouton_suivant").innerText = "Suivant"
+
+
+	}else{
+		//Plus de question : montrer le résumé de mes réponses
+		element_DOM("contenu_etape_quiz").innerText = '[RESUME ICI]'
+	} 
+
+
+	if(position_question === nb_questions) element_DOM("bouton_suivant").innerText = "Terminer"
+
+	return datas
+}
 
 function nouvelle_question(donnees_question,donnees_reponses){
 	var formulaire = $("#quiz-form").append(une_question_quiz(donnees_question))
@@ -15929,7 +16048,10 @@ function add_response(id_question,donnees_reponses){
 		e.target.style.color = valeur < 0 ? "red" :
 								valeur > 0 ? "green" : ""
 
-		console.log(id_question)
+
+		var id_question = e.target.parentNode.parentNode.parentNode.id
+
+		//console.log(id_question)
 		mettre_type_question(id_question)
 		remarque_par_defaut(e.target)
 	})
@@ -16155,7 +16277,7 @@ function go_to_step(step_number,prev_step){
 	//console.log(recuperer("tmp_quiz"))
 
 	if(step_number === 1){
-		init_quiz()
+		init_creation_quiz()
 	}else if(step_number === 2){
 		crud_questions()
 	}else if(step_number === 3){
