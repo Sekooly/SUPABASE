@@ -317,7 +317,7 @@ function supprimer_avec_ces_references(nom_table, champs_refs){
 }
 
 
-function rechercher_avec_ces_references(nom_table, champs_refs){
+function rechercher_avec_ces_references(nom_table, champs_refs, liste_champs_a_chercher, orderby){
 
   var references = ""
   $.each(champs_refs, (key,valeur) => {
@@ -325,7 +325,10 @@ function rechercher_avec_ces_references(nom_table, champs_refs){
     references += prefix + key+"=eq."+valeur
   })
 
-  url = racine_data + nom_table + "?"+ references+ "&"+apikey + "&limit=1"
+  var select = liste_champs_a_chercher ? "&select=" + liste_champs_a_chercher.join(',') : ""
+
+
+  url = racine_data + nom_table + "?"+ references + select + "&"+apikey + (orderby ? "&order=" + orderby : "")
   //console.log(url)
   return get_resultat_asynchrone(url)
 }
