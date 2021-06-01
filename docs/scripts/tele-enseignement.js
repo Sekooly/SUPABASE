@@ -4672,10 +4672,9 @@ async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_init
 
 
 	if(nom_proprio_devoir){
-		url = racine_data +"Rendus?id_fichier=eq."+ id_fichier+"&"+ apikey
-		console.log(id_fichier)
+		//console.log(id_fichier)
 		donnees_devoir_a_corriger = await rechercher("Rendus", "id_fichier", id_fichier) //get_resultat(url)
-		console.log(donnees_devoir_a_corriger)
+		//console.log(donnees_devoir_a_corriger)
 		remarque = donnees_devoir_a_corriger[0]['remarque']
 		coefficient_rendu = donnees_devoir_a_corriger[0]['coefficient_rendu']
 		note_rendu = donnees_devoir_a_corriger[0]['note_rendu']
