@@ -4927,6 +4927,7 @@ function quitter_previsualisation(){
 
 
 	ma_tentative = {}
+	effacer("tmp_quiz")
 
 }
 
@@ -15804,6 +15805,11 @@ async function saisie_des_questions_responses(){
 async function init_creation_quiz(){
 
 	var donnees_quiz = await valeur_par_defaut("*")
+	if(!donnees_quiz){
+		donnees_quiz = {}
+		donnees_quiz["titre"] = ""
+		donnees_quiz["description"] = ""
+	}
 
 	element_DOM("contenu_etape_quiz").innerHTML = `
 		<span>Vous êtes sur le point de créer un quiz de <b class="sekooly-mode">` + la_matiere_chargee("Matiere")+ `</b> dans <b class="sekooly-mode">` +la_matiere_chargee("Classe") + `</b>.</span>
@@ -15816,7 +15822,7 @@ async function init_creation_quiz(){
 
 }
 
-async function valeur_par_defaut(nom_champ){
+async function valeur_par_defaut(){
 	try{
 
 
