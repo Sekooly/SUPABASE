@@ -558,6 +558,7 @@ function initialisation_choix_devoir(){
 
 	les_devoirs = element_DOM('drive_devoirs').childNodes;
 	les_examens = element_DOM('drive_examens').childNodes;
+	les_quiz = element_DOM('drive_quiz').childNodes;
 	la_liste_devoirs = element_DOM("devoir_choisi");
 	//console.log(les_devoirs);
 
@@ -598,6 +599,21 @@ function initialisation_choix_devoir(){
 	}
 
 
+
+	//inclure les quiz dans la liste 
+	for (var i = 0; i < les_quiz.length; i++) {
+		var id_quiz = les_quiz[i]['id'];
+		//console.log("\n"+ id_quiz);
+
+		var nom_fichier = $("span#"+id_quiz+".span_un_fichier").contents().filter(function(){ 
+		  return this.nodeType == 3; 
+		})[0].nodeValue;
+
+		var un_examen_html = '<option value="' + id_quiz + '">' + nom_fichier  + '</option>' 
+		var un_examen = document.createElement('div');
+		un_examen.innerHTML = un_examen_html;
+		la_liste_devoirs.appendChild(un_examen.firstChild);
+	}
 
 
 
@@ -827,7 +843,7 @@ function afficher_rendus_devoirs(resultats){
 	if (resultats.length === 0) element_DOM('rendu_devoir').style.height='auto';
 
 
-	if (resultats.length === 0) return liste_des_devoirs_rendus.innerHTML = '<i style="color: #bfbfbf;">Pas encore de rendus pour ce devoir/examen.</i>';
+	if (resultats.length === 0) return liste_des_devoirs_rendus.innerHTML = '<i style="color: #bfbfbf;">Pas encore de rendus pour ce devoir/examen/quiz.</i>';
 
 	//dans l'ordre chronologique CROISSANT
 	resultats.sort(function tri_ordre_chrono_decroissant(a, b) {
@@ -2095,6 +2111,10 @@ function afficher_ou_non_choix_fichier(oui,forcing){
 		//par défaut: coefficient = 0
 		element_DOM('coef').value = 0	
 
+		//mode NON quiz
+		element_DOM("mode-non-quiz").style.display = "grid"
+		element_DOM("mode-quiz").style.display = "none"
+
 
 		afficher_choix_date(false);
 		afficher_choix_coef(false);
@@ -2442,7 +2462,7 @@ function recuperer_logs(){
 	vider_fenetre(titre_fenetre);
 
 	//on ajoute le bouton télécharger
-		var bouton_télécharger = '<a id="telechargement" style="position: fixed;z-index:3;" href = "#"><img alt="télécharger" style="width: 30px; cursor: pointer;position:fixed;" id="telechargement" src="https://sekooly.github.io/SUPABASE/images/img_download.png""></a>';
+		var bouton_télécharger = '<a id="telechargement" style="position: fixed;z-index:3;" href = "#"><img alt="télécharger" class="window-btn" id="telechargement" src="https://sekooly.github.io/SUPABASE/images/img_download.png""></a>';
 		//on le met dans l'en-tête
 		var a_ajouter = document.createElement('div');
 		a_ajouter.innerHTML = bouton_télécharger;
@@ -2906,6 +2926,9 @@ function chargement_a_larrivee(){
 	gerer_sondage()
 
 
+	
+
+
 	//accueil principal
 	if ((recuperer('dossier_chargé') === '' || recuperer('dossier_chargé') === null) && recuperer('mes_donnees') !== ''){
 
@@ -2930,6 +2953,7 @@ function chargement_a_larrivee(){
 
 	//à l'arrivée sur la page: on ouvre tout dossier déjà chargé
 	}else{
+
 
 		var id_matiere = recuperer('dossier_chargé');
 		var mes_matieres = JSON.parse(recuperer('mes_matieres'));
@@ -3349,7 +3373,7 @@ function charger_dossier(id_dossier,final_booleen,titre){
 		//afficher l'EDT
 		//afficher_edt(true);
 
-		changement_quiz_ou_non()
+		
 			
 		//ajouter le bouton ajout et LISTE pour profs 
 		if (recuperer('mon_type')=== 'Profs'){
@@ -4630,7 +4654,7 @@ function renommer_fichier(id_fichier,ancien_nom){
 
 
 
-function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, pas_de_telechargement, mode_extrait_png_canva, mode_extrait_png_div){
+async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, pas_de_telechargement, mode_extrait_png_canva, mode_extrait_png_div){
 
 	chargement(true);
 
@@ -4642,15 +4666,16 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 
 	//console.log(mode_extrait_png_canva)
 	//on ajoute le bouton télécharger sauf en cas de PAS DE TELECHARGENEMTN
-	var bouton_télécharger = mode_extrait_png_canva ? '<a id="telechargement" style="position: fixed;z-index:3;" download="Bulletin.png" onclick="telecharger_canvas()"><img alt="télécharger" style="width: 30px; cursor: pointer;position:fixed;" id="'+ id_fichier+ '" src="https://sekooly.github.io/SUPABASE/images/img_download.png"></a>' :
+	var bouton_télécharger = mode_extrait_png_canva ? '<a id="telechargement" class="download-btn" download="Bulletin.png" onclick="telecharger_canvas()"><img alt="télécharger" class="window-btn"  id="'+ id_fichier+ '" src="https://sekooly.github.io/SUPABASE/images/img_download.png"></a>' :
 							pas_de_telechargement ? '' :
-							'<a id="telechargement" style="position: fixed;z-index:3;" href = "https://drive.google.com/uc?export=download&id=' + id_fichier +'"><img alt="télécharger" style="width: 30px; cursor: pointer;position:fixed;" id="'+ id_fichier+ '" src="https://sekooly.github.io/SUPABASE/images/img_download.png"></a>';
+							'<a id="telechargement" class="download-btn" href = "https://drive.google.com/uc?export=download&id=' + id_fichier +'"><img alt="télécharger" class="window-btn" id="'+ id_fichier+ '" src="https://sekooly.github.io/SUPABASE/images/img_download.png"></a>';
 
 
 	if(nom_proprio_devoir){
 		url = racine_data +"Rendus?id_fichier=eq."+ id_fichier+"&"+ apikey
-		//console.log(url)
-		donnees_devoir_a_corriger = get_resultat(url)
+		console.log(id_fichier)
+		donnees_devoir_a_corriger = await rechercher("Rendus", "id_fichier", id_fichier) //get_resultat(url)
+		console.log(donnees_devoir_a_corriger)
 		remarque = donnees_devoir_a_corriger[0]['remarque']
 		coefficient_rendu = donnees_devoir_a_corriger[0]['coefficient_rendu']
 		note_rendu = donnees_devoir_a_corriger[0]['note_rendu']
@@ -4661,7 +4686,7 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 		remarque = remarque.replace(/'/g, "\\'");
 
 
-		var bouton_corriger = '<span id="'+id_fichier+'"><img id="corriger" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png" style="width: 30px; height: 30px; cursor: pointer; position: fixed; z-index: 3; top: 141px; left: 913px;" onclick="mettre_remarque_devoir(this,\'' +remarque +'\',' + coefficient_rendu +','+ note_rendu + ')"></span>'
+		var bouton_corriger = '<span id="'+id_fichier+'"><img id="corriger" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png" class="window-btn" style="right: 30px;" onclick="mettre_remarque_devoir(this,\'' +remarque +'\',' + coefficient_rendu +','+ note_rendu + ')"></span>'
 
 
 	}else{
@@ -4684,7 +4709,11 @@ function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, p
 	if(extension === "quiz") {
 		chargement(false)
 		stocker('fichier_ouvert',id_fichier);
-		return run_quiz(recuperer("mon_type")!=="Eleves",id_fichier)
+
+		//
+
+		return accueil_quiz(id_fichier,recuperer("mon_type")!=="Eleves")
+
 	}
 	
 	//on y met un iframe de visualisation dont la source est le fichier FORCEMENT le fichier cliqué
@@ -5042,8 +5071,8 @@ function ajuster_boutons_fenetre(bis){
 			var le_left = (la_fenetre.offsetLeft + la_fenetre.offsetWidth - 60) + "px";
 			//console.log(le_left);
 
-			le_bouton_telecharger.style.top = le_top;
-			le_bouton_telecharger.style.left= le_left;
+			//le_bouton_telecharger.style.top = le_top;
+			//le_bouton_telecharger.style.left= le_left;
 			//console.log("bouton télécharger OK: " + le_bouton_telecharger.style.top + " et " + le_bouton_telecharger.style.left);
 		}
 		
@@ -5052,8 +5081,8 @@ function ajuster_boutons_fenetre(bis){
 			var le_left = (la_fenetre.offsetLeft + la_fenetre.offsetWidth - 90) + "px";
 			//console.log(le_left);
 
-			le_bouton_corriger.style.top = le_top;
-			le_bouton_corriger.style.left= le_left;
+			//le_bouton_corriger.style.top = le_top;
+			//le_bouton_corriger.style.left= le_left;
 			//console.log("bouton corriger OK: " + le_bouton_corriger.style.top + " et " + le_bouton_corriger.style.left);
 
 
@@ -9033,6 +9062,11 @@ function afficher_parametres(oui){
 	
 }
 
+function recuperer_analyses(){
+
+	vider_fenetre("Analyses");
+}
+
 function recuperer_parametres(){
 	
 	if(recuperer('liste_params_colonnes_masquees') === null) stocker('liste_params_colonnes_masquees','')
@@ -12407,13 +12441,13 @@ function tdb_recuperer_devoirs(ne_pas_arreter_chargement,aujourdhui){
 	//prof ou eleve
 	if(!recuperer('mon_type').includes('Admin')){
 		url = racine_data + 'Fichiers?' +apikey 
-		url += '&categorie_fichier=in.(Devoirs,Examens)'
+		url += '&categorie_fichier=in.(Devoirs,Examens,Quiz)'
 		url += '&id_dossier=in.' + les_id_dossier_classe
 	
 	//admin
 	}else{
 		url = racine_data + 'Fichiers?' +apikey 
-		url += '&categorie_fichier=in.(Devoirs,Examens)'
+		url += '&categorie_fichier=in.(Devoirs,Examens,Quiz)'
 	}
 
 	url += '&order=date_effet.asc,heure_effet.asc,id_dossier.asc'
@@ -14470,6 +14504,7 @@ function aide_recherche(){
 }
 
 async function afficher_resultats_recherche(){
+	chargement(true)
 
 	var mot_cle = $("#rechercher")[0].value.trim().toLowerCase().replaceAll(" ","")
 	//console.log(mot_cle)
@@ -14541,6 +14576,8 @@ async function afficher_resultats_recherche(){
 	$("#liste_resultats").append(liste_des_resultats)
 
 	$("#mini_popup").append('<div id="nb_resultats"><b>'+fichiers_trouves.length +' résultats trouvés<b></div>')
+
+	chargement(false)
 
 }
 
@@ -15558,7 +15595,15 @@ async function valider_suppression_via_mail_si_besoin(){
 
 
 /******************************** LES QUIZ *********************************/
+function afficher_quiz_option(oui){
+	element_DOM("quiz-option").style.display = oui ? "" : "none"
+
+	
+}
+
 async function changement_quiz_ou_non(){
+
+		afficher_quiz_option(window.location.href.includes("localhost"))
 
 		$('#liste_quiz').off('change')
 		$('#liste_quiz').on('change', function(e){
@@ -15577,9 +15622,6 @@ async function changement_quiz_ou_non(){
 			$("#mode-quiz").css("display", "grid");
 
 
-
-			//par défaut : pas de quiz
-			$("#liste_quiz")[0].value = "--"
 
 			//lister les quizz possibles
 			all_quiz = await rechercher("Quiz","id_classe_matiere",recuperer("dossier_chargé"))
@@ -15604,10 +15646,13 @@ async function changement_quiz_ou_non(){
 
 			afficher_checkbox_fichier_telechargeable(false)
 
+			//par défaut : pas de quiz
+			$("#liste_quiz")[0].value = "--"
+
 		}else{
 			
-			$("#mode-non-quiz").css("display", "grid");
-			$("#mode-quiz").css("display", "none");
+			element_DOM("mode-non-quiz").style.display = "grid"
+			element_DOM("mode-quiz").style.display = "none"
 			afficher_checkbox_fichier_telechargeable(true)
 		}
 
@@ -15758,11 +15803,14 @@ async function saisie_des_questions_responses(){
 
 //étape 1: titre et description
 async function init_creation_quiz(){
+
+	var donnees_quiz = await valeur_par_defaut("*")
+
 	element_DOM("contenu_etape_quiz").innerHTML = `
 		<span>Vous êtes sur le point de créer un quiz de <b class="sekooly-mode">` + la_matiere_chargee("Matiere")+ `</b> dans <b class="sekooly-mode">` +la_matiere_chargee("Classe") + `</b>.</span>
 		<form id="quiz-form">
-			<input id="titre" name="titre" type="text"  value="`+await valeur_par_defaut("titre")+`" placeholder="Titre de votre quiz">
-			<textarea id="description" name="description" type="text"  placeholder="Brève description de votre quiz">`+await valeur_par_defaut("description")+`</textarea>
+			<input id="titre" name="titre" type="text"  value="`+donnees_quiz["titre"].split(".quiz")[0] +`" placeholder="Titre de votre quiz">
+			<textarea id="description" name="description" type="text"  placeholder="Brève description de votre quiz">`+donnees_quiz["description"]+`</textarea>
 		</form>
 	`
 
@@ -15774,10 +15822,10 @@ async function valeur_par_defaut(nom_champ){
 
 
 		var id_quiz = get_current_quiz()
-		var res2 = await rechercher("Quiz","id_quiz",id_quiz, nom_champ)
-		if(res2) res2 = res2[0][nom_champ]
+		var res2 = await rechercher("Quiz","id_quiz",id_quiz)
+		if(res2) res2 = res2[0]
 
-		var res = JSON.parse(recuperer("tmp_quiz"))[nom_champ]? JSON.parse(recuperer("tmp_quiz"))[nom_champ] : res2
+		var res = JSON.parse(recuperer("tmp_quiz")) ? JSON.parse(recuperer("tmp_quiz")) : res2
 
 		//console.log(res)
 		return res
@@ -15919,7 +15967,7 @@ async function accueil_quiz(id_quiz, preview_mode){
 		vider_fenetre(infos_quiz['titre'] + bouton_edit,false,true)
 		initialiser_fenetre_quiz(true,nb_questions)
 
-		if(preview_mode) return go_to_question(0,nb_questions)
+		//if(preview_mode) return go_to_question(0,nb_questions)
 
 
 		var total_score = await rechercher_avec_ces_references("total_score",{"id_quiz": id_quiz}, ["score_question"])
@@ -15929,7 +15977,7 @@ async function accueil_quiz(id_quiz, preview_mode){
 
 		var fin_quiz = ma_tentative['date_publication'] ? "<br>Vous l'avez terminé le "  +  afficher_date(ma_tentative['date_publication']) : ""
 		//var points = ma_tentative['note_rendu'] ? "<br>Votre score: "  + await calculer_mon_score(ma_tentative['reponses'])  +  "/" + total_score : ""
-		var points = "<br>Votre score: "  + await calculer_mon_score(ma_tentative['reponses'])  +  "/" + total_score 
+		var points = ma_tentative['date_publication'] ? "<br>Votre score: "  + await calculer_mon_score(ma_tentative['reponses'])  +  "/" + total_score : ""
 		var remarque_quiz = date_debut_premiere_tentative ? '<i style="color: #737373;"> Vous avez déjà fait 1 tentative le ' + afficher_date(date_debut_premiere_tentative) + ' ' + fin_quiz + points +' </i>': ""
 
 		element_DOM("remarque-quiz").innerHTML = remarque_quiz
@@ -15989,15 +16037,16 @@ async function calculer_mon_score(rpses){
 	score = await rechercher_avec_ces_references("total_score",ref)
 
 
-	return 10
+	return "todo"
 } 
 
 
 function initialiser_tentative(){
 	if(Object.keys(ma_tentative).length === 0){
-
+		var id_devoir = creer_uuid()
 		ma_tentative = {
-			id_devoir : creer_uuid(),
+			id_devoir : id_devoir,
+			id_fichier : id_devoir,
 			proprietaire: recuperer("identifiant_courant"),
 			id_dossier_sujetdevoir: recuperer("dossier_chargé"),
 			matiere_rendue: la_matiere_chargee('Matiere'),
@@ -16005,7 +16054,7 @@ function initialiser_tentative(){
 			date_debut: get_date_debut_quiz(),
 			remarque: "",
 			taille_fichier: 0,
-			nom_fichier: "Quiz de " +  recuperer("identifiant_courant"),
+			nom_fichier: "Quiz de " +  recuperer("identifiant_courant") + ".quiz",
 			reponses: {}
 		}
 
@@ -16040,18 +16089,28 @@ async function submit_quiz(sans_terminer){
 
 	if(!sans_terminer) {
 
+		if(quiz_mode_previz()){
+			alert("Au clic de ce bouton, l'utilisateur aura le score de sa tentative, ainsi que la correction du quiz.\n⚠️Votre tentative n'est pas envoyée car vous êtes éditeur de ce quiz.")
+			return false	
+		} 
+
 		var confirmation = confirm("Êtes-vous sûr de vouloir terminer le quiz ? Cette action est irréversible.")
 		if(!confirmation) return false
+
 		ma_tentative['date_publication'] = !quiz_mode_previz() ? await maintenant() : ""
 	}
 
 
+	if(Object.keys(ma_tentative.reponses).length > 0 ){
 
-	var retour = await supabase
-	  .from('Rendus')
-	  .upsert(ma_tentative)
+		var retour = await supabase
+		  .from('Rendus')
+		  .upsert(ma_tentative)
 
-  	//console.log(retour)
+	  	//console.log(retour)
+
+
+	}
 
   	return ma_tentative
 }
@@ -16161,7 +16220,8 @@ async function get_nth_question(position_question,nb_questions){
 
 		var scoring = await rechercher_avec_ces_references("total_score", champs_refs)
 
-		console.log(scoring)
+		//console.log(scoring)
+		if(!scoring) return afficher_alerte("Erreur de connexion, merci de réessayer plus tard.")
 
 		var nb_questions_ok = scoring[0]['nb_questions_ok']
 		var score_question = scoring[0]['score_question']
@@ -16228,12 +16288,16 @@ function resume_tentative_quiz(nb_questions){
 	var res = ""
 	var element = ""
 
+
+
 	//pour chaque reponse de la tentative (entre 0 et nb_questions-1)
 	for (var i = 0; i<nb_questions;i++) {
 
-		
-		element = typeof(ma_tentative.reponses[i]) === "string" ?  ma_tentative.reponses[i] :
-					typeof(ma_tentative.reponses[i]) === "object" ? JSON.stringify(ma_tentative.reponses[i]) : ""		
+		if(ma_tentative.reponses){
+
+			element = typeof(ma_tentative.reponses[i]) === "string" ?  ma_tentative.reponses[i] :
+						typeof(ma_tentative.reponses[i]) === "object" ? JSON.stringify(ma_tentative.reponses[i]) : ""	
+		}
 		
 		if(element === "[]") element = []
 
@@ -16808,7 +16872,7 @@ async function sauvegarder_quiz(){
 	//run mode	
 	}else if(quiz_mode_run()){
 
-		texte_a_afficher = "Votre tentative a bien été sauvegardée."
+		texte_a_afficher =  ma_tentative.reponses && Object.keys(ma_tentative.reponses).length > 0  ? "Votre tentative a bien été sauvegardée." : ""
 		save_current_submition()
 		//submit_quiz(true)
 		retour = ma_tentative
@@ -16820,7 +16884,7 @@ async function sauvegarder_quiz(){
 
 
 
-	afficher_alerte(texte_a_afficher)
+	if(texte_a_afficher) afficher_alerte(texte_a_afficher)
 
 	return retour
 }
@@ -16879,7 +16943,7 @@ function stocker_element_server(nom_table,donnees_locales){
 
 
 
-function publier_quiz(id_quiz, nom_fichier){
+async function publier_quiz(id_quiz, nom_fichier){
 
 	date_heure_actuelle = maintenant()
 	mes_donnees = JSON.parse(recuperer('mes_donnees'))
@@ -16906,37 +16970,47 @@ function publier_quiz(id_quiz, nom_fichier){
 
 	}
 
-	//console.log(nouveau_fichier)
-	ajouter_un_element("Fichiers",nouveau_fichier, id_quiz)
+
+	try{
 
 
-	id_notif = id_quiz+suite_notif()
-	nouvelle_notif = {
-		"id_notif" : id_notif,
-		"Horodateur": date_heure_actuelle,
-		"Type_notif" : "fichier",
-		"Id_source" : id_quiz,
-		"Intitulé" : nom_fichier,
-		"Identifiant_originaire": recuperer('identifiant_courant'),
-		"Role_originaire": mon_role,
-		"Identifiant_derniere_modif" : recuperer('identifiant_courant'),
-		'Role_derniere_modif' : mon_role,
-		'Classe' : la_classe,
-		'Classe_matiere' : "(" + la_classe + "|" + la_matiere + ")" ,
-		'Id_classe_matiere' : recuperer("dossier_chargé"),
-		'Date_derniere_modif' : date_heure_actuelle,
-		'Cycle' : mes_donnees['Cycle']
+
+		//console.log(nouveau_fichier)
+		retour1 = await ajouter_un_element("Fichiers",nouveau_fichier, id_quiz)
+
+
+		id_notif = id_quiz+suite_notif()
+		nouvelle_notif = {
+			"id_notif" : id_notif,
+			"Horodateur": date_heure_actuelle,
+			"Type_notif" : "fichier",
+			"Id_source" : id_quiz,
+			"Intitulé" : nom_fichier,
+			"Identifiant_originaire": recuperer('identifiant_courant'),
+			"Role_originaire": mon_role,
+			"Identifiant_derniere_modif" : recuperer('identifiant_courant'),
+			'Role_derniere_modif' : mon_role,
+			'Classe' : la_classe,
+			'Classe_matiere' : "(" + la_classe + "|" + la_matiere + ")" ,
+			'Id_classe_matiere' : recuperer("dossier_chargé"),
+			'Date_derniere_modif' : date_heure_actuelle,
+			'Cycle' : mes_donnees['Cycle']
+		}
+		//console.log(nouvelle_notif)
+		retour2 = await ajouter_un_element("Notifs",nouvelle_notif, id_notif)
+
+
+
+		afficher_alerte("Votre quiz a bien été publié.",true)
+
+		
+
+	}catch(e){
+		console.error(e)
+		afficher_alerte("Erreur de publication du quiz: vérifiez s'il n'est pas déjà publié.")
+
 	}
-	//console.log(nouvelle_notif)
-	ajouter_un_element("Notifs",nouvelle_notif, id_notif)
 
-
-
-
-	
-	//dans 3 secondes, on masque l'alerte et on actualise
-	afficher_alerte("Votre quiz a bien été publié.",true)
-	
 
 	chargement(false)
 	
