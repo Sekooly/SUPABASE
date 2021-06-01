@@ -76,6 +76,16 @@
 
 	<style>
 
+		.download-btn {
+			position: relative;
+			z-index:3;right: 30px;
+		}
+		.window-btn {
+			width: 30px;
+			cursor: pointer;
+			position: relative;
+		}
+
 		.option-rps:checked + .label-check {
 			font-weight: bold;
 		}
@@ -2341,6 +2351,7 @@
 			<div id="recup_profs" onclick="recuperer_profs()" >Liste des professeurs</div>
 			<div id="recup_admin" onclick="recuperer_admin()">Liste de l'Administration</div>
 			<div id="recup_params" onclick="recuperer_parametres()" >Paramètres</div>
+			<div id="recup_analyses" onclick="recuperer_analyses()" >Analyses</div>
 			<div onclick="deconnexion()">Se déconnecter</div>		
 		</div>
 		
@@ -2486,12 +2497,10 @@
 			<option value="--">--</option>
 			<option value="Cours">Cours</option>
 
-			<!--<option value="Exercices">Exercices</option>-->
-
 			<option value="Devoirs">Devoirs</option>
 			
 
-			<!--<option value="Quiz">Quiz</option>-->
+			<option id="quiz-option" value="Quiz">Quiz</option>
 			
 
 			<option value="Corrections">Corrections</option>
@@ -2629,6 +2638,7 @@
 
 	<div id="snackbar">CONTENU</div>
 
+	<!--<script type="text/javascript" src="scripts/tele-enseignement.min.js"></script>-->
 	<script type="text/javascript" src="scripts/tele-enseignement.js"></script>
 
 	</body>
