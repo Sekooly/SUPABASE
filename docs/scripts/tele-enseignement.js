@@ -7605,7 +7605,7 @@ function ajouter_la_notif(la_notif,index,mode_notif){
 
 	var ma_notif = document.createElement('div');
 	ma_notif.className = "une_notif";
-	ma_notif.id = Id_source;
+	ma_notif.id = Type_notif === "visio" ? id_notif : Id_source;
 	ma_notif.setAttribute('id_notif',id_notif.toString());
 	ma_notif.onclick = function(e){
 		chargement(true);
@@ -7681,7 +7681,7 @@ function clic_de_notif(type_notif,id_source,id_dossier,id_notif,ouvrir_topic){
 		}else if(type_notif === "devoir"){
 			notif_devoir(id_source,id_dossier);
 		}else if(type_notif === "visio"){
-			notif_visio(id_source);
+			notif_visio(id_dossier);
 		};
 
 
@@ -7694,9 +7694,9 @@ function clic_de_notif(type_notif,id_source,id_dossier,id_notif,ouvrir_topic){
 
 }
 
-async function notif_visio(id_source){
+async function notif_visio(id_dossier){
 	//charger si pas encore ouvert
-	stocker_temp('dossier_chargé',id_source);
+	stocker_temp('dossier_chargé',id_dossier);
 	init = await initialisation()
 	//console.log(init)
 	rejoindre_visio()
