@@ -16436,7 +16436,7 @@ async function get_nth_question(position_question,nb_questions){
 			var nb_reponses_possibles = rsp.length
 
 			if(typeof(ma_tentative.reponses) === 'string') ma_tentative.reponses = JSON.parse(ma_tentative.reponses)
-				
+
 			var valeurs_par_defaut =  ma_tentative.reponses ? ma_tentative.reponses[position_question] : null
 			//si 1 réponse possible -> ma_tentative.reponses[position_question]
 			//sinon -> ma_tentative.reponses[position_question]
@@ -16528,8 +16528,10 @@ function resp_zone(id_question, rsp, nb_reponses_possibles,nb_questions_ok, vale
 		//console.log(rsp)
 
 		var val = valeurs_par_defaut ? 'value="' + valeurs_par_defaut + '"' : ""
-		var remarque_rpse =  rsp[0]['remarque_correction'] ?  rsp[0]['remarque_correction'] : ""
-		var score_rpse =  rsp[0]['score'] ? (rsp[0]['score'] > 0 ? "+" +rsp[0]['score'] : rsp[0]['score']) : ""
+
+		var est_la_bonne_reponse = val ? valeurs_par_defaut.trim() === rsp[0]['intitule_reponse'].trim()  : ""
+		var remarque_rpse =  est_la_bonne_reponse && rsp[0]['remarque_correction'] ?  rsp[0]['remarque_correction'] : ""
+		var score_rpse = est_la_bonne_reponse && rsp[0]['score'] ? (rsp[0]['score'] > 0 ? "+" +rsp[0]['score'] : rsp[0]['score']) : ""
 
 		phrase_score = rsp[0]['score'] ? pronom_et_verbe + score_rpse + " points pour cette question." : ""
 
