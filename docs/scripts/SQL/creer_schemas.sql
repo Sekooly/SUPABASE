@@ -1859,7 +1859,7 @@ where "Fichiers".categorie_fichier <> 'Profil'
 
 -- DROP TABLE public."Quiz";
 
-CREATE OR REPLACE TABLE public."Quiz"
+CREATE TABLE public."Quiz"
 (
     id_quiz text COLLATE pg_catalog."default" NOT NULL,
     id_classe_matiere text COLLATE pg_catalog."default",
@@ -2005,4 +2005,28 @@ COMMENT ON TABLE public."Reponses"
 
 
 
+
+
+-- View: public.total_score
+
+-- DROP VIEW public.total_score;
+
+CREATE OR REPLACE VIEW public.total_score
+ AS
+ SELECT sum("Reponses".score::double precision) AS score_question,
+    count("Reponses".score) AS nb_questions_ok,
+    "Reponses".id_quiz,
+    "Reponses".id_question
+   FROM "Reponses"
+  WHERE "Reponses".score::double precision > 0::double precision
+  GROUP BY "Reponses".id_quiz, "Reponses".id_question;
+
+ALTER TABLE public.total_score
+    OWNER TO supabase_admin;
+
+GRANT ALL ON TABLE public.total_score TO anon;
+GRANT ALL ON TABLE public.total_score TO postgres;
+GRANT ALL ON TABLE public.total_score TO supabase_admin;
+GRANT ALL ON TABLE public.total_score TO authenticated;
+GRANT ALL ON TABLE public.total_score TO service_role;
 

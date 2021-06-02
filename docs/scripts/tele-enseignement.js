@@ -16179,6 +16179,8 @@ function transform_rsp(rpses){
 	var my_id_resp = []
 	var my_str_rsp = []
 
+	if(typeof(rpses) === 'string') rpses = JSON.parse(rpses)
+
 	$.each(rpses, (key,rsp) => {
 	    //console.log(rsp)
 	    //a string -> push it
