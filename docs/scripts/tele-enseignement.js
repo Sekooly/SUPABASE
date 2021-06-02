@@ -16540,8 +16540,9 @@ function resp_zone(id_question, rsp, nb_reponses_possibles,nb_questions_ok, vale
 								!est_la_bonne_reponse && rsp[0]['intitule_reponse'] ? "<rouge class='remarque_correction'>❌Mauvaise réponse. La réponse était: <b>" + rsp[0]['intitule_reponse'] +"</b></rouge>" : ""
 		
 
-		var score_rpse = est_la_bonne_reponse && rsp[0]['score'] ? (rsp[0]['score'] > 0 ? "+" +rsp[0]['score'] : rsp[0]['score']) :
-						!est_la_bonne_reponse ? 0 :	""
+		score_rpse = !rsp[0]['intitule_reponse'] ? "" :
+					est_la_bonne_reponse && rsp[0]['score'] ? (rsp[0]['score'] > 0 ? "+" +rsp[0]['score'] : rsp[0]['score']) :
+					!est_la_bonne_reponse ? 0 :	""
 
 		phrase_score = rsp[0]['score'] ? pronom_et_verbe + score_rpse + " points pour cette question." : ""
 
