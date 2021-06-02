@@ -16287,7 +16287,7 @@ async function submit_quiz(sans_terminer){
 			id_quiz = get_current_quiz()
 
 			var ma_notif_quiz = {
-				"id_notif":id_quiz,
+				"id_notif":id_quiz + suite_notif(),
 				"Horodateur": ma_tentative['date_publication'],
 				"Type_notif" : "devoir",
 				"Id_source" : id_quiz,
