@@ -11410,7 +11410,12 @@ function mon_ecolage_est_ok(){
 		identifiant_eleve = recuperer("identifiant_courant")
 		url = racine_data + "Eleves" + "?Identifiant=eq." + identifiant_eleve + "&" +apikey
 		//console.log(url)
-		return get_resultat(url)[0]["Ecolage_OK"] === "oui"
+		try{
+			return get_resultat(url)[0]["Ecolage_OK"] === "oui"	
+		}catch(e){
+			return false
+		}
+		
 	}else{
 		return true
 	}
@@ -16158,6 +16163,7 @@ async function calculer_mon_score(rpses){
 
 	//filter with my reponses
 	var mon_score = total_score.filter(function(a_rsp){
+		//console.log(a_rsp['intitule_reponse'] + " dans " , my_str_rsp)
 		//if a_rsp.id_reponse is in my_id_resp OR if a_rsp.intitule_reponse is in my_str_rsp
 		return my_id_resp.indexOf(a_rsp['id_reponse']) >= 0 || my_str_rsp.indexOf(a_rsp['intitule_reponse']) >= 0
 	})
@@ -16529,9 +16535,13 @@ function resp_zone(id_question, rsp, nb_reponses_possibles,nb_questions_ok, vale
 
 		var val = valeurs_par_defaut ? 'value="' + valeurs_par_defaut + '"' : ""
 
-		var est_la_bonne_reponse = val ? valeurs_par_defaut.trim() === rsp[0]['intitule_reponse'].trim()  : ""
-		var remarque_rpse =  est_la_bonne_reponse && rsp[0]['remarque_correction'] ?  rsp[0]['remarque_correction'] : ""
-		var score_rpse = est_la_bonne_reponse && rsp[0]['score'] ? (rsp[0]['score'] > 0 ? "+" +rsp[0]['score'] : rsp[0]['score']) : ""
+		var est_la_bonne_reponse = rsp[0]['intitule_reponse'] ? valeurs_par_defaut.trim() === rsp[0]['intitule_reponse'].trim()  : ""
+		var remarque_rpse =  est_la_bonne_reponse && rsp[0]['remarque_correction'] ?  rsp[0]['remarque_correction'] :
+								!est_la_bonne_reponse && rsp[0]['intitule_reponse'] ? "<rouge class='remarque_correction'>❌Mauvaise réponse. La réponse était: <b>" + rsp[0]['intitule_reponse'] +"</b></rouge>" : ""
+		
+
+		var score_rpse = est_la_bonne_reponse && rsp[0]['score'] ? (rsp[0]['score'] > 0 ? "+" +rsp[0]['score'] : rsp[0]['score']) :
+						!est_la_bonne_reponse ? 0 :	""
 
 		phrase_score = rsp[0]['score'] ? pronom_et_verbe + score_rpse + " points pour cette question." : ""
 
