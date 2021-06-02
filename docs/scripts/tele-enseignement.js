@@ -15718,7 +15718,7 @@ function ajouter_edit_quiz(oui){
 
 async function changement_quiz_ou_non(){
 
-		afficher_quiz_option(window.location.href.includes("localhost"))
+		//afficher_quiz_option(window.location.href.includes("localhost"))
 
 		$('#liste_quiz').off('change')
 		$('#liste_quiz').on('change', function(e){
