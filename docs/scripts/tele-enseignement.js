@@ -16983,7 +16983,8 @@ function go_to_step(step_number,prev_step){
 
 
 	resultat['id_quiz'] = JSON.parse(recuperer("tmp_quiz"))['id_quiz']
-	
+	resultat['id_classe_matiere'] = recuperer("dossier_chargé")
+	resultat['proprietaire'] = recuperer("identifiant_courant")
 
 	
 	stocker_quiz_local(resultat)
