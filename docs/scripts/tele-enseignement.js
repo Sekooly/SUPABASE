@@ -887,7 +887,7 @@ function afficher_rendus_devoirs(resultats){
 	liste_des_devoirs_rendus.innerHTML = '';
 	//console.log(resultats.length)
 
-
+	var est_quiz = nom_du_devoir_choisi().split(".").pop() === "quiz"
 	for (var i = 0; i < resultats.length; i++) {
 		//console.log(resultats[i][4] + " par " + resultats[i][5]);
 		
@@ -922,7 +922,8 @@ function afficher_rendus_devoirs(resultats){
 
 		un_devoir_rendu.innerHTML += '<img alt="remarque" class="mini-image envoi_remarque" onclick="mettre_remarque_devoir(this,\'' + remarque +'\',' + coefficient_rendu +','+ note_rendu + ');" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png">';
 
-		un_devoir_rendu.innerHTML += '<a   id="telechargement" href = "https://drive.google.com/uc?export=download&id=' + un_devoir_rendu.id +'" download="mon_fichier.txt"><img alt="télécharger" class="mini-image" src="https://sekooly.github.io/SUPABASE/images/img_download.png"></a>';
+
+		un_devoir_rendu.innerHTML += est_quiz ? "" : '<a   id="telechargement" href = "https://drive.google.com/uc?export=download&id=' + un_devoir_rendu.id +'" download="mon_fichier.txt"><img alt="télécharger" class="mini-image" src="https://sekooly.github.io/SUPABASE/images/img_download.png"></a>';
 		
 		un_devoir_rendu.innerHTML += '<i style="color: #bfbfbf;">' + afficher_date(resultats[i]["date_publication"]) + '  </i>';
 
