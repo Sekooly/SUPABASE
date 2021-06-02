@@ -15847,7 +15847,7 @@ async function saisie_des_questions_responses(){
 	var les_reponses = []
 	console.log("Enregistrement des questions...")
 
-	sauvegarder_le_quiz_dans_la_table_quiz()
+	await sauvegarder_le_quiz_dans_la_table_quiz()
 
 	//pour chaque question
 	$(".une_question_quiz").each(async (index,element) => {
