@@ -16435,7 +16435,8 @@ async function get_nth_question(position_question,nb_questions){
 			//count rsp
 			var nb_reponses_possibles = rsp.length
 
-
+			if(typeof(ma_tentative.reponses) === 'string') ma_tentative.reponses = JSON.parse(ma_tentative.reponses)
+				
 			var valeurs_par_defaut =  ma_tentative.reponses ? ma_tentative.reponses[position_question] : null
 			//si 1 réponse possible -> ma_tentative.reponses[position_question]
 			//sinon -> ma_tentative.reponses[position_question]
