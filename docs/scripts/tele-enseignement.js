@@ -16166,7 +16166,7 @@ async function calculer_mon_score(rpses){
 	var mon_score = total_score.filter(function(a_rsp){
 		//console.log(a_rsp['intitule_reponse'] + " dans " , my_str_rsp)
 		//if a_rsp.id_reponse is in my_id_resp OR if a_rsp.intitule_reponse is in my_str_rsp
-		return my_id_resp.indexOf(a_rsp['id_reponse']) >= 0 || my_str_rsp.indexOf(a_rsp['intitule_reponse']) >= 0
+		return my_id_resp.indexOf(a_rsp['id_reponse']) >= 0 || my_str_rsp.indexOf(a_rsp['intitule_reponse'].trim()) >= 0
 	})
 
 	//console.log({mon_score:mon_score})
