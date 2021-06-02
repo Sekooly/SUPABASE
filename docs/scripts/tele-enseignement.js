@@ -16513,7 +16513,7 @@ function resp_zone(id_question, rsp, nb_reponses_possibles,nb_questions_ok, vale
 	var score_rpse = ""
 	var remarque_rpse = ""
 	var pronom_et_verbe = "Vous avez eu "
-	
+
 	if(recuperer("proprietaire_devoir") ){
 		pronom_et_verbe = recuperer("proprietaire_devoir") === recuperer("identifiant_courant") ? "Vous avez eu " : recuperer("proprietaire_devoir").toUpperCase() + " a eu "	
 	}
@@ -16971,7 +16971,10 @@ function go_to_step(step_number,prev_step){
 		saisie_des_questions_responses()
 	}else if(prev_step === 1){
 		//verifier que tout est rempli
-		if(!formulaire_rempli_ok("quiz-form")) return alert("Vous devez remplir tous les champs avant de continuer.")
+		if(!formulaire_rempli_ok("quiz-form")){
+			element_DOM("etape-quiz").innerText = prev_step
+			return alert("Vous devez remplir tous les champs avant de continuer.")
+		}
 		resultat = objectifyForm("quiz-form")	
 	}
 	
