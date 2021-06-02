@@ -186,6 +186,8 @@ function ordonner(nom_table){
     return "&order=date_publication.desc"
   }else if(nom_table==="Fichiers_tout"){
     return '&order=date_effet.asc,heure_effet.asc,id_dossier.asc'
+  }else if(nom_table==="Reponses"){
+    return '&order=id_quiz.asc,id_question.asc,position_reponse.asc'
   }else{
     return ""
   
@@ -814,14 +816,17 @@ function garder_les_colonnes_non_automatiques(arr){
 
 function csv_en_JSON(contenu){
   var toutes_les_lignes = contenu.split('\r\n')
-  //console.log(toutes_les_lignes)
   var entete = toutes_les_lignes[0].split(separateur)
-  //console.log(entete)
+  console.log(entete)
 
   var json_final = []
 
   //pour chaque ligne, on créer un seul et unique objet {} avec les clés et valeurs qu'il faut
   toutes_les_lignes.forEach(function(valeur,index){
+    
+    if(typeof(valeur) === "string") valeur.split('\n')
+    console.log(valeur)
+
     if(index === 0) return true
     //console.log({[index]: toutes_les_lignes[index].split(separateur)})
     var nouvel_objet = {}

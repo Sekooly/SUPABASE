@@ -76,6 +76,27 @@
 
 	<style>
 
+		gris {
+			color:grey;
+		}
+
+		#soumettre_quiz {
+			display: none;
+		}
+
+		.wrong {
+			color: red;
+		}
+
+		.points{
+			color: grey;
+			text-align: center;
+			padding: 15px;
+			color: gray;
+			font-style: italic;
+		}
+
+
 		.download-btn {
 			position: relative;
 			z-index:3;right: 30px;
@@ -88,6 +109,7 @@
 
 		.option-rps:checked + .label-check {
 			font-weight: bold;
+			background: #8e8e8e;
 		}
 
 		.resume{
@@ -275,7 +297,7 @@
 
 		.query{
 			width: 100%;
-			height: 400px;
+			height: 200px;
 			background: black;
 			resize: none;
 			color: white;
@@ -1128,7 +1150,6 @@
 		}
 		.un_menu:hover{
 			
-			font-weight: bold;
 			background-color: antiquewhite
 		}
 
@@ -2489,8 +2510,7 @@
 
 	<div id="choix_popup" class="choix_popup">
 		<img alt="X" src="images/quitter.png" id="bye_prev" onclick="afficher_ou_non_choix_fichier(false)" class="quitter_rendu_devoir">
-		<!--<img id="mini-image" src="images/img_help.png" onclick="alert('Si vous attendez un rendu de la part des élèves, catégorisez votre fichier en Devoirs/Examens.')">-->
-		<rouge id="mini-image" onclick="alert('Si vous attendez un rendu de la part des élèves, catégorisez votre fichier en Devoirs/Examens.')">Besoin d'aide?</rouge>
+		<rouge id="mini-image" onclick="alert('Si vous attendez un rendu de la part des élèves, catégorisez votre fichier en Devoirs/Examens/Quiz.')">Besoin d'aide?</rouge>
 		
 		<span style="font-size: 14px;"> Catégorie de fichier: </span>
 		<select id="categorie_choisie" class="categorie_choisie">
@@ -2500,7 +2520,7 @@
 			<option value="Devoirs">Devoirs</option>
 			
 
-			<!--<option id="quiz-option" value="Quiz">Quiz</option>-->
+			<option id="quiz-option" value="Quiz">Quiz</option>
 			
 
 			<option value="Corrections">Corrections</option>
@@ -2621,6 +2641,10 @@
 
 			<button id="bouton_rendre_devoir" type="button" class="rendre" onclick="rendre_devoir()"> Rendre le devoir</button>
 			<div id="tout"><img id="result"></div>
+		</div>
+
+		<div id="soumettre_quiz">
+			<button  class="rendre" onclick="$('#'+element_DOM('devoir_choisi').value).click()">Faire le quiz</button>
 		</div>
 	</div>​
 	

@@ -1,11 +1,11 @@
-var elements_menu_haut = ["Infos établissement","Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Programme", "Alerte", "Logs", "Conversations", "Visio", "Notifs", "Fichiers", "Rendus", "Topic", "Coms","Espace etablissement restant","Analyses des connexions"]
+var elements_menu_haut = ["Infos établissement","Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Programme", "Alerte", "Logs", "Conversations", "Visio", "Notifs", "Fichiers", "Quiz","Questions","Reponses","Rendus", "Topic", "Coms","Espace etablissement restant","Analyses des connexions"]
 var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL_Mapping","URL_agenda",
 								"id_googlecalendar","nb_avis_donnés", "nb_avis_max","nom_fiche","taux_conseil",
 								"Matiere_bis", "classe_id", "classe_bis", "type", "Derniere_consultation_notifs",
 								"id_formulaire_remediation", "id_fiche", "URL_Mapping","niveau",
 								"classe_bis", "id_dossier_cycle", "dossier_rendus_cycle", "liste_notifs_lues", "nombre_avis", "Numero_telephone",
-								"id", "Id_classe_matiere", "id_notif", "Id_source", "id_fichier", "id_dossier", "id_devoir", "id_dossier_sujetdevoir", "id_fichier_sujetdevoir", "Id_topic", "id_com", "ID_FICHIER", "id_msg","id_conv", "id_chapitre"
-								]
+								"id", "Id_classe_matiere", "id_notif", "Id_source", "id_fichier", "id_dossier", "id_devoir", "id_dossier_sujetdevoir", "id_fichier_sujetdevoir", "Id_topic", "id_com", "ID_FICHIER", "id_msg","id_conv", "id_chapitre",
+								"id_quiz", "id_question", "id_reponse"]
 
 var elements_menu_haut_avec_modifs = ["Classes","Matieres","Eleves","Profs","Administration"]
 var elements_menu_haut_avec_reset = ["Eleves","Profs","Administration"]
@@ -493,11 +493,12 @@ function recuperer_MA_fiche_conseil(){
 
 function aide_devoirs(){
 	alerte = "CONSIGNES POUR METTRE EN LIGNE UN DEVOIR: \n"
-	alerte = alerte + '• Vous pouvez rendre uniquement un devoir lorsque le professeur a catégorisé un fichier de "Devoir" ou "Examen".\n'
-	alerte = alerte + '• Pour rendre un devoir, choisissez le sujet que le professeur aura mis en ligne.\n'
+	alerte = alerte + '• Pour un quiz, il suffit d\y répondre en ligne et d\'enregistrer vos réponses. Une fois tout validé, vous ne pourrez plus modifier vos réponses.\n'
+	alerte = alerte + '• Vous pouvez rendre uniquement un devoir lorsque l\'enseignant a catégorisé un fichier de "Devoir" ou "Examen".\n'
+	alerte = alerte + '• Pour rendre un devoir, choisissez le sujet que l\'enseignant aura mis en ligne.\n'
  	alerte = alerte + "• Pour un même devoir, si vous avez plusieurs images, cliquez sur 'Ajouter une page' et choissisez le fichier IMAGE à rajouter.\n"
  	alerte = alerte + "• Vérifiez bien l'ordre des images car cela sera pris en compte dans l'image finale générée, que pouvez voir en aperçu ci-dessous.\n"
- 	alerte = alerte + "• Si vous êtes sur ordinateur, vous pouvez également créer un fichier word et y coller toutes vos images. Les fichiers word (doc / docx) sont également supportés par SEKOOLY."
+ 	alerte = alerte + "• Si vous êtes sur ordinateur, vous pouvez également créer un fichier word et y coller toutes vos images. Les fichiers word (doc / docx) sont également supportés par Sekooly."
  
  	alert(alerte)
  
@@ -539,6 +540,8 @@ function afficher_fenetre_rendudevoir(oui){
 	} 
 
 }
+
+
 
 function initialisation_choix_devoir(){
 
@@ -689,7 +692,6 @@ function recuperer_mon_devoir(id_fichier_sujetdevoir,proprietaire,examen_termin�
 
 
 
-
 	chargement(true);
 	
 
@@ -704,6 +706,15 @@ function recuperer_mon_devoir(id_fichier_sujetdevoir,proprietaire,examen_termin�
 
 	if(recuperer('mon_type') === "Eleves"){
 		element_DOM('rendu_devoir').style.height='';
+		/*
+		console.log({
+			id_fichier_sujetdevoir:id_fichier_sujetdevoir,
+			proprietaire:proprietaire,
+			examen_terminé:examen_terminé,
+			date_fin:date_fin
+
+		})
+		*/
 
 		rechercher("Rendus",'id_devoir',id_fichier_sujetdevoir+suite_notif(),"").then(snapshot => { 
 			chargement(false)
@@ -719,10 +730,11 @@ function recuperer_mon_devoir(id_fichier_sujetdevoir,proprietaire,examen_termin�
 			if(donnees_initiales!==undefined){
 
 				data = donnees_initiales['nom_fichier']
+				extension = data.split('.').pop()
 
 				remarque = donnees_initiales['remarque']
 
-				id_fichier = donnees_initiales['id_fichier']
+				id_fichier = extension === "quiz" ? donnees_initiales['id_fichier_sujetdevoir'] : donnees_initiales['id_fichier']
 
 				//rendre le border vert
 				changer_couleur_devoir("green");
@@ -740,10 +752,12 @@ function recuperer_mon_devoir(id_fichier_sujetdevoir,proprietaire,examen_termin�
 
 				//on ne peut plus supprimer si examen terminé
 				var suppression_devoir = examen_terminé ? "" : '<img alt="supprimer"  id="'+ data +'" src="https://sekooly.github.io/SUPABASE/images/img_trash.png" style="width:15px;height:15px;cursor:pointer;" onclick="supprimer_devoir(this)">'
-				mon_devoir_rendu.innerHTML += '<div id="mon_devoir_rendu"> <div id="'+id_fichier+'">'+ data + '<img class="mini-image" onclick="visualiser(\''+titre+'\',\''+id_fichier+'\')" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" style="padding-left:1%">'+ suppression_devoir+'</div></div>';
-				
+				var remarque_non_termine = donnees_initiales['date_publication'] === null ? '  <i><gris>non terminé</gris></i>  ' : "" 
+				mon_devoir_rendu.innerHTML += '<div id="mon_devoir_rendu"> <div id="'+id_fichier+'">'+ data + '<img class="mini-image" onclick="visualiser(\''+titre+'\',\''+id_fichier+'\')" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" style="padding-left:1%">'+ suppression_devoir+remarque_non_termine+'</div></div>';
+
+
 				//afficher le devoir
-				element_DOM('rendu_devoir').appendChild(mon_devoir_rendu.firstChild);
+				$('#rendu_devoir').append(mon_devoir_rendu.innerHTML);
 
 
 
@@ -795,8 +809,7 @@ function recuperer_mon_devoir(id_fichier_sujetdevoir,proprietaire,examen_termin�
 					supprimer_div_devoir_choisi();
 					supprimer_rendus_devoirs_affiches();
 
-					//afficher le input upload
-					element_DOM('soumettre_devoir').style.display ="";
+					gerer_affichage_quiz_devoir(id_fichier_sujetdevoir)
 				}
 			}
 
@@ -812,6 +825,7 @@ function recuperer_mon_devoir(id_fichier_sujetdevoir,proprietaire,examen_termin�
 
 
 		rechercher("Rendus",'id_fichier_sujetdevoir',id_fichier_sujetdevoir,"").then(snapshot => {
+			snapshot = snapshot.filter(e => e['date_publication']) //uniquement ceux publiés
 			chargement(false)
 
 			//console.log(snapshot)
@@ -823,6 +837,25 @@ function recuperer_mon_devoir(id_fichier_sujetdevoir,proprietaire,examen_termin�
 
 	$('#recuperer_devoir').remove(); // on enlève le form invisible : TRES UTILE
 
+}
+
+function gerer_affichage_quiz_devoir(id_fichier_sujetdevoir){
+
+	var est_quiz = $('[value="'+id_fichier_sujetdevoir+'"]').text().split('.').pop() === "quiz"
+	//si quiz: afficher bouton faire quiz et masquer input upload
+	//si NON quiz: afficher le input upload et masquer bouton faire quiz
+	if(est_quiz && !element_DOM("mon_devoir_rendu")){
+		element_DOM('soumettre_devoir').style.display ="none" ;
+		element_DOM('soumettre_quiz').style.display ="block";
+	}else{
+		element_DOM('soumettre_quiz').style.display ="none";
+		element_DOM('soumettre_devoir').style.display ="" ;
+	}
+
+}
+
+function nom_du_devoir_choisi(){
+	return $('[value="'+element_DOM("devoir_choisi").value+'"]').text()
 }
 
 
@@ -1027,7 +1060,7 @@ function mettre_remarque_devoir(ceci,remarque,coefficient_rendu, note_rendu){
 }
 
 
-function supprimer_devoir(moi, id_fichier_donné, id_devoir_donné){
+async function supprimer_devoir(moi, id_fichier_donné, id_devoir_donné){
 
 	if(id_fichier_donné){
 		var id_fichier = id_fichier_donné
@@ -1035,9 +1068,6 @@ function supprimer_devoir(moi, id_fichier_donné, id_devoir_donné){
 		var id_fichier = moi.parentNode.id;	
 	}	
 	//console.log("le fichier sur drive: "+id_fichier)
-
-
-
 
 
 
@@ -1059,9 +1089,17 @@ function supprimer_devoir(moi, id_fichier_donné, id_devoir_donné){
 
 	if(!accepter_suppression) return -1;
 
+	stocker("id_devoir",id_devoir)
 	chargement(true);
 
 	
+
+    //si c'est un quiz
+    if(nom_du_devoir_choisi().split(".").pop() === "quiz"){
+    	return await suppression_devoir_sur_db("Votre tentative du quiz a été supprimée.")
+    }
+
+
 	//déjà le nouveau script de suppression
 	var lien_script = 'https://script.google.com/macros/s/AKfycbw_04bdiepfQ0P9Ddtn6nyRPjxzxumORN4J8xm7bnmu7yO3HvQ/exec';
 	var bon_API = (id_fichier_donné || id_devoir_donné) ? "API_KEY_DELETE" : "API_KEY_DEVOIR"
@@ -1079,36 +1117,12 @@ function supprimer_devoir(moi, id_fichier_donné, id_devoir_donné){
     var form = $("#supprimer_devoir");
 
 
-	$.ajax({
+    $.ajax({
 		type: "POST",
 		url: lien_script,
 		data: form.serialize(),
-		success: function(data) {
-			//console.log(data);
-			afficher_alerte(data)
-
-			
-			//on met à jour la BDD: dans Rendus
-			supprimer("Rendus","id_devoir",id_devoir)
-			supprimer("Notifs","id_notif",id_devoir)
-
-			//au bout de 2 secondes
-			setTimeout(function(){
-				recuperer_mon_devoir(element_DOM('devoir_choisi').value, recuperer('identifiant_courant'));
-			}, 2000);
-
-
-			chargement(false);
-
-		},
-
-		error: function(data){
-			console.error(data);
-			alert('Impossible de supprimer le rendu: vérifiez que vous êtes toujours connecté.');
-
-
-			chargement(false);
-		}
+		success: suppression_devoir_sur_db,
+		error: erreur_suppression_devoir
 
 	});
 	
@@ -1117,6 +1131,30 @@ function supprimer_devoir(moi, id_fichier_donné, id_devoir_donné){
 	$('#supprimer_devoir').remove(); // on enlève le form invisible : TRES UTILE
 
 
+}
+
+async function suppression_devoir_sur_db(data){
+	
+	var id_devoir = recuperer("id_devoir")
+	//console.log(id_devoir)
+
+	//on met à jour la BDD: dans Rendus
+	await supprimer("Rendus","id_devoir",id_devoir)
+	await supprimer("Notifs","id_notif",id_devoir)
+
+	effacer("id_devoir")
+
+	//console.log(data);
+	afficher_alerte(data)
+
+	//au bout de 2 secondes
+	setTimeout(function(){
+		return recuperer_mon_devoir(element_DOM('devoir_choisi').value, recuperer('identifiant_courant'));
+		chargement(false);
+	}, 2000);
+
+
+	
 }
 
 function supprimer_div_devoir_choisi(){
@@ -1128,6 +1166,14 @@ function supprimer_div_devoir_choisi(){
 
 
 	if(element_DOM('mon_devoir_rendu')) element_DOM('mon_devoir_rendu').remove();
+}
+
+function erreur_suppression_devoir(data){
+	console.error(data);
+	alert('Impossible de supprimer le rendu: vérifiez que vous êtes toujours connecté.');
+
+
+	chargement(false);
 }
 
 function supprimer_rendus_devoirs_affiches(){
@@ -1144,6 +1190,8 @@ function afficher_soumettre_devoir(oui){
 		element_DOM('soumettre_devoir').style.display ="";
 	}else{
 		element_DOM('soumettre_devoir').style.display ="none";
+		element_DOM('soumettre_quiz').style.display ="none";
+		
 	}
 }
 
@@ -1584,7 +1632,7 @@ function url_pp(){
 
 function supprimer_pp(identifiant_courant, sans_confirmation){
 
-	if(!sans_confirmation) var confirmation = confirm("Voulez-vous supprimer cette photo de profil ? Cette action est irréversible.")
+	if(!sans_confirmation) var confirmation = confirm("⚠️Voulez-vous supprimer cette photo de profil ? Cette action est irréversible.")
 
 	if(confirmation || sans_confirmation){
 
@@ -4707,11 +4755,15 @@ async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_init
 
 	if(extension === "quiz") {
 		chargement(false)
-		stocker('fichier_ouvert',id_fichier);
+		//var id_quiz = (nom_proprio_devoir || recuperer("mon_type") === "Eleves") ? element_DOM("devoir_choisi").value : id_fichier
+		var id_quiz = (nom_proprio_devoir) ? element_DOM("devoir_choisi").value : id_fichier
+		stocker('fichier_ouvert',id_quiz);
 
-		//
 
-		return accueil_quiz(id_fichier,recuperer("mon_type")!=="Eleves")
+		nom_proprio_devoir = nom_proprio_devoir ? nom_proprio_devoir.toLowerCase().replace("(","").replace(")","").trim() : recuperer("identifiant_courant")
+		stocker("proprietaire_devoir",nom_proprio_devoir)
+
+		return accueil_quiz(id_quiz,recuperer("mon_type")!=="Eleves", nom_proprio_devoir)
 
 	}
 	
@@ -4928,6 +4980,7 @@ function quitter_previsualisation(){
 
 	ma_tentative = {}
 	effacer("tmp_quiz")
+	effacer("proprietaire_devoir")
 
 }
 
@@ -7325,7 +7378,7 @@ function supprimer_topic(id_topic){
 
 function supprimer_fichier(id_fichier){
 
-	var confirmation_suppression = confirm("Êtes-vous sûr de vouloir supprimer ce fichier ? Cette action est irréversible.");
+	var confirmation_suppression = confirm("⚠️Êtes-vous sûr de vouloir supprimer ce fichier ? Cette action est irréversible.");
 
 	if(!confirmation_suppression) return -1;
 
@@ -7384,12 +7437,14 @@ function supprimer_fichier(id_fichier){
 			supprimer("Notifs","id_notif",id_fichier + suite_notif())
 			supprimer("Fichiers","id_fichier",id_fichier)
 			
-			//dans 4 secondes, on masque l'alerte et on actualise			
+			//dans 4 secondes, on masque l'alerte et on actualise
+			
 			setTimeout(function(){
 				msg_alerte.className = "";
 				window.location.href = window.location.href;
 
 			}, 4000);
+			
 			
 			chargement(false);
 
@@ -10255,7 +10310,7 @@ function supprimer_ligne_parameters(id_parametre){
 
 	var id_ligne = $(".selected")[0].getAttribute('suppression_id')
 
-	var validation = confirm("Voulez-vous supprimer cette ligne ? Cette action est irréversible. (" + id_ligne +")")
+	var validation = confirm("⚠️Voulez-vous supprimer cette ligne ? Cette action est irréversible. (" + id_ligne +")")
 	if(validation){
 
 
@@ -10521,16 +10576,19 @@ function importer_parametres(){
   				for (var i = 0; i< json_final.length; i++) {
   					/*Afficher la barre de progression ici...*/
   					afficher_alerte("Progression de l'import: " + Number(100*i/json_final.length).toFixed(2) + "% ("+i+"/"+json_final.length+")")
-  					try{
+  					//try{
   						//ajouter_un_element(id_parametre, json_final[i])
   						//console.log(json_final[i])
   						creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, false, json_final[i] ? json_final[i] : "")
 						ajouter_donnees_saisies(id_parametre, i<(json_final.length-1)) //deuxieme parametre vaut FAUX -> on est sur le dernier
-  						
+  					
+
+  					/*	
   					}catch(error){
   						console.error(error)
   						alert(error)
   					}
+  					*/
   				}
 
   				afficher_alerte("Import terminé.")
@@ -10641,7 +10699,7 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 
 			//si c'est disabled alors on masque cet élément carrément
 
-			html_du_input = '<input class="donnee" '+donnee_dupliquee+' id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" '+disabled +'>'
+			html_du_input = '<input class="donnee" '+donnee_dupliquee.replaceAll('"',"'") +' id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" '+disabled +'>'
 			
 
 			//SI SANS DUPLICATION
@@ -14327,7 +14385,7 @@ function supprimer_ce_chapitre(ceci){
 
 	var id_chapitre = le_id_chapitre(ceci)
 	//console.log(id_chapitre)
-	var confirmation = confirm("Voulez-vous vraiment supprimer ce chapitre ? Cette action est irréversible. ("+id_chapitre+")")
+	var confirmation = confirm("⚠️Voulez-vous vraiment supprimer ce chapitre ? Cette action est irréversible. ("+id_chapitre+")")
 	if(confirmation){
 		supprimer("Programme","id_chapitre",id_chapitre).then(() => maj_matiere())
 	}
@@ -15596,8 +15654,65 @@ async function valider_suppression_via_mail_si_besoin(){
 
 /******************************** LES QUIZ *********************************/
 function afficher_quiz_option(oui){
-	element_DOM("quiz-option").style.display = oui ? "" : "none"
+	element_DOM("quiz-option").style.display = oui ? "block" : "none"
 
+	
+}
+
+function quiz_selected(){
+	return $("#liste_quiz").val()
+}
+
+function edit_quiz(){
+	stocker("tmp_quiz",JSON.stringify({id_quiz: quiz_selected()}))
+	creer_quiz()
+}
+
+async function delete_quiz(){
+	var confirmation = confirm("⚠️Êtes-vous sûr de vouloir supprimer ce quiz ? Cette action est irréversible.")
+	if(confirmation){
+		var id_quiz = quiz_selected()
+
+
+		//vérifier qu'il n'est pas publié 
+		est_publié = await rechercher("Fichiers","id_fichier", id_quiz)
+		//console.log(est_publié)
+		//si publié -> demander de reconfirmer la suppression
+		if(est_publié.length > 0){
+			var confirmation2 = confirm("Le quiz possède peut-être déjà des réponses.\nSi vous le supprimez, vous supprimez toutes les réponses du quiz. Voulez-vous continuer?")
+			if(confirmation2) supprimer_quiz(id_quiz)
+		}else{
+			supprimer_quiz(id_quiz)
+		}
+
+
+
+	}
+}
+
+async function supprimer_quiz(id_quiz){
+	//supprimer les reponses
+	await supprimer("Reponses","id_quiz",id_quiz)
+	//supprimer les questions
+	await supprimer("Questions","id_quiz",id_quiz)
+	//supprimer les rendus
+	await supprimer("Rendus","id_fichier_sujetdevoir",id_quiz)
+	//supprimer le quiz
+	await supprimer("Quiz","id_quiz",id_quiz)
+
+
+
+	afficher_alerte("Le quiz a bien été supprimé.")
+	changement_quiz_ou_non()
+}
+
+function ajouter_edit_quiz(oui){
+	if(oui){
+		if($("#edit-quiz").length === 0) $("#mode-quiz").append('<img id="edit-quiz" onclick="edit_quiz()" src="https://sekooly.com/assets/images/img_edit.png" alt="modifier" class="editer">')	
+		if($("#delete-quiz").length === 0) $("#mode-quiz").append('<img id="delete-quiz" onclick="delete_quiz()" src="https://sekooly.com/assets/images/img_trash.png" alt="SUPPRIMER" class="editer">')	
+	}else{
+		$("#edit-quiz").remove()
+	}
 	
 }
 
@@ -15610,7 +15725,12 @@ async function changement_quiz_ou_non(){
 			//console.log(e.target.value)
 			if(e.target.value === "new"){
 				$("#liste_quiz")[0].value = "--"
+				ajouter_edit_quiz(false)
 				creer_quiz()
+			}else if(e.target.value === "--"){
+				ajouter_edit_quiz(false)
+			}else{
+				ajouter_edit_quiz(true)
 			}
 		})
 
@@ -15619,7 +15739,7 @@ async function changement_quiz_ou_non(){
 		
 
 			$("#mode-non-quiz").css("display", "none");
-			$("#mode-quiz").css("display", "grid");
+			$("#mode-quiz").css("display", "block");
 
 
 
@@ -15684,7 +15804,8 @@ async function creer_quiz(numero_etape){
 
 	if(recuperer("mon_type").includes("Eleve")) return alert("Vous n'avez pas les droits pour modifier un quiz.")
 
-	vider_fenetre("Créer un nouveau quiz (<span id='etape-quiz'>1</span>/2)",false,true)
+
+	vider_fenetre("Editer un quiz (<span id='etape-quiz'>1</span>/2)",false,true)
 	afficher_fenetre(true)
 
 	initialiser_fenetre_quiz()
@@ -15724,9 +15845,9 @@ async function saisie_des_questions_responses(){
 	
 	var les_questions = []
 	var les_reponses = []
+	console.log("Enregistrement des questions...")
 
-
-	//supprimer tout ce qui existe sur le quiz d'abord
+	sauvegarder_le_quiz_dans_la_table_quiz()
 
 	//pour chaque question
 	$(".une_question_quiz").each(async (index,element) => {
@@ -15756,7 +15877,7 @@ async function saisie_des_questions_responses(){
 		//pour chaque reponse de cette question (identifié par id_question)
 		$(".une_question_quiz#"+id_question+" > .ui-sortable > ").each(async (index_reponse,une_reponse) => {
 			//stocker: id_reponse, intitule_reponse, note_globale, EVENTUELLEMENT une remarque vrai/faux
-			var id_reponse = index_reponse
+			var id_reponse = une_reponse['id'] //index_reponse
 			var intitule_reponse = une_reponse.querySelector('[name=reponse]').value
 			var note_globale = Number(une_reponse.querySelector('[name=note_globale]').value)
 			var remarque_correction =  une_reponse.querySelector('.remarque_correction').outerHTML
@@ -15768,7 +15889,7 @@ async function saisie_des_questions_responses(){
 				id_quiz:get_current_quiz(),
 				id_question:id_question,
 				id_reponse: id_reponse,
-				position_reponse: id_reponse,
+				position_reponse: index_reponse,
 				intitule_reponse: intitule_reponse,
 				score: note_globale,
 				remarque_correction: remarque_correction
@@ -15805,6 +15926,7 @@ async function saisie_des_questions_responses(){
 async function init_creation_quiz(){
 
 	var donnees_quiz = await valeur_par_defaut("*")
+	//console.log(donnees_quiz)
 	if(!donnees_quiz){
 		donnees_quiz = {}
 		donnees_quiz["titre"] = ""
@@ -15830,7 +15952,7 @@ async function valeur_par_defaut(){
 		var res2 = await rechercher("Quiz","id_quiz",id_quiz)
 		if(res2) res2 = res2[0]
 
-		var res = JSON.parse(recuperer("tmp_quiz")) ? JSON.parse(recuperer("tmp_quiz")) : res2
+		var res = res2 ? res2 : JSON.parse(recuperer("tmp_quiz"))
 
 		//console.log(res)
 		return res
@@ -15888,10 +16010,8 @@ async function run_quiz(preview_mode, id_quiz_initial){
 		//submit_quiz(true)
 		sauvegarder_quiz()
 	}
-
-
 	
-	accueil_quiz(id_quiz,preview_mode,ma_tentative['date_debut'])	
+	accueil_quiz(id_quiz,preview_mode)	
 
 }
 
@@ -15930,21 +16050,29 @@ async function next_question(nb_questions){
 	
 }
 
-async function accueil_quiz(id_quiz, preview_mode){
+async function accueil_quiz(id_quiz, preview_mode, proprietaire_initial){
+	var proprietaire_devoir = recuperer("proprietaire_devoir")
 
-	/*
-	console.log({
-		preview_mode:preview_mode
-	})
-	*/
+
+	var proprietaire = proprietaire_initial ? proprietaire_initial :
+						proprietaire_devoir ? proprietaire_devoir :
+						recuperer("identifiant_courant")
+
+
 
 	//tentatives anterieures
 	var references = {
 		id_fichier_sujetdevoir: id_quiz,
-		proprietaire: recuperer("identifiant_courant")
+		proprietaire: proprietaire
 	}
+
+	//console.log(references)
+
 	var mes_tentatives = await rechercher_avec_ces_references("Rendus",references)
 	var tentative_en_cours = mes_tentatives.length > 0
+
+	//console.log({tentative_en_cours:tentative_en_cours}) 
+
 	if(tentative_en_cours){
 		//console.log(mes_tentatives)
 		ma_tentative = mes_tentatives[0]
@@ -15954,7 +16082,11 @@ async function accueil_quiz(id_quiz, preview_mode){
 	}
 
 
+	var moimeme = proprietaire.toLowerCase() === recuperer("identifiant_courant")
 
+	var pronom_utilisateur = !moimeme ? proprietaire.toUpperCase() : "Vous"
+	var verbe_utilisateur = pronom_utilisateur === "Vous" ? "avez" : "a"
+	var poss = pronom_utilisateur === "Vous" ? "Votre" : "Son"
 
 
 
@@ -15962,11 +16094,15 @@ async function accueil_quiz(id_quiz, preview_mode){
 	var nb_questions = await rechercher("Questions","id_quiz", id_quiz, "id_question")
 	//console.log(infos_quiz)
 	//console.log(nb_questions)
+
+
 	if(infos_quiz.length > 0 && nb_questions.length > 0){
 
 		infos_quiz = infos_quiz[0]
 		nb_questions = nb_questions.length
-		var bouton_edit = preview_mode || $('[class="editer"]').length > 0 ? '<img onclick="creer_quiz()" src="https://sekooly.com/assets/images/img_edit.png" alt="modifier" class="editer">' : ''
+
+		//&& pronom_utilisateur === "Vous"  commenté
+		var bouton_edit = (preview_mode || $('[class="editer"]').length > 0) ? '<img onclick="creer_quiz()" src="https://sekooly.com/assets/images/img_edit.png" alt="modifier" class="editer">' : ''
 
 
 		vider_fenetre(infos_quiz['titre'] + bouton_edit,false,true)
@@ -15980,15 +16116,14 @@ async function accueil_quiz(id_quiz, preview_mode){
 		
 
 
-		var fin_quiz = ma_tentative['date_publication'] ? "<br>Vous l'avez terminé le "  +  afficher_date(ma_tentative['date_publication']) : ""
-		//var points = ma_tentative['note_rendu'] ? "<br>Votre score: "  + await calculer_mon_score(ma_tentative['reponses'])  +  "/" + total_score : ""
-		var points = ma_tentative['date_publication'] ? "<br>Votre score: "  + await calculer_mon_score(ma_tentative['reponses'])  +  "/" + total_score : ""
-		var remarque_quiz = date_debut_premiere_tentative ? '<i style="color: #737373;"> Vous avez déjà fait 1 tentative le ' + afficher_date(date_debut_premiere_tentative) + ' ' + fin_quiz + points +' </i>': ""
+		var fin_quiz = ma_tentative['date_publication'] ? "<br>"+pronom_utilisateur+" l'"+verbe_utilisateur+" terminé le "  +  afficher_date(ma_tentative['date_publication']) : ""
+		var points = ma_tentative['date_publication'] ? "<br><b class='sekooly-mode'> "+poss+" score: "  + await calculer_mon_score(ma_tentative['reponses'])  +  "/" + total_score + '</b>': ""
+		var remarque_quiz = date_debut_premiere_tentative ? '<i style="color: #737373;"> '+pronom_utilisateur+' '+verbe_utilisateur+' déjà fait 1 tentative le ' + afficher_date(date_debut_premiere_tentative) + ' ' + fin_quiz + points +' </i>': ""
 
 		element_DOM("remarque-quiz").innerHTML = remarque_quiz
 
 
-		$("#contenu_etape_quiz").append(infos_quiz['description'] + '<br><br>Ce quiz comporte ' + nb_questions + ' questions, et noté sur '+ total_score +'.')
+		$("#contenu_etape_quiz").append(infos_quiz['description'] + '<br><br>Ce quiz comporte ' + nb_questions + ' question'+(nb_questions > 1 ? "s" : "")+', et noté sur '+ total_score +'.')
 
 		$("#contenu_etape_quiz").addClass("resp_zone")
 
@@ -15996,7 +16131,7 @@ async function accueil_quiz(id_quiz, preview_mode){
 		afficher_fenetre(true)
 
 		element_DOM("bouton_suivant").innerText = ma_tentative['date_publication'] ? "Relecture" :
-												 date_debut_premiere_tentative ? "Reprendre ma tentative" : "Commencer"
+												 date_debut_premiere_tentative ? "Reprendre la tentative" : "Commencer"
 
 		element_DOM("btn-previous").setAttribute("style","display: none;")
 	}
@@ -16009,48 +16144,66 @@ async function accueil_quiz(id_quiz, preview_mode){
 
 async function calculer_mon_score(rpses){
 	
-	mes_reponses = rpses
-	//console.log(mes_reponses)
-	all = []
-	all_str = []
+	rspses_t = transform_rsp(rpses)
+	my_id_resp = rspses_t[0]
+	my_str_rsp = rspses_t[1]
 
-	score = 0
-	score_str = 0
-
-	$.each(mes_reponses, (key,rsp) => {
-
-		//si c'est un input direct
-		if(typeof(rsp) === 'string'){
-			all_str.push(rsp)
-		//si c'est des cases à cocher
-		}else{
-			all.push(Object.keys(rsp))
-		}
-		
-
-	})
-
-
-	//'in.("Devoirs","Examens")'
-
-	all = 'in.("' + all.join('","') + '")'
-	console.log([all,all_str])
 	ref = {
-		id_quiz: get_current_quiz()
+		id_quiz:get_current_quiz()
 	}
 
-	score = await rechercher_avec_ces_references("total_score",ref)
+	//nom_table, champs_refs, liste_champs_a_chercher, orderby, mode_OR
+	total_score = await rechercher_avec_ces_references("Reponses",ref, ['id_reponse','score','intitule_reponse'])
+	//console.log({TOUT:total_score})
+
+	//filter with my reponses
+	var mon_score = total_score.filter(function(a_rsp){
+		//if a_rsp.id_reponse is in my_id_resp OR if a_rsp.intitule_reponse is in my_str_rsp
+		return my_id_resp.indexOf(a_rsp['id_reponse']) >= 0 || my_str_rsp.indexOf(a_rsp['intitule_reponse']) >= 0
+	})
+
+	//console.log({mon_score:mon_score})
 
 
-	return "todo"
+
+	mon_score = mon_score.map(e => Number(e['score']))
+	//console.log({mon_score:mon_score})
+
+	//console.log({total_score:total_score})
+
+	return eval(mon_score.join('+'))
 } 
+
+function transform_rsp(rpses){
+
+	var my_id_resp = []
+	var my_str_rsp = []
+
+	$.each(rpses, (key,rsp) => {
+	    //console.log(rsp)
+	    //a string -> push it
+	    if(typeof(rsp) === 'string'){
+	    	my_str_rsp.push(rsp)
+
+	    //an array -> map to push only id_response
+	    }else if(rsp){
+	    	my_id_resp.push(rsp.map(e => Object.keys(e)).join(','))
+	    }
+	    
+	})
+
+	my_id_resp = my_id_resp.join(',').split(',')
+
+	//console.log({my_id_resp:my_id_resp,my_str_rsp:my_str_rsp})
+	return [my_id_resp, my_str_rsp]
+}
 
 
 function initialiser_tentative(){
 	if(Object.keys(ma_tentative).length === 0){
 		var id_devoir = creer_uuid()
 		ma_tentative = {
-			id_devoir : id_devoir,
+			id_devoir : get_current_quiz()+suite_notif(),
 			id_fichier : id_devoir,
 			proprietaire: recuperer("identifiant_courant"),
 			id_dossier_sujetdevoir: recuperer("dossier_chargé"),
@@ -16088,18 +16241,23 @@ function get_date_debut_quiz(){
 	return recuperer("date_debut_quiz") ? recuperer("date_debut_quiz") : maintenant()
 }
 
+
+
+
 async function submit_quiz(sans_terminer){
 
-	if(quiz_mode_lecture()) return false
+	
+
+	if(quiz_mode_lecture()) return true
 
 	if(!sans_terminer) {
 
 		if(quiz_mode_previz()){
 			alert("Au clic de ce bouton, l'utilisateur aura le score de sa tentative, ainsi que la correction du quiz.\n⚠️Votre tentative n'est pas envoyée car vous êtes éditeur de ce quiz.")
-			return false	
+			return true	
 		} 
 
-		var confirmation = confirm("Êtes-vous sûr de vouloir terminer le quiz ? Cette action est irréversible.")
+		var confirmation = confirm("⚠️Êtes-vous sûr de vouloir terminer le quiz ? Cette action est irréversible.")
 		if(!confirmation) return false
 
 		ma_tentative['date_publication'] = !quiz_mode_previz() ? await maintenant() : ""
@@ -16114,6 +16272,33 @@ async function submit_quiz(sans_terminer){
 
 	  	//console.log(retour)
 
+	  	if(ma_tentative['date_publication']){
+
+			mes_donnees = JSON.parse(recuperer("mes_donnees"))
+			id_quiz = get_current_quiz()
+
+			var ma_notif_quiz = {
+				"id_notif":id_quiz,
+				"Horodateur": ma_tentative['date_publication'],
+				"Type_notif" : "devoir",
+				"Id_source" : id_quiz,
+				"Intitulé" : ma_tentative['nom_fichier'],
+				"Identifiant_originaire": recuperer('identifiant_courant'),
+				"Role_originaire": "Eleve",
+				"Identifiant_derniere_modif" : recuperer('identifiant_courant'),
+				'Role_derniere_modif' : "Eleve",
+				'Classe' : mes_donnees['Classe'],
+				'Classe_matiere' : "(" + mes_donnees['Classe'] + "|" + la_matiere_chargee("Matiere") + ")" ,
+				'Id_classe_matiere' : recuperer("dossier_chargé"),
+				'Date_derniere_modif' :  ma_tentative['date_publication'],
+				'Cycle' : mes_donnees['Cycle']
+			}
+
+
+	  		var retour2 = await supabase
+			  .from('Notifs')
+			  .upsert(ma_notif_quiz)
+	  	}
 
 	}
 
@@ -16240,6 +16425,7 @@ async function get_nth_question(position_question,nb_questions){
 		
 
 		var liste_champs_utiles = nb_reponses_possibles === 1 ? ["id_quiz","id_question","id_reponse"] : ["id_quiz","id_question","id_reponse","intitule_reponse"]
+		if(quiz_mode_lecture()) liste_champs_utiles = ['*']
 		var rsp = await rechercher_avec_ces_references("Reponses", champs_refs, liste_champs_utiles, "position_reponse.asc")
 		
 		if(rsp){
@@ -16322,13 +16508,29 @@ function resume_tentative_quiz(nb_questions){
 function resp_zone(id_question, rsp, nb_reponses_possibles,nb_questions_ok, valeurs_par_defaut){
 
 	var activation = ma_tentative['date_publication'] ? ' disabled  readonly="readonly" ' : ""
+	var score_total = 0
+	var phrase_score = ""
+	var score_rpse = ""
+	var remarque_rpse = ""
+	var pronom_et_verbe = "Vous avez eu "
+	
+	if(recuperer("proprietaire_devoir") ){
+		pronom_et_verbe = recuperer("proprietaire_devoir") === recuperer("identifiant_courant") ? "Vous avez eu " : recuperer("proprietaire_devoir").toUpperCase() + " a eu "	
+	}
+	
+
 	//nb_reponses_possibles = 1: simple input
 	if(nb_reponses_possibles === 1){
 
-
+		//console.log(rsp)
 
 		var val = valeurs_par_defaut ? 'value="' + valeurs_par_defaut + '"' : ""
-		return `<form id="resp_zone" class="resp_zone" style="text-align: center;"><input `+val+`     class="rps_quiz"  id_question="`+id_question+`"  name="qst`+id_question+`"  id="response`+rsp[0]['id_reponse']+`" placeholder="Votre réponse..."   `+activation+`  type="text" name="rsp'+id_question+'"> <div id="rmq`+id_question+`"></div>    </form>`
+		var remarque_rpse =  rsp[0]['remarque_correction'] ?  rsp[0]['remarque_correction'] : ""
+		var score_rpse =  rsp[0]['score'] ? (rsp[0]['score'] > 0 ? "+" +rsp[0]['score'] : rsp[0]['score']) : ""
+
+		phrase_score = rsp[0]['score'] ? pronom_et_verbe + score_rpse + " points pour cette question." : ""
+
+		return `<form id="resp_zone" class="resp_zone" style="text-align: center;"><input `+val+`     class="rps_quiz"  id_question="`+id_question+`"  name="qst`+id_question+`"  id="response`+rsp[0]['id_reponse']+`" placeholder="Votre réponse..."   `+activation+`  type="text" name="rsp'+id_question+'"> <div>`+remarque_rpse + `  <span class="points">`+ score_rpse+`</span></div>  <div class="points" id="rmq'+id_question+'"> `+phrase_score+` </div>   </form>`
 
 
 	//nb_reponses_possibles > 1:
@@ -16338,28 +16540,52 @@ function resp_zone(id_question, rsp, nb_reponses_possibles,nb_questions_ok, vale
 		//nb_questions_ok > 1: checkbox
 		var type_input = nb_questions_ok === 1 ? "radio" : "checkbox"
 		var res = '<form id="resp_zone" class="resp_zone">'
+		var liste_id_reponses_choisies = ","
 
-		//si 1 seul choix vrai
-		if(valeurs_par_defaut) var objet_reference =  valeurs_par_defaut[0]
+		//si des valeurs par defaut
+		if(valeurs_par_defaut){
+			//liste id reponses choisies
+			//console.log(valeurs_par_defaut)
+			liste_id_reponses_choisies = typeof(valeurs_par_defaut) !== "string" ? ","+valeurs_par_defaut.map(e => Object.keys(e)).join(',')+"," : valeurs_par_defaut
+
+		}
+
+
 
 		rsp.forEach((une_rsp) => {
 
+
 			est_coché = ""
 			if(valeurs_par_defaut){
-				
-				//plusieurs choix vrais
-				if(type_input === "checkbox") objet_reference =  valeurs_par_defaut[une_rsp['id_reponse']]
-				
-				//si 1 seul valeurs_par_defaut
-				//check si le id_reponse existe dans valeurs_par_defaut
-				/*				
-				console.log('\n\n\n')
-				console.log("*******debut********")
-				console.log(objet_reference)	
-				*/
-			
-				est_coché = objet_reference && Object.keys(objet_reference).indexOf(une_rsp['id_reponse']) >= 0 ? "  checked  " : ""		
 
+				/*
+				console.log('\n\n\n')							
+				console.log("*******debut********")
+				console.log({
+					une_rsp_id_reponse: une_rsp['id_reponse'],
+					valeurs_par_defaut: valeurs_par_defaut,
+					liste_id_reponses_choisies: liste_id_reponses_choisies
+				})
+				*/
+					
+				est_coché = liste_id_reponses_choisies.includes(","+une_rsp['id_reponse']+",") ? "  checked  " : ""
+
+
+				phrase_reponse_vraie_non_cochee = type_input === "checkbox" ? "<rouge class='remarque_correction'>✅Cette réponse était aussi vraie.</rouge>" : "<rouge class='remarque_correction'>✅Celle-ci était la bonne réponse.</rouge>"
+
+
+				remarque_rpse = !une_rsp['score'] ? "" : 
+							une_rsp['score'] > 0 && est_coché ? une_rsp['remarque_correction'] :
+							une_rsp['score'] <= 0 && est_coché ?  une_rsp['remarque_correction'] :
+							une_rsp['score'] > 0 && !est_coché ?  phrase_reponse_vraie_non_cochee :
+							""
+
+
+				signe = une_rsp['score'] >= 0 ? "+" : ""				
+				score_rpse = une_rsp['score'] ? signe + une_rsp['score'] : ""
+
+				score_total = une_rsp['score'] && est_coché ? score_total + Number(une_rsp['score']) : score_total
+				phrase_score = une_rsp['score'] ? pronom_et_verbe + score_total + " points pour cette question." : ""
 			} 
 
 			
@@ -16367,16 +16593,18 @@ function resp_zone(id_question, rsp, nb_reponses_possibles,nb_questions_ok, vale
 			console.log({[une_rsp['id_reponse']]: est_coché})
 			console.log("*******fin*******")
 			*/
+			
 
 
 			res += `
 				<div>
 					<input class="option-rps" type="`+type_input+`"     `+activation+`     id_question="`+id_question+`"  `+est_coché+` name="qst`+id_question+`"  value="`+une_rsp['id_reponse']+`" id="response`+une_rsp['id_reponse']+`" ><label class="label-check" for="response`+une_rsp['id_reponse']+`">`+une_rsp['intitule_reponse']+`</label>
+					<span>`+remarque_rpse + `  <span class="points">`+ score_rpse+`</span></span>
 				</div>
 			`
 		})
 
-		res += ' <div id="rmq'+id_question+'"></div>    </form>'
+		res += ' <div class="points" id="rmq'+id_question+'"> '+phrase_score+' </div>    </form>'
 		return res
 	}
 
@@ -16642,13 +16870,16 @@ function mettre_score_total(oui){
 
 
 function une_reponse_possible(donnees_reponses){
-	var prochain_id = donnees_reponses ? donnees_reponses['id_reponse'] : $(".une_reponse_possible").length+1
+	var prochain_id = donnees_reponses ? donnees_reponses['id_reponse'] : creer_uuid() //$(".une_reponse_possible").length+1
+	var editable = quiz_mode_lecture() ? "" : ' contenteditable="true" onclick="focus_edit(this)"'
+
+	//console.log({prochain_id:prochain_id})
 	var valeur_score = !donnees_reponses ? "0" : Number(donnees_reponses['score']).toFixed(2)
 	return 	`<span class="une_reponse_possible" id="`+prochain_id+`">
     <input name="reponse" style="width: 55%;" placeholder="Réponse possible et le SCORE de la réponse (liste déroulante)...">`+liste_notes_possibles(true,valeur_score,"note_globale") +`
     <img class="small-icon trash" alt="SUPPRIMER" src="https://sekooly.github.io/SUPABASE/images/img_trash.png" onclick="delete_resp(this)">
     <br>
-    <bleu onclick="focus_edit(this)" class="mini-image remarque_correction" contenteditable="true">Remarque correction</bleu>
+    <bleu class="mini-image remarque_correction wrong" `+editable+` >Remarque correction</bleu>
   </span>
   `
 }
@@ -16759,8 +16990,7 @@ function go_to_step(step_number,prev_step){
 	if(step_number === 1){
 		init_creation_quiz()
 	}if(step_number === prev_step){
-		var confirmation = confirm("Êtes-vous sûr d'avoir bien édité les questions-réponses du quiz?")
-		if(confirmation) dernieres_modifs_quiz()
+		finaliser_edition_quiz()
 	}else if(step_number === 2){
 		crud_questions()
 	} 
@@ -16768,13 +16998,18 @@ function go_to_step(step_number,prev_step){
 
 }
 
+function finaliser_edition_quiz(){
+	var confirmation = confirm("Êtes-vous sûr d'avoir bien édité les questions-réponses du quiz?")
+	if(confirmation) dernieres_modifs_quiz()
+}
+
 
 //étape 3: les denieres modifs
 async function dernieres_modifs_quiz(){
 
-
+	var id_quiz = get_current_quiz()
 	var nouvel_item = {
-		id_quiz: get_current_quiz(),
+		id_quiz: id_quiz,
 		id_classe_matiere: recuperer("dossier_chargé"),
 		proprietaire: recuperer("identifiant_courant"),
 		date_publication: maintenant()
@@ -16784,10 +17019,12 @@ async function dernieres_modifs_quiz(){
 
 	$("#sauvegarder").remove()
 
+
+	//console.log(id_quiz)
 	$("#bye_prev").one('click',function(){
-		
+		//console.log(id_quiz)
 		$("#categorie_choisie").change()
-		element_DOM("liste_quiz").value  = JSON.parse(recuperer("tmp_quiz"))['id_quiz']
+		element_DOM("liste_quiz").value  = id_quiz
 		effacer("tmp_quiz")
 
 
@@ -16809,6 +17046,7 @@ function avec_sauvegarde(oui){
 }
 
 function next_step_quiz(){
+	sauvegarder_quiz(true)
 	var prev_step = Number(element_DOM("etape-quiz").innerText)
 	element_DOM("etape-quiz").innerText++
 	if(element_DOM("etape-quiz").innerText > 2) element_DOM("etape-quiz").innerText = 2
@@ -16817,6 +17055,7 @@ function next_step_quiz(){
 }
 
 function prev_step_quiz(){
+	sauvegarder_quiz(true)
 	var prev_step = Number(element_DOM("etape-quiz").innerText)
 	element_DOM("etape-quiz").innerText--
 	if(element_DOM("etape-quiz").innerText < 1) element_DOM("etape-quiz").innerText = 1
@@ -16863,7 +17102,7 @@ function quiz_mode_previz(){
 	return $("[onclick='creer_quiz()']").length > 0
 }
 
-async function sauvegarder_quiz(){
+async function sauvegarder_quiz(sans_afficher){
 
 	var retour =  ""
 	var texte_a_afficher = ""
@@ -16871,7 +17110,7 @@ async function sauvegarder_quiz(){
 	//mode lecture
 	if(quiz_mode_lecture()){
 
-		texte_a_afficher = "Vous ne pouvez plus modifier votre tentative."
+		texte_a_afficher = "Vous ne pouvez pas modifier cette tentative."
 		retour = ma_tentative
 
 	//run mode	
@@ -16889,7 +17128,7 @@ async function sauvegarder_quiz(){
 
 
 
-	if(texte_a_afficher) afficher_alerte(texte_a_afficher)
+	if(texte_a_afficher && !sans_afficher) afficher_alerte(texte_a_afficher)
 
 	return retour
 }
@@ -16906,27 +17145,33 @@ async function sauvegarde_mode_edit(){
 		saisie_des_questions_responses()
 	}else{
 		//alert("mode tableau quiz")
-		
-		if(recuperer("tmp_quiz")){
-			try{			
-				var donnees_locales = JSON.parse(recuperer("tmp_quiz"))
-				//console.log(donnees_locales)
-				await stocker_quiz_server(donnees_locales) // actualiser("Quiz", "id_quiz", 0, donnees_locales)
-				retour = donnees_locales
-				//console.log(retour)
-				//effacer("tmp_quiz") // libérer la mémoire quand c'est envoyé sur le serveur ? non
-			}catch(e){
-				texte_a_afficher = "Votre quiz n'a PAS été sauvegardé: merci de réessayer ou de vérifier votre connexion internet."
-			}
-		}else{
-			texte_a_afficher = "Aucune donnée de quiz à sauvegarder: appuyez sur suivant avant d'enregistrer."
-		}
+		texte_a_afficher = await sauvegarder_le_quiz_dans_la_table_quiz()
 	}
 
 	return texte_a_afficher
 
 }
 
+async function sauvegarder_le_quiz_dans_la_table_quiz(){
+
+
+	if(recuperer("tmp_quiz")){
+		try{			
+			var donnees_locales = JSON.parse(recuperer("tmp_quiz"))
+			//console.log(donnees_locales)
+			await stocker_quiz_server(donnees_locales) // actualiser("Quiz", "id_quiz", 0, donnees_locales)
+			retour = donnees_locales
+			//console.log(retour)
+			//effacer("tmp_quiz") // libérer la mémoire quand c'est envoyé sur le serveur ? non
+		}catch(e){
+			texte_a_afficher = "Votre quiz n'a PAS été sauvegardé: merci de réessayer ou de vérifier votre connexion internet."
+		}
+	}else{
+		texte_a_afficher = "Aucune donnée de quiz à sauvegarder: appuyez sur suivant avant d'enregistrer."
+	}
+
+	return texte_a_afficher
+}
 
 function stocker_quiz_server(donnees_locales){
 	return supabase

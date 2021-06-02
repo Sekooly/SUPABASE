@@ -771,6 +771,8 @@ CREATE TABLE public."Rendus"
     coefficient_rendu real,
     taille_fichier bigint,
     note_rendu double precision,
+    reponses json,
+    date_debut text COLLATE pg_catalog."default",
     CONSTRAINT "Rendus_pkey" PRIMARY KEY (id_devoir)
 )
 
@@ -1850,6 +1852,143 @@ where "Fichiers".categorie_fichier <> 'Profil'
 
 
 
+
+
+
+-- Table: public.Quiz
+
+-- DROP TABLE public."Quiz";
+
+CREATE OR REPLACE TABLE public."Quiz"
+(
+    id_quiz text COLLATE pg_catalog."default" NOT NULL,
+    id_classe_matiere text COLLATE pg_catalog."default",
+    proprietaire text COLLATE pg_catalog."default",
+    titre text COLLATE pg_catalog."default",
+    description text COLLATE pg_catalog."default",
+    resultat_immediat boolean DEFAULT true,
+    nb_tentatives integer DEFAULT 1,
+    questions_aleatoires boolean DEFAULT false,
+    date_publication text COLLATE pg_catalog."default",
+    CONSTRAINT id_quiz_pkey PRIMARY KEY (id_quiz)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public."Quiz"
+    OWNER to postgres;
+
+GRANT ALL ON TABLE public."Quiz" TO anon;
+
+GRANT ALL ON TABLE public."Quiz" TO authenticated;
+
+GRANT ALL ON TABLE public."Quiz" TO postgres;
+
+GRANT ALL ON TABLE public."Quiz" TO service_role;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- Table: public.Questions
+
+-- DROP TABLE public."Questions";
+
+CREATE TABLE public."Questions"
+(
+    id_quiz text COLLATE pg_catalog."default" NOT NULL,
+    id_question text COLLATE pg_catalog."default" NOT NULL,
+    position_question integer,
+    type_question text COLLATE pg_catalog."default",
+    intitule_question text COLLATE pg_catalog."default",
+    CONSTRAINT "Questions_pkey" PRIMARY KEY (id_quiz, id_question),
+    CONSTRAINT fk_questions FOREIGN KEY (id_quiz)
+        REFERENCES public."Quiz" (id_quiz) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public."Questions"
+    OWNER to postgres;
+
+GRANT ALL ON TABLE public."Questions" TO anon;
+
+GRANT ALL ON TABLE public."Questions" TO authenticated;
+
+GRANT ALL ON TABLE public."Questions" TO postgres;
+
+GRANT ALL ON TABLE public."Questions" TO service_role;
+
+COMMENT ON TABLE public."Questions"
+    IS 'Questions des quiz identifiés par id_quiz';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- Table: public.Reponses
+
+-- DROP TABLE public."Reponses";
+
+CREATE TABLE public."Reponses"
+(
+    id_quiz text COLLATE pg_catalog."default" NOT NULL,
+    id_question text COLLATE pg_catalog."default" NOT NULL,
+    id_reponse text COLLATE pg_catalog."default" NOT NULL,
+    position_reponse integer,
+    intitule_reponse text COLLATE pg_catalog."default",
+    score text COLLATE pg_catalog."default",
+    remarque_correction text COLLATE pg_catalog."default",
+    CONSTRAINT "Reponses_pkey" PRIMARY KEY (id_quiz, id_question, id_reponse),
+    CONSTRAINT fk_reponses FOREIGN KEY (id_question, id_quiz)
+        REFERENCES public."Questions" (id_question, id_quiz) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public."Reponses"
+    OWNER to postgres;
+
+GRANT ALL ON TABLE public."Reponses" TO anon;
+
+GRANT ALL ON TABLE public."Reponses" TO authenticated;
+
+GRANT ALL ON TABLE public."Reponses" TO postgres;
+
+GRANT ALL ON TABLE public."Reponses" TO service_role;
+
+COMMENT ON TABLE public."Reponses"
+    IS 'Réponses aux questions de quiz identifiées par (id_quiz,id_question)';
 
 
 
