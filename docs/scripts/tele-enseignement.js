@@ -16165,7 +16165,7 @@ async function calculer_mon_score(rpses){
 	//filter with my reponses
 	var mon_score = total_score.filter(function(a_rsp){
 		//console.log(a_rsp['intitule_reponse'] + " dans " , my_str_rsp)
-		//if a_rsp.id_reponse is in my_id_resp OR if a_rsp.intitule_reponse is in my_str_rsp
+
 		return my_id_resp.indexOf(a_rsp['id_reponse']) >= 0 || my_str_rsp.indexOf(a_rsp['intitule_reponse'].trim()) >= 0
 	})
 
@@ -16192,7 +16192,7 @@ function transform_rsp(rpses){
 	    //console.log(rsp)
 	    //a string -> push it
 	    if(typeof(rsp) === 'string'){
-	    	my_str_rsp.push(rsp)
+	    	my_str_rsp.push(rsp.trim())
 
 	    //an array -> map to push only id_response
 	    }else if(rsp){
