@@ -12323,7 +12323,11 @@ function creer_element_journee(nom_matiere,nom_fichier,date_reference,heure_refe
 	console.log(type_notif)
 	*/
 
-	if(heure_reference.length !== 0) heure_reference = ' à ' +heure_reference
+	if(heure_reference){
+		heure_reference = ' à ' +heure_reference
+	}else{
+		heure_reference = ""
+	}
 
 	//si prof/admin -> pourcentage de correction
 	//sinon -> coche
