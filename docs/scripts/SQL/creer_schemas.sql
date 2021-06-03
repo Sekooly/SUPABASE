@@ -48,7 +48,7 @@ GRANT ALL ON TABLE public."Administration" TO service_role;
 GRANT ALL ON TABLE public."Administration" TO supabase_admin;
 
 
-
+   
 
 
 -- CREER L'ADMIN PAR DEFAUT
