@@ -10072,7 +10072,7 @@ function valeurs_possibles_modification_classes(e, id_parametre, les_matieres){
 }
 
 
-function suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur){
+async function suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur){
 
 
 		if(nouvelle_valeur===null) return -1;
@@ -10087,7 +10087,9 @@ function suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur){
 		var ancien_data = {[champ_actualise] : ancienne_valeur}
 		var nouveau_data = {[champ_actualise] : nouvelle_valeur}
 		
-		var table_JSON_local = JSON.parse(recuperer(nom_table));
+		var table_JSON_local = await rechercher_tout(nom_table) //JSON.parse(recuperer(nom_table));
+
+		//console.log(table_JSON_local)
 
 		/*
 		console.log(nom_table)
@@ -10097,17 +10099,21 @@ function suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur){
 		console.log(champ_actualise)		
 		console.log(nouveau_data)*/
 		
-		if (champ_actualise === nom_champ_reference){
-			//-> il faut que l'identifiant n'existe pas déjà
-			//-> en utilisant le JSON
-			existence_ID = table_JSON_local.filter(a => a[nom_champ_reference] === nouvelle_valeur).length > 0 ;
-			//console.log("cet ID existe: " + existence_ID)
+		if(table_JSON_local !== null){
 
-			//si c'est un id qui a été mis à jour
-			if(existence_ID){
-				alert("Mise à jour impossible: cet identifiant '"  + nouvelle_valeur + "' existe déjà.")
-				chargement(false);
-				return 0 //pas de màj
+		
+			if (champ_actualise === nom_champ_reference){
+				//-> il faut que l'identifiant n'existe pas déjà
+				//-> en utilisant le JSON
+				existence_ID = table_JSON_local.filter(a => a[nom_champ_reference] === nouvelle_valeur).length > 0 ;
+				//console.log("cet ID existe: " + existence_ID)
+
+				//si c'est un id qui a été mis à jour
+				if(existence_ID){
+					alert("Mise à jour impossible: cet identifiant '"  + nouvelle_valeur + "' existe déjà.")
+					chargement(false);
+					return 0 //pas de màj
+				}
 			}
 		}
 
