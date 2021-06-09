@@ -48,9 +48,21 @@
 			text-decoration: none;
 		}
 
-		.logo_en_haut{			
-			width: 40%;
+
+		/* If the screen size is phone*/
+		@media (orientation: portrait) {
+			.logo_etab {
+				width: 40%;
+			}
 		}
+
+		/* If the screen size is computer*/
+		@media (orientation: landscape) {
+			.logo_etab{
+				width: 30%;
+			}
+		}
+
 
 		.mon_formulaire{
 			text-align: center;
@@ -106,9 +118,9 @@
 	<iframe class="mon_log" src="" id="mon_log" style='display: none;'></iframe> 
 	<div style="text-align: center;">
 		<a href="https://sekooly.com">
-			<img class ="logo_en_haut" alt="SEKOOLY - Connexion" src="images/default-logo.svg">
+			<img class ="logo_etab" alt="SEKOOLY - Connexion" src="images/default-logo.svg">
 		</a><a id="site_etablissement" href="">
-			<img id="logo_etablissement" class ="logo_en_haut" alt="Site web établissement" src="">
+			<img id="logo_etablissement" class ="logo_etab" alt="Site web établissement" src="">
 		</a>
 	</div>
 
