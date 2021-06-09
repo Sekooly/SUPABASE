@@ -6,6 +6,8 @@
 		<meta http-equiv="refresh" content="0; url=https://sekooly.com/no-script">
 	</noscript>
 
+
+	<title>Connexion | Sekooly</title>
 	<link rel="shortcut icon" href="https://sekooly.com/assets/images/logo-no-background-128x128.png" type="image/x-icon">
 	<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="description" content="Connectez-vous grâce à votre Identifiant et Code d'accès pour accéder aux ressources Sekooly." />
@@ -48,21 +50,22 @@
 			text-decoration: none;
 		}
 
+		.logo_sekooly {
+			width: 30%;
+		}
 
-		/* If the screen size is phone*/
+		.logo_portrait {
+			width: 15%;
+		}
+
+		/*on portrait*/
 		@media (orientation: portrait) {
-			.logo_etab {
-				width: 40%;
-			}
-		}
 
-		/* If the screen size is computer*/
-		@media (orientation: landscape) {
-			.logo_etab{
-				width: 30%;
+			.logo_sekooly {
+				width: 45%;
 			}
-		}
 
+		}
 
 		.mon_formulaire{
 			text-align: center;
@@ -118,9 +121,9 @@
 	<iframe class="mon_log" src="" id="mon_log" style='display: none;'></iframe> 
 	<div style="text-align: center;">
 		<a href="https://sekooly.com">
-			<img class ="logo_etab" alt="SEKOOLY - Connexion" src="images/default-logo.svg">
+			<img class="logo_sekooly" alt="SEKOOLY - Connexion" src="images/default-logo.svg">
 		</a><a id="site_etablissement" href="">
-			<img id="logo_etablissement" class ="logo_etab" alt="Site web établissement" src="">
+			<img id="logo_etablissement" class="logo_sekooly" alt="Site web établissement" src="">
 		</a>
 	</div>
 
@@ -153,7 +156,16 @@
 		<span> Pour tout problème d'ordre <strong>technique</strong>, contactez SEKOOLY en envoyant un mail à <a class="lien_mail" href="mailto:contact@sekooly.com">contact@sekooly.com</a> en précisant votre établissement.</span>
 	</div>
 
+
 	<script type="text/javascript" src="scripts/index.js"></script>
+	<script type="text/javascript" src="scripts/index-logo.js"></script>
+
+
+
+
+	</script>
+	
+
 
 </body>
 
