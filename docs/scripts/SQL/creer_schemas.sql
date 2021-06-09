@@ -1798,7 +1798,7 @@ COMMENT ON COLUMN public."Programme"."Classe_Matiere"
 
 
 alter publication supabase_realtime add table "Notifs";
-alter publication supabase_realtime add table "Conversations" 
+alter publication supabase_realtime add table "Conversations" ;
 
 
 
@@ -1835,7 +1835,7 @@ alter publication supabase_realtime add table "Conversations"
 CREATE OR REPLACE VIEW public."Fichiers_tout"
 AS
 select "Fichiers".*, "Programme".intitule_chapitre, "Programme".etat from "Fichiers" left join "Programme" on "Fichiers".id_chapitre = "Programme".id_chapitre
-where "Fichiers".categorie_fichier <> 'Profil'
+where "Fichiers".categorie_fichier <> 'Profil';
 
 
 
