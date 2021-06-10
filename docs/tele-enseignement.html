@@ -2214,6 +2214,21 @@
 			overflow-y: hidden; 
 		}
 
+		.previz_analysis{
+			width: 100%;
+			height: 45vw;
+			border-width:0;
+			overflow-x: hidden;
+			overflow-y: hidden; 
+		}
+
+		@media (orientation: portrait) {
+
+			.previz_analysis {
+				height: 150vw;
+			}
+		}
+
 		.filtres_notifs{
 			display: grid;
 			width: -moz-available;
@@ -2372,7 +2387,7 @@
 			<div id="recup_profs" onclick="recuperer_profs()" >Liste des professeurs</div>
 			<div id="recup_admin" onclick="recuperer_admin()">Liste de l'Administration</div>
 			<div id="recup_params" onclick="recuperer_parametres()" >Paramètres</div>
-			<!--<div id="recup_analyses" onclick="recuperer_analyses()" >Analyses</div>-->
+			<div id="recup_analyses" onclick="recuperer_analyses()" >Analyses</div>
 			<div onclick="deconnexion()">Se déconnecter</div>		
 		</div>
 		

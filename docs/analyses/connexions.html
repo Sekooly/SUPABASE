@@ -37,8 +37,10 @@
 	    xmlHttp.send( null );
 	    return JSON.parse(xmlHttp.responseText);
 	}
+
+
 	//console.log(racine_initiale)
-	document.getElementById("url_analyse").value = get_resultat(racine_initiale + "Etablissements?nom_etablissement=eq."+nom_etablissement + "&" + api_initial)[0]['nom_analyses_connexions']
+	document.getElementById("url_analyse").value = get_resultat(parent.racine_initiale + "Etablissements?nom_etablissement=eq."+parent.nom_etablissement + "&" + parent.api_initial)[0]['nom_analyses_connexions']
 
 
     var divElement = document.getElementById('viz1591036472177');

@@ -1,4 +1,7 @@
-var elements_menu_haut = ["Infos établissement","Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Programme", "Alerte", "Logs", "Conversations", "Visio", "Notifs", "Fichiers", "Quiz","Questions","Reponses","Rendus", "Topic", "Coms","Espace etablissement restant","Analyses des connexions"]
+var elements_menu_haut = ["Infos établissement","Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Programme", "Alerte", "Logs", "Conversations", "Visio", "Notifs", "Fichiers", "Quiz","Questions","Reponses","Rendus", "Topic", "Coms","Espace etablissement restant"]
+
+var elements_menu_analyses = ["Analyses des connexions"]
+
 var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL_Mapping","URL_agenda",
 								"id_googlecalendar","nb_avis_donnés", "nb_avis_max","nom_fiche","taux_conseil",
 								"Matiere_bis", "classe_id", "classe_bis", "type", "Derniere_consultation_notifs",
@@ -6,6 +9,7 @@ var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","UR
 								"classe_bis", "id_dossier_cycle", "dossier_rendus_cycle", "liste_notifs_lues", "nombre_avis", "Numero_telephone",
 								"id", "Id_classe_matiere", "id_notif", "Id_source", "id_fichier", "id_dossier", "id_devoir", "id_dossier_sujetdevoir", "id_fichier_sujetdevoir", "Id_topic", "id_com", "ID_FICHIER", "id_msg","id_conv", "id_chapitre",
 								"id_quiz", "id_question", "id_reponse"]
+
 
 var elements_menu_haut_avec_modifs = ["Classes","Matieres","Eleves","Profs","Administration"]
 var elements_menu_haut_avec_reset = ["Eleves","Profs","Administration"]
@@ -9112,16 +9116,48 @@ function ajouter_form(id_formulaire, valeur_champ_par_defaut){
 function afficher_parametres(oui){
 	if(!oui){
 		$("#recup_params").remove()
+		$("#recup_analyses").remove()
 	}else{
 		element_DOM("recup_params").style.display = "block"
+		element_DOM("recup_analyses").style.display = "block"
 	}
 	
 }
 
 function recuperer_analyses(){
 
-	vider_fenetre("Analyses");
+	vider_fenetre("Analyses");	
+
+	var contenu_menu_haut = ""
+	
+	for (var i =  0; i < elements_menu_analyses.length; i++) {
+		contenu_menu_haut = contenu_menu_haut + '<span class="un_menu" id ="'+elements_menu_analyses[i]+'">'+elements_menu_analyses[i]+'</span>' 
+	}
+
+	var conteneur_menu_html = '<div id="conteneur_menu"><div id="menu_haut" class="menu_haut"> ' + contenu_menu_haut+ '</div><div id="menu_params" class="menu_params"><iframe id="previsualisation" class="previz_analysis" height="90%"></iframe></div></div>'
+
+
+	
+	$("#fenetre").append(conteneur_menu_html);
+
+
+	//clic -> mise en forme + actualisation de menu_details
+	$('.un_menu').click(function(e) {
+		chargement(true)
+		un_menu_clic(e.target.id)			
+        chargement(false)
+    });
+
+
+    //clic par défaut sur Analyses des connexions
+    $("[id='Analyses des connexions']").click();
+
+	afficher_fenetre(true)
 }
+
+
+
+
 
 function recuperer_parametres(){
 	
@@ -9149,9 +9185,6 @@ function recuperer_parametres(){
 		un_menu_clic(e.target.id)			
         chargement(false)
     });
-
-
-
 
 
     //clic par défaut sur Alerte
@@ -9209,26 +9242,57 @@ function appliquer_filtre_choisi(nom_champ_reference, valeur_champ_reference){
 }
 
 
+function url_analysis_iframe(test){
+	return test || window.location.href.includes("localhost") ? "http://localhost:5000/connexions.html" : "https://sekooly.com/assets/analysis/connexions"
+}
+
+async function une_analyse_clic(id_parametre){
+
+	chargement(true)
+
+	//connexions
+	var url =   url_analysis_iframe()
+	element_DOM("previsualisation").src = url
+	var iframe_target = element_DOM("previsualisation").contentWindow
+
+	$('#previsualisation').on('load', function(){
+			
+
+		iframe_target.postMessage({
+			racine_initiale:racine_initiale,
+			nom_etablissement:nom_etablissement,
+			api_initial:api_initial
+		}, element_DOM("previsualisation").src);
+
+		//ask for update
+
+		chargement(false);
+	});
+
+}
 
 async function un_menu_clic(id_parametre){
 
 
+
+
+	$("#mini_popup").remove()
+    mettre_en_forme_onglet_clicked(id_parametre);
+
+	
 	//si c'est une analyse -> on va direct dans le nouvel onglet
 	if(id_parametre.includes("Analyses")){
 
-		window.open("analyses/"+id_parametre.split(" ").pop() +".html", '_blank').focus();
+		//window.open("analyses/"+id_parametre.split(" ").pop() +".html", '_blank').focus();
+		une_analyse_clic(id_parametre)
 
-	}else{
-
-
-
-		$("#mini_popup").remove()
-	    mettre_en_forme_onglet_clicked(id_parametre);
+		
+	}else{        
 	    actualiser_filtre_onglet(id_parametre);
 	    await actualiser_details_parametre(id_parametre);
 		await mettre_etat_espace(id_parametre)
-		
-	    
+	
+
 	    //pas de modifs à faire
 	    if($("#boutons_params")){
 		    if (elements_menu_haut_avec_modifs.indexOf(id_parametre) === -1){
