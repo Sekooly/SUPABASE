@@ -9265,9 +9265,30 @@ async function une_analyse_clic(id_parametre){
 		}, element_DOM("previsualisation").src);
 
 		//ask for update
+		update_viz_logs()
 
 		chargement(false);
 	});
+
+}
+
+async function update_viz_logs(){
+
+	var lien_script = await chercher_lien_script(6)
+	var api_analyses_connexions = "94e27fab-46a2-4a3d-949c-0d7b1c65faf3"
+
+	options = {
+		API_ANALYSES_CONNEXIONS:  api_analyses_connexions,
+		nom_etablissement: nom_etablissement,
+		type_analyses: "Connexions"
+	}
+
+
+	var url = lien_script + json_to_url(options)
+
+	//console.log(url)
+	post_resultat_asynchrone(url)
+
 
 }
 

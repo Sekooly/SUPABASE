@@ -1319,7 +1319,7 @@ function la_matiere_chargee(nom_du_champ){
 }
 
 
-
+ 
 
 function convertir_db(racine_data){
   return 'db.'+racine_data.replace('https://',"").split("/rest/v1")[0]
@@ -1531,7 +1531,14 @@ function recherche_initiale(nom_table){
 
 
 
-
+function json_to_url(json_object){
+  var retour = ""
+  $.each(json_object, (key,valeur) => {
+    var prefix = retour === "" ? "?" : "&"
+    retour += prefix + key+"="+valeur
+  })
+  return retour
+}
 
 
 
