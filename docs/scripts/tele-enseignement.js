@@ -7560,7 +7560,7 @@ function recuperer_edt(nom_classe_fournie){
 
 	rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher).then(id_googlecalendar => {
 		id_googlecalendar = id_googlecalendar[0]['id_googlecalendar']
-		var la_source = "https://calendar.google.com/calendar/embed?wkst=2&bgcolor=%23ffffff&ctz=Africa%2FNairobi&src=" + id_googlecalendar + "&color=%234285F4&showPrint=0&showTabs=0&showCalendars=0&showTitle=1&mode=WEEK&showTz=0";
+		var la_source = "https://calendar.google.com/calendar/embed?wkst=2&bgcolor=%23ffffff&ctz="+my_ctz()+"&src=" + id_googlecalendar + "&color=%234285F4&showPrint=0&showTabs=0&showCalendars=0&showTitle=1&mode=WEEK&showTz=0";
 		calendrier.src = la_source;
 		chargement(false);
 	}).catch(error => {
@@ -11048,7 +11048,7 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 			//id_google_calendar
 			$(".donnee[id='id_googlecalendar']")[0].value  = id_googlecalendar
 			//URL_agenda
-			$(".donnee[id='URL_agenda']")[0].value  = "https://calendar.google.com/calendar/embed?src="+id_googlecalendar+"&ctz=Africa%2FNairobi"
+			$(".donnee[id='URL_agenda']")[0].value  = "https://calendar.google.com/calendar/embed?src="+id_googlecalendar+"&ctz=" + my_ctz()
 			
 		}else if(id_parametre === "Matieres"){
 		/******* POUR MATIERE *******/

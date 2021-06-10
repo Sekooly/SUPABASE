@@ -1553,3 +1553,7 @@ function objectifyForm(id_form) {
   }
   return returnArray;
 }
+
+function my_ctz(){
+  return encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)
+}
