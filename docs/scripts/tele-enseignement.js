@@ -52,6 +52,7 @@ var mes_reponses = {}
 
 const { createClient } = supabase
 supabase = createClient(racine_data.replace("/rest/v1/",""),  data_etablissement["apikey"])
+supabaseInit = createClient(racine_initiale.replace("/rest/v1/",""),  api_initial.split('=')[1])
 
 
 
@@ -1630,12 +1631,13 @@ var donnees_pp
 var extension_pp = ""
 
 
-function url_pp(){
-	return "https://script.google.com/macros/s/AKfycbzGLJpVC55WvaC2akFbRw8Y-jOr--w7wwArd0IFHZGPORNuZV8DHl7e2T0sCaeGrh-k/exec"
+async function url_pp(){
+	var res = await chercher_lien_script(8)
+	return res
 }
 
 
-function supprimer_pp(identifiant_courant, sans_confirmation){
+async function supprimer_pp(identifiant_courant, sans_confirmation){
 
 	if(!sans_confirmation) var confirmation = confirm("⚠️Voulez-vous supprimer cette photo de profil ? Cette action est irréversible.")
 
@@ -1646,7 +1648,7 @@ function supprimer_pp(identifiant_courant, sans_confirmation){
 		identifiant_courant = identifiant_courant ? identifiant_courant : recuperer("identifiant_courant")
 
 		//supprimer sur le drive
-		var url =  url_pp()
+		var url = await  url_pp()
 		url += "?supp_mon_id_pp=true"
 		url += "&nom_etablissement=" + data_etablissement['nom_etablissement']
 		url += "&identifiant=" + identifiant_courant
@@ -1735,9 +1737,9 @@ function changer_pp(identifiant_courant){
 
 }
 
-function envoyer_pp(identifiant_courant){
+async function envoyer_pp(identifiant_courant){
 	chargement(true)
-	url =  url_pp()
+	url = await url_pp()
 
 	identifiant_courant = identifiant_courant ? identifiant_courant : recuperer("identifiant_courant")
 
@@ -1765,6 +1767,10 @@ function envoyer_pp(identifiant_courant){
 				file: resp.replace(/^.*,/, '')
 
 			}
+
+
+
+
 
 			/*
 			console.log(url)
@@ -4410,7 +4416,9 @@ function recategoriser_fichier(id_fichier,nom_fichier){
 
 }
 
-function creer_mini_popup(titre,elements_html,nom_bouton,fonction_bouton,valeur_actuelle,id_element_valeur_actuelle, valeur_actuelle_bis, id_element_valeur_actuelle_bis,taille_du_titre){
+function creer_mini_popup(titre,elements_html,nom_bouton,fonction_bouton,valeur_actuelle,id_element_valeur_actuelle, valeur_actuelle_bis, id_element_valeur_actuelle_bis,taille_du_titre,id_bouton){
+
+	//console.log({id_bouton})
 
 	$("#mini_popup").remove();
 
@@ -4420,8 +4428,9 @@ function creer_mini_popup(titre,elements_html,nom_bouton,fonction_bouton,valeur_
 	var taille = taille_du_titre ? 'style="font-size: '+taille_du_titre+'px;"' : ""
 	var titre_html = '<div '+taille+' >'+titre+'</div>'
 
-
-	var valider_changement = '<button type="button" class="rendre" onclick="'+fonction_bouton+'">'+nom_bouton+'</button>'
+	var id_bouton_html = id_bouton ? "id='" + id_bouton + "'" : ""
+	console.log({id_bouton_html})
+	var valider_changement = '<button type="button"  '+id_bouton_html+'  class="rendre" onclick="'+fonction_bouton+'">'+nom_bouton+'</button>'
 
 	var mini_popup_html = '<div id="mini_popup">'+bouton_quitter+titre_html+elements_html+valider_changement+'</div>';
 
@@ -9243,7 +9252,7 @@ function appliquer_filtre_choisi(nom_champ_reference, valeur_champ_reference){
 
 
 function url_analysis_iframe(test){
-	return test || window.location.href.includes("localhost") ? "http://localhost:5000/connexions.html" : "https://sekooly.com/assets/analysis/connexions"
+	return test ? "http://localhost:5000/connexions.html" : "https://sekooly.com/assets/analysis/connexions"
 }
 
 async function une_analyse_clic(id_parametre){
@@ -9438,13 +9447,12 @@ function mettre_en_forme_onglet_clicked(id_onglet){
 
 }
 
-function information_etablissement(id_info, etiquette_info, valeur_info, est_modifiable){
-	sur_double_clic = est_modifiable ? bouton_editer("modifier_info(this)") : ""
-	return '<div class="un_detail"><b style="color:#FF6C00">'+etiquette_info+': </b><br><span id="' + id_info +'">'+valeur_info+sur_double_clic+'</span></div>';
-}
-
 function bouton_editer(nom_fonction_clic){
 	return '<img onclick="'+nom_fonction_clic+'" src="https://sekooly.com/assets/images/img_edit.png" alt="modifier" class="editer">'
+}
+
+function bouton_voir(nom_fonction_clic){
+	return '<img alt="voir" class="envoi_remarque mini-image" onclick="'+nom_fonction_clic+'" src="https://sekooly.github.io/SUPABASE/images/img_previz.png"> '
 }
 
 function modifier_info(ceci){
@@ -9464,11 +9472,23 @@ function modifier_info(ceci){
 		//console.log("on va modifier " + etiquette_info + " avec " + nouvelle_valeur)
 		chargement(true)
 
-		//envoyer la modif
-		url = racine_initiale + "Etablissements" + "?"+"id"+"=eq."+data_etablissement['id']+ "&"+api_initial
 		nouveau_data = {
 			[id_info]: nouvelle_valeur
 		}
+		actualiser_info(nouveau_data)
+
+	}else{
+
+		afficher_alerte("Modification annulée.")
+	}
+}
+
+
+function actualiser_info(nouveau_data){
+
+		//envoyer la modif
+		url = racine_initiale + "Etablissements" + "?"+"id"+"=eq."+data_etablissement['id']+ "&"+api_initial
+		
 		patch_resultat_asynchrone(url,nouveau_data).then(function(){
 
 
@@ -9486,12 +9506,301 @@ function modifier_info(ceci){
 			})
 		})
 
+}
+
+function voir_ou_generer_contrat(nom_fichier, valeur_info){
+	
+	if(valeur_info!=="null" && valeur_info.length > 0){
+		visualiser_avec_demande_signature(nom_fichier,valeur_info)
+	}else{
+		//alert("on est ici")
+		generer_contrat()
+	}
+	
+}
+
+function visualiser_avec_demande_signature(nom_fichier,id_fichier){
+
+	visualiser(nom_fichier,id_fichier)	
+	$("#titre_fenetre").append('<span onclick="signer_contrat()" class="sign">Signer contrat</span>') // pour signer
+}
+
+function contrat_datas(keep_temp){
+
+	var nb_eleves = compter("Eleves")[0]['result']
+	var nb_admin = compter("Administration")[0]['result']
+	var nb_profs = compter("Profs")[0]['result']
+	var nb_total = nb_eleves + nb_admin + nb_profs
+
+	var datas = {
+      'nom_etablissement': nom_etablissement.toUpperCase(),
+      'adresse_etablissement': data_etablissement["adresse_etablissement"],
+      'identite_responsable': data_etablissement["identite_responsable"],
+      role: mon_role,
+      montant_par_user: data_etablissement["donnees_contrat"]["montant_par_user"],
+      nb_total: nb_total,
+      nb_eleves: nb_eleves,
+      nb_admin: nb_admin,
+      nb_profs: nb_profs,
+      frequence_paiement: data_etablissement["donnees_contrat"]["frequence_paiement"],
+      duree_contrat_en_mois: data_etablissement["duree_contrat_en_mois"],
+      ville: data_etablissement["adresse_etablissement"],
+      date_premier_abonnement: data_etablissement["date_premier_abonnement"],
+      contact_etablissement:  data_etablissement["contact_etablissement"],
+      now: afficher_date(maintenant()),
+      unite_montant_par_user: data_etablissement["donnees_contrat"]["unite_montant_par_user"],
+      keep_temp: keep_temp,
+    }
+
+    if(contrat_avec_signature()){
+    	//alert('Contrat déjà avec signature.')
+    	datas['img_paraphe'] = data_etablissement["donnees_contrat"]['img_paraphe'] 
+    	datas['img_signature'] = data_etablissement["donnees_contrat"]['img_signature'] 
+    	datas['id_newTempFile'] = data_etablissement["donnees_contrat"]['id_newTempFile'] 
+    }
+
+    return datas
+	
+}
+
+function contrat_avec_signature(){
+	return data_etablissement["donnees_contrat"]['img_signature'] && data_etablissement["donnees_contrat"]['img_signature'] !== undefined && data_etablissement["donnees_contrat"]['img_signature'] !== "" && data_etablissement["donnees_contrat"]['img_signature'] !== null && data_etablissement["donnees_contrat"]['img_signature'] !== "null"
+}
+
+async function generer_contrat(){
+	chargement(true)
+	afficher_alerte("Merci de patienter, nous récupérons les données de votre contrat à signer...")
+	url_contrat = await chercher_lien_script(7)
+
+		
+	contrat = contrat_datas(true)
+	var url = url_contrat + "?API_KEY_UPLOAD=" + recuperer("API_KEY_UPLOAD")
+
+	//console.log(contrat,url)
+	
+
+	afficher_alerte("Récupération du contrat à signer...")
+	
+	res = await post_resultat_asynchrone(url, JSON.stringify(contrat))
+	//console.log(res)
+	if(res){
+		res = JSON.parse(res)
+		id_newTempFile = res['id_fichier']
+		nom_fichier = res['nom_fichier'] + ".doc"
+
+
+		visualiser_avec_demande_signature(nom_fichier,id_newTempFile)
+
+		//actualiser
+		data_etablissement['donnees_contrat']['id_newTempFile'] = id_newTempFile
+		actualiser_info_etablissement()
+		chargement(false)
+	
 
 	}else{
-
-		afficher_alerte("Modification annulée.")
+		chargement(false)	
 	}
+
+		
+	
+	
 }
+
+
+async function apposer_la_signature(lien_script){
+	chargement(true)
+
+		
+	contrat = contrat_datas(false)
+	var url = lien_script
+
+	//console.log({contrat})
+	//console.log({url})
+	
+	afficher_alerte("C'est bientôt terminé...")
+	chargement(true)
+	res = await post_resultat_asynchrone(url, JSON.stringify(contrat))
+	//console.log(res)
+	if(res){
+		res = JSON.parse(res)
+		id_contrat = res['id_fichier']
+		nom_fichier = res['nom_fichier'] + ".pdf"
+
+
+		visualiser(nom_fichier,id_contrat)
+
+		//actualiser
+		data_etablissement['donnees_contrat']['id_contrat'] = id_contrat		
+		data_etablissement['donnees_contrat']['id_newTempFile'] = false	
+		data_etablissement['donnees_contrat']['img_paraphe'] = false	
+		data_etablissement['donnees_contrat']['img_signature'] = false
+		actualiser_info_etablissement()
+		
+		
+		afficher_alerte("Contrat signé avec succès.")
+		chargement(false)
+
+	}else{
+		chargement(false)
+	}
+
+		
+	
+	
+}
+
+
+async function actualiser_info_etablissement(){
+	await supabaseInit
+			.from('Etablissements')
+			.upsert(data_etablissement)
+}
+
+function effacer_saisie(id_element){
+	$(element_DOM(id_element)).jSignature("reset")
+}
+
+function bouton_effacer_paint(id_element){
+	return `<rouge onclick="effacer_saisie('`+id_element+`')">EFFACER</rouge>`
+}
+
+function recuperer_image(id_image){
+	return $(element_DOM(id_image)).jSignature("getData")
+}
+
+function signer_contrat(){
+	
+	var elements_html = `
+	<div class='title_paint'>
+		Paraphe
+		`+bouton_effacer_paint("paraphe")+`
+	</div>
+	<div id='paraphe' class='paint_zone'></div>
+
+
+
+	<div class='title_paint'>
+		Signature
+		`+bouton_effacer_paint("signature")+`
+	</div>
+	<div id='signature' class='paint_zone'></div>
+	<input type="checkbox" name="sign" id="sign">
+	<label for="sign">Je reconnais avoir lu l'ensemble des termes du présent contrat et j'accepte de le signer électroniquement.</label>
+	`
+
+	creer_mini_popup("Paraphe et signature du contrat",elements_html,"Parapher et signer","envoyer_paraphe_signature()",false,false,false,false,false,"sign_contrat")
+
+
+	//désactiver par defaut, tant que non coché
+	$("#sign").on("change",function(e){
+		
+		if(e.target.checked){
+			$(element_DOM("sign_contrat")).show()	
+		}else{
+			$(element_DOM("sign_contrat")).hide()
+		}
+		
+
+	})
+
+	$("#sign").change()
+
+
+	$("#paraphe").jSignature()
+	$("#signature").jSignature()
+
+	
+}
+
+function recuperer_paraphe_signature(){	
+	return {img_paraphe:data_etablissement['donnees_contrat']['img_paraphe'],img_paraphe:data_etablissement['donnees_contrat']['img_signature'],id_newTempFile:data_etablissement['donnees_contrat']['id_contrat']}
+}
+
+function data_upload_paint(data_img, nom_fichier){
+
+	data = {
+		file: data_img.replace(/^.*,/, ''),
+		nom_fichier: nom_fichier
+	}
+
+	return data
+}
+
+async function envoyer_paraphe_signature(){
+	chargement(true)
+
+	//post avec le script 7
+	lien_script = await chercher_lien_script(7)
+	lien_script += "?API_KEY_UPLOAD=" + recuperer("API_KEY_UPLOAD")
+
+
+	
+	afficher_alerte("Merci de ne pas fermer l'onglet, votre signature est en cours de traitement...")
+
+	//UNIQUEMENT SI PAS ENCORE DE SIGNATURE
+	if(!contrat_avec_signature()){
+
+
+		//envoyer les 2 images en tant que signatures et paraphes
+		data_img_paraphe = recuperer_image("paraphe")
+		data_img_signature = recuperer_image("signature")
+
+
+		lien_script_bis  = lien_script + "&fichier=true"
+		//console.log({lien_script_bis})
+
+		afficher_alerte("Publication des paraphes et de la signature...")
+
+
+		//poster les 2	
+		data_etablissement['donnees_contrat']['img_paraphe']  = await poster_image(data_img_paraphe, "paraphe", lien_script_bis)
+		data_etablissement['donnees_contrat']['img_signature'] = await poster_image(data_img_signature, "signature", lien_script_bis)
+
+
+
+		//enregistrer les 2
+		actualiser_info_etablissement()
+		$('#mini_popup').remove()
+	}else{
+		$('#mini_popup').remove()
+	}
+
+
+
+	contrat = contrat_datas(false)
+	//console.log({contrat})
+	afficher_alerte("Récupération du contrat en cours...")
+
+	//mettre à jour id_contrat
+	//suprrimer id_newTempFile
+	//visualiser le contrat signé
+	apposer_la_signature(lien_script)
+
+
+}
+
+async function poster_image(data_img, type_fichier, lien_script){
+	var donnees = data_upload_paint(data_img, type_fichier + " " + nom_etablissement + ".png")
+	console.log({donnees})
+
+	id_img = await post_resultat_asynchrone(lien_script, JSON.stringify(donnees))
+	console.log({id_img})
+
+	return id_img
+}
+
+
+function information_etablissement(id_info, etiquette_info, valeur_info, est_modifiable, est_consultable){
+	crayon = est_modifiable ? bouton_editer("modifier_info(this)") : ""
+
+	nom_fichier = id_info.includes("id_newTempFile") ? "Contrat à signer" : "Contrat"
+	oeil = est_consultable ? bouton_voir("voir_ou_generer_contrat('"+nom_fichier+".pdf','"+valeur_info+"')") : ""
+
+	valeur_info = est_consultable ? oeil : valeur_info
+
+	return '<div class="un_detail"><b style="color:#FF6C00">'+etiquette_info+': </b><br><span id="' + id_info +'">'+valeur_info+crayon+'</span></div>';
+}
+
 
 function actualiser_details_parametre(id_parametre){
 	chargement(true)
@@ -9506,11 +9815,39 @@ function actualiser_details_parametre(id_parametre){
 	//si infos établissements
 	}else if(id_parametre === "Infos établissement"){
 
-		liste_id_infos_etablissement = ["nom_etablissement:Nom de l'établissement:false", "date_premier_abonnement:Date d'abonnement:false" , "duree_contrat_en_mois:Durée du contrat (en mois):false", "adresse_etablissement:Adresse:true", "contact_etablissement:Contact de l'Administration:true", "contact_economat:Contact de l'Economat:true", "mots_interdits:Liste des mots interdits (séparés par une virgule):true", "nb_heures_delai_examen:Nombre d'heures de tolérance pour les examens:true" ]
+		var id_contrat = data_etablissement.donnees_contrat.id_newTempFile ? "id_newTempFile" : "id_contrat"
+
+		liste_id_infos_etablissement = ["nom_etablissement:Nom de l'établissement:false",
+										"date_premier_abonnement:Date de début d'abonnement:false" ,
+										"duree_contrat_en_mois:Durée du contrat (en mois):false",
+										"adresse_etablissement:Adresse:true",
+										"contact_etablissement:Contact de l'Administration:true",
+										"contact_economat:Contact de l'Economat:true",
+										"mots_interdits:Liste des mots interdits (séparés par une virgule):true",
+										"nb_heures_delai_examen:Nombre d'heures de tolérance pour les examens:true",
+										"donnees_contrat.montant_par_user:Montant par utilisateur",
+										"donnees_contrat.unite_montant_par_user:Devise du montant",
+										"donnees_contrat.frequence_paiement:Modalités de paiement",
+										"donnees_contrat."+id_contrat+":Voir le contrat:false:true"]
+
+										
+
+
 		var info_etablissement_html = ""
 
 		liste_id_infos_etablissement.forEach(function(info){
-			info_etablissement_html += information_etablissement(info.split(':')[0], info.split(':')[1], data_etablissement[info.split(':')[0]], eval(info.split(':')[2]))	
+			id_info = info.split(':')[0]
+			etiquette_info =  info.split(':')[1]
+
+
+			valeur_info = id_info.includes(".") ? data_etablissement[id_info.split('.')[0]][id_info.split('.')[1]] : data_etablissement[id_info]
+
+
+
+			//console.log({id_info, etiquette_info,valeur_info})
+
+
+			info_etablissement_html += information_etablissement(id_info,etiquette_info, valeur_info, eval(info.split(':')[2]), eval(info.split(':')[3]) )	
 		})
 		
 		info_etablissement_html += `
@@ -12216,7 +12553,7 @@ function ma_journee(){
 
 
 function section_journee(nom_section, remarque_section){
-	return '<div id="section_'+nom_section+'" class="titre_section_journee bloc_topic"><span style="font-size: x-large;padding: 5px;">'+nom_section+'<div style="color: gray;font-size: 15px;background: white;font-style: italic;">'+remarque_section+'</div></span></div>'
+	return '<div id="section_'+nom_section+'" class="titre_section_journee bloc_topic"><span style="font-size: x-large;padding: 5px;">'+nom_section+'<div class="subtitle">'+remarque_section+'</div></span></div>'
 }
 
 function maj_date_journee(){

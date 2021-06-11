@@ -631,6 +631,8 @@ function patch_resultat_asynchrone(url,data_json){
 }
 
 function post_resultat_asynchrone(url,data_json){
+
+
   return $.ajax({
     type: 'POST',
     url: url,
@@ -1518,7 +1520,11 @@ async function recuperer_mes_donnees(){
   return mes_donnees
 }
 
+function compter(nom_table){
 
+  url = entete_heroku + convertir_db(racine_data) + '/SELECT COUNT(*) as result FROM "'+nom_table+'"'
+  return get_resultat(url)
+}
 
 function taille_fichier_quiz(liste_questions_str){
   return new Blob([liste_questions_str]).size;
@@ -1527,6 +1533,19 @@ function taille_fichier_quiz(liste_questions_str){
 
 function recherche_initiale(nom_table){
   return get_resultat_asynchrone(racine_initiale + nom_table + "?" + api_initial)
+}
+
+function recherche_initiale_where(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher, nombrelimite, orderby){
+
+  url = racine_initiale + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+api_initial
+  url = nom_champ_a_chercher ? url+"&select="+nom_champ_a_chercher : url
+  url = nombrelimite ? url+"&limit="+nombrelimite : url
+  url = orderby ? url+"&order="+orderby : url
+  
+  //console.log(url)
+  return get_resultat_asynchrone(url)
+
+
 }
 
 
