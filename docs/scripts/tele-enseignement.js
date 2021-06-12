@@ -12367,11 +12367,14 @@ function rendre_riche(id_text_area, agrandir_zone ){
             //console.log( editor )
             if(agrandir_zone){
 
+
+            	/*
             	$("[contenteditable]").on("click change", function(){
 
             		$("[contenteditable]")[0].style.height = $("[contenteditable]")[0].offsetHeight < 300 ? "300px" : $("[contenteditable]")[0].offsetHeight + "px"
 
             	})
+            	*/
 
             	
 
