@@ -83,7 +83,7 @@ function charger_classe_conseil(oui){
 	if(oui){
 
 		//la classe actuellement ouverte OU celle de l'élève
-		var classe = la_matiere_chargee("Classe") //element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
+		var classe = la_matiere_chargee("Classe") 
 		var mon_type = recuperer('mon_type').split("_")[0];
 		
 		if(mon_type.includes("Eleves")){
@@ -1048,7 +1048,7 @@ function fenetre_remarque_note(id_fichier, note_rendu, remarque){
 	/*
 	alert(nom_proprio_devoir)
 	console.log(nom_proprio_devoir)*/
-	return '<div class="ma_fenetre" id="remarque_et_note" style="visibility: visible;height: 33%;width: 280px;height: 300px;top: 35%;left: 10%;"><b style="text-align: center;"><div id="titre_fenetre" class="">Note et remarque de '+nom_proprio_devoir+' </div></b><span style=""><form id="mon_formulaire" autocomplete="off" style="padding: 0% 3% 0% 3%;height:82%;overflow-y: auto;">	<div id="champ_note"><label id="label" for="note_rendu">Note (sur 20)</label><input type="number" min=0 max=20 step=0.125 id="note_rendu" maxlength="2" style="width: 100%;" value="'+note_rendu+'"></div><br><label id="label" for="remarque">Votre remarque</label><textarea id="remarque" maxlength="300" style="width: 100%;resize: none;font-size: 13px;height: 50%;">'+remarque+'</textarea><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button class="bouton_sekooly" type="button" id="Annuler" onclick="$(\'#remarque_et_note\').remove()"> Annuler </button><button  class="bouton_sekooly" type="button" id="envoyer_note">Valider</button></div></form></span></div>'
+	return '<div class="ma_fenetre" id="remarque_et_note" style="visibility: visible;height: 33%;width: 280px;height: 300px;top: 35%;left: 10%;"><b style="text-align: center;"><div id="titre_fenetre" class="">Note et remarque de '+nom_proprio_devoir+' </div></b><span style=""><form id="mon_formulaire" autocomplete="off" class="edition">	<div id="champ_note"><label id="label" for="note_rendu">Note (sur 20)</label><input type="number" min=0 max=20 step=0.125 id="note_rendu" maxlength="2" style="width: 100%;" value="'+note_rendu+'"></div><br><label id="label" for="remarque">Votre remarque</label><textarea id="remarque" maxlength="300" style="width: 100%;resize: none;font-size: 13px;height: 50%;">'+remarque+'</textarea><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button class="bouton_sekooly" type="button" id="Annuler" onclick="$(\'#remarque_et_note\').remove()"> Annuler </button><button  class="bouton_sekooly" type="button" id="envoyer_note">Valider</button></div></form></span></div>'
 	//return '<div></div>'
 }
 
@@ -1341,9 +1341,7 @@ function mettre_devoir_en_ligne(lien_script,params, nom_fichier, extension,id_do
 				date_heure_actuelle = maintenant()
 				nom_table = "Rendus"
 				id_devoir = id_fichier_sujetdevoir+suite_notif()
-				la_matiere = la_matiere_chargee("Matiere") // $("#accueil_utilisateur")[0].innerText.trim()
-				//coefficient_rendu = post_resultat_asynchrone(racine_data + 'rpc/maj_coef_rendu?' + apikey,{"valeur_id_devoir":id_devoir})
-
+				la_matiere = la_matiere_chargee("Matiere") 
 				//console.log(coefficient_rendu)
 
 				nouveau_devoir  = {
@@ -2439,7 +2437,7 @@ function recuperer_eleves(sans_fenetre){
 	chargement(true);
 
 	//la classe actuellement ouverte
-	var classe = recuperer('mon_type').includes('Eleves') ? JSON.parse(recuperer("mes_donnees"))['Classe'] : la_matiere_chargee("Classe") //element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
+	var classe = recuperer('mon_type').includes('Eleves') ? JSON.parse(recuperer("mes_donnees"))['Classe'] : la_matiere_chargee("Classe")
 	
 
 	//si on est admin et à la première page: on récupère tout
@@ -2512,7 +2510,7 @@ function recuperer_logs(){
 		var titre_fenetre = "Historique des connexions";
 	//profs
 	}else{
-		var classe = la_matiere_chargee("Classe") // element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
+		var classe = la_matiere_chargee("Classe") 
 		var nom_variable = "classe"; //uniquement la liste des élèves
 		var titre_fenetre = "Liste des élèves en " + classe;
 	}
@@ -3254,12 +3252,14 @@ function ajouter_listener_dossier_non_final(id){
 		
 
 		$('#accueil_utilisateur').off('click');
-			//on a ouvert un dossier de classe et on veut récupérer les matières dedans
-		//console.log ("on a cliqué: " + e.target.id))
 
 		
 		//on change le titre si ça vient d'un clic de dossier (ET NON BOUTON PRECEDENT)
-		if (element_DOM(e.target.id)) element_DOM('accueil_utilisateur').innerHTML = element_DOM(e.target.id).innerText;
+		if (element_DOM(e.target.id)){
+
+			element_DOM('accueil_utilisateur').innerHTML = element_DOM(e.target.id).innerText;
+			mettre_infos_matiere(false)
+		} 
 
 		//on efface les dossiers actuels
 		element_DOM('liste_matieres').innerHTML = "";
@@ -3363,6 +3363,64 @@ function ajouter_date_filtre(id_date,valeur_date,valeur_aujd){
 	element_DOM('la_date_effet').appendChild(une_date.firstChild);
 }
 
+async function infos_matiere(){
+	id_matiere = recuperer("dossier_chargé")
+	la_matiere = la_matiere_chargee("Matiere")
+	description = await rechercher('Matieres','ID_URL',id_matiere, 'description')
+
+	if(description){
+		description = description[0]['description']
+
+		lire_description(id_matiere,la_matiere, description)
+		
+	}
+
+}
+
+
+function lire_description(id_matiere,la_matiere,description){
+
+	elements_html = '<div class="description_matiere" id="content">' + description + '</div>'
+	intitule_bouton = recuperer("mon_type") === "Eleves" ?  "Fermer" : "Editer la description"
+	fonction_bouton = recuperer("mon_type") === "Eleves" ?  "$('#mini_popup').remove()" : "editer_description_matiere('"+id_matiere+"','"+la_matiere+"')"
+
+	creer_mini_popup(la_matiere,elements_html,intitule_bouton,fonction_bouton,false,false,false,false,"25")
+}
+
+function editer_description_matiere(id_matiere,la_matiere){
+
+	description = element_DOM("content").innerHTML
+
+	vider_fenetre("Description de " + la_matiere,false,"sauvegarder_description()")
+	afficher_fenetre(true)
+	$('#mini_popup').remove()
+	
+
+	$("#fenetre").append('<div class="edition"><div id="description_matiere">'+description+'</div></div>')
+	rendre_riche("description_matiere",true)
+
+
+}
+
+function saisie_vide(){
+	return '<br data-cke-filler=\"true\">'
+}
+
+async function sauvegarder_description(){
+	console.log("Enregistrement de la description...")
+	
+	nouvelle_description = (recuperer_html_saisie_riche().includes(saisie_vide())) ? "Aucune description fournie" : recuperer_html_saisie_riche() 
+
+	await supabase
+		  .from('Matieres')
+		  .update({description: nouvelle_description})
+		  .match({ID_URL: recuperer("dossier_chargé")})
+
+	afficher_alerte("Description de la matière sauvegardée.")
+
+
+}
+
 function charger_dossier(id_dossier,final_booleen,titre){
 	/*
 	console.log({
@@ -3412,6 +3470,7 @@ function charger_dossier(id_dossier,final_booleen,titre){
 
 		//changer le titre du document 
 		element_DOM('accueil_utilisateur').innerHTML = titre;
+		mettre_infos_matiere(true)
 
 		//ajouter un bouton back
 		avec_bouton_back(true);
@@ -4425,11 +4484,11 @@ function creer_mini_popup(titre,elements_html,nom_bouton,fonction_bouton,valeur_
 	//on ajoute le bouton quitter
 	var bouton_quitter = '<div id="entete-fenetre" style="display: inline-flex;float: right;"><img  alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" class="bye_prev"> </div>';
 
-	var taille = taille_du_titre ? 'style="font-size: '+taille_du_titre+'px;"' : ""
+	var taille = taille_du_titre ? 'style="border-bottom-style: ridge;font-size: '+taille_du_titre+'px;"' : ""
 	var titre_html = '<div '+taille+' >'+titre+'</div>'
 
 	var id_bouton_html = id_bouton ? "id='" + id_bouton + "'" : ""
-	console.log({id_bouton_html})
+	//console.log({id_bouton_html})
 	var valider_changement = '<button type="button"  '+id_bouton_html+'  class="rendre" onclick="'+fonction_bouton+'">'+nom_bouton+'</button>'
 
 	var mini_popup_html = '<div id="mini_popup">'+bouton_quitter+titre_html+elements_html+valider_changement+'</div>';
@@ -5401,7 +5460,7 @@ function configurer_profil(){
 
 	//on met le nom prénoms
 	element_DOM('accueil_utilisateur').innerHTML = mes_donnees['Nom'] + " " + mes_donnees['Prénom(s)'] + "  -  " + affichage_classe;
-
+	mettre_infos_matiere(false)
 
 	
 }
@@ -5411,7 +5470,13 @@ function configurer_profil(){
 initialisation();
 
 
-
+function mettre_infos_matiere(oui){
+	if(oui && $(".matiere_description").length === 0){
+		$("#accueil_utilisateur").append('<div onclick="infos_matiere()" class="matiere_description sekooly-mode">Plus d\'informations</div>')
+	}else{
+		$(".matiere_description").remove()
+	}
+}
 
 
 
@@ -6197,8 +6262,8 @@ $(function charger_fichiers(e){
 					date_heure_actuelle = maintenant()
 					mes_donnees = JSON.parse(recuperer('mes_donnees'))
 					//mon_role = recuperer('mon_type').includes("Administration") ? mes_donnees['Role'] : recuperer('mon_type').replace("s","")
-					la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : la_matiere_chargee("Classe") //element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
-					la_matiere = recuperer('mon_type') === "Eleves" ? $("#accueil_utilisateur")[0].innerText :  la_matiere_chargee("Matiere") //  $("#accueil_utilisateur")[0].innerText.replace(la_classe,"").trim()
+					la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : la_matiere_chargee("Classe") 
+					la_matiere = recuperer('mon_type') === "Eleves" ? $("#accueil_utilisateur")[0].innerText :  la_matiere_chargee("Matiere") 
 					est_telechargeable = $("#est_telechargeable")[0].checked ? "oui" : "non"
 
 					//stocker la donnée dans la BDD
@@ -6617,7 +6682,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 			vider_fenetre("Nouvelle discussion");
 			element_DOM('maquestion').src="";
 
-			var nouveau_message = '<form id="mon_formulaire" autocomplete="off" style="padding: 0% 3% 0% 3%;height:82%;overflow-y: auto;"><label id="label" for="titre_question">Titre: </label><input type="text" id="titre_question" maxlength="50" style="width: 100%;">	<br><br><label id="label" for="contenu_question">Votre message: </label><textarea id="contenu_question" maxlength="1700" style="width: 100%;height: 70%;resize: none;font-size: 13px;"></textarea><div id="nb_max_div" style="margin-left: 90%;margin-top: 0%;font-size: 10px; display:none;"> <font id="nb_max"> 0 / 1700</font> </div><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button  class="bouton_sekooly" type="button" id="Annuler" onclick="recuperer_les_topics(false)"> Annuler </button><button  class="bouton_sekooly" type="button" id="envoi" onclick="envoyer_le_topic()"> Poster </button></div><div id="msg_erreur" style="text-align: center;padding: 1%;color: green;"> </div></form>';
+			var nouveau_message = '<form id="mon_formulaire" autocomplete="off" class="edition"><label id="label" for="titre_question">Titre: </label><input type="text" id="titre_question" maxlength="50" style="width: 100%;">	<br><br><label id="label" for="contenu_question">Votre message: </label><textarea id="contenu_question" maxlength="1700" style="width: 100%;height: 70%;resize: none;font-size: 13px;"></textarea><div id="nb_max_div" style="margin-left: 90%;margin-top: 0%;font-size: 10px; display:none;"> <font id="nb_max"> 0 / 1700</font> </div><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button  class="bouton_sekooly" type="button" id="Annuler" onclick="recuperer_les_topics(false)"> Annuler </button><button  class="bouton_sekooly" type="button" id="envoi" onclick="envoyer_le_topic()"> Poster </button></div><div id="msg_erreur" style="text-align: center;padding: 1%;color: green;"> </div></form>';
 
 
 			//ajouter la fenettre de nouveau message au DOM
@@ -6627,7 +6692,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 			element_DOM('fenetre').appendChild(mon_message);
 
 
-			rendre_riche("contenu_question")
+			rendre_riche("contenu_question",true)
 
 
 			//à chaque modif du contenu: on mà le nb de carac
@@ -6783,7 +6848,9 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 			*/
 
 			//on n'envoie pas de vide
-			if (mon_titre!=="" && mon_contenu!==""){
+			//if (mon_titre!=="" && mon_contenu!==""){
+
+			if(mon_titre!=="" && mon_contenu!=="" && mon_titre!==saisie_vide() && mon_contenu!==saisie_vide()){
 
 				//on n'envoie qu'une fois le message				
 				element_DOM('envoi').disabled=true;
@@ -6811,8 +6878,8 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 
 				nom_table = "Notifs"
 				mes_donnees = JSON.parse(recuperer('mes_donnees'))
-				la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : la_matiere_chargee("Classe") //element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
-				la_matiere = recuperer('mon_type') === "Eleves" ? $("#accueil_utilisateur")[0].innerText : la_matiere_chargee("Matiere") //$("#accueil_utilisateur")[0].innerText.replace(la_classe,"").trim()
+				la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : la_matiere_chargee("Classe") 
+				la_matiere = recuperer('mon_type') === "Eleves" ? $("#accueil_utilisateur")[0].innerText : la_matiere_chargee("Matiere") 
 				id_notif = id_topic
 
 				nouvelle_notif = {
@@ -6891,7 +6958,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 
 		}
 
-		function vider_fenetre(titre_fenetre,est_visio, save_button){
+		function vider_fenetre(titre_fenetre,est_visio, save_button_function){
 			element_DOM('fenetre').innerHTML = '';
 
 			//console.log("on a réaffiché");
@@ -6916,7 +6983,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 			}
 
 			//alert(save_button)
-			avec_sauvegarde(save_button)
+			avec_sauvegarde(save_button_function)
 
 			//faire le bon affichage de la fenêtre
 			ajuster_boutons_fenetre();
@@ -7541,7 +7608,7 @@ function recuperer_edt(nom_classe_fournie){
 
 	var nom_classe = "Tous";
 	if(recuperer('mon_type') === "Administration_bis" || recuperer('dossier_chargé'))
-		nom_classe = la_matiere_chargee("Classe") //element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
+		nom_classe = la_matiere_chargee("Classe")
 
 	if(recuperer('mon_type') === "Eleves")
 		nom_classe = JSON.parse(recuperer('mes_donnees'))['Classe'];
@@ -8511,7 +8578,6 @@ function rejoindre_visio(id_matiere_visio,sans_alerte,valeur_id_div_visio,pas_de
 
 	var mes_donnees = JSON.parse(recuperer('mes_donnees'));
 	var identifiant = recuperer('identifiant_courant').toUpperCase();
-	//var la_classe = (mon_type === "Eleves")? mes_donnees['Classe'] : element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim().toUpperCase();
 
 	//nouveau nom classe = classe ET matière
 	var id_matiere = id_matiere_visio ? id_matiere_visio : recuperer('dossier_chargé');
@@ -12294,11 +12360,22 @@ function reinitialiser_init(){
 
 
 /**************************************** textes riches *****************************************/
-function rendre_riche(id_text_area ){
+function rendre_riche(id_text_area, agrandir_zone ){
 	ClassicEditor
 		.create( document.querySelector( '[id="'+id_text_area+'"]' )   , config_editor() )
         .then( editor => {
             //console.log( editor )
+            if(agrandir_zone){
+
+            	$("[contenteditable]").on("click change", function(){
+
+            		$("[contenteditable]")[0].style.height = $("[contenteditable]")[0].offsetHeight < 300 ? "300px" : $("[contenteditable]")[0].offsetHeight + "px"
+
+            	})
+
+            	
+
+            } 
         } )
 	    .catch( error => {
 	        console.error( error );
@@ -12966,7 +13043,7 @@ function tdb_recuperer_devoirs(ne_pas_arreter_chargement,aujourdhui){
 	url = racine_data + 'Rendus?'+le_proprietaire+'&'+apikey  //racine_data + 'Rendus?'+le_proprietaire+'&id_dossier_sujetdevoir=in.'+les_id_dossier_classe+'&'+apikey 
 	mes_devoirs_rendus = get_resultat(url)
 	mes_devoirs_rendus = mes_devoirs_rendus.filter(function(valeur){
-		return les_id_dossier_classe.includes(valeur['id_dossier_sujetdevoir'])
+		return les_id_dossier_classe.includes(valeur['id_dossier_sujetdevoir']) && valeur['date_publication'] !== null
 	})
 	//console.log(mes_devoirs_rendus)
 
@@ -14367,7 +14444,7 @@ function ajouter_un_tout_nouveau_msg(){
 	vider_fenetre("Nouveau message");
 	element_DOM('maquestion').src="";
 
-	var nouveau_message = '<div id="mon_formulaire" autocomplete="off" style="padding: 0% 3% 0% 3%;height:82%;overflow-y: auto;"><label id="label" for="Destinataire">Destinataire: </label><div id="div_autocompletion" class="autocompletion"> <input placeholder="Tapez pour chercher le destinataire..." autocomplete="on" onkeyup="validation_par_touche(event)" oninput="faire_autocompletion_input(this,\'Destinataire\')" type="text" name="Destinataire" id="Destinataire" maxlength="50" style="width: 100%;"></div><br><br><label id="label" for="Message">Votre message: </label><textarea id="Message" name="Message" placeholder="Saisissez votre message..." maxlength="1700" style="width: 100%;height: 70%;resize: none;font-size: 13px;"></textarea><div id="nb_max_div" style="margin-left: 90%;margin-top: 0%;font-size: 10px; display:none;"> <font id="nb_max"> 0 / 1700</font> </div><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button class="bouton_sekooly" type="button" id="Annuler" onclick="recuperer_msgs(false)"> Annuler </button><button class="bouton_sekooly" type="button" id="envoi" onclick="envoyer_mon_message()"> Envoyer le message </button></div><div id="msg_erreur" style="text-align: center;padding: 1%;color: green;"> </div></div>';
+	var nouveau_message = '<div id="mon_formulaire" autocomplete="off" class="edition"><label id="label" for="Destinataire">Destinataire: </label><div id="div_autocompletion" class="autocompletion"> <input placeholder="Tapez pour chercher le destinataire..." autocomplete="on" onkeyup="validation_par_touche(event)" oninput="faire_autocompletion_input(this,\'Destinataire\')" type="text" name="Destinataire" id="Destinataire" maxlength="50" style="width: 100%;"></div><br><br><label id="label" for="Message">Votre message: </label><textarea id="Message" name="Message" placeholder="Saisissez votre message..." maxlength="1700" style="width: 100%;height: 70%;resize: none;font-size: 13px;"></textarea><div id="nb_max_div" style="margin-left: 90%;margin-top: 0%;font-size: 10px; display:none;"> <font id="nb_max"> 0 / 1700</font> </div><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button class="bouton_sekooly" type="button" id="Annuler" onclick="recuperer_msgs(false)"> Annuler </button><button class="bouton_sekooly" type="button" id="envoi" onclick="envoyer_mon_message()"> Envoyer le message </button></div><div id="msg_erreur" style="text-align: center;padding: 1%;color: green;"> </div></div>';
 
 	//ajouter la fenettre de nouveau message au DOM
 	var mon_message = document.createElement('span');
@@ -16243,7 +16320,7 @@ async function creer_quiz(numero_etape){
 	if(recuperer("mon_type").includes("Eleve")) return alert("Vous n'avez pas les droits pour modifier un quiz.")
 
 
-	vider_fenetre("Editer un quiz (<span id='etape-quiz'>1</span>/2)",false,true)
+	vider_fenetre("Editer un quiz (<span id='etape-quiz'>1</span>/2)",false,"sauvegarder_quiz()")
 	afficher_fenetre(true)
 
 	initialiser_fenetre_quiz()
@@ -16414,7 +16491,7 @@ async function crud_questions(){
 		<form id="quiz-form">
 		</form>
 		<bleu class="quiz-options" onclick="nouvelle_question()"><img src="`+ prefixe_image + `/img_ajout.png" style="" class="small-icon"> Ajouter une question</bleu>
-		<div onclick="run_quiz(true)" class="sekooly-mode quiz-options"><img src="'+ prefixe_image + '/img_previz.png" class="small-icon trash"> Prévisualiser le quiz</div>
+		<div onclick="run_quiz(true)" class="sekooly-mode quiz-options"><img src="`+ prefixe_image + `/img_previz.png" class="small-icon trash"> Prévisualiser le quiz</div>
 	`
 	//modifier
 	//supprimer
@@ -16543,7 +16620,7 @@ async function accueil_quiz(id_quiz, preview_mode, proprietaire_initial){
 		var bouton_edit = (preview_mode || $('[class="editer"]').length > 0) ? '<img onclick="creer_quiz()" src="'+ prefixe_image + '/img_edit.png" alt="modifier" class="editer">' : ''
 
 
-		vider_fenetre(infos_quiz['titre'] + bouton_edit,false,true)
+		vider_fenetre(infos_quiz['titre'] + bouton_edit,false,"sauvegarder_quiz()")
 		initialiser_fenetre_quiz(true,nb_questions)
 
 		//if(preview_mode) return go_to_question(0,nb_questions)
@@ -17490,9 +17567,9 @@ async function dernieres_modifs_quiz(){
 }
 
 
-function avec_sauvegarde(oui){
-	if(oui){
-		$("#titre_fenetre").append('<img id="sauvegarder" src="'+ prefixe_image + '/img_save.png" alt="ENREGISTRER" onclick="sauvegarder_quiz()" class="icon-save">')	
+function avec_sauvegarde(function_whole_name){
+	if(function_whole_name){
+		$("#titre_fenetre").append('<img id="sauvegarder" src="'+ prefixe_image + '/img_save.png" alt="ENREGISTRER" onclick="'+function_whole_name+'" class="icon-save">')	
 	}else{
 		$("#sauvegarder").remove()
 	}
@@ -17651,8 +17728,8 @@ async function publier_quiz(id_quiz, nom_fichier){
 	date_heure_actuelle = maintenant()
 	mes_donnees = JSON.parse(recuperer('mes_donnees'))
 	//mon_role = recuperer('mon_type').includes("Administration") ? mes_donnees['Role'] : recuperer('mon_type').replace("s","")
-	la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : la_matiere_chargee("Classe") //element_DOM('accueil_utilisateur').innerHTML.split("\n")[0].trim();
-	la_matiere = recuperer('mon_type') === "Eleves" ? $("#accueil_utilisateur")[0].innerText :  la_matiere_chargee("Matiere") //  $("#accueil_utilisateur")[0].innerText.replace(la_classe,"").trim()
+	la_classe = recuperer('mon_type') === "Eleves" ? mes_donnees['Classe'] : la_matiere_chargee("Classe") 
+	la_matiere = recuperer('mon_type') === "Eleves" ? $("#accueil_utilisateur")[0].innerText :  la_matiere_chargee("Matiere")
 
 
 	//stocker la donnée dans la BDD

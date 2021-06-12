@@ -577,6 +577,7 @@ CREATE TABLE public."Matieres"
     classe_id text COLLATE pg_catalog."default",
     commun_au_cycle character varying COLLATE pg_catalog."default" NOT NULL DEFAULT 'non'::character varying,
     coefficient_matiere real,
+    description text COLLATE pg_catalog."default" NOT NULL DEFAULT 'Aucune description fournie'::text,
     CONSTRAINT "Matieres_pkey" PRIMARY KEY ("Classe_Matiere", "Cycle")
 )
 
