@@ -20,7 +20,7 @@ function mettre_le_contact_etablissement(){
   }
 
 
-  if($("#logo_etablissement")[0]) $("#logo_etablissement")[0].src = "https://sekooly.github.io/SUPABASE/images/" + nom_fichier_logo
+  if($("#logo_etablissement")[0]) $("#logo_etablissement")[0].src = "https://sekooly.com/assets/images/" + nom_fichier_logo
   if($("#site_etablissement")[0]) $("#site_etablissement")[0].href = site_etablissement
 }
 

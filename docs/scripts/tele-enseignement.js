@@ -54,7 +54,7 @@ const { createClient } = supabase
 supabase = createClient(racine_data.replace("/rest/v1/",""),  data_etablissement["apikey"])
 supabaseInit = createClient(racine_initiale.replace("/rest/v1/",""),  api_initial.split('=')[1])
 
-
+var prefixe_image = "https://sekooly.com/assets/images"
 
 
 
@@ -202,7 +202,7 @@ function lister_les_eleves(liste_eleves,classe){
 		var identifiant_eleve_bloc = element_DOM(identifiant_eleve);
 
 		//on ajoute le bouton OEIL de l'élève -> détails via tableau software
-		var oeil_tableau_html = '<span><img alt="voir" class="envoi_remarque mini-image" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" onclick="recuperer_details_plateforme(\''+identifiant_eleve+'\')"></span>';
+		var oeil_tableau_html = '<span><img alt="voir" class="envoi_remarque mini-image" src="'+ prefixe_image + '/img_previz.png" onclick="recuperer_details_plateforme(\''+identifiant_eleve+'\')"></span>';
 		var oeil_tableau = document.createElement('div');
 		oeil_tableau.innerHTML = oeil_tableau_html;
 		while(oeil_tableau.firstChild) identifiant_eleve_bloc.appendChild(oeil_tableau.firstChild);
@@ -213,7 +213,7 @@ function lister_les_eleves(liste_eleves,classe){
 		//observations sur l'élève -> ajout ou modif ou suppression
 		var mon_type = recuperer('mon_type').split("_")[0]
 		if(mon_type!=="Eleves"){
-			var mode_edition_html = '<span><img alt="remarque" class="envoi_remarque mini-image" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png" onclick="emettre_avis(\''+identifiant_eleve+'\',\''+classe+'\')"></span>';
+			var mode_edition_html = '<span><img alt="remarque" class="envoi_remarque mini-image" src="'+ prefixe_image + '/img_remarque.png" onclick="emettre_avis(\''+identifiant_eleve+'\',\''+classe+'\')"></span>';
 			var mode_edition = document.createElement('div');
 			mode_edition.innerHTML = mode_edition_html;
 			while(mode_edition.firstChild) identifiant_eleve_bloc.appendChild(mode_edition.firstChild);
@@ -221,7 +221,7 @@ function lister_les_eleves(liste_eleves,classe){
 		
 		//on ajoute le bouton détails de l'élève -> visualiser tous les avis sur l'élève SI ILS EXISTENT
 		if (valeur['nombre_avis']>0){
-			var details_html = '<span><img alt="autres avis" class="envoi_remarque mini-image" src="https://sekooly.github.io/SUPABASE/images/img_details.png" onclick="recuperer_autres_avis(\''+identifiant_eleve+'\')"></span>';
+			var details_html = '<span><img alt="autres avis" class="envoi_remarque mini-image" src="'+ prefixe_image + '/img_details.png" onclick="recuperer_autres_avis(\''+identifiant_eleve+'\')"></span>';
 			var details = document.createElement('div');
 			details.innerHTML = details_html;
 			while(details.firstChild) identifiant_eleve_bloc.appendChild(details.firstChild);
@@ -242,7 +242,7 @@ function recuperer_details_plateforme(identifiant_eleve){
 }
 
 function dupliquer_visualisation(identifiant_eleve){
-	var fenetre_bis_html = '<div class="ma_fenetre" id="fenetre_bis" style="visibility: visible; opacity:95%; top: 0px; left: 0px; width: 99%; height: 99%;"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="https://sekooly.github.io/SUPABASE/images/quitter.png" id="bye_prev_bis" onclick="quitter_previsualisation_bis()" style="width: 30px; height: 30px; cursor: pointer; position: fixed; z-index: 3; top: 0px; left: 673px;"></div><div class="titre_fenetre" id="titre_fenetre_bis">Détails sur ' + identifiant_eleve + '</div><div class="fullscreen-btn" id="conteneur_plein_ecran_bis"> <img alt="plein écran" style="position: fixed;" id="pleinecran_bis" src="https://sekooly.github.io/SUPABASE/images/img_petitecran.png" onclick="switch_mode_bis()" class="pleinecran"> </div></div>';
+	var fenetre_bis_html = '<div class="ma_fenetre" id="fenetre_bis" style="visibility: visible; opacity:95%; top: 0px; left: 0px; width: 99%; height: 99%;"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev_bis" onclick="quitter_previsualisation_bis()" style="width: 30px; height: 30px; cursor: pointer; position: fixed; z-index: 3; top: 0px; left: 673px;"></div><div class="titre_fenetre" id="titre_fenetre_bis">Détails sur ' + identifiant_eleve + '</div><div class="fullscreen-btn" id="conteneur_plein_ecran_bis"> <img alt="plein écran" style="position: fixed;" id="pleinecran_bis" src="'+ prefixe_image + '/img_petitecran.png" onclick="switch_mode_bis()" class="pleinecran"> </div></div>';
 
 		//on rajoute tout
 		var fenetre_bis = document.createElement('div');
@@ -299,7 +299,7 @@ function actualiser_bilan(identifiant_eleve){
 function emettre_avis(identifiant_eleve, classe){
 	//console.log("emettre_avis: " + identifiant_eleve);
 
-	var pop_up_html  = '<div id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X"  src="https://sekooly.github.io/SUPABASE/images/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Vos observations sur <b>'+identifiant_eleve+'</b>:</div><textarea id="observation" style="width: 80%;resize: none;font-size: 13px;margin-bottom: 5%;"></textarea><div style="">Passage de <b>'+identifiant_eleve+'</b> en classe supérieure:</div><select style="width: 80%;border-color: red;border-style: solid;margin-bottom: 5%;" id="avis_passage" value=""><option value=""></option><option value="Favorable">Favorable</option><option value="Non favorable">Non favorable</option></select><button type="button" class="rendre" onclick="envoyer_avis_conseil(\''+identifiant_eleve+'\',\''+classe+'\')">Envoyer l\'avis</button></div>';
+	var pop_up_html  = '<div id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X"  src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Vos observations sur <b>'+identifiant_eleve+'</b>:</div><textarea id="observation" style="width: 80%;resize: none;font-size: 13px;margin-bottom: 5%;"></textarea><div style="">Passage de <b>'+identifiant_eleve+'</b> en classe supérieure:</div><select style="width: 80%;border-color: red;border-style: solid;margin-bottom: 5%;" id="avis_passage" value=""><option value=""></option><option value="Favorable">Favorable</option><option value="Non favorable">Non favorable</option></select><button type="button" class="rendre" onclick="envoyer_avis_conseil(\''+identifiant_eleve+'\',\''+classe+'\')">Envoyer l\'avis</button></div>';
 
 	var pop_up = document.createElement('div');
 	pop_up.innerHTML = pop_up_html;
@@ -463,7 +463,7 @@ function recuperer_MA_fiche_conseil(){
 
 	//oeil -> tableau
 	var identifiant_eleve_bloc = element_DOM(identifiant_eleve);
-	var oeil_tableau_html = '<span><img alt="voir"  class="envoi_remarque mini-image" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" onclick="recuperer_details_plateforme(\''+identifiant_eleve+'\')"></span>';
+	var oeil_tableau_html = '<span><img alt="voir"  class="envoi_remarque mini-image" src="'+ prefixe_image + '/img_previz.png" onclick="recuperer_details_plateforme(\''+identifiant_eleve+'\')"></span>';
 	var oeil_tableau = document.createElement('div');
 	oeil_tableau.innerHTML = oeil_tableau_html;
 	while(oeil_tableau.firstChild) identifiant_eleve_bloc.appendChild(oeil_tableau.firstChild);
@@ -756,9 +756,9 @@ function recuperer_mon_devoir(id_fichier_sujetdevoir,proprietaire,examen_termin�
 				var titre = rfc3986EncodeURIComponent(data);
 
 				//on ne peut plus supprimer si examen terminé
-				var suppression_devoir = examen_terminé ? "" : '<img alt="supprimer"  id="'+ data +'" src="https://sekooly.github.io/SUPABASE/images/img_trash.png" style="width:15px;height:15px;cursor:pointer;" onclick="supprimer_devoir(this)">'
+				var suppression_devoir = examen_terminé ? "" : '<img alt="supprimer"  id="'+ data +'" src="'+ prefixe_image + '/img_trash.png" style="width:15px;height:15px;cursor:pointer;" onclick="supprimer_devoir(this)">'
 				var remarque_non_termine = donnees_initiales['date_publication'] === null ? '  <i><gris>non terminé</gris></i>  ' : "" 
-				mon_devoir_rendu.innerHTML += '<div id="mon_devoir_rendu"> <div id="'+id_fichier+'">'+ data + '<img class="mini-image" onclick="visualiser(\''+titre+'\',\''+id_fichier+'\')" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" style="padding-left:1%">'+ suppression_devoir+remarque_non_termine+'</div></div>';
+				mon_devoir_rendu.innerHTML += '<div id="mon_devoir_rendu"> <div id="'+id_fichier+'">'+ data + '<img class="mini-image" onclick="visualiser(\''+titre+'\',\''+id_fichier+'\')" src="'+ prefixe_image + '/img_previz.png" style="padding-left:1%">'+ suppression_devoir+remarque_non_termine+'</div></div>';
 
 
 				//afficher le devoir
@@ -923,12 +923,12 @@ function afficher_rendus_devoirs(resultats){
 		var coefficient_rendu = resultats[i]["coefficient_rendu"]
 		var note_rendu = resultats[i]["note_rendu"]
 		
-		un_devoir_rendu.innerHTML += '<img alt="voir"  class="mini-image" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" onclick="visualiser(\''+ titre + '\',\'' + un_devoir_rendu.id +'\', \'' + nom_proprio_devoir + '\')">';
+		un_devoir_rendu.innerHTML += '<img alt="voir"  class="mini-image" src="'+ prefixe_image + '/img_previz.png" onclick="visualiser(\''+ titre + '\',\'' + un_devoir_rendu.id +'\', \'' + nom_proprio_devoir + '\')">';
 
-		un_devoir_rendu.innerHTML += '<img alt="remarque" class="mini-image envoi_remarque" onclick="mettre_remarque_devoir(this,\'' + remarque +'\',' + coefficient_rendu +','+ note_rendu + ');" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png">';
+		un_devoir_rendu.innerHTML += '<img alt="remarque" class="mini-image envoi_remarque" onclick="mettre_remarque_devoir(this,\'' + remarque +'\',' + coefficient_rendu +','+ note_rendu + ');" src="'+ prefixe_image + '/img_remarque.png">';
 
 
-		un_devoir_rendu.innerHTML += est_quiz ? "" : '<a   id="telechargement" href = "https://drive.google.com/uc?export=download&id=' + un_devoir_rendu.id +'" download="mon_fichier.txt"><img alt="télécharger" class="mini-image" src="https://sekooly.github.io/SUPABASE/images/img_download.png"></a>';
+		un_devoir_rendu.innerHTML += est_quiz ? "" : '<a   id="telechargement" href = "https://drive.google.com/uc?export=download&id=' + un_devoir_rendu.id +'" download="mon_fichier.txt"><img alt="télécharger" class="mini-image" src="'+ prefixe_image + '/img_download.png"></a>';
 		
 		un_devoir_rendu.innerHTML += '<i style="color: #bfbfbf;">' + afficher_date(resultats[i]["date_publication"]) + '  </i>';
 
@@ -1593,12 +1593,12 @@ function afficher_modif_profil(){
 
 function bouton_supprimer_pp(identifiant_courant){
 	identifiant_courant = identifiant_courant ? identifiant_courant : recuperer("identifiant_courant")
-	return '<img id="suppr_pp" onclick="supprimer_pp(\''+identifiant_courant+'\')" class="editer" src="https://sekooly.com/assets/images/img_trash.png" alt="supprimer">'
+	return '<img id="suppr_pp" onclick="supprimer_pp(\''+identifiant_courant+'\')" class="editer" src="'+ prefixe_image + '/img_trash.png" alt="supprimer">'
 }
 
 function bouton_modifier_pp(identifiant_courant){
 	identifiant_courant = identifiant_courant ? identifiant_courant : recuperer("identifiant_courant")
-	return '<span class="pp-upload"><label for="pp-'+identifiant_courant+'"><img src="https://sekooly.com/assets/images/img_edit.png" alt="modifier" class="editer"></label><input onchange="changer_pp(\''+identifiant_courant+'\')" accept=".png,.jpeg,.jpg,.bmp,.svg,.gif" id="pp-'+identifiant_courant+'" type="file"/> </span>'
+	return '<span class="pp-upload"><label for="pp-'+identifiant_courant+'"><img src="'+ prefixe_image + '/img_edit.png" alt="modifier" class="editer"></label><input onchange="changer_pp(\''+identifiant_courant+'\')" accept=".png,.jpeg,.jpg,.bmp,.svg,.gif" id="pp-'+identifiant_courant+'" type="file"/> </span>'
 }
 
 function ma_photo(identifiant_optionnel, sans_bouton_modifier){
@@ -1671,7 +1671,7 @@ async function supprimer_pp(identifiant_courant, sans_confirmation){
 
 				//changer localement
 				//console.log("changer localement pour " + identifiant_courant)
-				$("[id='pp_"+identifiant_courant+"']")[0].src = "https://sekooly.com/assets/images/default-user.svg";	
+				$("[id='pp_"+identifiant_courant+"']")[0].src = prefixe_image + "/default-user.svg";	
 				$("#suppr_pp").remove()
 				
 				
@@ -2521,7 +2521,7 @@ function recuperer_logs(){
 	vider_fenetre(titre_fenetre);
 
 	//on ajoute le bouton télécharger
-		var bouton_télécharger = '<a id="telechargement" style="position: fixed;z-index:3;" href = "#"><img alt="télécharger" class="window-btn" id="telechargement" src="https://sekooly.github.io/SUPABASE/images/img_download.png""></a>';
+		var bouton_télécharger = '<a id="telechargement" style="position: fixed;z-index:3;" href = "#"><img alt="télécharger" class="window-btn" id="telechargement" src="'+ prefixe_image + '/img_download.png""></a>';
 		//on le met dans l'en-tête
 		var a_ajouter = document.createElement('div');
 		a_ajouter.innerHTML = bouton_télécharger;
@@ -2899,7 +2899,7 @@ function mettre_le_contact_etablissement(){
   }
 
 
-  if($("#logo_etablissement")[0]) $("#logo_etablissement")[0].src = "https://sekooly.github.io/SUPABASE/images/" + nom_fichier_logo
+  if($("#logo_etablissement")[0]) $("#logo_etablissement")[0].src = prefixe_image + "/" + nom_fichier_logo
   if($("#site_etablissement")[0]) $("#site_etablissement")[0].href = site_etablissement
 }
 
@@ -3184,7 +3184,7 @@ function ajout_dossiers_matieres(mes_matieres){
 
 			var ma_classe = arrayItem.Classe;
 		    var ma_matiere = arrayItem.Matiere;
-		    var couleur_matiere = "https://sekooly.github.io/SUPABASE/images/img_dossier_" + arrayItem.Couleur_matiere.replace(/ /g,"") + ".png" 
+		    var couleur_matiere = prefixe_image + "/img_dossier_" + arrayItem.Couleur_matiere.replace(/ /g,"") + ".png" 
 
 		    if (ma_classe !==undefined && ma_matiere !== undefined){
 				
@@ -3331,7 +3331,7 @@ function creer_span_div(mon_div,URL_classe_matiere,la_classe,la_matiere,couleur_
 	if(recuperer('mon_type') !== "Administration"){
 		var icone = couleur_dossier;
 	}else{
-		var icone = "https://sekooly.github.io/SUPABASE/images/dossier_drive.png";
+		var icone = prefixe_image + "/dossier_drive.png";
 	}
 
 
@@ -3848,7 +3848,7 @@ function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,d
 
 
 
-	var image_fichier = "https://sekooly.github.io/SUPABASE/images/img_icone_" + extension_fichier + ".png";
+	var image_fichier = prefixe_image + "/img_icone_" + extension_fichier + ".png";
 	
 	//console.log("on va ajouter " + nom_fichier + " dans " + nom_drive);
 
@@ -3859,7 +3859,7 @@ function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,d
 
 	// sans téléchargement EN PLUS DE YOUTUBE
 	var padding_yt = est_telechargeable === "oui" ?  "" : ' style="padding-top: 25%;" ' 
-	var telecharger_le_fichier = est_telechargeable === "oui" ? '<img alt="télécharger" src="https://sekooly.github.io/SUPABASE/images/img_download.png" onclick="telecharger_fichier(event,this)" id="telecharger" class="download_fichier">' : ""
+	var telecharger_le_fichier = est_telechargeable === "oui" ? '<img alt="télécharger" src="'+ prefixe_image + '/img_download.png" onclick="telecharger_fichier(event,this)" id="telecharger" class="download_fichier">' : ""
 	var periode_bulletin = periode_bulletin ? " periode_bulletin='"+periode_bulletin+"'" : ""
 	var destinataire_par_page = destinataire_par_page ? " destinataire_par_page='"+destinataire_par_page+"'" : ""
 	var id_chapitre = id_chapitre ? " id_chapitre='" + id_chapitre + "'" : ""
@@ -3878,7 +3878,7 @@ function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,d
 	$('#' + id_fichier + ' .un_fichier').on("error",function(e){
 
 		console.log("on a une erreur " + JSON.stringify(e));
-		$('#' + id_fichier + ' .un_fichier').attr("src","https://sekooly.github.io/SUPABASE/images/img_fichier.png");
+		$('#' + id_fichier + ' .un_fichier').attr("src", prefixe_image + "/img_fichier.png");
 		//console.log("on a changé sa source");
 	});
 
@@ -3895,7 +3895,7 @@ function ajouter_cadenas_examen(id_fichier,nom_drive){
 
 		if(non_ouvrable){
 
-			$(".span_un_fichier#"+id_fichier).append('<img alt="verrouillé" id="locked" src="https://sekooly.github.io/SUPABASE/images/img_cadenas.png" class="locked">')
+			$(".span_un_fichier#"+id_fichier).append('<img alt="verrouillé" id="locked" src="'+ prefixe_image + '/img_cadenas.png" class="locked">')
 		}
 
 	}
@@ -4423,7 +4423,7 @@ function creer_mini_popup(titre,elements_html,nom_bouton,fonction_bouton,valeur_
 	$("#mini_popup").remove();
 
 	//on ajoute le bouton quitter
-	var bouton_quitter = '<div id="entete-fenetre" style="display: inline-flex;float: right;"><img  alt="X" src="https://sekooly.github.io/SUPABASE/images/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" class="bye_prev"> </div>';
+	var bouton_quitter = '<div id="entete-fenetre" style="display: inline-flex;float: right;"><img  alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" class="bye_prev"> </div>';
 
 	var taille = taille_du_titre ? 'style="font-size: '+taille_du_titre+'px;"' : ""
 	var titre_html = '<div '+taille+' >'+titre+'</div>'
@@ -4728,9 +4728,9 @@ async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_init
 
 	//console.log(mode_extrait_png_canva)
 	//on ajoute le bouton télécharger sauf en cas de PAS DE TELECHARGENEMTN
-	var bouton_télécharger = mode_extrait_png_canva ? '<a id="telechargement" class="download-btn" download="Bulletin.png" onclick="telecharger_canvas()"><img alt="télécharger" class="window-btn"  id="'+ id_fichier+ '" src="https://sekooly.github.io/SUPABASE/images/img_download.png"></a>' :
+	var bouton_télécharger = mode_extrait_png_canva ? '<a id="telechargement" class="download-btn" download="Bulletin.png" onclick="telecharger_canvas()"><img alt="télécharger" class="window-btn"  id="'+ id_fichier+ '" src="'+ prefixe_image + '/img_download.png"></a>' :
 							pas_de_telechargement ? '' :
-							'<a id="telechargement" class="download-btn" href = "https://drive.google.com/uc?export=download&id=' + id_fichier +'"><img alt="télécharger" class="window-btn" id="'+ id_fichier+ '" src="https://sekooly.github.io/SUPABASE/images/img_download.png"></a>';
+							'<a id="telechargement" class="download-btn" href = "https://drive.google.com/uc?export=download&id=' + id_fichier +'"><img alt="télécharger" class="window-btn" id="'+ id_fichier+ '" src="'+ prefixe_image + '/img_download.png"></a>';
 
 
 	if(nom_proprio_devoir){
@@ -4747,7 +4747,7 @@ async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_init
 		remarque = remarque.replace(/'/g, "\\'");
 
 
-		var bouton_corriger = '<span id="'+id_fichier+'"><img id="corriger" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png" class="window-btn" style="right: 30px;" onclick="mettre_remarque_devoir(this,\'' +remarque +'\',' + coefficient_rendu +','+ note_rendu + ')"></span>'
+		var bouton_corriger = '<span id="'+id_fichier+'"><img id="corriger" src="'+ prefixe_image + '/img_remarque.png" class="window-btn" style="right: 30px;" onclick="mettre_remarque_devoir(this,\'' +remarque +'\',' + coefficient_rendu +','+ note_rendu + ')"></span>'
 
 
 	}else{
@@ -5001,10 +5001,10 @@ function quitter_previsualisation(){
 
 function initialisation_bouton(bis){
 	
-	element_DOM('pleinecran' + (bis ? "_bis" : "")).src ="https://sekooly.github.io/SUPABASE/images/img_pleinecran.png";
+	element_DOM('pleinecran' + (bis ? "_bis" : "")).src = prefixe_image + "/img_pleinecran.png";
 
 	//si déjà plein écran alors on change l'icône
-	if (element_DOM('fenetre' + (bis ? "_bis" : "")).style.width=== "99%") element_DOM('pleinecran' + (bis ? "_bis" : "")).src ="https://sekooly.github.io/SUPABASE/images/img_petitecran.png";
+	if (element_DOM('fenetre' + (bis ? "_bis" : "")).style.width=== "99%") element_DOM('pleinecran' + (bis ? "_bis" : "")).src = prefixe_image + "/img_petitecran.png";
 	
 
 }
@@ -5014,13 +5014,13 @@ function switch_mode(forcing){
 
 	if(!element_DOM('pleinecran')) return -1;
 
-	var est_plein_ecran = (element_DOM('pleinecran').src.includes("https://sekooly.github.io/SUPABASE/images/img_pleinecran.png"));
+	var est_plein_ecran = (element_DOM('pleinecran').src.includes(prefixe_image + "/img_pleinecran.png"));
 
 	//console.log('est_plein_ecran: ' + est_plein_ecran);
 	
 	if (est_plein_ecran || forcing){
 
-		element_DOM('pleinecran').src ="https://sekooly.github.io/SUPABASE/images/img_petitecran.png";
+		element_DOM('pleinecran').src = prefixe_image + "/img_petitecran.png";
 
 		//bcp + de top et de left
 		element_DOM('fenetre').style.top = 0;
@@ -5032,7 +5032,7 @@ function switch_mode(forcing){
 
 	}else{
 
-		element_DOM('pleinecran').src ="https://sekooly.github.io/SUPABASE/images/img_pleinecran.png";
+		element_DOM('pleinecran').src = prefixe_image + "/img_pleinecran.png";
 		
 		//on reset tout le style
 		element_DOM('fenetre').style.top ="";
@@ -5055,13 +5055,13 @@ function switch_mode_bis(forcing){
 
 	if(!element_DOM('pleinecran_bis')) return -1;
 
-	var est_plein_ecran = (element_DOM('pleinecran_bis').src.includes("https://sekooly.github.io/SUPABASE/images/img_pleinecran.png"));
+	var est_plein_ecran = (element_DOM('pleinecran_bis').src.includes(prefixe_image + "/img_pleinecran.png"));
 
 	//console.log('est_plein_ecran: ' + est_plein_ecran);
 	
 	if (est_plein_ecran || forcing){
 
-		element_DOM('pleinecran_bis').src ="https://sekooly.github.io/SUPABASE/images/img_petitecran.png";
+		element_DOM('pleinecran_bis').src = prefixe_image + "/img_petitecran.png";
 
 		//bcp + de top et de left
 		element_DOM('fenetre_bis').style.top = 0;
@@ -5073,7 +5073,7 @@ function switch_mode_bis(forcing){
 
 	}else{
 
-		element_DOM('pleinecran_bis').src ="https://sekooly.github.io/SUPABASE/images/img_pleinecran.png";
+		element_DOM('pleinecran_bis').src = prefixe_image + "/img_pleinecran.png";
 		
 		//on reset tout le style
 		element_DOM('fenetre_bis').style.top ="";
@@ -5153,7 +5153,7 @@ function ajuster_boutons_fenetre(bis){
 			//console.log("bouton corriger OK: " + le_bouton_corriger.style.top + " et " + le_bouton_corriger.style.left);
 
 
-			//<img id="corriger" src="https://sekooly.github.io/SUPABASE/images/img_remarque.png" style="width: 30px; height: 30px; cursor: pointer; position: fixed; z-index: 3; top: 141px; left: 913px;" onclick="">
+			//<img id="corriger" src="'+ prefixe_image + '/img_remarque.png" style="width: 30px; height: 30px; cursor: pointer; position: fixed; z-index: 3; top: 141px; left: 913px;" onclick="">
 		}
 
 	}
@@ -5212,7 +5212,7 @@ function avec_bouton_back(oui){
 
 	if (oui){
 
-		element_DOM('bouton_precedent').innerHTML = '<img alt="<<" src="https://sekooly.github.io/SUPABASE/images/img_retour.png" width = 25 height = 25>'
+		element_DOM('bouton_precedent').innerHTML = '<img alt="<<" src="'+ prefixe_image + '/img_retour.png" width = 25 height = 25>'
 
 		//test click 1er élément
 		element_DOM('bouton_precedent').addEventListener('click', function(e) {
@@ -6593,7 +6593,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 
 
 		function html_boutons_fenetre(nom_fonction_actualiser, nom_fonction_ajouter, texte_aide){
-			return '<div id="entete-fenetre" style="text-align: center;"> <img alt="actualiser"  src="https://sekooly.github.io/SUPABASE/images/img_actualiser.png" onclick="'+nom_fonction_actualiser+'" id="actu_topics" style="width: 30px; cursor: pointer;"> <img alt="ajouter" src="https://sekooly.github.io/SUPABASE/images/img_ajout.png" onclick="'+nom_fonction_ajouter+'" id="nouvelle_discu" style="width: 30px; cursor: pointer;"></div><div id="entete-fenetre" style="text-align: center;color: #c1c1c1;font-size: 13px;border-bottom-width: 1px;border-bottom-style: ridge;">'+texte_aide+'</div>';
+			return '<div id="entete-fenetre" style="text-align: center;"> <img alt="actualiser"  src="'+ prefixe_image + '/img_actualiser.png" onclick="'+nom_fonction_actualiser+'" id="actu_topics" style="width: 30px; cursor: pointer;"> <img alt="ajouter" src="'+ prefixe_image + '/img_ajout.png" onclick="'+nom_fonction_ajouter+'" id="nouvelle_discu" style="width: 30px; cursor: pointer;"></div><div id="entete-fenetre" style="text-align: center;color: #c1c1c1;font-size: 13px;border-bottom-width: 1px;border-bottom-style: ridge;">'+texte_aide+'</div>';
 		}
 
 		function ajouter_une_discu(){
@@ -6899,13 +6899,13 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 			var clique_quitter = est_visio ? '' : 'onclick="quitter_previsualisation()"';
 
 			//on ajoute le bouton quitter + en-tête
-  			var bouton_quitter = '<div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="https://sekooly.github.io/SUPABASE/images/quitter.png" id="bye_prev" class="bye_prev" '+clique_quitter+' > </div>';
+  			var bouton_quitter = '<div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" class="bye_prev" '+clique_quitter+' > </div>';
 
   			var le_titre = "";
   			if(titre_fenetre) le_titre = '<div class="titre_fenetre" id="titre_fenetre">'+ titre_fenetre + '</div>';
 
 			//on ajoute le bouton plein écran
-  			var plein_ecran = '<div class="fullscreen-btn" id="conteneur_plein_ecran" > <img alt="plein écran" style="position: fixed;" id="pleinecran" src="https://sekooly.github.io/SUPABASE/images/img_petitecran.png" onclick="switch_mode()" class="pleinecran"> </div>'
+  			var plein_ecran = '<div class="fullscreen-btn" id="conteneur_plein_ecran" > <img alt="plein écran" style="position: fixed;" id="pleinecran" src="'+ prefixe_image + '/img_petitecran.png" onclick="switch_mode()" class="pleinecran"> </div>'
 
   			//on rajoute tout
   			var elements = document.createElement('div');
@@ -7024,7 +7024,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 			var date = afficher_date(le_topic['Horodateur']);
 
 			//afficher le poste principal
-			var entete_poste = '	<div id="entete_poste" style="display: flex;overflow-wrap: anywhere;"><img id="<<" src="https://sekooly.github.io/SUPABASE/images/img_retour.png" style="width: 30px;margin: 2%;cursor:pointer;height: 30px;"  onclick="recuperer_les_topics(false)"> <div id="titre_du_poste" style="font-weight: bold;margin: 2%;font-size: 25px;">' + titre_poste + '</div></div>';
+			var entete_poste = '	<div id="entete_poste" style="display: flex;overflow-wrap: anywhere;"><img id="<<" src="'+ prefixe_image + '/img_retour.png" style="width: 30px;margin: 2%;cursor:pointer;height: 30px;"  onclick="recuperer_les_topics(false)"> <div id="titre_du_poste" style="font-weight: bold;margin: 2%;font-size: 25px;">' + titre_poste + '</div></div>';
 
 			var entete = document.createElement('div');
 			entete.innerHTML = entete_poste;
@@ -7259,7 +7259,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 					if(nb_coms === undefined) nb_coms = 0;
 
 
-					var icone_poubelle = '<span id="bye' + id_topic + '"><img alt="supprimer" class="byebye" onclick="event.stopPropagation(); clic_de_poubelle_topic(this)" src="https://sekooly.github.io/SUPABASE/images/img_trash.png" style="width: 20px;position: relative;float: right;" id="bye' + id_topic + '"></span>';
+					var icone_poubelle = '<span id="bye' + id_topic + '"><img alt="supprimer" class="byebye" onclick="event.stopPropagation(); clic_de_poubelle_topic(this)" src="'+ prefixe_image + '/img_trash.png" style="width: 20px;position: relative;float: right;" id="bye' + id_topic + '"></span>';
 
 					//si élève/prof et le topic n'est pas le sien: pas d'icone poubelle
 					if(!recuperer('mon_type').includes("Administration") && valeur['Identifiant'] !== recuperer('identifiant_courant').trim()) icone_poubelle = "";
@@ -7909,10 +7909,10 @@ function changer_couleur_temporairement(id_element,class_element,couleur_clignot
 
 
 function choix_image(type_notif){
-	return type_notif==="fichier" ? "https://sekooly.github.io/SUPABASE/images/img_ajout.png"
-	: type_notif==="discussion" || type_notif==="commentaire" ? "https://sekooly.github.io/SUPABASE/images/question.png"
-	: type_notif==="visio" || type_notif==="commentaire" ? "https://sekooly.github.io/SUPABASE/images/img_visio.png"
-	: type_notif==="devoir" ? "https://sekooly.github.io/SUPABASE/images/img_devoirs.png" : "";
+	return type_notif==="fichier" ? prefixe_image + "/img_ajout.png"
+	: type_notif==="discussion" || type_notif==="commentaire" ? prefixe_image + "/question.png"
+	: type_notif==="visio" || type_notif==="commentaire" ? prefixe_image + "/img_visio.png"
+	: type_notif==="devoir" ? prefixe_image + "/img_devoirs.png" : "";
 }
 
 function contenu_notification(type_notif,la_matiere_concernee,la_classe_concernee,Identifiant_originaire,Identifiant_derniere_modif, objet_dates, intitule_notif){
@@ -7941,7 +7941,7 @@ function contenu_notification(type_notif,la_matiere_concernee,la_classe_concerne
 function vider_les_notifs(){
 
 	var tout_marquer_html = '<div style="display: flex;"><span class="tout_marquer" id="rien_lire" onclick="executer_ne_rien_lire()">Tout marquer comme NON LU❌</span><span class="tout_marquer" id="tout_lire" onclick="executer_tout_lire()">Tout marquer comme LU✅</span></div>'
-	element_DOM('pannel_notif').innerHTML= tout_marquer_html+'<div class="filtres_notifs un_filtre_notif" height="50px" style=""><div class="un_filtre_notif"  id="filtre_tous">Tous</div><div class="un_filtre_notif"><img alt="Discussions" src="https://sekooly.github.io/SUPABASE/images/question.png" class="icone_filtre_notif"></div><div class="un_filtre_notif" style=""><img alt="Visio" class="icone_filtre_notif" style="" src="https://sekooly.github.io/SUPABASE/images/img_visio.png"></div><div class="un_filtre_notif"><img alt="Devoirs" src="https://sekooly.github.io/SUPABASE/images/img_devoirs.png" class="icone_filtre_notif"></div><div class="un_filtre_notif"><img alt="Fichiers" src="https://sekooly.github.io/SUPABASE/images/img_ajout.png" class="icone_filtre_notif"></div></div>';
+	element_DOM('pannel_notif').innerHTML= tout_marquer_html+'<div class="filtres_notifs un_filtre_notif" height="50px" style=""><div class="un_filtre_notif"  id="filtre_tous">Tous</div><div class="un_filtre_notif"><img alt="Discussions" src="'+ prefixe_image + '/question.png" class="icone_filtre_notif"></div><div class="un_filtre_notif" style=""><img alt="Visio" class="icone_filtre_notif" style="" src="'+ prefixe_image + '/img_visio.png"></div><div class="un_filtre_notif"><img alt="Devoirs" src="'+ prefixe_image + '/img_devoirs.png" class="icone_filtre_notif"></div><div class="un_filtre_notif"><img alt="Fichiers" src="'+ prefixe_image + '/img_ajout.png" class="icone_filtre_notif"></div></div>';
 
 		
 
@@ -9448,11 +9448,11 @@ function mettre_en_forme_onglet_clicked(id_onglet){
 }
 
 function bouton_editer(nom_fonction_clic){
-	return '<img onclick="'+nom_fonction_clic+'" src="https://sekooly.com/assets/images/img_edit.png" alt="modifier" class="editer">'
+	return '<img onclick="'+nom_fonction_clic+'" src="'+ prefixe_image + '/img_edit.png" alt="modifier" class="editer">'
 }
 
 function bouton_voir(nom_fonction_clic){
-	return '<img alt="voir" class="envoi_remarque mini-image" onclick="'+nom_fonction_clic+'" src="https://sekooly.github.io/SUPABASE/images/img_previz.png"> '
+	return '<img alt="voir" class="envoi_remarque mini-image" onclick="'+nom_fonction_clic+'" src="'+ prefixe_image + '/img_previz.png"> '
 }
 
 function modifier_info(ceci){
@@ -10296,7 +10296,7 @@ function chercher(){
 
 function un_bouton_param(id_bouton_param, fonction_bouton_param, alt_bouton_param, src_image){
 
-	return '<img id="'+id_bouton_param+'" onclick="'+fonction_bouton_param+'()" alt="'+alt_bouton_param+'" src="https://sekooly.github.io/SUPABASE/images/'+src_image+'" class="icone_param">'
+	return '<img id="'+id_bouton_param+'" onclick="'+fonction_bouton_param+'()" alt="'+alt_bouton_param+'" src="'+ prefixe_image + '/'+src_image+'" class="icone_param">'
 }
 
 
@@ -10595,7 +10595,7 @@ function formulaire_choix_checkbox(nom_champ, e, ancienne_valeur, identifiant, l
 	
 	$("#mini_popup").remove()
 
-	var entetes = '<div id="mini_popup" style="overflow: hidden auto;"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="https://sekooly.github.io/SUPABASE/images/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div>'
+	var entetes = '<div id="mini_popup" style="overflow: hidden auto;"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div>'
 	var titre_formulaire = '<div>'+nom_champ+' pour <b>'+identifiant+'</b></div><div id="liste_classe_matieres" style="padding-top: 4%;padding-bottom: 4%;text-align: left;"><div>'
 	
 	//pour chaque element de la liste
@@ -10887,7 +10887,7 @@ function telecharger_donnees_parametres(id_parametre){
 	//alert("Téléchargement ici.")
 	var choix_entete_ou_tout_html = '<div id="mini_popup">'
 	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<div id="entete-fenetre" style="display: inline-flex;float: right;">'
-	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<img alt="X" src="https://sekooly.github.io/SUPABASE/images/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div>'
+	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div>'
 	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<div>Télécharger '+id_parametre+'</div><select style="width: 80%;" id="choix_download_param">'
 	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<option value="En-têtes">En-têtes</option>'
 	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<option value="Tout">Toutes les données</option></select>'
@@ -11109,7 +11109,7 @@ function recuperer_entetes_params(id_parametre){
 
 
 function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_duplicata, une_donnee){
-	var entete = '<div style="overflow:auto;" id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="https://sekooly.github.io/SUPABASE/images/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Nouvelle donnée dans ' +id_parametre+ '</div><form class="donnees_saisies" id="donnees_saisies" >'
+	var entete = '<div style="overflow:auto;" id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Nouvelle donnée dans ' +id_parametre+ '</div><form class="donnees_saisies" id="donnees_saisies" >'
 	var liste_champs_html = ""
 	
 	//console.log(une_donnee)
@@ -11686,7 +11686,7 @@ function consulter(){
 /*NON UTILE*/
 function choisir_clic_bulletin(){
 
-	popup_choix = '<div id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="https://sekooly.github.io/SUPABASE/images/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Que voulez-vous faire?</div><select style="width: 80%;" id="choix_bulletin"><option value="upload">Mettre en ligne les bulletins</option><option value="voir">Voir les bulletins en ligne</option></select><button type="button" class="rendre" onclick="choix_bulletin_ok()">Valider</button></div>'
+	popup_choix = '<div id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Que voulez-vous faire?</div><select style="width: 80%;" id="choix_bulletin"><option value="upload">Mettre en ligne les bulletins</option><option value="voir">Voir les bulletins en ligne</option></select><button type="button" class="rendre" onclick="choix_bulletin_ok()">Valider</button></div>'
 	$('body').append(popup_choix) 
 }
 
@@ -12226,7 +12226,7 @@ function enregistrer_la_saisie(){
 }
 
 function progression_initialisation(){
-	reinit_init = numero_etape > 0 ? '<img id="reset_param" onclick="reinitialiser_init()" alt="Recommencer" src="https://sekooly.github.io/SUPABASE/images/img_reset.png" class="icone_param">' : ''
+	reinit_init = numero_etape > 0 ? '<img id="reset_param" onclick="reinitialiser_init()" alt="Recommencer" src="'+ prefixe_image + '/img_reset.png" class="icone_param">' : ''
 	return 'Bienvenue sur Sekooly <i><progress style="width: 60px;" value="'+numero_etape+'" max="'+nb_etapes+'"></progress>'+numero_etape+'/'+nb_etapes +'</i>' + reinit_init
 }
 
@@ -12767,7 +12767,7 @@ function creer_element_journee(nom_matiere,nom_fichier,date_reference,heure_refe
 
 
 	affichage_date = date_heure_ensemble ? afficher_date(date_reference) : afficher_date(date_reference,true) + heure_reference
-	return '<div class="contenu_section_journee"><b class="nom_matiere_journee">'+nom_matiere+"</b> "+nom_fichier+'<i style="color: #bfbfbf;"> '+affichage_date+' </i><span class="mini-image deja_traite">'+coche_traitement+'</span> <img id="'+champ_id+'" src="https://sekooly.github.io/SUPABASE/images/img_previz.png" alt="voir" onclick="clic_de_notif(\''+type_notif+'\',\''+champ_id+'\',\''+id_classe_matiere+'\');" class="mini-image"></div>'
+	return '<div class="contenu_section_journee"><b class="nom_matiere_journee">'+nom_matiere+"</b> "+nom_fichier+'<i style="color: #bfbfbf;"> '+affichage_date+' </i><span class="mini-image deja_traite">'+coche_traitement+'</span> <img id="'+champ_id+'" src="'+ prefixe_image + '/img_previz.png" alt="voir" onclick="clic_de_notif(\''+type_notif+'\',\''+champ_id+'\',\''+id_classe_matiere+'\');" class="mini-image"></div>'
 }
 
 
@@ -12847,7 +12847,7 @@ function bouton_details(compteur){
 
 
 function bouton_actualiser(nom_fonction_actualisation,taille_bouton_px){
-	return '<span style="padding-left: 10px;"><img alt="actualiser" src="https://sekooly.github.io/SUPABASE/images/img_actualiser.png" onclick="'+nom_fonction_actualisation+'" style="width: '+taille_bouton_px+'px; cursor: pointer;"></span>'
+	return '<span style="padding-left: 10px;"><img alt="actualiser" src="'+ prefixe_image + '/img_actualiser.png" onclick="'+nom_fonction_actualisation+'" style="width: '+taille_bouton_px+'px; cursor: pointer;"></span>'
 }
 
 function tdb_tout_actualiser(){
@@ -13993,7 +13993,7 @@ if ('serviceWorker' in navigator) {
 
 /******************** PHOTO DE PROFIL *************************/
 function lien_pp(id_pp){
-	return id_pp ? "https://drive.google.com/uc?export=download&id=" + id_pp : "https://sekooly.com/assets/images/default-user.svg"
+	return id_pp ? "https://drive.google.com/uc?export=download&id=" + id_pp : prefixe_image + "/default-user.svg"
 }
 
 
@@ -14178,7 +14178,7 @@ function ajouter_msg(liste_des_msgs,ma_liste,valeur){
 	if(nb_coms === undefined) nb_coms = 0;
 
 
-	var icone_poubelle = "" //'<span id="bye' + id_topic + '"><img alt="supprimer" class="byebye" onclick="supprimer_conversation(this)" src="https://sekooly.github.io/SUPABASE/images/img_trash.png" style="width: 20px;position: relative;float: right;" id="bye' + id_topic + '"></span>';
+	var icone_poubelle = "" //'<span id="bye' + id_topic + '"><img alt="supprimer" class="byebye" onclick="supprimer_conversation(this)" src="'+ prefixe_image + '/img_trash.png" style="width: 20px;position: relative;float: right;" id="bye' + id_topic + '"></span>';
 
 	//si élève/prof et le topic n'est pas le sien: pas d'icone poubelle
 	if(!recuperer('mon_type').includes("Administration") && valeur['Identifiant'] !== recuperer('identifiant_courant').trim()) icone_poubelle = "";
@@ -14243,7 +14243,7 @@ function recuperer_tous_les_msgs(id_conv, forcing){
 	}
 	
 
-	var entete_convo = '<span id="entete_convo"><img id="<<" class="retour_msgs" src="https://sekooly.github.io/SUPABASE/images/img_retour.png" onclick="recuperer_msgs(true)"> <img class="retour_msgs" src="'+src_pp+'"><div id="Destinataire" class="titre_du_poste">'+nom_destinataire+'</div></span>';
+	var entete_convo = '<span id="entete_convo"><img id="<<" class="retour_msgs" src="'+ prefixe_image + '/img_retour.png" onclick="recuperer_msgs(true)"> <img class="retour_msgs" src="'+src_pp+'"><div id="Destinataire" class="titre_du_poste">'+nom_destinataire+'</div></span>';
 	//console.log(entete_convo)
 
 	$("#div_liste_msgs").remove()
@@ -14310,7 +14310,7 @@ function recuperer_tous_les_msgs(id_conv, forcing){
 
 
 function zone_envoi(id_conv){
-	return '<div id="nouveau_msg_convo"><textarea id="Message" name="Message" placeholder="Ecrivez votre message..."></textarea><button class="bouton_envoi" onclick="envoyer_mon_message(\''+id_conv+'\')"><img alt="Envoyer" class="pp" src="https://sekooly.github.io/SUPABASE/images/img_send.png" style="width: 30px;height: 30px;filter: invert(1);"></button></div>'
+	return '<div id="nouveau_msg_convo"><textarea id="Message" name="Message" placeholder="Ecrivez votre message..."></textarea><button class="bouton_envoi" onclick="envoyer_mon_message(\''+id_conv+'\')"><img alt="Envoyer" class="pp" src="'+ prefixe_image + '/img_send.png" style="width: 30px;height: 30px;filter: invert(1);"></button></div>'
 }
 
 function afficher_msg_conversation(le_msg){
@@ -14717,11 +14717,11 @@ function nouvelle_position_chapitre(){
 }
 
 function bouton_renommer_chapitre(){
-	return '<img onclick="renommer_chapitre(this)" src="https://sekooly.com/assets/images/img_edit.png" alt="Renommer" class="editer">'
+	return '<img onclick="renommer_chapitre(this)" src="'+ prefixe_image + '/img_edit.png" alt="Renommer" class="editer">'
 }
 
 function bouton_supprimer_chapitre(){
-	return '<img onclick="supprimer_ce_chapitre(this)" src="https://sekooly.com/assets/images/img_trash.png" alt="Supprimer" class="editer">'
+	return '<img onclick="supprimer_ce_chapitre(this)" src="'+ prefixe_image + '/img_trash.png" alt="Supprimer" class="editer">'
 }
 
 function liste_statuts(je_suis_eleve, etat_si_eleve){
@@ -15870,7 +15870,7 @@ function popup_notification(contenu,donnees_notifs){
 	var content = contenu || 'Vous avez activé les notifications Sekooly.'
 	const notification = new Notification("Sekooly | Nouvelle notification", {
 		body: content,
-		icon: 'https://sekooly.com/assets/images/logo-no-background-128x128.png',
+		icon: prefixe_image + "/logo-no-background-128x128.png",
 		vibrate: [100,50,100]
 	})
 
@@ -16146,8 +16146,8 @@ async function supprimer_quiz(id_quiz){
 
 function ajouter_edit_quiz(oui){
 	if(oui){
-		if($("#edit-quiz").length === 0) $("#mode-quiz").append('<img id="edit-quiz" onclick="edit_quiz()" src="https://sekooly.com/assets/images/img_edit.png" alt="modifier" class="editer">')	
-		if($("#delete-quiz").length === 0) $("#mode-quiz").append('<img id="delete-quiz" onclick="delete_quiz()" src="https://sekooly.com/assets/images/img_trash.png" alt="SUPPRIMER" class="editer">')	
+		if($("#edit-quiz").length === 0) $("#mode-quiz").append('<img id="edit-quiz" onclick="edit_quiz()" src="'+ prefixe_image + '/img_edit.png" alt="modifier" class="editer">')	
+		if($("#delete-quiz").length === 0) $("#mode-quiz").append('<img id="delete-quiz" onclick="delete_quiz()" src="'+ prefixe_image + '/img_trash.png" alt="SUPPRIMER" class="editer">')	
 	}else{
 		$("#edit-quiz").remove()
 	}
@@ -16413,8 +16413,8 @@ async function crud_questions(){
 	element_DOM("contenu_etape_quiz").innerHTML = `
 		<form id="quiz-form">
 		</form>
-		<bleu class="quiz-options" onclick="nouvelle_question()"><img src="https://sekooly.github.io/SUPABASE/images/img_ajout.png" style="" class="small-icon"> Ajouter une question</bleu>
-		<div onclick="run_quiz(true)" class="sekooly-mode quiz-options"><img src="https://sekooly.github.io/SUPABASE/images/img_previz.png" class="small-icon trash"> Prévisualiser le quiz</div>
+		<bleu class="quiz-options" onclick="nouvelle_question()"><img src="`+ prefixe_image + `/img_ajout.png" style="" class="small-icon"> Ajouter une question</bleu>
+		<div onclick="run_quiz(true)" class="sekooly-mode quiz-options"><img src="'+ prefixe_image + '/img_previz.png" class="small-icon trash"> Prévisualiser le quiz</div>
 	`
 	//modifier
 	//supprimer
@@ -16540,7 +16540,7 @@ async function accueil_quiz(id_quiz, preview_mode, proprietaire_initial){
 		nb_questions = nb_questions.length
 
 		//&& pronom_utilisateur === "Vous"  commenté
-		var bouton_edit = (preview_mode || $('[class="editer"]').length > 0) ? '<img onclick="creer_quiz()" src="https://sekooly.com/assets/images/img_edit.png" alt="modifier" class="editer">' : ''
+		var bouton_edit = (preview_mode || $('[class="editer"]').length > 0) ? '<img onclick="creer_quiz()" src="'+ prefixe_image + '/img_edit.png" alt="modifier" class="editer">' : ''
 
 
 		vider_fenetre(infos_quiz['titre'] + bouton_edit,false,true)
@@ -17119,7 +17119,7 @@ function une_question_quiz(donnees_question){
 		<div name="type_question" id="type_question`+nouvel_id_question+`"></div>
 		<textarea id="intitule_question" name="intitule_question" type="text" placeholder="Intitulé de la question..."></textarea>
 		<div class="top-qstn">
-			<rouge class="foot-element" onclick="supprimer_question(`+nouvel_id_question+`)"><img src="https://sekooly.github.io/SUPABASE/images/img_trash.png" alt="SUPPRIMER" class="small-icon trash"></rouge>			
+			<rouge class="foot-element" onclick="supprimer_question(`+nouvel_id_question+`)"><img src="`+ prefixe_image + `/img_trash.png" alt="SUPPRIMER" class="small-icon trash"></rouge>			
 	    </div>
 	    <div class="reponses_possibles" name="reponses_possibles`+nouvel_id_question+`"></div>
     	<div class="foot-qst" style="font-size: 15px;">
@@ -17326,7 +17326,7 @@ function une_reponse_possible(donnees_reponses){
 	var valeur_score = !donnees_reponses ? "0" : Number(donnees_reponses['score']).toFixed(2)
 	return 	`<span class="une_reponse_possible" id="`+prochain_id+`">
     <input name="reponse" style="width: 55%;" placeholder="Réponse possible et le SCORE de la réponse (liste déroulante)...">`+liste_notes_possibles(true,valeur_score,"note_globale") +`
-    <img class="small-icon trash" alt="SUPPRIMER" src="https://sekooly.github.io/SUPABASE/images/img_trash.png" onclick="delete_resp(this)">
+    <img class="small-icon trash" alt="SUPPRIMER" src="`+ prefixe_image + `/img_trash.png" onclick="delete_resp(this)">
     <br>
     <bleu class="mini-image remarque_correction wrong" `+editable+` >Remarque correction</bleu>
   </span>
@@ -17492,7 +17492,7 @@ async function dernieres_modifs_quiz(){
 
 function avec_sauvegarde(oui){
 	if(oui){
-		$("#titre_fenetre").append('<img id="sauvegarder" src="https://sekooly.github.io/SUPABASE/images/img_save.png" alt="ENREGISTRER" onclick="sauvegarder_quiz()" class="icon-save">')	
+		$("#titre_fenetre").append('<img id="sauvegarder" src="'+ prefixe_image + '/img_save.png" alt="ENREGISTRER" onclick="sauvegarder_quiz()" class="icon-save">')	
 	}else{
 		$("#sauvegarder").remove()
 	}
