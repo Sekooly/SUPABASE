@@ -2031,3 +2031,10 @@ GRANT ALL ON TABLE public.total_score TO supabase_admin;
 GRANT ALL ON TABLE public.total_score TO authenticated;
 GRANT ALL ON TABLE public.total_score TO service_role;
 
+
+
+
+
+
+
+

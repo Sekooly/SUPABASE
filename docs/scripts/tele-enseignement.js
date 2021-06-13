@@ -6842,27 +6842,10 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 			}
 			
 			var mon_id_classe_matiere = recuperer('dossier_chargé');
-			
-			//console.log("on va envoyer via " + mon_role);
-			
-
-			//var mon_action = "https://docs.google.com/forms/d/e/1FAIpQLSdJSsvIrh2f4cQ6t7KjHfvqFnU59urE1uHYdadhqYTTuEjobw/formResponse?usp=pp_url&entry.926690826="+ mon_titre +"&entry.75640320=" + mon_contenu +"&entry.513447430="+ mon_identifiant + "&entry.985226520="+ mon_id_classe_matiere + "&entry.746299129="+ mon_role+"&submit=Submit";
-
-        	//var url = mon_action;
-
-        	//console.log("l'action: " + url);
-        	//console.log("taille actuellement : " + url.length);
 
 
-			/*
-			console.log('titre: "' + mon_titre + '"');
-			console.log('contenu: "' + mon_contenu + '"');
-			*/
 
-			//on n'envoie pas de vide
-			//if (mon_titre!=="" && mon_contenu!==""){
-
-			if(mon_titre!=="" && mon_contenu!=="" && mon_titre!==saisie_vide() && mon_contenu!==saisie_vide()){
+			if(mon_titre!=="" && mon_contenu!=="" &&       !mon_contenu.includes(saisie_vide())           ){
 
 				//on n'envoie qu'une fois le message				
 				element_DOM('envoi').disabled=true;
@@ -7109,7 +7092,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 			entete.innerHTML = entete_poste;
 			element_DOM('fenetre').appendChild(entete);
 
-			var bloc_poste = '<div id="bloc_poste" style="padding: 2%;display: block;overflow-wrap: anywhere;border-bottom-style: solid;"><div id="auteur_du_poste" >' + auteur_poste +' (' + role_auteur_poste + ')</div><h id="contenu_poste" style=""> '+ contenu_poste+'</h><h style="color: #B5B3B8;" id="date_poste"> ' + date + '</h></div>';
+			var bloc_poste = '<div id="bloc_poste" style="padding: 2%;display: block;overflow-wrap: anywhere;border-bottom-style: solid;"><div class="auteur_du_poste" >' + auteur_poste +' (' + role_auteur_poste + ')</div><h id="contenu_poste" style=""> '+ contenu_poste+'</h><h style="color: #B5B3B8;" id="date_poste"> ' + date + '</h></div>';
 
 
 
@@ -7204,7 +7187,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 
 			contenu_poste = decodage(contenu_poste);
 
-			var un_com = '<div id="'+id_com+'" class="un_commentaire"><div id="auteur_du_poste" style="font-weight: bold;color: #FF6C00;">'+ auteur_poste + ' ('+  role_auteur_poste  +')</div><h id="contenu_poste" style=""> ' + contenu_poste + '</h><h style="color: #B5B3B8;" id="date_poste"> '+ date + '</h></div>';
+			var un_com = '<div id="'+id_com+'" class="un_commentaire"><div class="auteur_du_poste" style="font-weight: bold;color: #FF6C00;">'+ auteur_poste + ' ('+  role_auteur_poste  +')</div><h id="contenu_poste" style=""> ' + contenu_poste + '</h><h style="color: #B5B3B8;" id="date_poste"> '+ date + '</h></div>';
 
 			//ajouter le commentaire au DOM
 			var nouveau_com = document.createElement('div');
@@ -7220,10 +7203,14 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 		function ajouter_mon_com(){
 
 			chargement(true);
-			var contenu_poste = recuperer_html_saisie_riche() //element_DOM('mon_com').value.trim();
+			var contenu_poste = recuperer_html_saisie_riche().trim() //element_DOM('mon_com').value.trim();
+
+			contenu_vide = contenu_poste.includes(saisie_vide()) 
+			//console.log({contenu_poste,contenu_vide})
+			
 
 			//on continue ssi contenu poste NON VIDE
-			if (contenu_poste!==""){
+			if (contenu_poste!=="" &&  !contenu_vide  )  {
 				var mon_identifiant = recuperer('identifiant_courant').toUpperCase();
 				
 				
@@ -7235,6 +7222,8 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 				//console.log(id_topic)
 				//console.log(contenu_poste)
 				envoyer_le_com(id_topic,mon_identifiant,mon_role,contenu_poste,date);
+			}else{
+				alert("Votre commentaire ne peut pas être vide.")
 			}
 			chargement(false);
 		}
@@ -14408,7 +14397,7 @@ function zone_envoi(id_conv){
 function afficher_msg_conversation(le_msg){
 	la_className = "un_msg " + (le_msg['Expediteur'] === recuperer('identifiant_courant') ? "msg_envoye" : "msg_recu")	
 	Expediteur = le_msg['Expediteur'] === recuperer('identifiant_courant') ? "MOI-MÊME" :  le_msg['Expediteur'].toUpperCase()
-	return '<div class="'+la_className+'" id="'+le_msg['id_msg']+'"><div id="auteur_du_poste">'+Expediteur+'</div><h id="contenu_poste"><p data-placeholder="Votre commentaire...">'+le_msg['Message']+'</p></h><h id="date_poste">'+ afficher_date(le_msg['Horodateur']) +'</h></div>'
+	return '<div class="'+la_className+'" id="'+le_msg['id_msg']+'"><div class="auteur_du_poste">'+Expediteur+'</div><h id="contenu_poste"><p data-placeholder="Votre commentaire...">'+le_msg['Message']+'</p></h><h id="date_poste">'+ afficher_date(le_msg['Horodateur']) +'</h></div>'
 }
 
 
