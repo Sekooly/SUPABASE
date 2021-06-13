@@ -1121,7 +1121,7 @@ function config_editor(){
       content: "fr",
       ui: "fr"
     },
-    toolbar: {items : ["heading","|", 'bold', 'italic','fontBackgroundColor',"|", "bulletedList","numberedList","|","blockQuote",'|','insertImage']}
+    toolbar: {items : ["heading","|", 'bold', 'italic','fontBackgroundColor',"|", "bulletedList","numberedList","|","blockQuote",'link']}
 
   }
 

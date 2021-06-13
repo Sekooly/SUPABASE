@@ -3389,14 +3389,16 @@ function lire_description(id_matiere,la_matiere,description){
 
 function editer_description_matiere(id_matiere,la_matiere){
 
+	$("#foot_modifs").remove()
 	description = element_DOM("content").innerHTML
+	//console.log({description})
 
 	vider_fenetre("Description de " + la_matiere,false,"sauvegarder_description()")
 	afficher_fenetre(true)
 	$('#mini_popup').remove()
 	
 
-	$("#fenetre").append('<div class="edition"><div id="description_matiere">'+description+'</div></div>')
+	$("#fenetre").append('<div class="edition"><div id="description_matiere">'+description+'</div></div>')	
 	rendre_riche("description_matiere",true)
 
 
@@ -3406,10 +3408,20 @@ function saisie_vide(){
 	return '<br data-cke-filler=\"true\">'
 }
 
+function pied_modifs(){
+	var res = "<div id='foot_modifs'><br><br><gris><i>Dernière modification: " + afficher_date(maintenant())
+	res += "<br>Par: " + recuperer("identifiant_courant").toUpperCase() + '</i></gris></div>'
+	return res
+
+}
+
 async function sauvegarder_description(){
 	console.log("Enregistrement de la description...")
 	
 	nouvelle_description = (recuperer_html_saisie_riche().includes(saisie_vide())) ? "Aucune description fournie" : recuperer_html_saisie_riche() 
+	nouvelle_description +=  pied_modifs()
+
+
 
 	await supabase
 		  .from('Matieres')
@@ -7733,7 +7745,7 @@ function switch_pannel_notifs(){
 
 	//au clic droit -> marquer non lu
 	$(".une_notif").on("contextmenu",function(e){
-		console.log("vous avez cliqué droit sur " + e.target.id)
+		//console.log("vous avez cliqué droit sur " + e.target.id)
 	})
 
 
