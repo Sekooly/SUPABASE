@@ -2937,6 +2937,7 @@ function chargement_a_larrivee(img){
 	//si écolage pas ok -> deconnexion automatique
 	if(!mon_ecolage_est_ok()) deconnexion()
 
+	afficher_images_initiales(img)
 
 	if(!plateforme_prete()){
 		return initialisation_de_la_plateforme()
@@ -2945,8 +2946,6 @@ function chargement_a_larrivee(img){
 	
 	effacer("nb_clics")
 	effacer("numero_etape")
-
-	afficher_images_initiales(img)
 
 	//alert("avant notifs")
 	mettre_en_place_les_notifications();
