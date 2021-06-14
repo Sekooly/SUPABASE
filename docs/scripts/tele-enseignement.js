@@ -2795,10 +2795,10 @@ divContainer.appendChild(table);
 
 
 function initialisation(){
-	chargement(true);
+	chargement(true);	
 	
-	appliquer_preferences()
 	mettre_mon_mode()
+	appliquer_preferences()
 	document.title = "Sekooly | " + nom_etablissement.toUpperCase();
 
 	effacer("date_heure_depassement")
@@ -9545,6 +9545,8 @@ function appliquer_preferences(){
 			the_src = decodeURIComponent(img.src)
 			suffixe = the_src.split(hebergeur_defaut())[1]
 
+
+			if(!suffixe) suffixe = the_src.split(hebergeur_actuel())[1]
 			//console.log(prefixe_image + suffixe)
 			img.src = prefixe_image + suffixe
 
@@ -9571,7 +9573,7 @@ function remplacer_image_par_defaut(){
 	const targetNode = $("body")[0];
 
 	// Options for the observer (which mutations to observe)
-	const config = { attributes: true, childList: true, subtree: true };
+	const config = { attributes: false, childList: true, subtree: false };
 
 	// Callback function to execute when mutations are observed
 	const callback = function(mutationsList, observer) {
@@ -9610,9 +9612,18 @@ function actualiser_image_non_trouvee(new_node){
 function remplacer_avec_defaut(e){
 	a_changer = e.target.src
 	//console.log("à changer: ",a_changer)
-	e.target.src = hebergeur_defaut() + "/" + a_changer.split("/").pop()
-	//console.log("problème de chargement de "+a_changer+": remplacé avec ",e.target.src)
 
+	if(!a_changer.includes("undefined")){
+
+
+		var new_link = hebergeur_defaut() + "/" + a_changer.split("/").pop()
+		//console.log("NEW LINK:", new_link)
+
+		e.target.src = new_link
+		//console.log("problème de chargement de "+a_changer+": remplacé avec ",e.target.src)
+
+
+	}
 }
 
 
