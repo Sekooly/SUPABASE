@@ -5,7 +5,7 @@ var elements_menu_analyses = ["Analyses des connexions"]
 var elements_menu_preferences = ["Images","Couleurs","Formes","Police"]
 
 
-var img_dynamiques = ["img_retour.png", "img_reset.png","img_import.png","img_download.png","img_dupliquer.png","img_redtrash.png","img_previz.png","img_pleinecran.png", "img_petitecran.png"]
+var img_dynamiques = ["logo-no-background-128x128.png","img_retour.png","default-user.svg", "img_reset.png","img_import.png","img_download.png","img_dupliquer.png","img_redtrash.png","img_previz.png","img_pleinecran.png", "img_petitecran.png"]
 img_dynamiques = img_dynamiques.concat(liste_img_extensions())
 
 var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL_Mapping","URL_agenda",
@@ -9380,6 +9380,8 @@ async function maj_liste_images_pref(conteneur, futur_hebergeur){
 	var liste_images = ""
 	var liste_images_initiale = []
 
+	var liste_name = "img_links"
+	var attributeName = "href"
 
 
 	//par rapport à la liste des images visibles
@@ -9450,7 +9452,7 @@ async function maj_liste_images_pref(conteneur, futur_hebergeur){
 				var une_image = '<strong class="sekooly-mode une_image">' + nom_image + '</strong><span class="rmq" id="rmq_'+e.split("/").pop()+'"></span>'
 
 				//console.log(e)
-				return '<a href="'+mon_hebergeur+nom_image+'" target="_blank"><span class="content_prefixe_image">'+mon_hebergeur+'</span>'+une_image+'</a>'
+				return '<a list="'+liste_name+'" href="'+mon_hebergeur+nom_image+'" target="_blank"><span class="content_prefixe_image">'+mon_hebergeur+'</span>'+une_image+'</a>'
 
 
 			}
@@ -9458,7 +9460,7 @@ async function maj_liste_images_pref(conteneur, futur_hebergeur){
 		}
 	})
 
-	liste_images = liste_images.join("<br>")
+	liste_images = liste_images.join("<br><br>")
 
 
 	
@@ -9466,7 +9468,7 @@ async function maj_liste_images_pref(conteneur, futur_hebergeur){
 	
 
 	//console.log(liste_images)
-	ajouter_liste_pref(conteneur,  liste_images )
+	ajouter_liste_pref(conteneur,  liste_images, liste_name, attributeName )
 	appliquer_images()
 
 
@@ -9522,9 +9524,9 @@ function explications_pref(conteneur, contenu_explications, callback){
 	eval(callback)
 }
 
-function ajouter_liste_pref(conteneur, liste){
+function ajouter_liste_pref(conteneur, liste, liste_name, attributeName){
 	$("#liste_pref").remove()
-	conteneur.append(`<p id="liste_pref">`+liste+`</p>`)
+	conteneur.append('<p id="liste_pref"><div><button onclick="copier_liste(`[list=\''+liste_name+'\']`,\''+attributeName+'\')">COPIER</button></div>'+liste+'</p>')
 }
 
 

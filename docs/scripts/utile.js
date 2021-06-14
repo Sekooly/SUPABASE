@@ -565,6 +565,31 @@ function liste_img_extensions(){
 }
 
 
+
+
+function texte_liste(selector,attrName){
+  return $(selector).map( function() {
+    return $(this).attr(attrName);
+  }).get().join('\n');
+}
+
+
+//exemple: copier_liste("[list='img_links']","href")
+function copier_liste(selector,attrName){
+  res =  texte_liste(selector,attrName)
+
+  var $temp = $("<textarea>");
+  $("body").append($temp);
+  $temp.val(res).select();
+  document.execCommand("copy");
+  $temp.remove();
+
+  afficher_alerte("Liste copiée dans le presse-papiers!")
+
+  return res
+
+}
+
 function liste_extensions(){
   return ",txt,bmp,gif,jpeg,jpg,png,svg,pdf,bmp,xlsx,xls,xlsm,ppt,pptx,doc,docx,html,csv,js,rtf,mp4,mp3,wav,youtube,quiz,"
 }
