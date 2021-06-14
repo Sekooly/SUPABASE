@@ -9422,7 +9422,7 @@ async function maj_liste_images_pref(conteneur, futur_hebergeur){
 
 	//supprimer les doublons
 	liste_images = liste_images.filter(function(item, pos) {
-	    return liste_images.indexOf(item) == pos;
+	    return item && liste_images.indexOf(item) == pos;
 	})
 
 
