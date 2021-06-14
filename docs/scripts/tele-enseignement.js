@@ -2,6 +2,12 @@ var elements_menu_haut = ["Infos établissement","Cycles", "Classes", "Matieres"
 
 var elements_menu_analyses = ["Analyses des connexions"]
 
+var elements_menu_preferences = ["Images","Couleurs","Formes","Police"]
+
+
+var img_dynamiques = ["img_retour.png", "img_reset.png","img_import.png","img_download.png","img_dupliquer.png","img_redtrash.png","img_previz.png","img_pleinecran.png", "img_petitecran.png"]
+img_dynamiques = img_dynamiques.concat(liste_img_extensions())
+
 var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL_Mapping","URL_agenda",
 								"id_googlecalendar","nb_avis_donnés", "nb_avis_max","nom_fiche","taux_conseil",
 								"Matiere_bis", "classe_id", "classe_bis", "type", "Derniere_consultation_notifs",
@@ -54,7 +60,6 @@ const { createClient } = supabase
 supabase = createClient(racine_data.replace("/rest/v1/",""),  data_etablissement["apikey"])
 supabaseInit = createClient(racine_initiale.replace("/rest/v1/",""),  api_initial.split('=')[1])
 
-var prefixe_image = "https://sekooly.com/assets/images"
 
 
 
@@ -1596,7 +1601,7 @@ function bouton_supprimer_pp(identifiant_courant){
 
 function bouton_modifier_pp(identifiant_courant){
 	identifiant_courant = identifiant_courant ? identifiant_courant : recuperer("identifiant_courant")
-	return '<span class="pp-upload"><label for="pp-'+identifiant_courant+'"><img src="'+ prefixe_image + '/img_edit.png" alt="modifier" class="editer"></label><input onchange="changer_pp(\''+identifiant_courant+'\')" accept=".png,.jpeg,.jpg,.bmp,.svg,.gif" id="pp-'+identifiant_courant+'" type="file"/> </span>'
+	return '<span class="pp-upload"><label for="pp-'+identifiant_courant+'"><img src="'+ prefixe_image + '/img_edit.png" alt="MODIFIER" class="editer"></label><input onchange="changer_pp(\''+identifiant_courant+'\')" accept=".png,.jpeg,.jpg,.bmp,.svg,.gif" id="pp-'+identifiant_courant+'" type="file"/> </span>'
 }
 
 function ma_photo(identifiant_optionnel, sans_bouton_modifier){
@@ -1832,7 +1837,7 @@ function calculer_mes_XP(){
 
 async function switch_edition(){
 
-	var est_mode_edition = $("#valider_modifs")[0].innerText === "Enregistrer";
+	var est_mode_edition = $("#valider_modifs")[0].innerText === "💾";
 
 	//entrer en mode édition: exiger le code d'accès
 	if(!est_mode_edition){
@@ -2792,6 +2797,7 @@ divContainer.appendChild(table);
 function initialisation(){
 	chargement(true);
 	
+	appliquer_preferences()
 	mettre_mon_mode()
 	document.title = "Sekooly | " + nom_etablissement.toUpperCase();
 
@@ -3946,9 +3952,9 @@ function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,d
 	}
 
 	//si une image n'est pas chargée on met l'image par défaut
-	$('#' + id_fichier + ' .un_fichier').on("error",function(e){
+	$('#' + id_fichier + ' .un_fichier').one("error",function(e){
 
-		console.log("on a une erreur " + JSON.stringify(e));
+		//console.log("on a une erreur " + JSON.stringify(e));
 		$('#' + id_fichier + ' .un_fichier').attr("src", prefixe_image + "/img_fichier.png");
 		//console.log("on a changé sa source");
 	});
@@ -9193,9 +9199,11 @@ function afficher_parametres(oui){
 	if(!oui){
 		$("#recup_params").remove()
 		$("#recup_analyses").remove()
+		$("#recup_pref").remove()
 	}else{
 		element_DOM("recup_params").style.display = "block"
 		element_DOM("recup_analyses").style.display = "block"
+		element_DOM("recup_pref").style.display = "block"
 	}
 	
 }
@@ -9232,7 +9240,436 @@ function recuperer_analyses(){
 }
 
 
+function recuperer_preferences(){
 
+	vider_fenetre("Préférences",false,"sauvegarder_pref()");
+	
+
+	var contenu_menu_haut = ""
+	
+	for (var i =  0; i < elements_menu_preferences.length; i++) {
+		contenu_menu_haut = contenu_menu_haut + '<span class="un_menu" id ="'+elements_menu_preferences[i]+'">'+elements_menu_preferences[i]+'</span>' 
+	}
+
+	var conteneur_menu_html = '<div id="conteneur_menu"><div id="menu_haut" class="menu_haut"> ' + contenu_menu_haut+ '</div><div id="menu_params" class="menu_params"><div id="previsualisation" class="previz-pref"></div></div></div>'
+
+	$("#fenetre").append(conteneur_menu_html);
+
+
+	//clic -> mise en forme + actualisation de menu_details
+	$('.un_menu').click(function(e) {
+		chargement(true)
+		un_menu_clic(e.target.id,true)			
+        chargement(false)
+    });
+
+
+    //clic par défaut sur Images
+    $("[id='Images']").click();
+    afficher_fenetre(true)
+
+
+	
+
+}
+
+
+function personnaliser(id_parametre){
+	//console.log(id_parametre)
+	var conteneur = $("#previsualisation")
+	var contenu_explications = ""
+	var callback = ""
+	element_DOM("previsualisation").innerHTML = ""
+
+	var mon_hebergeur = hebergeur_actuel()
+
+	//si images
+	if(id_parametre === "Images"){
+		contenu_explications = `
+		<strong>
+			<rouge>
+				Vous devez avoir votre propre hébergeur d'images à partir duquel SEKOOLY récupère les images.<br>
+			</rouge>
+			Les images que vous hébergez <rouge>doivent</rouge> avoir <rouge>le même nom</rouge> que celui cité ci-dessous.<br>
+		</strong>
+
+		<input id="prefixe_image" class="barre_recherche" name="rechercher" value="`+mon_hebergeur+`" placeholder="Lien de votre hébergeur d'images..."><br>
+		<button class="rendre" onclick="reinitialiser_images()">Réinitialiser</button> 
+
+
+		<p>
+			Pour convertir vos images vers la bonne extension, vous pouvez utiliser <a target="_blank" href="https://image.online-convert.com/fr/convertir-en-png"><strong>ce site</strong></a>.<br>
+			Retrouvez ci-dessous la liste des <span id="nb_images"></span>images personnalisables sur votre plateforme.
+		</p>
+			
+		<p>
+			<vert>✅ = image trouvée</vert>
+			<rouge>❌ = image non trouvée</rouge>
+		</p>
+		`
+
+		//console.log(contenu_explications)
+		
+		callback = "personnaliser_images(conteneur)"
+
+	//si couleurs	
+	} else if(id_parametre === "Couleurs"){
+		contenu_explications = "En cours de construction."
+
+	//si formes	
+	}else if(id_parametre === "Formes"){
+		contenu_explications = "En cours de construction."	
+
+		
+	}else{
+		contenu_explications = "En cours de construction."
+	}
+
+
+
+	explications_pref(conteneur, contenu_explications, callback)
+}
+
+function reinitialiser_images(conteneur){
+	element_DOM("prefixe_image").value = ""
+	maj_liste_images_pref($("#previsualisation"), hebergeur_defaut())
+}
+
+
+async function mettre_la_coche(lien_img){
+
+	//si l'image existe: ✅
+	//si l'image n'existe PAS: ❌
+
+
+	var res_lien = await fetch(lien_img)	
+	var res = res_lien.status === 200 ? "✅" : "❌"
+
+	return res
+
+
+}
+
+
+function personnaliser_images(conteneur){
+
+	/********************* à chaque màj du préfixe, màj les liens + les images en question*********************/
+	$("#prefixe_image").on("keyup",function(e){
+		
+
+		/********************* liste des images *****************/
+		//console.log(e.target.value)
+		maj_liste_images_pref(conteneur, e.target.value)
+		afficher_alerte("Vous pouvez soit enregistrer vos préférences, soit cliquer sur Réinitialiser pour avoir les images par défaut.")
+	})
+
+
+	/********************* liste des images *****************/
+	//$("#prefixe_image").keyup()
+	maj_liste_images_pref(conteneur, hebergeur_actuel(true))
+
+
+
+
+
+
+}
+
+
+async function maj_liste_images_pref(conteneur, futur_hebergeur){
+	var liste_images = ""
+	var liste_images_initiale = []
+
+
+
+	//par rapport à la liste des images visibles
+	$.each($("img"), (key,valeur) => {
+		//console.log(valeur.src)
+		if(valeur.src && !liste_images.includes(valeur.src)){
+			liste_images += valeur.src + "\n"	
+		} else{
+			//console.log("déjà present 1: ", valeur.src )
+		}
+
+	})
+
+	//par rapport à la liste de couleurs
+	liste_images += liste_couleurs.map((e) => {
+		if(!liste_images.includes(e)){
+			return hebergeur_actuel(true) + "/img_dossier_"+e.replaceAll(" ","") +".png"  	
+		}else{
+			//console.log("déjà present 2: ", e )
+
+		}
+	}).join("\n")
+	//console.log({liste_images})
+
+
+	//par rapport à la liste des images dynamiques
+	liste_images += img_dynamiques.map((e) => {
+		if(!liste_images.includes(e)){
+			return '/'+e
+		} else{
+			//console.log("déjà present 3: ", e )
+		}
+	}).join('\n')
+
+
+
+	//transformer en array
+	liste_images = liste_images.replaceAll("\n\n","\n").replaceAll("\n","<br>").split("<br>")
+
+
+	//supprimer les doublons
+	liste_images = liste_images.filter(function(item, pos) {
+	    return liste_images.indexOf(item) == pos;
+	})
+
+
+	//enregistrer cet array d'éléments uniques
+	liste_images_initiale = liste_images
+
+
+	//afficher le nombre de fichier
+	element_DOM("nb_images").innerText = liste_images.length + " "
+
+	liste_images = liste_images.map((e) => {
+		if(e){
+
+			var mon_hebergeur = futur_hebergeur ? futur_hebergeur : hebergeur_defaut()
+			//console.log({mon_hebergeur})
+			var nom_image = "/" + e.split("/").pop()
+
+			if(nom_image){
+
+				/*
+				la_coche = await mettre_la_coche(mon_hebergeur+nom_image)
+				console.log(la_coche)
+				*/
+
+				var une_image = '<strong class="sekooly-mode une_image">' + nom_image + '</strong><span class="rmq" id="rmq_'+e.split("/").pop()+'"></span>'
+
+				//console.log(e)
+				return '<a href="'+mon_hebergeur+nom_image+'" target="_blank"><span class="content_prefixe_image">'+mon_hebergeur+'</span>'+une_image+'</a>'
+
+
+			}
+
+		}
+	})
+
+	liste_images = liste_images.join("<br>")
+
+
+	
+
+	
+
+	//console.log(liste_images)
+	ajouter_liste_pref(conteneur,  liste_images )
+	appliquer_images()
+
+
+
+
+
+
+	//pour chaque image, actualiser son rmq
+	//console.log(liste_images_initiale)
+	liste_images_initiale.map(async (e) => {
+
+		if(e){
+
+			var mon_hebergeur = futur_hebergeur ? futur_hebergeur : hebergeur_defaut()
+			//console.log({mon_hebergeur})
+			var nom_fichier = e.split("/").pop()
+			var nom_image = "/" + nom_fichier 
+
+			if(nom_image){
+
+				la_coche = await mettre_la_coche(mon_hebergeur+nom_image)
+
+				if(nom_image.includes("bmp")){
+					//console.log({[nom_fichier] : la_coche})
+					//console.log({selector : "[id='rmq_"+nom_fichier +"']"})
+						
+				} 
+
+
+				$("[id='rmq_"+nom_fichier +"']")[0].innerText = la_coche
+
+			}
+
+		}
+
+
+	})
+
+
+}
+
+
+
+function recuperer_autorisations(){
+	url = CryptoJS.AES.decrypt("U2FsdGVkX19VFoAHA6uGaVw+nJmUqMm1V/wAI54lcDrc9CEoJu2NzJntc1jMydf+904/pcwg0f6gbd5g75V1HEIkENqhb4hq5zVqjqLJ/5NFwdd8kzFN7Ls8C2Ig1yKAuEZisjgxM9BrHuAzQ3bZvaJVifOpAi7RJDrRWmJWyAV9bfbIEM4iS/JIE0l7wsVB+Yy0nfXj+PAK6z0tkSfnpYKws7CxDTQvz0+wBeOmee0=","Sekooly").toString(CryptoJS.enc.Utf8)
+	autorisations = get_resultat_brut(url)
+	return autorisations
+}
+
+function explications_pref(conteneur, contenu_explications, callback){
+	$("#explications").remove()
+	conteneur.append('<div class="description_matiere" id="explications">'+contenu_explications+'</div>');
+	eval(callback)
+}
+
+function ajouter_liste_pref(conteneur, liste){
+	$("#liste_pref").remove()
+	conteneur.append(`<p id="liste_pref">`+liste+`</p>`)
+}
+
+
+
+function appliquer_preferences(){
+
+
+
+	if(data_etablissement['preferences']){
+		//console.log("on a des préférences à mettre...")
+
+		//dans le ficher HTML
+		//remplacer {{prefixe_image}} par la valeur	
+		$.each($("img[src]"), (key,img) => {
+
+			//console.log(img.src)
+
+			the_src = decodeURIComponent(img.src)
+			suffixe = the_src.split(hebergeur_defaut())[1]
+
+			//console.log(prefixe_image + suffixe)
+			img.src = prefixe_image + suffixe
+
+
+
+		})		
+
+		//actualiser les images
+		appliquer_images()
+		//actualiser les couleurs
+		appliquer_couleurs()
+		//actualiser les formes
+		appliquer_couleurs()
+	}
+
+
+	remplacer_image_par_defaut()
+}
+
+
+function remplacer_image_par_defaut(){
+
+	// Select the node that will be observed for mutations
+	const targetNode = $("body")[0];
+
+	// Options for the observer (which mutations to observe)
+	const config = { attributes: true, childList: true, subtree: true };
+
+	// Callback function to execute when mutations are observed
+	const callback = function(mutationsList, observer) {
+	    // Use traditional 'for loops' for IE 11
+	    for(const mutation of mutationsList) {
+	        if (mutation.type === 'childList') {
+	            //console.log('A child node has been added or removed.');
+	        }
+	        else if (mutation.type === 'attributes') {
+	            //console.log('The ' + mutation.attributeName + ' attribute was modified.');
+	        }
+	    }
+	};
+
+	// Create an observer instance linked to the callback function
+	const observer = new MutationObserver(actualiser_image_non_trouvee);
+
+	// Start observing the target node for configured mutations
+	observer.observe(targetNode, config);
+
+}
+
+function actualiser_image_non_trouvee(new_node){
+
+	//console.log("NEW NODE!",new_node)
+
+	$("img").off("error")
+	$("img").on("error",function(e){
+		//console.log(e.target , "non trouvée ")
+		remplacer_avec_defaut(e)
+	});
+
+}
+
+
+function remplacer_avec_defaut(e){
+	a_changer = e.target.src
+	//console.log("à changer: ",a_changer)
+	e.target.src = hebergeur_defaut() + "/" + a_changer.split("/").pop()
+	//console.log("problème de chargement de "+a_changer+": remplacé avec ",e.target.src)
+
+}
+
+
+function appliquer_images(){
+	//pour chaque image listée
+	$.each($(".une_image"), (key,img) => {
+		//console.log(img)
+		//console.log(img.innerText)
+
+
+		//actualiser (chaque image du site) par celle listée		
+		$.each($("img[src$='"+img.innerText+"']"), (k,img_locale) => {
+
+			$(img_locale).one("error",function(e){
+				//e.preventDefault()
+				//console.log("image non trouvée.",img_locale)
+				remplacer_avec_defaut(e)
+				
+			});
+
+
+			img_locale.src = img.parentNode.href	
+					
+		})
+
+
+		//initialiser les préférences si c'est pas encore le cas
+		if(!data_etablissement['preferences']){
+			data_etablissement['preferences'] = {}			
+		}
+
+
+		data_etablissement['preferences']['prefixe_image'] =   element_DOM("prefixe_image").value ?  element_DOM("prefixe_image").value : hebergeur_defaut()
+		
+
+	})
+
+
+
+
+}
+
+
+function appliquer_couleurs(){
+	//console.log("TODO...")
+}
+
+
+function appliquer_couleurs(){
+	//console.log("TODO...")
+}
+
+
+async function sauvegarder_pref(){
+	await actualiser_info_etablissement()
+	afficher_alerte("Vos préférences sont sauvegardées.")
+}
 
 
 function recuperer_parametres(){
@@ -9368,7 +9805,7 @@ async function update_viz_logs(){
 
 }
 
-async function un_menu_clic(id_parametre){
+async function un_menu_clic(id_parametre,mode_pref){
 
 
 
@@ -9377,12 +9814,16 @@ async function un_menu_clic(id_parametre){
     mettre_en_forme_onglet_clicked(id_parametre);
 
 	
-	//si c'est une analyse -> on va direct dans le nouvel onglet
+	//si c'est une analyse
 	if(id_parametre.includes("Analyses")){
 
 		//window.open("analyses/"+id_parametre.split(" ").pop() +".html", '_blank').focus();
 		une_analyse_clic(id_parametre)
 
+	//si c'est les préf
+	}else if(mode_pref){
+
+		personnaliser(id_parametre)
 		
 	}else{        
 	    actualiser_filtre_onglet(id_parametre);
@@ -9515,7 +9956,7 @@ function mettre_en_forme_onglet_clicked(id_onglet){
 }
 
 function bouton_editer(nom_fonction_clic){
-	return '<img onclick="'+nom_fonction_clic+'" src="'+ prefixe_image + '/img_edit.png" alt="modifier" class="editer">'
+	return '<img onclick="'+nom_fonction_clic+'" src="'+ prefixe_image + '/img_edit.png" alt="MODIFIER" class="editer">'
 }
 
 function bouton_voir(nom_fonction_clic){
@@ -16227,7 +16668,7 @@ async function supprimer_quiz(id_quiz){
 
 function ajouter_edit_quiz(oui){
 	if(oui){
-		if($("#edit-quiz").length === 0) $("#mode-quiz").append('<img id="edit-quiz" onclick="edit_quiz()" src="'+ prefixe_image + '/img_edit.png" alt="modifier" class="editer">')	
+		if($("#edit-quiz").length === 0) $("#mode-quiz").append('<img id="edit-quiz" onclick="edit_quiz()" src="'+ prefixe_image + '/img_edit.png" alt="MODIFIER" class="editer">')	
 		if($("#delete-quiz").length === 0) $("#mode-quiz").append('<img id="delete-quiz" onclick="delete_quiz()" src="'+ prefixe_image + '/img_trash.png" alt="SUPPRIMER" class="editer">')	
 	}else{
 		$("#edit-quiz").remove()
@@ -16621,7 +17062,7 @@ async function accueil_quiz(id_quiz, preview_mode, proprietaire_initial){
 		nb_questions = nb_questions.length
 
 		//&& pronom_utilisateur === "Vous"  commenté
-		var bouton_edit = (preview_mode || $('[class="editer"]').length > 0) ? '<img onclick="creer_quiz()" src="'+ prefixe_image + '/img_edit.png" alt="modifier" class="editer">' : ''
+		var bouton_edit = (preview_mode || $('[class="editer"]').length > 0) ? '<img onclick="creer_quiz()" src="'+ prefixe_image + '/img_edit.png" alt="MODIFIER" class="editer">' : ''
 
 
 		vider_fenetre(infos_quiz['titre'] + bouton_edit,false,"sauvegarder_quiz()")
@@ -17573,7 +18014,7 @@ async function dernieres_modifs_quiz(){
 
 function avec_sauvegarde(function_whole_name){
 	if(function_whole_name){
-		$("#titre_fenetre").append('<img id="sauvegarder" src="'+ prefixe_image + '/img_save.png" alt="ENREGISTRER" onclick="'+function_whole_name+'" class="icon-save">')	
+		$("#titre_fenetre").append('<img id="sauvegarder" src="'+ prefixe_image + '/img_save.png" alt="💾" onclick="'+function_whole_name+'" class="icon-save">')	
 	}else{
 		$("#sauvegarder").remove()
 	}

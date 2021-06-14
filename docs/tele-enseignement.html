@@ -21,6 +21,8 @@
 		<script type="text/javascript" src="scripts/aes.js"></script>
 		<script type="text/javascript" src="scripts/utile.js"></script>
 		<script src="scripts/donnees_client.js"></script>
+
+
 		
 		<!--previz des fichiers-->
 		<script src="openseadragon/openseadragon.min.js"></script>
@@ -80,8 +82,29 @@
 
 	<style>
 
+		.rmq {
+
+		}
+
+		#liste_pref{
+			max-height: 50vh;
+		}
+
+		.previz-pref {
+			width: 100%;
+			height: 85vh;
+		}
+
+		.une_image{
+
+		}
+
+		.content_prefixe_image{
+
+		}
+
 		.description_matiere {
-			padding: 15px;
+			padding: 15px 15px 0 15px;
 		}
 
 
@@ -490,7 +513,7 @@
 			width: 90%;
 		    position: relative;
 		    float: right;
-		    margin: 1%;
+		    margin: 1% 5%;
 		    display: block;
 		    z-index: 1;
 		    overflow-wrap: anywhere;
@@ -1052,7 +1075,6 @@
 
 		.sidebar > div{
 			font-size: 25px;
-			font-family: Arial;
 			text-align: center;
 			padding: 7%;
 		    cursor: pointer;
@@ -1373,7 +1395,6 @@
 		/*titre affiché*/
 		.navbar > font {
 
-			font-family: arial;
 			color: white;
 			position: absolute;
 			top: 50%;
@@ -1742,7 +1763,6 @@
 		    color: #fff;
 		    text-align: center;
 		    border-radius: 6px;
-		    font-family: arial;
 		    -webkit-user-select: none;
 		    -moz-user-select: none;
 		    -ms-user-select: none;
@@ -2351,13 +2371,7 @@
 
 	<button class="add-button" id="a2hs" onclick="ajouter_a_laccueil()">Ajouter Sekooly à l'accueil en tant qu'application</button>	
 	<div class="navbar" id="mynavbar">
-		<img class="haut_droite dropdown" onclick="switch_side_bar_top()" position="50px" alt="PLUS..." src="https://sekooly.com/assets/images/img_down.png" width="35" height="35">
-
-		<!--
-		<span onclick="deconnexion()">
-			<img class="haut_droite" position="50px" src="https://sekooly.com/assets/images/img_deconnexion.png" width = "35" height = "35" alt="DECONNEXION" >
-		</span>	-->
-
+		<img class="haut_droite dropdown" onclick="switch_side_bar_top()" alt="(+)" position="50px" src="https://sekooly.com/assets/images/img_down.png" width="35" height="35">
 
 		
 		<span>
@@ -2380,19 +2394,9 @@
 		</span>
 
 
-		<!--
-		<span>
-			<img id="recup_edt" position="50px" alt="EDT" class="icone_navbar" onclick="recuperer_edt()" src="https://sekooly.com/assets/images/img_edt.png">
-		</span>		
-		-->
-
-		<!--
-		<span>
-			<img id="recup_params" position="50px" alt="EDT" class="icone_navbar" style="display: none;width: 37px;" id="params" onclick="recuperer_parametres()" src="https://sekooly.com/assets/images/img_parametres.png">
+		<span class="retourner_en_arriere" id="logo" onclick="switch_side_bar()">
+			<img alt="≡" src="https://sekooly.com/assets/images/img_side_bar.png" width="25" height="35">
 		</span>
-		-->
-
-		<span class="retourner_en_arriere" id="logo" onclick="switch_side_bar()"><img alt="≡" src="https://sekooly.com/assets/images/img_side_bar.png" width="25" height="35"></span>
 		
 
 		<span class="retourner_en_arriere" id="bouton_precedent" >  </span>
@@ -2435,6 +2439,7 @@
 			<div id="recup_profs" onclick="recuperer_profs()" >Liste des professeurs</div>
 			<div id="recup_admin" onclick="recuperer_admin()">Liste de l'Administration</div>
 			<div id="recup_params" onclick="recuperer_parametres()" >Paramètres</div>
+			<div id="recup_pref" onclick="recuperer_preferences()" >Préférences</div>
 			<div id="recup_analyses" onclick="recuperer_analyses()" >Analyses</div>
 			<div onclick="deconnexion()">Se déconnecter</div>		
 		</div>
@@ -2725,7 +2730,7 @@
 
 	<div id="snackbar">CONTENU</div>
 
-	<script type="text/javascript" src="scripts/tele-enseignement.min.js"></script>
+	<script type="text/javascript" src="scripts/tele-enseignement.js"></script>
 
 	</body>
 

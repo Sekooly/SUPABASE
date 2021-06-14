@@ -552,14 +552,26 @@ async function switcher_le_champ(nom_champ, nouvelle_valeur){
 }
 
 
+function liste_img_extensions(){
+  res = liste_extensions().split(",").map(function(e){
+    if(e){
+      return "img_icone_" + e + ".png"
+    }
+  })
+
+  res = res.filter(e => e)
+
+  return res
+}
 
 
-
-
+function liste_extensions(){
+  return ",txt,bmp,gif,jpeg,jpg,png,svg,pdf,bmp,xlsx,xls,xlsm,ppt,pptx,doc,docx,html,csv,js,rtf,mp4,mp3,wav,youtube,quiz,"
+}
 
 
 function extension_ok(extension){
-	return ",txt,bmp,gif,jpeg,jpg,png,svg,pdf,bmp,xlsx,xls,xlsm,ppt,pptx,doc,docx,html,csv,js,rtf,mp4,mp3,wav,youtube,quiz,".includes(","+extension.toLowerCase()+",")
+	return liste_extensions().includes(","+extension.toLowerCase()+",")
 }
 
 function element_DOM(nom_element){
@@ -1575,4 +1587,13 @@ function objectifyForm(id_form) {
 
 function my_ctz(){
   return encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)
+}
+
+
+function hebergeur_defaut(){
+  return "https://sekooly.com/assets/images"
+}
+
+function hebergeur_actuel(forcing_avec_str){
+  return prefixe_image === hebergeur_defaut() ? (forcing_avec_str ? hebergeur_defaut() : "") : prefixe_image
 }
