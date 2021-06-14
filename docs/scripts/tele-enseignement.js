@@ -9573,7 +9573,7 @@ function remplacer_image_par_defaut(){
 	const targetNode = $("body")[0];
 
 	// Options for the observer (which mutations to observe)
-	const config = { attributes: false, childList: true, subtree: false };
+	const config = { attributes: true, childList: true, subtree: true };
 
 	// Callback function to execute when mutations are observed
 	const callback = function(mutationsList, observer) {
