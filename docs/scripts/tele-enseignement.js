@@ -2797,6 +2797,7 @@ divContainer.appendChild(table);
 function initialisation(){
 	chargement(true);	
 	
+	var img = masquer_images_initialement()
 	mettre_mon_mode()
 	appliquer_preferences()
 	document.title = "Sekooly | " + nom_etablissement.toUpperCase();
@@ -2820,7 +2821,7 @@ function initialisation(){
 		configurer_profil();
 		mon_role = init_mon_role();		
 		
-		return chargement_a_larrivee();
+		return chargement_a_larrivee(img);
 		
 
 	}
@@ -2909,7 +2910,7 @@ function mettre_le_contact_etablissement(){
 
 
 
-function chargement_a_larrivee(){
+function chargement_a_larrivee(img){
 	
 	chargement(true);
 	fermer_side_bar()
@@ -2944,6 +2945,8 @@ function chargement_a_larrivee(){
 	
 	effacer("nb_clics")
 	effacer("numero_etape")
+
+	afficher_images_initiales(img)
 
 	//alert("avant notifs")
 	mettre_en_place_les_notifications();
@@ -9239,6 +9242,14 @@ function recuperer_analyses(){
 	afficher_fenetre(true)
 }
 
+
+function masquer_images_initialement(){
+	return $("img:visible").hide()
+}
+
+function afficher_images_initiales(img){
+	img.show()
+}
 
 function recuperer_preferences(){
 
