@@ -9536,7 +9536,7 @@ function explications_pref(conteneur, contenu_explications, callback){
 
 function ajouter_liste_pref(conteneur, liste, liste_name, attributeName){
 	$("#liste_pref").remove()
-	conteneur.append('<p id="liste_pref"><div><button onclick="copier_liste(`[list=\''+liste_name+'\']`,\''+attributeName+'\')">COPIER</button></div>'+liste+'</p>')
+	conteneur.append('<div id="liste_pref"><div><button onclick="copier_liste(`[list=\''+liste_name+'\']`,\''+attributeName+'\')">COPIER</button></div>'+liste+'</div>')
 }
 
 
