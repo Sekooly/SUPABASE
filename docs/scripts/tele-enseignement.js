@@ -3781,7 +3781,7 @@ function dossier_vide(garder_liste){
 
 	var alerte = document.createElement('div');
 	alerte.id = "alerte_vide";
-	alerte.style.top = "80px";
+	alerte.style.top = "100px";
 	alerte.style.position = "relative";
 
 
