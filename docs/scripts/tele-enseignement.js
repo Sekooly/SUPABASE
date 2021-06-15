@@ -2276,9 +2276,9 @@ function recuperer_devoirs(forcing){
 
 function afficher_devoirs(oui){
 	if(oui){
-		element_DOM('devoirs_a_rendre').style.visibility = "visible";
+		element_DOM('a-rendre').style.visibility = "visible";
 	}else{
-		element_DOM('devoirs_a_rendre').style.visibility = "hidden";
+		element_DOM('a-rendre').style.visibility = "hidden";
 	}
 
 
@@ -2797,9 +2797,13 @@ divContainer.appendChild(table);
 function initialisation(){
 	chargement(true);	
 	
-	var img = masquer_images_initialement()
+	
+
+	attribuer_les_clics()
 	mettre_mon_mode()
 	appliquer_preferences()
+
+
 	document.title = "Sekooly | " + nom_etablissement.toUpperCase();
 
 	effacer("date_heure_depassement")
@@ -2821,7 +2825,7 @@ function initialisation(){
 		configurer_profil();
 		mon_role = init_mon_role();		
 		
-		return chargement_a_larrivee(img);
+		return chargement_a_larrivee();
 		
 
 	}
@@ -2910,7 +2914,77 @@ function mettre_le_contact_etablissement(){
 
 
 
-function chargement_a_larrivee(img){
+
+function attribuer_les_clics(){
+
+	au_clic("#a2hs", "ajouter_a_laccueil()")//
+	au_clic('[class="haut_droite dropdown"]', "switch_side_bar_top()")//
+	au_clic("#recup_notifs, #bulle_notif", "switch_pannel_notifs()")//
+	au_clic("#recup_msgs, #bulle_notif_msg", "recuperer_msgs(true)")//
+	au_clic("#rechercher_element", "faire_la_recherche_fichier()")//
+	
+	au_clic("#menu", "switch_side_bar()")//
+	au_clic('[class="sidebar left"]', "fermer_si_non_recherche(event)")//
+	au_clic("#side-bar-profil", "afficher_modif_profil()")//
+	au_clic("#side-bar-edt", "edt()")//
+	au_clic("#side-bar-day", "ma_journee()")//
+	au_clic("#dashboard", "tableau_de_bord()")//
+	au_clic("#side-bar-prog", "recuperer_programme()")//
+	au_clic("#side-bar-conseil", "conseils_de_classe()")//
+	au_clic("#side-bar-remed", "remediations()")//
+	au_clic("#side-bar-bulletins", "clic_bulletin()")//
+	au_clic("#side-bar-irl", "gerer_notifs_irl()")//
+	au_clic("#side-bar-help", "retourner_site()")//
+	au_clic("#side-bar-night", "changer_mode()")//
+	au_clic("#side-bar-review", "emettre_avis_sekooly()")//
+
+
+
+	au_clic("#side-bar-top-right", "fermer_side_bar()")//
+	au_clic("#recup_eleves", "recuperer_eleves()")//
+	au_clic("#recup_profs", "recuperer_profs()")//
+	au_clic("#recup_admin", "recuperer_admin()")//
+	au_clic("#recup_params", "recuperer_parametres()")//
+	au_clic("#recup_pref", "recuperer_preferences()")//
+	au_clic("#recup_analyses", "recuperer_analyses()")//
+	au_clic("#disconnect", "deconnexion()")//
+
+
+	au_clic("#afficher", "charger_les_topics()")//
+	au_clic("#a-rendre", "recuperer_devoirs()")//
+	au_clic("#visioconference", "rejoindre_visio()")//
+	au_clic("#gerer-bulletins", "clic_bulletin()")//
+	au_clic("#img_ajout", "afficher_ou_non_choix_fichier(true)")//
+
+
+	au_clic("#par_la_date_effet, #par_filtre_id_chapitre", "choisir_ce_mode(this)")//
+	au_clic("#config-date-prog", "switch_config_mode()")//
+
+	au_clic("#est_video_youtube", "switch_affichage_youtube()")//
+	au_clic("#est_extrait_manuel", "switch_extrait_manuel()")//
+
+
+	au_clic("#bye_prev_upload", "afficher_ou_non_choix_fichier(false)")//
+	au_clic("#bye_prev_rendu", "afficher_fenetre_rendudevoir(false)")//
+	
+	au_clic("#helper-categ", "alert('Si vous attendez un rendu de la part des élèves, catégorisez votre fichier en Devoirs/Examens/Quiz.')")//
+	au_clic("#helper-prog","help_chapitre()")//
+	au_clic("#helper-coef","alert('Si ce rendu est noté et compte dans le bulletin scolaire, merci de mettre un coefficient > 0.')")//
+	
+	au_clic("#helper-dev", "aide_devoirs()")//
+	au_clic("#supprimer_page", "supprimer_derniere_page_devoir()")//
+	au_clic("#ajouter_page", "ajouter_page_devoir()")//
+	au_clic("#bouton_rendre_devoir", "rendre_devoir()")//
+	au_clic("#run-quiz-dev", "$('#'+element_DOM('devoir_choisi').value).click()")
+	
+
+}
+
+function help_chapitre(){
+	alert('Choisir le chapitre permet de mieux retrouver votre fichier.\nPour gérer les chapitres de votre matière, vous pouvez aller en haut à gauche -> Programme scolaire.')
+}
+
+function chargement_a_larrivee(){
 	
 	chargement(true);
 	fermer_side_bar()
@@ -2936,8 +3010,6 @@ function chargement_a_larrivee(img){
 
 	//si écolage pas ok -> deconnexion automatique
 	if(!mon_ecolage_est_ok()) deconnexion()
-
-	afficher_images_initiales(img)
 
 	if(!plateforme_prete()){
 		return initialisation_de_la_plateforme()
@@ -3055,6 +3127,8 @@ function chargement_a_larrivee(img){
 
 	valider_suppression_via_mail_si_besoin()
 
+	
+	appliquer_preferences()
 	chargement(false);
 	
 }
@@ -7636,12 +7710,14 @@ function recuperer_edt(nom_classe_fournie){
 	valeur_champ_reference = nom_classe
 	nom_champ_a_chercher = "id_googlecalendar"
 
+	/*
 	console.log({
 		nom_table:nom_table,
 		nom_champ_reference:nom_champ_reference,
 		valeur_champ_reference:valeur_champ_reference,
 		nom_champ_a_chercher:nom_champ_a_chercher		
 	})
+	*/
 
 	rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher).then(id_googlecalendar => {
 		id_googlecalendar = id_googlecalendar[0]['id_googlecalendar']
@@ -18287,6 +18363,15 @@ async function publier_quiz(id_quiz, nom_fichier){
 
 
 
+
+
+
+function au_clic(selector, callback){
+	$(selector).off("click")
+	$(selector).on("click",function(event){
+		eval(callback)
+	})
+}
 
 
 
