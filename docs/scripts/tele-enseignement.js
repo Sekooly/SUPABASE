@@ -14547,9 +14547,11 @@ window.addEventListener('beforeinstallprompt', (e) => {
 	// Update UI to notify the user they can add to home screen
 	addBtn.style.display = 'block';
 	$("#mynavbar")[0].style.top = "20px"
+	
 
 	//décaler l'alerte
 	$('.alerte#alerte')[0].style.top = "95px"
+	if($('#alerte_vide')[0]) $('#alerte_vide')[0].style.top = "100px"
 
 });
 
