@@ -202,7 +202,7 @@ function lister_les_eleves(liste_eleves,classe){
 		var identifiant_eleve = valeur['Identifiant'].toUpperCase();
 
 		//on ajoute l'identifiant 
-		$("#liste_eleves").append('<b style="color: #FF6C00;margin-bottom: 5px;" id="'+identifiant_eleve+'">' + identifiant_eleve + " </b>")
+		$("#liste_eleves").append('<b  class="sekooly-mode"  style="margin-bottom: 5px;" id="'+identifiant_eleve+'">' + identifiant_eleve + " </b>")
 
 		var identifiant_eleve_bloc = element_DOM(identifiant_eleve);
 
@@ -446,7 +446,7 @@ function afficher_toutes_les_observations(les_observations,identifiant_eleve){
 		var signe_avis_passage = valeur["avis_passage"] === "Favorable" ? "✅" : "❌"
 		var vient_de_moi = valeur['identifiant_remarque'].toUpperCase() === recuperer('identifiant_courant').toUpperCase() ? " (Vous)"
 							: valeur['matiere'] ? " ("+valeur['matiere']+")" : "" ;
-		une_observation= '<div style="color:black;font-size:10px;padding:5px;">'+signe_avis_passage +'<b style="color:#FF6C00;">'+valeur['identifiant_remarque'].toUpperCase()+ vient_de_moi+': </b>'+valeur['observation']+'<i style="color: #bfbfbf;"> ' + afficher_date(valeur['horodateur']) + '  </i></div>';	
+		une_observation= '<div style="color:black;font-size:10px;padding:5px;">'+signe_avis_passage +'<b class="sekooly-mode">'+valeur['identifiant_remarque'].toUpperCase()+ vient_de_moi+': </b>'+valeur['observation']+'<i style="color: #bfbfbf;"> ' + afficher_date(valeur['horodateur']) + '  </i></div>';	
 		$("#ensemble_observations").append(une_observation);
 	})
 	
@@ -464,7 +464,7 @@ function recuperer_MA_fiche_conseil(){
 	//créer une mini fenêtre de l'identifiant
 	element_DOM('fenetre').style.overflowY = "auto";
 	vider_fenetre("Vos résultats");
-	$("#fenetre").append('<div style="text-align:center;margin-top: 20px;margin-left: 20px;"><b style="color: #FF6C00;margin-bottom: 5px;" id="'+identifiant_eleve+'">' + identifiant_eleve + " </b></div>")
+	$("#fenetre").append('<div style="text-align:center;margin-top: 20px;margin-left: 20px;"><b  class="sekooly-mode"  style="margin-bottom: 5px;" id="'+identifiant_eleve+'">' + identifiant_eleve + " </b></div>")
 
 	//oeil -> tableau
 	var identifiant_eleve_bloc = element_DOM(identifiant_eleve);
@@ -905,7 +905,7 @@ function afficher_rendus_devoirs(resultats){
 		un_devoir_rendu.id = resultats[i]["id_fichier"];
 		un_devoir_rendu.style = 'padding: 0.5%;';
 		un_devoir_rendu.innerHTML = "Devoir de "
-		un_devoir_rendu.innerHTML += '<b style="color: #FF6C00;" id="proprietaire'+resultats[i]["id_fichier"]+'">' + resultats[i]["proprietaire"].toUpperCase() + " </b>";
+		un_devoir_rendu.innerHTML += '<b  class="sekooly-mode" id="proprietaire'+resultats[i]["id_fichier"]+'">' + resultats[i]["proprietaire"].toUpperCase() + " </b>";
 
 		//si il y a une remarque -> corrigé
 		var remarque = decodeURIComponent(resultats[i]["remarque"]);
@@ -1520,11 +1520,6 @@ function retourner_site(){
 	visualiser("Tutoriels d'utilisation.docx","1HnsoX5_NQGhJ34WZ68p9SPvZ30jn4gKpf_cQjz2ZyUo",false,"Tutoriels d'utilisation")
 	$("#telechargement").remove()
 	afficher_fenetre(true)
-	/*contenu = "Bonjour <span style='font-weight: bold;color: #FF6C00;'> "+recuperer('identifiant_courant').toUpperCase()+ "</span>, bienvenue sur la plateforme de télé-enseignement Sekooly !<br><br>Sur cette page, vous trouverez bientôt des tutoriels d'utilisation de Sekooly, en fonction de votre rôle au sein de votre établissement.<br><br>Cette section est en cours de construction, merci infiniment de votre patience !"
-	conteneur_texte_html = '<div style="overflow: hidden auto;height: 90%;padding: 2%;"><div id="redaction" >'+contenu+'</div></div>'
-	conteneur_texte = document.createElement('div')
-	conteneur_texte.innerHTML = conteneur_texte_html
-	$("#fenetre")[0].appendChild(conteneur_texte.firstChild)*/
 	
 
 }
@@ -1985,7 +1980,7 @@ function changer_element(id_element,type_element,est_mdp){
 function mon_detail(nom_detail,valeur_detail,mdp){
 
 	if(mdp) valeur_detail = "•".repeat(valeur_detail.length);
-	var resultat = '<div class="un_detail"><b style="color:#FF6C00">'+nom_detail+': </b><br><span id="' + nom_detail.split(" ")[0] +'">'+valeur_detail+'</span></div>';
+	var resultat = '<div class="un_detail"><b class="sekooly-mode">'+nom_detail+': </b><br><span id="' + nom_detail.split(" ")[0] +'">'+valeur_detail+'</span></div>';
 	return resultat;
 }
 
@@ -7281,7 +7276,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 
 			contenu_poste = decodage(contenu_poste);
 
-			var un_com = '<div id="'+id_com+'" class="un_commentaire"><div class="auteur_du_poste" style="font-weight: bold;color: #FF6C00;">'+ auteur_poste + ' ('+  role_auteur_poste  +')</div><h id="contenu_poste" style=""> ' + contenu_poste + '</h><h style="color: #B5B3B8;" id="date_poste"> '+ date + '</h></div>';
+			var un_com = '<div id="'+id_com+'" class="un_commentaire"><div class="auteur_du_poste">'+ auteur_poste + ' ('+  role_auteur_poste  +')</div><h id="contenu_poste" style=""> ' + contenu_poste + '</h><h style="color: #B5B3B8;" id="date_poste"> '+ date + '</h></div>';
 
 			//ajouter le commentaire au DOM
 			var nouveau_com = document.createElement('div');
@@ -7884,7 +7879,7 @@ function ajouter_la_notif(la_notif,index,mode_notif){
 
 
 
-	var identifiant_notif = '<b style="color: #FF6C00;">' + Identifiant_derniere_modif + ' ('+Role_derniere_modif+') </b>';
+	var identifiant_notif = '<b  class="sekooly-mode" >' + Identifiant_derniere_modif + ' ('+Role_derniere_modif+') </b>';
 	var contenu_notif = contenu_notification(Type_notif,la_matiere_concernee,la_classe_concernee,Identifiant_originaire,Identifiant_derniere_modif, {'Horodateur':Horodateur,'Date_derniere_modif':Date_derniere_modif},intitule_notif);
 	var intitule = ' - <i><b style="color:#c65e46">'+intitule_notif  +'</b></i>'
 	var icone_notif = '<span> <img src=' +  choix_image(Type_notif)  + ' class="icone_notif"> </span>'
@@ -10417,7 +10412,7 @@ function information_etablissement(id_info, etiquette_info, valeur_info, est_mod
 
 	valeur_info = est_consultable ? oeil : valeur_info
 
-	return '<div class="un_detail"><b style="color:#FF6C00">'+etiquette_info+': </b><br><span id="' + id_info +'">'+valeur_info+crayon+'</span></div>';
+	return '<div class="un_detail"><b class="sekooly-mode">'+etiquette_info+': </b><br><span id="' + id_info +'">'+valeur_info+crayon+'</span></div>';
 }
 
 
@@ -12549,7 +12544,7 @@ function initialisation_de_la_plateforme(){
 
 	afficher_fenetre(true)	
 
-	contenu = "Bonjour <span style='font-weight: bold;color: #FF6C00;'> "+recuperer('identifiant_courant').toUpperCase()+ "</span>, et bienvenue sur la plateforme de télé-enseignement Sekooly!<br><br>"
+	contenu = "Bonjour <span  class='sekooly-mode' > "+recuperer('identifiant_courant').toUpperCase()+ "</span>, et bienvenue sur la plateforme de télé-enseignement Sekooly!<br><br>"
 	contenu += "Pour mettre en route la plateforme de l'établissement <b>" + nom_etablissement.toUpperCase() + "</b>, nous aurons besoin de quelques informations supplémentaires.<br><br><rouge>Toutes les informations que vous allez saisir seront modifiables plus tard.</rouge><br>"
 	bouton = "<button onclick='suivant()' id='bouton_suivant' class='mon_bouton' style='height: 50px;font-size: inherit;'>C'est parti!</button>"
 	
