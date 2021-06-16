@@ -1216,7 +1216,7 @@ function changer_mode(sans_changer){
 
   stocker('mode_nuit_oui',mode_nuit_oui_final)
   if($("#mode_nuit_oui")[0]) $("#mode_nuit_oui")[0].innerText = texte_final_mode_nuit_oui
-  $("body")[0].className = classe_finale_body
+  $("body").attr("class",classe_finale_body)
 
 
   var mode = mode_nuit_oui_final === "oui" ? "night" :  "day" 
