@@ -14,7 +14,7 @@ var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","UR
 								"id_formulaire_remediation", "id_fiche", "URL_Mapping","niveau",
 								"classe_bis", "id_dossier_cycle", "dossier_rendus_cycle", "liste_notifs_lues", "nombre_avis", "Numero_telephone",
 								"id", "Id_classe_matiere", "id_notif", "Id_source", "id_fichier", "id_dossier", "id_devoir", "id_dossier_sujetdevoir", "id_fichier_sujetdevoir", "Id_topic", "id_com", "ID_FICHIER", "id_msg","id_conv", "id_chapitre",
-								"id_quiz", "id_question", "id_reponse"]
+								"id_quiz", "id_question", "id_reponse", "description"]
 
 
 var elements_menu_haut_avec_modifs = ["Classes","Matieres","Eleves","Profs","Administration"]
@@ -3099,28 +3099,40 @@ function chargement_a_larrivee(){
 			if (element !== null) return element['ID_URL'] === id_matiere;
 		});
 
-		//console.log('on a trouvé: ' + JSON.stringify(la_matiere[0].Matiere) + '\n');
-		var titre = la_matiere[0].Classe+ "\n" + la_matiere[0].Matiere;
-		if (recuperer('mon_type') === 'Eleves')  titre = la_matiere[0].Matiere;
-		
-
-		//console.log("chargeons " + id_matiere + " de titre " + titre);
-
-		afficher_alerte_etablissement()
-
-		return charger_dossier(id_matiere,true, titre).then(function(){
 
 
-			//si un fichier déjà ouvert: on l'ouvre
-			if(recuperer('fichier_ouvert')){
-				var fichier_ouvert = recuperer('fichier_ouvert');
-				
-				//console.log("on devra ouvrir " + fichier_ouvert);
-				//ATTENDRE pour ouvrir
-				element_DOM(fichier_ouvert).click();
-			}
+		if(la_matiere.length > 0){
 
-		})
+			//console.log('on a trouvé: ' + JSON.stringify(la_matiere[0].Matiere) + '\n');
+			var titre = la_matiere[0].Classe+ "\n" + la_matiere[0].Matiere;
+			if (recuperer('mon_type') === 'Eleves')  titre = la_matiere[0].Matiere;
+			
+
+			//console.log("chargeons " + id_matiere + " de titre " + titre);
+
+			afficher_alerte_etablissement()
+
+			return charger_dossier(id_matiere,true, titre).then(function(){
+
+
+				//si un fichier déjà ouvert: on l'ouvre
+				if(recuperer('fichier_ouvert')){
+					var fichier_ouvert = recuperer('fichier_ouvert');
+					
+					//console.log("on devra ouvrir " + fichier_ouvert);
+					//ATTENDRE pour ouvrir
+					element_DOM(fichier_ouvert).click();
+				}
+
+			})
+
+		//matière non trouvée
+		} else {
+			//si admin -> accueil
+			if(recuperer("mon_type").includes("Admin")) stocker("mon_type","Administration")
+			ajouter_les_dossiers_dynamiques();
+		}
+
 
 		
 	}
@@ -4256,7 +4268,7 @@ function autoriser_clic_droit_supprimer_et_renommer(e,ceci){
 	//ajouter l'offset
 
 	ajouter_fonction_clic_droit(e,ceci,4+mon_offset,"changer_coef","Coefficient",id_fichier,null,$("#"+id_fichier)[0].getAttribute("coefficient_rendu"));
-	ajouter_fonction_clic_droit(e,ceci,5+mon_offset,"changer_telechargeable","Téléchargeable ou non",id_fichier);
+	ajouter_fonction_clic_droit(e,ceci,5+mon_offset,"changer_telechargeable","Téléchargeable",id_fichier);
 	ajouter_fonction_clic_droit(e,ceci,6+mon_offset,"supprimer_fichier","Supprimer",id_fichier);
 
 	//au clic de n'importe où : ça enleve le clic droit
@@ -5107,7 +5119,7 @@ function calcul_lien_de_visu(extension,id_fichier){
 
 	//si c'est un lien YOUTUBE
 	}else if(est_youtube(extension)){
-		lien_de_visu = 'https://www.youtube.com/embed/' + id_fichier;
+		lien_de_visu = 'https://www.youtube.com/embed/' + id_fichier + '?fs=1&loop=1&rel=0&showinfo=0';
 	}
 
 
@@ -11317,7 +11329,7 @@ function dupliquer_donnees_parametres(id_parametre){
 	creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, true)
 }
 
-function supprimer_ligne_parameters(id_parametre){
+async function supprimer_ligne_parameters(id_parametre){
 	if(!id_parametre) id_parametre = $(".un_menu_orange")[0].id
 
 
@@ -11359,7 +11371,7 @@ function supprimer_ligne_parameters(id_parametre){
 		chargement(true)
 		//si besoin (classe ou matière): supprimer sur le drive
 		if (id_parametre === "Classes" || id_parametre === "Matieres"){
-			var donnees_parametres = JSON.parse(recuperer(id_parametre))
+			var donnees_parametres = await rechercher_tout(id_parametre) // JSON.parse(recuperer(id_parametre))
 			var index_google_calendar = $("#id_googlecalendar").length > 0 ? $("#id_googlecalendar")[0].cellIndex : -1
 			var id_googlecalendar = index_google_calendar >= 0 ? $(".selected")[0].children[index_google_calendar].innerText : ""
 			
@@ -11803,7 +11815,9 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 
 				//si c'est oui ou non
 				}else if(champs_oui_ou_non.indexOf(liste_champs[i]) > 0){
-					html_du_input = '<select class="donnee" value="non" id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" ><option value="non">non</option><option value="oui">oui</option></select>'
+					selected_oui = donnee_dupliquee.includes("oui") ? " selected " : ""
+					selected_non = donnee_dupliquee.includes("non") ? " selected " : ""
+					html_du_input = '<select class="donnee" value="non" id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" ><option value="non" '+selected_non+'>non</option><option value="oui" '+selected_oui+'>oui</option></select>'
 				}
 
 
