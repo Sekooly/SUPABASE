@@ -79,8 +79,30 @@
 
 	<body>
 
+		<link id="style-sekooly" rel="stylesheet" href="https://sekooly.com/assets/style/sekooly.css" ></link>
+		<link id="style-sekooly" rel="stylesheet" href="https://sekooly.com/assets/style/sekooly-dark.css" ></link>
+		
 
 	<style>
+		.palette {
+			width:30%;
+		}
+
+
+		.far {
+			margin: 15px;
+		}
+
+		.element-pref {
+			border-style: solid;
+			border-width: 0.1px;
+			padding-bottom: 15px;
+		}
+
+		.image-en-haut-fenetre {
+			width: 30px;
+			cursor: pointer;
+		}
 
 		.highlight {
 			outline: #f00 solid 2px
@@ -209,13 +231,6 @@
 			min-height: 40%;
 		}
 
-		.current-qst {
-			color: #ff6c00;
-		}
-
-		.sekooly-mode {
-			color: #ff6c00;
-		}
 
 		.reponses_possibles{
 			text-align: center;
@@ -235,9 +250,6 @@
 			display: inline-flex;
 		}
 
-		.dark-mode .trash{
-			filter: invert(1);
-		}
 
 		#reponses_possibles{
 			display: grid;
@@ -294,7 +306,6 @@
 		.btn-setup {
 			height: 50px;
 			font-size: inherit;
-			background-color: #FF6C00;
 			color: white;
 			margin-right: 5px;
 		}
@@ -313,9 +324,6 @@
 			bottom: 45px;
 		}
 
-		.dark-mode .icon-save {
-			filter: invert(1);
-		}
 
 		.icon-save {
 			width: 30px;
@@ -389,9 +397,7 @@
 			cursor: pointer;
 		}
 
-		.dark-mode a{
-			color: #888;
-		}
+
 
 		.fichier_supplementaire{
 
@@ -487,10 +493,6 @@
 			padding: 5%;
 		}
 
-		.dark-mode .envoi_remarque {
-			filter: invert(1);
-		}
-
 		vert{
 			color: green;
 		}
@@ -530,10 +532,6 @@
 			padding: 10%;
 		}
 
-		.mode_choisi{
-			background: #ff6c00;
-		}
-
 		.mode_affichage_fichiers:hover {
 			background: #4a4a4a;
 		}
@@ -560,10 +558,6 @@
 			top: 5px;
 		}
 
-		.dark-mode .gear{			
-			filter: invert(1);
-		}
-
 		.conteneur_bouton_ajout_chapitre{
 			text-align: center;
 		}
@@ -584,12 +578,10 @@
 
 		.bouton_ajout_chapitre {
 			height: 30px;
-			background-color: #FF6C00;
 		}
 
 		.titre_chapitre{
 			font-weight: bold;
-			color:#FF6C00;
 		}
 
 		.programme_scolaire{
@@ -632,7 +624,6 @@
 		}
 
 		.bouton_envoi {
-			background-color: #FF6C00;
 			position: absolute;
 			margin-top: 0.5%;
 			height: 50px;
@@ -661,10 +652,9 @@
 
 		.auteur_du_poste {
 			font-weight: bold;
-			color: #FF6C00;
 		}
 
-		#date_poste {
+		.date_poste {
 			color: #B5B3B8;
 		}
 
@@ -699,9 +689,6 @@
 			background-color: #fff;
 		}
 
-		.dark-mode .msg_recu {
-			background-color: black;
-		}
 
 		.msg_envoye {
 			background-color: #ffd3b8;
@@ -709,14 +696,10 @@
 			left: 90%;
 		}
 
-		.dark-mode .msg_envoye {
-			background-color: #4a1c00;
-		}
 
 
 		.bouton_sekooly{
 			height: 30px;
-			background-color: #FF6C00;
 			margin-right: 1%;
 		}
 
@@ -783,10 +766,6 @@
 			cursor: pointer;
 		}
 
-		.dark-mode .editer {
-			filter: invert(1);
-		}
-
 		.pp{
 			width: 75px;
 			height: 75px;
@@ -794,7 +773,6 @@
 
 		.add-button {
 			position: fixed;
-			background-color: #FF6C00;
 			color: white;
 			top: 0%;
 			left: 0;
@@ -824,21 +802,6 @@
 
 		.stockage{
 			color: #b7b2aa;
-		}
-
-		.dark-mode .section_journee img.mini-image{
-			-webkit-filter: invert(1);
-   			filter: invert(1);
-
-		}
-
-		.dark-mode #mini_popup .contenu_section_journee img.mini-image{			
-			-webkit-filter: invert(1);
-   			filter: invert(1);
-		}
-
-		.dark-mode .element_tdb_titre{
-			background: #41626c;
 		}
 
 		.graphe_tdb{
@@ -887,138 +850,6 @@
 
 
 
-		.dark-mode {
-		  background-color: rgb(56, 66, 77);
-		  color: white;
-		}
-
-		.dark-mode> .ma_fenetre{
-			background-color: #1E1E1E;
-		}
-
-		.dark-mode> .choix_popup {
-			background-color: #1E1E1E;
-
-		}
-
-
-		.dark-mode> #rendu_devoir {
-			background-color: #1E1E1E;
-
-		}
-
-
-		.dark-mode> div> div> a {
-			text-decoration: none;
-			color: white;
-		}
-
-
-		.dark-mode> div> div> span> .clic_droit{
-			background-color: black;
-		}
-
-		.dark-mode> div> .titre_drive {
-			background-color: #937e7e;
-		}
-
-		.dark-mode> #rendu_devoir> #liste_des_devoirs_rendus> div> .mini-image{
-			-webkit-filter: invert(1);
-   			filter: invert(1);
-		}
-
-		.dark-mode> #rendu_devoir> #liste_des_devoirs_rendus> div> a> .mini-image{
-			-webkit-filter: invert(1);
-   			filter: invert(1);
-		}
-
-
-		.dark-mode> .ma_fenetre> #entete-fenetre> span> img{
-			-webkit-filter: invert(1);
-   			filter: invert(1);
-		}
-
-		.dark-mode> .ma_fenetre> #entete-fenetre> a> img{
-			-webkit-filter: invert(1);
-   			filter: invert(1);
-		}
-
-		.dark-mode> div> .ma_liste> span> .download_fichier {
-			-webkit-filter: invert(1);
-   			filter: invert(1);			
-		}
-
-
-		.dark-mode> .pannel_notif {
-			background-color: #424242;
-		}
-
-
-		.dark-mode> .pannel_notif> .un_filtre_notif> .un_filtre_notif {
-			background-color: #424242;
-		}
-
-
-		.dark-mode> .pannel_notif> .une_notif:hover {
-			background-color: #3e3131;
-		}
-
-		.dark-mode> .pannel_notif> .non_lu:hover {
-			background-color: #3e3131;
-		}
-
-		.dark-mode> .ma_fenetre> div> .bloc_topic> span> .byebye {
-			-webkit-filter: invert(1);
-   			filter: invert(1);			
-
-		}
-
-		.dark-mode> .ma_fenetre> .section_journee> div> .contenu_section_journee> div> img {
-			-webkit-filter: invert(1);
-   			filter: invert(1);				
-		}
-
-		.dark-mode> .ma_fenetre> div> div> div> table> thead> div> .clic_droit_titre_param {
-			background-color: black;
-		}
-
-
-		.dark-mode> #mini_popup {
-			background-color: #1e1e1e;
-		}
-
-		.dark-mode img#dupliquer_param{
-			-webkit-filter: invert(1);
-   			filter: invert(1);			
-
-		}
-
-
-		.dark-mode img#telecharger_param{
-			-webkit-filter: invert(1);
-   			filter: invert(1);			
-
-		}
-
-
-		.dark-mode img#importer_param{
-			-webkit-filter: invert(1);
-   			filter: invert(1);			
-
-		}
-
-		.dark-mode img#tout_voir{
-			-webkit-filter: invert(1);
-   			filter: invert(1);			
-
-		}
-
-		.dark-mode #mon_devoir_rendu img{
-			-webkit-filter: invert(1);
-   			filter: invert(1);		
-
-		}
-
 
 		.voir_tdb{
 			color: #f00;
@@ -1028,7 +859,6 @@
 		
 		.nom_matiere_journee{
 			font-weight: bold;
-			color: #FF6C00;
 		}
 
 
@@ -1174,7 +1004,6 @@
 
 		.un_menu_orange{
 			font-weight: bold;
-			background-color: #e66506;
 			color: white;
 			border-style: inset;
 		}
@@ -1187,7 +1016,6 @@
 		    position: sticky;
 		    top: 0;
 		    z-index: 10;
-		    background-color: #e66506;
 		}
 
 		.header_table{
@@ -1358,9 +1186,7 @@
 		  transition: .4s;
 		}
 
-		input:checked + .slider {
-		  background-color: #FF6C00;
-		}
+
 
 		input:focus + .slider {
 		  box-shadow: 0 0 1px #2196F3;
@@ -1674,11 +1500,6 @@
 
 		}
 
-		.dark-mode .byebye {
-			-webkit-filter: invert(1);
-   			filter: invert(1);
-		}
-
 		.petite_ecriture{
 			font-size: 10px;
 			position: sticky;
@@ -1892,7 +1713,6 @@
 
 		.mon_bouton{
 			height:20px;
-			background-color: #FF6C00;
 			color: white; 
 		}
 
@@ -1998,7 +1818,6 @@
 
 		.rendre{
 			height:20px;
-			background-color: #FF6C00;
 			color: white; 
 			margin-bottom: 20px;
 		}
@@ -2044,14 +1863,6 @@
 			position: relative;
 			height: 100%;
 			margin: 2%;
-		}
-
-		.titre_moitie_fenetre{
-			font-size: 20px;
-			font-weight: bold;
-			color: #FF6C00;
-			padding-bottom: 10%;
-			text-align: center;
 		}
 
 		.liste_destinataire{
@@ -2115,7 +1926,7 @@
 		}
 
 
-		.fermer{
+		.clickable{
 			cursor: pointer;
 		}
 
@@ -2375,7 +2186,7 @@
 
 
 
-	<button class="add-button" id="a2hs">Ajouter Sekooly à l'accueil en tant qu'application</button>	
+	<button class="add-button sekooly-mode-background" id="a2hs">Ajouter Sekooly à l'accueil en tant qu'application</button>	
 	<div class="navbar" id="mynavbar">
 		<img class="haut_droite dropdown" alt="(+)" position="50px" src="https://sekooly.com/assets/images/img_down.png" width="35" height="35">
 
@@ -2475,7 +2286,7 @@
 
 	<div class="grid-container" id="liste_matieres"> </div>
 
-	<div class="ma_fenetre" id="fenetre"></div>
+	<div class="ma_fenetre" id="fenetre" name="fenetre"></div>
 
 	<div class="gros_conteneur" id="gros_conteneur">
 
@@ -2682,7 +2493,7 @@
 			<rouge class="mini-image" id="helper-coef">Besoin d'aide?</rouge>
 		</div>
 		
-		<button type="button" class="rendre"  id="mettre_fichier_en_ligne">Mettre en ligne</button>
+		<button type="button" class="rendre sekooly-mode-background"  id="mettre_fichier_en_ligne">Mettre en ligne</button>
 		<div style="font-size: 10px;" id="telechargeable">
 	      <input type="checkbox" id="est_telechargeable" checked>Fichier téléchargeable
 	  	</div>
@@ -2705,17 +2516,17 @@
 
 			<div id="boutons_devoir">
 				<button type="button" class="supprimer_page" id="supprimer_page">Supprimer la dernière page</button>
-				<button id="ajouter_page" type="button" class="rendre"> Ajouter une page</button>
+				<button id="ajouter_page" type="button" class="rendre sekooly-mode-background"> Ajouter une page</button>
 			</div>
 
 
 
-			<button id="bouton_rendre_devoir" type="button" class="rendre"> Rendre le devoir</button>
+			<button id="bouton_rendre_devoir" type="button" class="rendre sekooly-mode-background"> Rendre le devoir</button>
 			<div id="tout"><img id="result"></div>
 		</div>
 
 		<div id="soumettre_quiz">
-			<button  class="rendre"  id="run-quiz-dev">Faire le quiz</button>
+			<button  class="rendre sekooly-mode-background"  id="run-quiz-dev">Faire le quiz</button>
 		</div>
 	</div>​
 	
@@ -2733,7 +2544,8 @@
 
 	<div id="snackbar">CONTENU</div>
 
-	<script type="text/javascript" src="scripts/tele-enseignement.min.js"></script>
+	<style type="text/css" id="custom-css"></style>
+	<script type="text/javascript" src="scripts/tele-enseignement.js"></script>
 
 	</body>
 

@@ -304,7 +304,7 @@ function actualiser_bilan(identifiant_eleve){
 function emettre_avis(identifiant_eleve, classe){
 	//console.log("emettre_avis: " + identifiant_eleve);
 
-	var pop_up_html  = '<div id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X"  src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Vos observations sur <b>'+identifiant_eleve+'</b>:</div><textarea id="observation" style="width: 80%;resize: none;font-size: 13px;margin-bottom: 5%;"></textarea><div style="">Passage de <b>'+identifiant_eleve+'</b> en classe supérieure:</div><select style="width: 80%;border-color: red;border-style: solid;margin-bottom: 5%;" id="avis_passage" value=""><option value=""></option><option value="Favorable">Favorable</option><option value="Non favorable">Non favorable</option></select><button type="button" class="rendre" onclick="envoyer_avis_conseil(\''+identifiant_eleve+'\',\''+classe+'\')">Envoyer l\'avis</button></div>';
+	var pop_up_html  = '<div id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X"  src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Vos observations sur <b>'+identifiant_eleve+'</b>:</div><textarea id="observation" style="width: 80%;resize: none;font-size: 13px;margin-bottom: 5%;"></textarea><div style="">Passage de <b>'+identifiant_eleve+'</b> en classe supérieure:</div><select style="width: 80%;border-color: red;border-style: solid;margin-bottom: 5%;" id="avis_passage" value=""><option value=""></option><option value="Favorable">Favorable</option><option value="Non favorable">Non favorable</option></select><button type="button" class="rendre sekooly-mode-background" onclick="envoyer_avis_conseil(\''+identifiant_eleve+'\',\''+classe+'\')">Envoyer l\'avis</button></div>';
 
 	var pop_up = document.createElement('div');
 	pop_up.innerHTML = pop_up_html;
@@ -1053,7 +1053,7 @@ function fenetre_remarque_note(id_fichier, note_rendu, remarque){
 	/*
 	alert(nom_proprio_devoir)
 	console.log(nom_proprio_devoir)*/
-	return '<div class="ma_fenetre" id="remarque_et_note" style="visibility: visible;height: 33%;width: 280px;height: 300px;top: 35%;left: 10%;"><b style="text-align: center;"><div id="titre_fenetre" class="">Note et remarque de '+nom_proprio_devoir+' </div></b><span style=""><form id="mon_formulaire" autocomplete="off" class="edition">	<div id="champ_note"><label id="label" for="note_rendu">Note (sur 20)</label><input type="number" min=0 max=20 step=0.125 id="note_rendu" maxlength="2" style="width: 100%;" value="'+note_rendu+'"></div><br><label id="label" for="remarque">Votre remarque</label><textarea id="remarque" maxlength="300" style="width: 100%;resize: none;font-size: 13px;height: 50%;">'+remarque+'</textarea><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button class="bouton_sekooly" type="button" id="Annuler" onclick="$(\'#remarque_et_note\').remove()"> Annuler </button><button  class="bouton_sekooly" type="button" id="envoyer_note">Valider</button></div></form></span></div>'
+	return '<div class="ma_fenetre" id="remarque_et_note" style="visibility: visible;height: 33%;width: 280px;height: 300px;top: 35%;left: 10%;"><b style="text-align: center;"><div id="titre_fenetre" class="">Note et remarque de '+nom_proprio_devoir+' </div></b><span style=""><form id="mon_formulaire" autocomplete="off" class="edition">	<div id="champ_note"><label id="label" for="note_rendu">Note (sur 20)</label><input type="number" min=0 max=20 step=0.125 id="note_rendu" maxlength="2" style="width: 100%;" value="'+note_rendu+'"></div><br><label id="label" for="remarque">Votre remarque</label><textarea id="remarque" maxlength="300" style="width: 100%;resize: none;font-size: 13px;height: 50%;">'+remarque+'</textarea><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button class="bouton_sekooly sekooly-mode-background" type="button" id="Annuler" onclick="$(\'#remarque_et_note\').remove()"> Annuler </button><button  class="bouton_sekooly sekooly-mode-background" type="button" id="envoyer_note">Valider</button></div></form></span></div>'
 	//return '<div></div>'
 }
 
@@ -1572,7 +1572,7 @@ function afficher_modif_profil(){
 
 	var mes_details_code_acces =mon_detail('Code d\'accès',mes_donnees['Code'],true);
 
-	var boutons = '<span id="les_boutons" style="text-align: center;position: relative;display: block;"><button type="button" id="annuler_modifs" onclick="quitter_previsualisation()"> Annuler </button><button type="button" id="valider_modifs" onclick="switch_edition()">Enregistrer</button></span>';
+	var boutons = '<span id="les_boutons" style="text-align: center;position: relative;display: block;"><button class="rendre sekooly-mode-background" type="button" id="annuler_modifs" onclick="quitter_previsualisation()"> Annuler </button><button class="rendre sekooly-mode-background" type="button" id="valider_modifs" onclick="switch_edition()">Enregistrer</button></span>';
 
 	var details_profil_html = '<div id="mes_details" class="mes_details">' + ma_photo_de_profil+ mon_niveau_XP + mes_details_identifiant + mes_details_nom + mes_details_prenoms + mes_details_type + mes_details_classe + mes_details_contact + mes_details_code_acces +'</div>' + boutons;
 
@@ -3796,7 +3796,7 @@ function dossier_vide(garder_liste){
 	var le_chapitre_choisi = $("#filtre_id_chapitre").find(":selected").text();
 
 	//en fonction du mode
-	var mode_date = $(".mode_choisi").length > 0 ? $(".mode_choisi")[0].id === "par_la_date_effet" : true
+	var mode_date = $(".sekooly-mode-background").length > 0 ? $(".sekooly-mode-background")[0].id === "par_la_date_effet" : true
 	var element_choisi = mode_date ? la_date_choisie : le_chapitre_choisi
 
 	alerte.innerHTML = '<i style="width: max-content;color: #d9d8db;">Il n\'y a pas encore de fichiers pour ' + element_choisi + '.</i>';
@@ -4590,7 +4590,7 @@ function creer_mini_popup(titre,elements_html,nom_bouton,fonction_bouton,valeur_
 
 	var id_bouton_html = id_bouton ? "id='" + id_bouton + "'" : ""
 	//console.log({id_bouton_html})
-	var valider_changement = '<button type="button"  '+id_bouton_html+'  class="rendre" onclick="'+fonction_bouton+'">'+nom_bouton+'</button>'
+	var valider_changement = '<button type="button"  '+id_bouton_html+'  class="rendre sekooly-mode-background" onclick="'+fonction_bouton+'">'+nom_bouton+'</button>'
 
 	var mini_popup_html = '<div id="mini_popup">'+bouton_quitter+titre_html+elements_html+valider_changement+'</div>';
 
@@ -6759,7 +6759,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 
 
 		function html_boutons_fenetre(nom_fonction_actualiser, nom_fonction_ajouter, texte_aide){
-			return '<div id="entete-fenetre" style="text-align: center;"> <img alt="actualiser"  src="'+ prefixe_image + '/img_actualiser.png" onclick="'+nom_fonction_actualiser+'" id="actu_topics" style="width: 30px; cursor: pointer;"> <img alt="ajouter" src="'+ prefixe_image + '/img_ajout.png" onclick="'+nom_fonction_ajouter+'" id="nouvelle_discu" style="width: 30px; cursor: pointer;"></div><div id="entete-fenetre" style="text-align: center;color: #c1c1c1;font-size: 13px;border-bottom-width: 1px;border-bottom-style: ridge;">'+texte_aide+'</div>';
+			return '<div id="entete-fenetre" style="text-align: center;"> <img alt="actualiser"  src="'+ prefixe_image + '/img_actualiser.png" onclick="'+nom_fonction_actualiser+'" id="actu_topics" class="image-en-haut-fenetre"> <img alt="ajouter" src="'+ prefixe_image + '/img_ajout.png" onclick="'+nom_fonction_ajouter+'" id="nouvelle_discu" class="image-en-haut-fenetre"></div><div id="entete-fenetre" style="text-align: center;color: #c1c1c1;font-size: 13px;border-bottom-width: 1px;border-bottom-style: ridge;">'+texte_aide+'</div>';
 		}
 
 		function ajouter_une_discu(){
@@ -6783,7 +6783,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 			vider_fenetre("Nouvelle discussion");
 			element_DOM('maquestion').src="";
 
-			var nouveau_message = '<form id="mon_formulaire" autocomplete="off" class="edition"><label id="label" for="titre_question">Titre: </label><input type="text" id="titre_question" maxlength="50" style="width: 100%;">	<br><br><label id="label" for="contenu_question">Votre message: </label><textarea id="contenu_question" maxlength="1700" style="width: 100%;height: 70%;resize: none;font-size: 13px;"></textarea><div id="nb_max_div" style="margin-left: 90%;margin-top: 0%;font-size: 10px; display:none;"> <font id="nb_max"> 0 / 1700</font> </div><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button  class="bouton_sekooly" type="button" id="Annuler" onclick="recuperer_les_topics(false)"> Annuler </button><button  class="bouton_sekooly" type="button" id="envoi" onclick="envoyer_le_topic()"> Poster </button></div><div id="msg_erreur" style="text-align: center;padding: 1%;color: green;"> </div></form>';
+			var nouveau_message = '<form id="mon_formulaire" autocomplete="off" class="edition"><label id="label" for="titre_question">Titre: </label><input type="text" id="titre_question" maxlength="50" style="width: 100%;">	<br><br><label id="label" for="contenu_question">Votre message: </label><textarea id="contenu_question" maxlength="1700" style="width: 100%;height: 70%;resize: none;font-size: 13px;"></textarea><div id="nb_max_div" style="margin-left: 90%;margin-top: 0%;font-size: 10px; display:none;"> <font id="nb_max"> 0 / 1700</font> </div><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button  class="bouton_sekooly sekooly-mode-background" type="button" id="Annuler" onclick="recuperer_les_topics(false)"> Annuler </button><button  class="bouton_sekooly sekooly-mode-background" type="button" id="envoi" onclick="envoyer_le_topic()"> Poster </button></div><div id="msg_erreur" style="text-align: center;padding: 1%;color: green;"> </div></form>';
 
 
 			//ajouter la fenettre de nouveau message au DOM
@@ -7181,7 +7181,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 			entete.innerHTML = entete_poste;
 			element_DOM('fenetre').appendChild(entete);
 
-			var bloc_poste = '<div id="bloc_poste" style="padding: 2%;display: block;overflow-wrap: anywhere;border-bottom-style: solid;"><div class="auteur_du_poste" >' + auteur_poste +' (' + role_auteur_poste + ')</div><h id="contenu_poste" style=""> '+ contenu_poste+'</h><h style="color: #B5B3B8;" id="date_poste"> ' + date + '</h></div>';
+			var bloc_poste = '<div id="bloc_poste" style="padding: 2%;display: block;overflow-wrap: anywhere;border-bottom-style: solid;"><div class="auteur_du_poste sekooly-mode" >' + auteur_poste +' (' + role_auteur_poste + ')</div><h id="contenu_poste" style=""> '+ contenu_poste+'</h><h class="date_poste"> ' + date + '</h></div>';
 
 
 
@@ -7210,7 +7210,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 
 			if (oui){
 
-				var bloc_commenter = '<div id="bloc_commenter"><textarea id="mon_com" style="display:inline-block; width:100%; resize: unset; min-height:200px; overflow-y:hidden;" placeholder="Votre commentaire..." maxlength="1500"></textarea><button id="envoicommentaire" onclick="'+fonction_ajout_commentaire+'" style="height: 30px;background-color: #FF6C00;">'+intitule_bouton+'</button></div>';
+				var bloc_commenter = '<div id="bloc_commenter"><textarea id="mon_com" style="display:inline-block; width:100%; resize: unset; min-height:200px; overflow-y:hidden;" placeholder="Votre commentaire..." maxlength="1500"></textarea><button class="sekooly-mode-background" id="envoicommentaire" onclick="'+fonction_ajout_commentaire+'" style="height: 30px;">'+intitule_bouton+'</button></div>';
 
 				//ajouter le bloc COMMENTER dans le DOM
 				var le_bloc = document.createElement('div');
@@ -7276,7 +7276,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 
 			contenu_poste = decodage(contenu_poste);
 
-			var un_com = '<div id="'+id_com+'" class="un_commentaire"><div class="auteur_du_poste">'+ auteur_poste + ' ('+  role_auteur_poste  +')</div><h id="contenu_poste" style=""> ' + contenu_poste + '</h><h style="color: #B5B3B8;" id="date_poste"> '+ date + '</h></div>';
+			var un_com = '<div id="'+id_com+'" class="un_commentaire"><div class="auteur_du_poste sekooly-mode">'+ auteur_poste + ' ('+  role_auteur_poste  +')</div><h id="contenu_poste" style=""> ' + contenu_poste + '</h><h class="date_poste"> '+ date + '</h></div>';
 
 			//ajouter le commentaire au DOM
 			var nouveau_com = document.createElement('div');
@@ -7881,7 +7881,7 @@ function ajouter_la_notif(la_notif,index,mode_notif){
 
 	var identifiant_notif = '<b  class="sekooly-mode" >' + Identifiant_derniere_modif + ' ('+Role_derniere_modif+') </b>';
 	var contenu_notif = contenu_notification(Type_notif,la_matiere_concernee,la_classe_concernee,Identifiant_originaire,Identifiant_derniere_modif, {'Horodateur':Horodateur,'Date_derniere_modif':Date_derniere_modif},intitule_notif);
-	var intitule = ' - <i><b style="color:#c65e46">'+intitule_notif  +'</b></i>'
+	var intitule = ' - <i><b class="sekooly-mode-darker">'+intitule_notif  +'</b></i>'
 	var icone_notif = '<span> <img src=' +  choix_image(Type_notif)  + ' class="icone_notif"> </span>'
 	var date_grise = '<div> '+icone_notif+' <i style="color: #bfbfbf;"> ' + Date_derniere_modif+ '  </i></div>';
 
@@ -9358,7 +9358,7 @@ function recuperer_preferences(){
 
 
     //clic par défaut sur Images
-    $("[id='Images']").click();
+    $("[id='Couleurs']").click();
     afficher_fenetre(true)
 
 
@@ -9387,7 +9387,9 @@ function personnaliser(id_parametre){
 		</strong>
 
 		<input id="prefixe_image" class="barre_recherche" name="rechercher" value="`+mon_hebergeur+`" placeholder="Lien de votre hébergeur d'images..."><br>
-		<button class="rendre" onclick="reinitialiser_images()">Réinitialiser</button> 
+		
+
+		`+btn_prefs("reinitialiser_images()")+`
 
 
 		<p>
@@ -9407,11 +9409,72 @@ function personnaliser(id_parametre){
 
 	//si couleurs	
 	} else if(id_parametre === "Couleurs"){
-		contenu_explications = "En cours de construction."
+
+		contenu_explications = `
+
+				<form id="color-prefs">
+
+					<div class="element-pref">
+						<h2 class="au-centre sekooly-mode">Mise en valeur de texte<br>
+							<input type="color" onchange="change_couleur_texte_apres_choix(this)" value="`+ couleur_texte("sekooly-mode") +`" class="palette" name="sekooly-mode">
+						</h2>
+						
+					</div>
+
+
+					<div class="element-pref">
+						<h2 class="au-centre sekooly-mode-darker">Objet des notifications<br>
+							<input type="color" onchange="change_couleur_texte_apres_choix(this)" value="`+ couleur_texte("sekooly-mode-darker") +`" class="palette" name="sekooly-mode-darker">
+						</h2>
+						
+					</div>
+
+					<div class="element-pref">
+						<h2 class="au-centre"><button type="button" onclick="apercu_btn()" class="btn-setup sekooly-mode-background">Boutons à cliquer</button><br>
+							<h3> ASPECT
+								<input type="color" onchange="changer_fond_apres_choix(this)" value="`+ couleur_fond("sekooly-mode-background") +`" class="palette"  name="sekooly-mode-background">
+							</h3>
+							<h3> AU SURVOL
+								<input type="color" onchange="changer_fond_apres_choix(this)" value="`+ rgb2hex($(".sekooly-mode-background:hover").css("background-color")) +`" class="palette" name="sekooly-mode-background:hover, .un_menu:hover">
+							</h3>
+						</h2>
+						
+					</div>
+
+
+
+					<div class="element-pref">
+						<h2 class="au-centre">Corps de la page<br>
+							<input id="body-color" type="color" onchange="changer_fond_body_apres_choix(this)" value="`+ rgb2hex($("body").css("background-color")) +`" class="palette" name="body">
+						</h2>
+						`+night_mode_option()+
+						`					
+					</div>
+					
+
+					<div class="element-pref">
+						<h2 class="au-centre">Corps de la fenêtre<br>
+							<input id="fenetre-color" type="color" onchange="changer_fond_apres_choix(this)" value="`+ rgb2hex($("#fenetre").css("background-color")) +`" class="palette" name="ma_fenetre">
+						</h2>	
+						`
+						+night_mode_option()+
+						`				
+					</div>
+
+				</form>
+
+				`+btn_prefs("reinitialiser_couleurs()")+`
+
+
+		`
+		callback = "configurer_mode();configurer_mode()"
+
+
 
 	//si formes	
 	}else if(id_parametre === "Formes"){
 		contenu_explications = "En cours de construction."	
+
 
 		
 	}else{
@@ -9423,9 +9486,167 @@ function personnaliser(id_parametre){
 	explications_pref(conteneur, contenu_explications, callback)
 }
 
-function reinitialiser_images(conteneur){
+function night_mode_option(){
+	return `
+
+		<span class="clickable au-centre" onclick="configurer_mode()">
+			<img class="mini-image my-vision-mode" alt="🌙" src="https://raw.githubusercontent.com/Sekooly/SUPABASE/main/docs/images/img_night.png" style="">
+			Mode <span class="mode-night">nuit</span>
+		</span>	
+
+	`
+}
+
+function configurer_mode(){
+	changer_mode()
+
+	mode_night = mode_nuit_oui_final === "oui" ? "nuit" :  "jour" 
+		
+	if($(".mode-night")[0]){
+		$(".mode-night").text(mode_night)
+	}
+
+	if($("#body-color")[0]){
+		$("#body-color")[0].value = rgb2hex($("body").css("background-color"))
+	}
+
+	if($("#fenetre-color")[0]){
+		$("#fenetre-color")[0].value = rgb2hex($("#fenetre").css("background-color"))
+	}
+
+
+	if($(".my-vision-mode")[0]){
+		var mode = mode_nuit_oui_final === "oui" ? "night" :  "day" 
+		$(".my-vision-mode").attr("src","https://sekooly.com/assets/images/img_"+mode+".png")
+	}
+	
+}
+
+function btn_prefs(fonction_reinit){
+	return `
+		<div>
+			<button class="btn-setup sekooly-mode-background far" onclick="`+fonction_reinit+`">Réinitialiser</button> 
+			<button class="btn-setup sekooly-mode-background far" onclick="sauvegarder_pref()">Enregistrer</button> 
+		</div>
+	`
+}
+
+
+function apercu_btn(){
+	afficher_alerte("Ceci est l'aperçu de la couleur des boutons.")
+}
+
+function change_couleur_texte_apres_choix(ceci){
+	changer_couleur_texte(ceci.name, ceci.value)
+}
+
+function changer_fond_body_apres_choix(ceci){
+	selector = recuperer("mode_nuit_oui") === "oui" ? ".dark-mode" : "body"
+	changer_css_selector(selector,"background-color", ceci.value)
+}
+
+
+
+function changer_fond_apres_choix(ceci){
+	changer_fond(ceci.name, ceci.value)
+}
+
+
+function changer_couleur_texte(className, valeur_couleur){
+	changer_css_selector("." + className,"color",valeur_couleur)
+	
+}
+
+function changer_fond(className, valeur_couleur){
+	changer_css_selector("." + className,"background-color",valeur_couleur)
+}
+
+function changer_css_selector(selector,label_selector,value_selector){
+	//$(selector).css(label_selector,value_selector)
+
+	css_actuel = element_DOM("custom-css").innerText
+	//console.log({css_actuel})
+
+	juste_selector =  selector + "{"
+	selector_label = juste_selector + label_selector
+	var a_ajouter = selector_label + ":" + value_selector + "}"	
+	//console.log({a_ajouter})
+
+	//si le 'selector{' existe déjà
+	selector_existant = css_actuel.split("}").find(e => e.includes(juste_selector))
+	//console.log({selector_existant})
+
+	//si selector_label existe déjà
+	selector_label_existant = css_actuel.split("}").find(e => e.includes(selector_label))
+	//console.log({selector_label_existant})
+
+
+	//le selector ET le selector_label n'existent pas
+	if(!selector_existant && !selector_label_existant){
+		element_DOM("custom-css").innerText += a_ajouter
+	}else{
+
+		avant = element_DOM("custom-css").innerText 
+			
+		//selector label existant: remplacer
+		if(selector_label_existant){
+
+			//alert("selector_label_existant")	
+			apres = avant.replaceAll(selector_label_existant + "}", a_ajouter)
+			element_DOM("custom-css").innerText = apres
+
+		//selector existant SEULEMENT: ajouter
+		}else  if(selector_existant){
+
+			//alert("selector_existant")
+			alert("Encore en cours de construction.")
+			apres = avant.replaceAll(selector_existant, selector_label + ":" + value_selector + ";"	)
+			element_DOM("custom-css").innerText = apres
+
+
+
+		}
+
+		
+		
+
+	}
+
+
+	//mettre dans data_etablissement
+	data_etablissement['preferences']['couleurs'] = element_DOM("custom-css").innerText
+	//console.log(data_etablissement.preferences.couleurs)	
+
+
+}
+
+function reinitialiser_couleurs(){
+
+	var confirmation = element_DOM("custom-css").innerText.length === 0 || confirm("⚠️ Voulez-vous vraiment remettre les couleurs par défaut ?")
+	if(!confirmation) return afficher_alerte("Réinitialisation des couleurs annulée.")
+
+	element_DOM("custom-css").innerText = ""
+	
+	if(data_etablissement.preferences.couleurs){
+		delete data_etablissement.preferences.couleurs	
+	} 
+	
+	
+
+	$("#explications").remove()
+	$("#Couleurs").click()
+
+}
+
+function reinitialiser_images(){
+
+
+	var confirmation = element_DOM("prefixe_image").value.length === 0 || confirm("⚠️ Voulez-vous vraiment remettre les images par défaut ?")
+	if(!confirmation) return afficher_alerte("Réinitialisation d'images annulée.")	
+
 	element_DOM("prefixe_image").value = ""
 	maj_liste_images_pref($("#previsualisation"), hebergeur_defaut())
+	sauvegarder_pref()
 }
 
 
@@ -9654,7 +9875,7 @@ function appliquer_preferences(){
 		//actualiser les couleurs
 		appliquer_couleurs()
 		//actualiser les formes
-		appliquer_couleurs()
+		appliquer_formes()
 	}
 
 
@@ -9763,11 +9984,14 @@ function appliquer_images(){
 
 
 function appliquer_couleurs(){
-	//console.log("TODO...")
+	if(data_etablissement['preferences']['couleurs']){
+		//console.log(data_etablissement['preferences']['couleurs'])
+		element_DOM("custom-css").innerText = data_etablissement['preferences']['couleurs']
+	}
 }
 
 
-function appliquer_couleurs(){
+function appliquer_formes(){
 	//console.log("TODO...")
 }
 
@@ -10049,7 +10273,7 @@ function mettre_en_forme_onglet_clicked(id_onglet){
 		//on met en orange l'onglet choisi
 		if(id_onglet_courant===id_onglet){
 			//console.log(id_onglet_courant + " = id_onglet")
-			$('[id="' + id_onglet_courant + '"]')[0].className = "un_menu un_menu_orange"
+			$('[id="' + id_onglet_courant + '"]')[0].className = "un_menu un_menu_orange sekooly-mode-background"
 		}else{
 			//console.log("id_onglet_courant <> id_onglet")
 			$('[id="' + id_onglet_courant + '"]')[0].className = "un_menu"
@@ -10937,7 +11161,7 @@ function json2Table(json, id_table) {
 
   //Map over columns, make headers,join into string
   let headerRow = cols
-    .map(col => `<th id="${col}" oncontextmenu="afficher_clic_droit_param(this)" class="header_table entete_sticky">${col}</th>`)
+    .map(col => `<th id="${col}" oncontextmenu="afficher_clic_droit_param(this)" class="header_table entete_sticky sekooly-mode-background">${col}</th>`)
     .join("");
 
   //map over array of json objs, for each row(obj) map over column values,
@@ -11222,7 +11446,7 @@ function formulaire_choix_checkbox(nom_champ, e, ancienne_valeur, identifiant, l
 
 	}
 
-	var bouton_assigner = '</div></div><button type="button" class="rendre" id="assigner">Assigner</button></div>'
+	var bouton_assigner = '</div></div><button type="button" class="rendre sekooly-mode-background" id="assigner">Assigner</button></div>'
 	var html_final = entetes + titre_formulaire + les_elements  + bouton_assigner
 
 	$("body").append(html_final)
@@ -11505,7 +11729,7 @@ function telecharger_donnees_parametres(id_parametre){
 	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<div>Télécharger '+id_parametre+'</div><select style="width: 80%;" id="choix_download_param">'
 	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<option value="En-têtes">En-têtes</option>'
 	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<option value="Tout">Toutes les données</option></select>'
-	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<button type="button" class="rendre" onclick="telecharger_parametre()">Télécharger</button></div>'
+	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<button type="button" class="rendre sekooly-mode-background" onclick="telecharger_parametre()">Télécharger</button></div>'
 
 	$("#mini_popup").remove()
 	$("body").append(choix_entete_ou_tout_html)
@@ -11706,16 +11930,6 @@ function init_donnees(){
 
 function recuperer_entetes_params(id_parametre){
 
-	/*
-	if(!id_parametre) id_parametre = $(".un_menu_orange")[0].id
-	var liste_champs = []
-
-	for (var i = 0 ; i < $(".header_table.entete_sticky").length ; i++){
-		liste_champs.push($(".header_table.entete_sticky")[i].innerText)
-	}
-
-	return liste_champs*/
-
 	return nom_des_champs(id_parametre)
 
 }
@@ -11826,8 +12040,8 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 		}
 	}
 
-	var boutons_ajouter_annuler = '</form><button type="button" class="rendre" onclick="ajouter_donnees_saisies(\''+id_parametre+'\')">Ajouter</button>'
-	boutons_ajouter_annuler = boutons_ajouter_annuler + '<button type="button" class="rendre" onclick="$(\'#mini_popup\').remove()">Annuler</button></div>'
+	var boutons_ajouter_annuler = '</form><button type="button" class="rendre sekooly-mode-background" onclick="ajouter_donnees_saisies(\''+id_parametre+'\')">Ajouter</button>'
+	boutons_ajouter_annuler = boutons_ajouter_annuler + '<button type="button" class="rendre sekooly-mode-background" onclick="$(\'#mini_popup\').remove()">Annuler</button></div>'
 	boutons_ajouter_annuler = boutons_ajouter_annuler
 
 
@@ -12302,7 +12516,7 @@ function consulter(){
 /*NON UTILE*/
 function choisir_clic_bulletin(){
 
-	popup_choix = '<div id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Que voulez-vous faire?</div><select style="width: 80%;" id="choix_bulletin"><option value="upload">Mettre en ligne les bulletins</option><option value="voir">Voir les bulletins en ligne</option></select><button type="button" class="rendre" onclick="choix_bulletin_ok()">Valider</button></div>'
+	popup_choix = '<div id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Que voulez-vous faire?</div><select style="width: 80%;" id="choix_bulletin"><option value="upload">Mettre en ligne les bulletins</option><option value="voir">Voir les bulletins en ligne</option></select><button type="button" class="rendre sekooly-mode-background" onclick="choix_bulletin_ok()">Valider</button></div>'
 	$('body').append(popup_choix) 
 }
 
@@ -12546,7 +12760,7 @@ function initialisation_de_la_plateforme(){
 
 	contenu = "Bonjour <span  class='sekooly-mode' > "+recuperer('identifiant_courant').toUpperCase()+ "</span>, et bienvenue sur la plateforme de télé-enseignement Sekooly!<br><br>"
 	contenu += "Pour mettre en route la plateforme de l'établissement <b>" + nom_etablissement.toUpperCase() + "</b>, nous aurons besoin de quelques informations supplémentaires.<br><br><rouge>Toutes les informations que vous allez saisir seront modifiables plus tard.</rouge><br>"
-	bouton = "<button onclick='suivant()' id='bouton_suivant' class='mon_bouton' style='height: 50px;font-size: inherit;'>C'est parti!</button>"
+	bouton = "<button onclick='suivant()' id='bouton_suivant' class='mon_bouton sekooly-mode-background' style='height: 50px;font-size: inherit;'>C'est parti!</button>"
 	
 	conteneur_texte_html = '<div class="init" style="overflow: hidden auto;height: 90%;padding: 2%;text-align: center;font-size: 150%;"><div id="contenu_etape">'+contenu+'</div>'+bouton+'</div>'
 	conteneur_texte = document.createElement('div')
@@ -13397,7 +13611,7 @@ function creer_element_journee(nom_matiere,nom_fichier,date_reference,heure_refe
 
 
 	affichage_date = date_heure_ensemble ? afficher_date(date_reference) : afficher_date(date_reference,true) + heure_reference
-	return '<div class="contenu_section_journee"><b class="nom_matiere_journee">'+nom_matiere+"</b> "+nom_fichier+'<i style="color: #bfbfbf;"> '+affichage_date+' </i><span class="mini-image deja_traite">'+coche_traitement+'</span> <img id="'+champ_id+'" src="'+ prefixe_image + '/img_previz.png" alt="voir" onclick="clic_de_notif(\''+type_notif+'\',\''+champ_id+'\',\''+id_classe_matiere+'\');" class="mini-image"></div>'
+	return '<div class="contenu_section_journee"><b class="nom_matiere_journee sekooly-mode">'+nom_matiere+"</b> "+nom_fichier+'<i style="color: #bfbfbf;"> '+affichage_date+' </i><span class="mini-image deja_traite">'+coche_traitement+'</span> <img id="'+champ_id+'" src="'+ prefixe_image + '/img_previz.png" alt="voir" onclick="clic_de_notif(\''+type_notif+'\',\''+champ_id+'\',\''+id_classe_matiere+'\');" class="mini-image"></div>'
 }
 
 
@@ -14287,7 +14501,7 @@ function render_ces_pages(canvasContainer,url,numeros_pages){
 
 							$("#choix_pages_pdf").remove()
 							//console.log(numeros_pages.toString())
-							var boutons_valider_ou_annuler = '<div id="choix_pages_pdf" style="text-align: center;" class=""><rouge>Voici les pages que vous avez choisies. Voulez-vous valider ou annuler?</rouge><button class="mon_bouton" onclick="annuler_mon_choix()">Annuler</button><button class="mon_bouton" onclick="choisir_ces_pages(\''+numeros_pages.toString()+'\')">Valider</button></div>'
+							var boutons_valider_ou_annuler = '<div id="choix_pages_pdf" style="text-align: center;" class=""><rouge>Voici les pages que vous avez choisies. Voulez-vous valider ou annuler?</rouge><button class="mon_bouton sekooly-mode-background" onclick="annuler_mon_choix()">Annuler</button><button class="mon_bouton sekooly-mode-background" onclick="choisir_ces_pages(\''+numeros_pages.toString()+'\')">Valider</button></div>'
 							$("#fenetre").append(boutons_valider_ou_annuler)
 
 		    				chargement(false)
@@ -14942,13 +15156,13 @@ function recuperer_tous_les_msgs(id_conv, forcing){
 
 
 function zone_envoi(id_conv){
-	return '<div id="nouveau_msg_convo"><textarea id="Message" name="Message" placeholder="Ecrivez votre message..."></textarea><button class="bouton_envoi" onclick="envoyer_mon_message(\''+id_conv+'\')"><img alt="Envoyer" class="pp" src="'+ prefixe_image + '/img_send.png" style="width: 30px;height: 30px;filter: invert(1);"></button></div>'
+	return '<div id="nouveau_msg_convo"><textarea id="Message" name="Message" placeholder="Ecrivez votre message..."></textarea><button class="bouton_envoi sekooly-mode-background" onclick="envoyer_mon_message(\''+id_conv+'\')"><img alt="Envoyer" class="pp" src="'+ prefixe_image + '/img_send.png" style="width: 30px;height: 30px;filter: invert(1);"></button></div>'
 }
 
 function afficher_msg_conversation(le_msg){
 	la_className = "un_msg " + (le_msg['Expediteur'] === recuperer('identifiant_courant') ? "msg_envoye" : "msg_recu")	
 	Expediteur = le_msg['Expediteur'] === recuperer('identifiant_courant') ? "MOI-MÊME" :  le_msg['Expediteur'].toUpperCase()
-	return '<div class="'+la_className+'" id="'+le_msg['id_msg']+'"><div class="auteur_du_poste">'+Expediteur+'</div><h id="contenu_poste"><p data-placeholder="Votre commentaire...">'+le_msg['Message']+'</p></h><h id="date_poste">'+ afficher_date(le_msg['Horodateur']) +'</h></div>'
+	return '<div class="'+la_className+'" id="'+le_msg['id_msg']+'"><div class="auteur_du_poste sekooly-mode">'+Expediteur+'</div><h id="contenu_poste"><p data-placeholder="Votre commentaire...">'+le_msg['Message']+'</p></h><h class="date_poste">'+ afficher_date(le_msg['Horodateur']) +'</h></div>'
 }
 
 
@@ -14999,7 +15213,7 @@ function ajouter_un_tout_nouveau_msg(){
 	vider_fenetre("Nouveau message");
 	element_DOM('maquestion').src="";
 
-	var nouveau_message = '<div id="mon_formulaire" autocomplete="off" class="edition"><label id="label" for="Destinataire">Destinataire: </label><div id="div_autocompletion" class="autocompletion"> <input placeholder="Tapez pour chercher le destinataire..." autocomplete="on" onkeyup="validation_par_touche(event)" oninput="faire_autocompletion_input(this,\'Destinataire\')" type="text" name="Destinataire" id="Destinataire" maxlength="50" style="width: 100%;"></div><br><br><label id="label" for="Message">Votre message: </label><textarea id="Message" name="Message" placeholder="Saisissez votre message..." maxlength="1700" style="width: 100%;height: 70%;resize: none;font-size: 13px;"></textarea><div id="nb_max_div" style="margin-left: 90%;margin-top: 0%;font-size: 10px; display:none;"> <font id="nb_max"> 0 / 1700</font> </div><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button class="bouton_sekooly" type="button" id="Annuler" onclick="recuperer_msgs(false)"> Annuler </button><button class="bouton_sekooly" type="button" id="envoi" onclick="envoyer_mon_message()"> Envoyer le message </button></div><div id="msg_erreur" style="text-align: center;padding: 1%;color: green;"> </div></div>';
+	var nouveau_message = '<div id="mon_formulaire" autocomplete="off" class="edition"><label id="label" for="Destinataire">Destinataire: </label><div id="div_autocompletion" class="autocompletion"> <input placeholder="Tapez pour chercher le destinataire..." autocomplete="on" onkeyup="validation_par_touche(event)" oninput="faire_autocompletion_input(this,\'Destinataire\')" type="text" name="Destinataire" id="Destinataire" maxlength="50" style="width: 100%;"></div><br><br><label id="label" for="Message">Votre message: </label><textarea id="Message" name="Message" placeholder="Saisissez votre message..." maxlength="1700" style="width: 100%;height: 70%;resize: none;font-size: 13px;"></textarea><div id="nb_max_div" style="margin-left: 90%;margin-top: 0%;font-size: 10px; display:none;"> <font id="nb_max"> 0 / 1700</font> </div><div id="mes_boutons" style="text-align: center;padding: 1%;display: block ruby;"><button class="bouton_sekooly sekooly-mode-background" type="button" id="Annuler" onclick="recuperer_msgs(false)"> Annuler </button><button class="bouton_sekooly sekooly-mode-background" type="button" id="envoi" onclick="envoyer_mon_message()"> Envoyer le message </button></div><div id="msg_erreur" style="text-align: center;padding: 1%;color: green;"> </div></div>';
 
 	//ajouter la fenettre de nouveau message au DOM
 	var mon_message = document.createElement('span');
@@ -15258,7 +15472,7 @@ function maj_matiere(){
 	//si non eleve -> ajout/modifier/supprimer possible
 	if(!je_suis_eleve){			
 		boutons_update_programme =  liste_statuts(je_suis_eleve) + bouton_renommer_chapitre() +  bouton_supprimer_chapitre()
-		bouton_ajouter_nouveau_chapitre = '<div class="conteneur_bouton_ajout_chapitre"><button onclick="ajouter_un_chapitre()" class="bouton_ajout_chapitre">Ajouter un chapitre</button></div>'
+		bouton_ajouter_nouveau_chapitre = '<img class="conteneur_bouton_ajout_chapitre image-en-haut-fenetre" onclick="ajouter_un_chapitre()" src="'+prefixe_image+'/img_ajout.png">'
 	}else{
 		boutons_update_programme = ""
 		bouton_ajouter_nouveau_chapitre = ""
@@ -15286,7 +15500,7 @@ function maj_matiere(){
 
 
 			//boutons_update_programme = boutons_update_programme.replaceAll("#valeur_de_letat#",un_chapitre['etat'])
-			$("#programme_scolaire").append('<div class="un_chapitre" id="'+un_chapitre['id_chapitre']+'"><!--<span class="titre_chapitre position_chapitre" id="position_chapitre">'+un_chapitre["position_chapitre"]+') </span>--><span class="titre_chapitre" id="'+un_chapitre['id_chapitre']+'">'+un_chapitre['intitule_chapitre'] +'</span>'+'<br>'+ boutons_update_programme + date_fin_chapitre + "</div>" )			
+			$("#programme_scolaire").append('<div class="un_chapitre" id="'+un_chapitre['id_chapitre']+'"><!--<span class="titre_chapitre sekooly-mode position_chapitre " id="position_chapitre">'+un_chapitre["position_chapitre"]+') </span>--><span class="titre_chapitre sekooly-mode" id="'+un_chapitre['id_chapitre']+'">'+un_chapitre['intitule_chapitre'] +'</span>'+'<br>'+ boutons_update_programme + date_fin_chapitre + "</div>" )			
 			
 			//assigner la valeur par du select (si NON élève)
 			if(!je_suis_eleve){				
@@ -15333,7 +15547,7 @@ function maj_matiere(){
 	
 
 	if(bouton_ajouter_nouveau_chapitre){
-		$("#fenetre").append(bouton_ajouter_nouveau_chapitre)
+		$("#menu_programme").append(bouton_ajouter_nouveau_chapitre)
 		//$("#fenetre")[0].style.textAlign = "center"
 	}
 
@@ -15506,7 +15720,7 @@ function choisir_ce_mode(ceci){
 		$("#" + id_mode)[0].style.display = ""
 		$("#" + id_autre_mode)[0].style.display = "none"
 
-		ceci.className = "mode_affichage_fichiers mode_choisi"
+		ceci.className = "mode_affichage_fichiers sekooly-mode-background"
 		masquer_config_mode()
 
 		//enregistrer la préférence
@@ -15778,19 +15992,19 @@ function afficher_avis(mon_avis){
 
 
 function un_element_avis(titre_element,valeur_element,id_element){
-	return '<div><b class="titre_chapitre">'+titre_element+':</b><div class="element_avis" id="'+id_element+'">'+valeur_element + '</div></div>'
+	return '<div><b class="titre_chapitre sekooly-mode">'+titre_element+':</b><div class="element_avis" id="'+id_element+'">'+valeur_element + '</div></div>'
 }
 
 function formulaire_avis(){
 	return `<div id="nouvel_avis"><br>		
-		<p>Nous serions honorés de <span class="titre_chapitre">connaître en détails</span> ce qui vous plaît! (et même ce qui vous plaît moins 😉)</p>
+		<p>Nous serions honorés de <span class="titre_chapitre sekooly-mode">connaître en détails</span> ce qui vous plaît! (et même ce qui vous plaît moins 😉)</p>
 		<form onsubmit="event.preventDefault();" id="avis">
 			<div>Note globale pour Sekooly (sur 5):`+liste_notes_possibles()+`</div>
 			<div>`+avis_good()+`:<textarea id="commentaire" class="texte_avis"></textarea></div>
 			<div>`+avis_bad()+`:<textarea id="ameliorations" class="texte_avis"></textarea></div>
 		</form>
 		<div>
-			<label for="cgu_avis"><input onchange="accepter_cgu_avis()" id="cgu_avis" type="checkbox" checked>J'accepte les <a class="titre_chapitre" onclick="alert(CGU_avis(event))">Conditions d'Utilisation</a> du système d'avis de la plateforme.</label>
+			<label for="cgu_avis"><input onchange="accepter_cgu_avis()" id="cgu_avis" type="checkbox" checked>J'accepte les <a class="titre_chapitre sekooly-mode" onclick="alert(CGU_avis(event))">Conditions d'Utilisation</a> du système d'avis de la plateforme.</label>
 		</div>
 		</div>
 		`
@@ -16861,8 +17075,8 @@ function initialiser_fenetre_quiz(preview_mode, nb_questions){
 	$('#fenetre').append('<div class="setup" id="setup"></div>')
 	$('#setup').append('<div id="contenu_etape_quiz"></div>')
 	$('#setup').append('<div id="btn-quiz"></div>')
-	$('#btn-quiz').append('<button onclick="'+fonction_precedent+'" id="btn-previous" class="btn-setup">Précédent</button>')
-	$('#btn-quiz').append('<button onclick="'+fonction_suivant+'" id="bouton_suivant" class="btn-setup">Suivant</button>')
+	$('#btn-quiz').append('<button onclick="'+fonction_precedent+'" id="btn-previous" class="btn-setup sekooly-mode-background">Précédent</button>')
+	$('#btn-quiz').append('<button onclick="'+fonction_suivant+'" id="bouton_suivant" class="btn-setup sekooly-mode-background">Suivant</button>')
 	$('#btn-quiz').append('<div id="remarque-quiz"></div>')
 
 
@@ -17535,8 +17749,8 @@ async function get_nth_question(position_question,nb_questions){
 
 
 	$("#contenu_etape_quiz").removeClass("resp_zone")
-	$("span").removeClass("current-qst")
-	if($("a[ref='"+position_question+"']")[0]) $("a[ref='"+position_question+"']")[0].children[0].className = "current-qst"
+	$("span").removeClass("sekooly-mode")
+	if($("a[ref='"+position_question+"']")[0]) $("a[ref='"+position_question+"']")[0].children[0].className = "sekooly-mode"
 
 
 

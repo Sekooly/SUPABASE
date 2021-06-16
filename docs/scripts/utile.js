@@ -1219,10 +1219,12 @@ function changer_mode(sans_changer){
   $("body")[0].className = classe_finale_body
 
 
+  var mode = mode_nuit_oui_final === "oui" ? "night" :  "day" 
   if($("#mode")[0]){
-    var mode = mode_nuit_oui_final === "oui" ? "night" :  "day" 
-    $("#mode")[0].src = "https://raw.githubusercontent.com/Sekooly/SUPABASE/main/docs/images/img_"+mode+".png"
+    $("#mode")[0].src = "https://sekooly.com/assets/images/img_"+mode+".png"
   }
+
+
 
 }
 
@@ -1621,4 +1623,58 @@ function hebergeur_defaut(){
 
 function hebergeur_actuel(forcing_avec_str){
   return prefixe_image === hebergeur_defaut() ? (forcing_avec_str ? hebergeur_defaut() : "") : prefixe_image
+}
+
+
+function rgb2hex(rgb) {
+  if (rgb === "rgba(0, 0, 0, 0)") {
+    return '#FFFFFF'; //default color
+  }
+  //console.log(rgb)
+  if(!rgb) return '#FFFFFF'
+
+  return `#${rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/).slice(1).map(n => parseInt(n, 10).toString(16).padStart(2, '0')).join('')}`
+} 
+
+function couleur_texte(noms_classes,juste_un_selector){
+
+  type_tmp = juste_un_selector ? noms_classes : "h1"
+  class_tmp = juste_un_selector ? "" : noms_classes + " tmp"
+
+  //create a h1 element
+  tmp = document.createElement(type_tmp)
+  tmp.id = "tmp_color"
+  tmp.className = class_tmp
+  //console.log({noms_classes})
+
+  $("body").append(tmp)
+
+  rgb = $(noms_classes.split(" ").map(e => (juste_un_selector ? "" : ".") +e) + ".tmp").css("color")
+  //console.log({rgb})
+
+  $("#"+tmp.id).remove()
+
+  return rgb2hex(rgb) 
+}
+
+
+function couleur_fond(noms_classes,juste_un_selector){
+
+  type_tmp = juste_un_selector ? noms_classes : "h1"
+  class_tmp = juste_un_selector ? "" : noms_classes + " tmp"
+
+  //create a h1 element
+  tmp = document.createElement(type_tmp)
+  tmp.id = "tmp_color"
+  tmp.className = class_tmp
+  //console.log({noms_classes})
+
+  $("body").append(tmp)
+
+  rgb = $(noms_classes.split(" ").map(e => (juste_un_selector ? "" : ".") +e) + ".tmp").css("background-color")
+  //console.log({rgb})
+
+  $("#"+tmp.id).remove()
+
+  return rgb2hex(rgb) 
 }
