@@ -9447,7 +9447,7 @@ function personnaliser(id_parametre){
 					</div>
 
 					<div class="element-pref">
-						<h2 class="au-centre"><button type="button" onclick="apercu_btn()" class="btn-setup sekooly-mode-background">Boutons à cliquer</button><br>
+						<h2 class="au-centre"><button type="button" onclick="apercu_btn()" class="btn-setup sekooly-mode-background">Bouton</button><br>
 							<h3> ASPECT
 								<input type="color" onchange="changer_fond_apres_choix(this)" value="`+ couleur_fond("sekooly-mode-background") +`" class="palette"  name="sekooly-mode-background">
 							</h3>
