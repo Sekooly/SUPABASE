@@ -249,9 +249,9 @@ function recuperer_details_plateforme(identifiant_eleve){
 function dupliquer_visualisation(identifiant_eleve){
 	var fenetre_bis_html = '<div class="ma_fenetre" id="fenetre_bis" style="visibility: visible; opacity:95%; top: 0px; left: 0px; width: 99%; height: 99%;"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev_bis" onclick="quitter_previsualisation_bis()" style="width: 30px; height: 30px; cursor: pointer; position: fixed; z-index: 3; top: 0px; left: 673px;"></div><div class="titre_fenetre" id="titre_fenetre_bis">Détails sur ' + identifiant_eleve + '</div><div class="fullscreen-btn" id="conteneur_plein_ecran_bis"> <img alt="plein écran" style="position: fixed;" id="pleinecran_bis" src="'+ prefixe_image + '/img_petitecran.png" onclick="switch_mode_bis()" class="pleinecran"> </div></div>';
 
-		//on rajoute tout
-		var fenetre_bis = document.createElement('div');
-		fenetre_bis.innerHTML = fenetre_bis_html
+	//on rajoute tout
+	var fenetre_bis = document.createElement('div');
+	fenetre_bis.innerHTML = fenetre_bis_html
 
 	while(fenetre_bis.firstChild) {
 	    document.body.appendChild(fenetre_bis.firstChild);
@@ -5174,6 +5174,20 @@ function switch_mode(forcing){
 
 	if(!element_DOM('pleinecran')) return -1;
 
+	mode_petitecran = $("[src$='img_petitecran.png']").length === 0
+	if(mode_petitecran && !forcing){
+		element_DOM('pleinecran').src = prefixe_image + "/img_petitecran.png";
+		$("#fenetre").addClass("big-window")
+		//console.log("on a agrandi")
+	}else{		
+		element_DOM('pleinecran').src = prefixe_image + "/img_pleinecran.png";
+		$("#fenetre").removeClass("big-window")	
+		//console.log("on a retréci")
+	}
+	
+
+	/*
+
 	var est_plein_ecran = (element_DOM('pleinecran').src.includes(prefixe_image + "/img_pleinecran.png"));
 
 	//console.log('est_plein_ecran: ' + est_plein_ecran);
@@ -5206,6 +5220,9 @@ function switch_mode(forcing){
 	ajuster_boutons_fenetre();
 	choisir_height_viz_si_pdf();
 
+	*/
+
+	choisir_height_viz_si_pdf();
 
 }
 
@@ -9454,7 +9471,7 @@ function personnaliser(id_parametre){
 
 					<div class="element-pref">
 						<h2 class="au-centre">Corps de la fenêtre<br>
-							<input id="fenetre-color" type="color" onchange="changer_fond_apres_choix(this)" value="`+ rgb2hex($("#fenetre").css("background-color")) +`" class="palette" name="ma_fenetre">
+							<input id="fenetre-color" type="color" onchange="changer_fond_fenetre_apres_choix(this)" value="`+ rgb2hex($("#fenetre").css("background-color")) +`" class="palette" name="ma_fenetre">
 						</h2>	
 						`
 						+night_mode_option()+
@@ -9467,6 +9484,8 @@ function personnaliser(id_parametre){
 
 
 		`
+
+		//garder le mode actuel -> 2 fois
 		callback = "configurer_mode();configurer_mode()"
 
 
@@ -9498,27 +9517,40 @@ function night_mode_option(){
 }
 
 function configurer_mode(){
+	//si on est INITIALEMENT en mode jour -> on change en mode nuit
+	//configurer tous les éléments qui sont configurables en mode nuit
+	
+	//couleur dans la palette
+	$('[class="clickable au-centre"]').siblings("h2").children("input").attr( "name", function( i, val ) {
+		if(mode_nuit_oui_final === "non"){
+			return "darkmode-" + val;
+		}else if(mode_nuit_oui_final === "oui"){
+			return val.split("darkmode-")[1];
+		}
+		
+	})
+
+	
 	changer_mode()
 
-	mode_night = mode_nuit_oui_final === "oui" ? "nuit" :  "jour" 
-		
-	if($(".mode-night")[0]){
-		$(".mode-night").text(mode_night)
-	}
+	var est_nuit = mode_nuit_oui_final === "oui" 
+	mode_night = est_nuit ? "nuit" :  "jour" 
+	
+	actualiser_class_apres_changement_mode(est_nuit,"ma_fenetre")
 
-	if($("#body-color")[0]){
-		$("#body-color")[0].value = rgb2hex($("body").css("background-color"))
-	}
+	
+	$(".mode-night").text(mode_night)
 
-	if($("#fenetre-color")[0]){
-		$("#fenetre-color")[0].value = rgb2hex($("#fenetre").css("background-color"))
-	}
+	$("#body-color")[0].value = rgb2hex($("body").css("background-color"))
+
+	$("#fenetre-color")[0].value = rgb2hex($("#fenetre").css("background-color"))
+	
+	var mode = est_nuit ? "night" :  "day" 
+	$(".my-vision-mode").attr("src","https://sekooly.com/assets/images/img_"+mode+".png")
 
 
-	if($(".my-vision-mode")[0]){
-		var mode = mode_nuit_oui_final === "oui" ? "night" :  "day" 
-		$(".my-vision-mode").attr("src","https://sekooly.com/assets/images/img_"+mode+".png")
-	}
+
+
 	
 }
 
@@ -9546,6 +9578,44 @@ function changer_fond_body_apres_choix(ceci){
 }
 
 
+function changer_fond_fenetre_apres_choix(ceci){
+	//console.log({"nom du input": ceci.name})
+
+	est_mode_nuit = mode_nuit_oui_final === "oui"	
+	//console.log({est_mode_nuit})
+
+	class_finale_nuit = ceci.name
+	//console.log({class_finale_nuit})
+
+	selector = est_mode_nuit ? "." + class_finale_nuit : "." + ceci.name
+	//console.log({selector})
+
+	importance = est_mode_nuit ?  " !important " : ""
+	//console.log({importance})
+
+	changer_css_selector(selector,"background-color", ceci.value, importance)
+	actualiser_class_apres_changement_mode(est_mode_nuit,ceci.name)
+
+
+}
+
+function actualiser_class_apres_changement_mode(est_mode_nuit,className){
+	class_initiale = className.replaceAll("darkmode-","")
+	//console.log({class_initiale})
+
+	classe_a_enlever = "darkmode-" + class_initiale
+
+	selector_changement = "[class*='"+class_initiale+"']"
+	//console.log({selector_changement})
+	if(est_mode_nuit){
+		//console.log({"ajouter":classe_a_enlever})
+		$(selector_changement).addClass(classe_a_enlever)
+	}else{
+		//console.log({"enlever":classe_a_enlever})
+		$(selector_changement).removeClass(classe_a_enlever)
+	}
+}
+
 
 function changer_fond_apres_choix(ceci){
 	changer_fond(ceci.name, ceci.value)
@@ -9561,7 +9631,7 @@ function changer_fond(className, valeur_couleur){
 	changer_css_selector("." + className,"background-color",valeur_couleur)
 }
 
-function changer_css_selector(selector,label_selector,value_selector){
+function changer_css_selector(selector,label_selector,value_selector, importance){
 	//$(selector).css(label_selector,value_selector)
 
 	css_actuel = element_DOM("custom-css").innerText
@@ -9569,7 +9639,7 @@ function changer_css_selector(selector,label_selector,value_selector){
 
 	juste_selector =  selector + "{"
 	selector_label = juste_selector + label_selector
-	var a_ajouter = selector_label + ":" + value_selector + "}"	
+	var a_ajouter = selector_label + ":" + value_selector + (importance || "") + "}"	
 	//console.log({a_ajouter})
 
 	//si le 'selector{' existe déjà
@@ -9982,13 +10052,6 @@ function appliquer_images(){
 
 }
 
-
-function appliquer_couleurs(){
-	if(data_etablissement['preferences']['couleurs']){
-		//console.log(data_etablissement['preferences']['couleurs'])
-		element_DOM("custom-css").innerText = data_etablissement['preferences']['couleurs']
-	}
-}
 
 
 function appliquer_formes(){
@@ -15034,7 +15097,7 @@ function ajouter_msg(liste_des_msgs,ma_liste,valeur){
 	var img_pp = ma_photo(titre.toLowerCase(), true) //pas de modifs de la pp
 
 	var span_nb_non_lus = nb_non_lus > 0 ? '<div class="msg_non_lu">'+nb_non_lus+'</div>' : ""
-	var dans_fenetre_str = '<ul class="bloc_msg" onclick="clic_de_msg(this.id)" id="' + id_topic + '"> '+ img_pp + '<span id="details_conv">' + icone_poubelle + ' <p id="' + id_topic + '" style="font-size: 25px; margin:0px;"> <b class="contenu_question" id="' + id_topic + '"> '  + titre +'  </b> <p id="' + id_topic + '" class="contenu_question"> ' + contenu + '</p><i class="petite_ecriture"> <h id="' + id_topic + '"><u id="' + id_topic + '"> Nombre de messages</u>: <u class="nb_com_actuel" id="' + id_topic + '">' + nb_coms + '</u> </h> <h id="' + id_topic + '">  &emsp; <u id="' + id_topic + '"> Dernier message le</u>: ' + date + ' </h><h id="' + id_topic + '"></h></i></span> '+span_nb_non_lus+' </ul>';
+	var dans_fenetre_str = '<ul class="bloc_msg" onclick="clic_de_msg(this.id)" id="' + id_topic + '"> '+ img_pp + '<span id="details_conv">' + icone_poubelle + ' <p id="' + id_topic + '" style="font-size: 25px; margin:0px;"> <b class="contenu_question sekooly-mode" id="' + id_topic + '"> '  + titre +'  </b> <p id="' + id_topic + '" class="contenu_question"> ' + contenu + '</p><i class="petite_ecriture"> <h id="' + id_topic + '"><u id="' + id_topic + '"> Nombre de messages</u>: <u class="nb_com_actuel" id="' + id_topic + '">' + nb_coms + '</u> </h> <h id="' + id_topic + '">  &emsp; <u id="' + id_topic + '"> Dernier message le</u>: ' + date + ' </h><h id="' + id_topic + '"></h></i></span> '+span_nb_non_lus+' </ul>';
 	
 	//console.log("dans_fenetre: " + dans_fenetre_str)
 	
@@ -15089,7 +15152,7 @@ function recuperer_tous_les_msgs(id_conv, forcing){
 	}
 	
 
-	var entete_convo = '<span id="entete_convo"><img id="<<" class="retour_msgs" src="'+ prefixe_image + '/img_retour.png" onclick="recuperer_msgs(true)"> <img class="retour_msgs" src="'+src_pp+'"><div id="Destinataire" class="titre_du_poste">'+nom_destinataire+'</div></span>';
+	var entete_convo = '<span id="entete_convo"><img id="<<" class="retour_msgs" src="'+ prefixe_image + '/img_retour.png" onclick="recuperer_msgs(true)"> <img class="retour_msgs" src="'+src_pp+'"><div id="Destinataire" class="titre_du_poste sekooly-mode">'+nom_destinataire+'</div></span>';
 	//console.log(entete_convo)
 
 	$("#div_liste_msgs").remove()

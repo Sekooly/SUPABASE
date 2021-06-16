@@ -10,15 +10,19 @@ $(window).on('load',function() {
 
 		w =  element_DOM(element_name).naturalWidth
 		h =  element_DOM(element_name).naturalHeight
+		/*
 		console.log({
 			w: w,
 			h: h
 		})
+		*/
 		res = (w <= h)
 		//console.log(res)
 		return res
 
 	}
+
+	appliquer_couleurs()
 
 
 })

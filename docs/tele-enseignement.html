@@ -81,11 +81,12 @@
 
 		<link id="style-sekooly" rel="stylesheet" href="https://sekooly.com/assets/style/sekooly.css" ></link>
 		<link id="style-sekooly" rel="stylesheet" href="https://sekooly.com/assets/style/sekooly-dark.css" ></link>
-		
 
 	<style>
+
 		.palette {
-			width:30%;
+			cursor: cell;
+			width: 169px;
 		}
 
 
@@ -303,12 +304,7 @@
 			margin: 5%;
 		}
 
-		.btn-setup {
-			height: 50px;
-			font-size: inherit;
-			color: white;
-			margin-right: 5px;
-		}
+
 		.setup {
 			overflow: hidden auto;
 			height: 90%;
@@ -1036,7 +1032,7 @@
 		}
 
 		#menu_details{
-			overflow: scroll;
+			overflow: auto;
 			height: 490px;
 			padding: 0 1% 1% 1%;
 
@@ -1465,18 +1461,34 @@
 		.ma_fenetre {
 			display: block;
 			position: fixed; 
+
+			
 			top: 15%;
 			left: 15%;
-			z-index: 3;
-			background-color: #EEEEEE;
-			opacity: 100%;
 			width: 70%;
 			height: 70%;
+			
+
+			z-index: 3;
+			opacity: 100%;
 			border-radius: 6px;
 			overflow: hidden;
 			visibility: hidden;
 			box-shadow: 1px 0px 10px 1px;
 
+
+
+		}
+
+		#conteneur_menu {
+			height: 90%;
+		}
+
+		.big-window {
+			top: 0px;
+			left: 0px;
+			width: 99%;
+			height: 99%;
 		}
 
 		.bloc_topic {
@@ -2254,9 +2266,9 @@
 			<div id="recup_eleves">Liste des élèves</div>
 			<div id="recup_profs">Liste des professeurs</div>
 			<div id="recup_admin">Liste de l'Administration</div>
-			<div id="recup_params">Paramètres</div>
-			<div id="recup_pref">Préférences</div>
 			<div id="recup_analyses">Analyses</div>
+			<div id="recup_pref">Préférences</div>
+			<div id="recup_params">Paramètres</div>
 			<div id="disconnect">Se déconnecter</div>		
 		</div>
 		
@@ -2544,6 +2556,7 @@
 
 	<div id="snackbar">CONTENU</div>
 
+	<!--overwrites some local rules-->
 	<style type="text/css" id="custom-css"></style>
 	<script type="text/javascript" src="scripts/tele-enseignement.js"></script>
 

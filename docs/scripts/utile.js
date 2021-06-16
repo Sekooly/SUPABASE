@@ -584,7 +584,7 @@ function copier_liste(selector,attrName){
   document.execCommand("copy");
   $temp.remove();
 
-  afficher_alerte("Liste copiée dans le presse-papiers!")
+  afficher_alerte("La liste est copiée dans votre presse-papiers.")
 
   return res
 
@@ -1677,4 +1677,12 @@ function couleur_fond(noms_classes,juste_un_selector){
   $("#"+tmp.id).remove()
 
   return rgb2hex(rgb) 
+}
+
+
+function appliquer_couleurs(){
+  if(data_etablissement['preferences']['couleurs']){
+    //console.log(data_etablissement['preferences']['couleurs'])
+    element_DOM("custom-css").innerText = data_etablissement['preferences']['couleurs']
+  }
 }
