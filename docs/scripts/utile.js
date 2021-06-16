@@ -1680,9 +1680,172 @@ function couleur_fond(noms_classes,juste_un_selector){
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+function appliquer_preferences(){
+
+
+
+  if(data_etablissement['preferences']){
+    //console.log("on a des préférences à mettre...")
+
+    //dans le ficher HTML
+    //remplacer {{prefixe_image}} par la valeur 
+    $.each($("img[src]"), (key,img) => {
+
+      //console.log(img.src)
+
+      the_src = decodeURIComponent(img.src)
+      suffixe = the_src.split(hebergeur_defaut())[1]
+
+
+      if(!suffixe) suffixe = the_src.split(hebergeur_actuel())[1]
+      //console.log(prefixe_image + suffixe)
+      img.src = prefixe_image + suffixe
+
+
+
+    })    
+
+    //actualiser les images
+    appliquer_images()
+    //actualiser les couleurs
+    appliquer_couleurs()
+    //actualiser les formes
+    appliquer_formes()
+  }
+
+
+  remplacer_image_par_defaut()
+}
+
+
+
+function remplacer_image_par_defaut(){
+
+  // Select the node that will be observed for mutations
+  const targetNode = $("body")[0];
+
+  // Options for the observer (which mutations to observe)
+  const config = { attributes: true, childList: true, subtree: true };
+
+  // Callback function to execute when mutations are observed
+  const callback = function(mutationsList, observer) {
+      // Use traditional 'for loops' for IE 11
+      for(const mutation of mutationsList) {
+          if (mutation.type === 'childList') {
+              //console.log('A child node has been added or removed.');
+          }
+          else if (mutation.type === 'attributes') {
+              //console.log('The ' + mutation.attributeName + ' attribute was modified.');
+          }
+      }
+  };
+
+  // Create an observer instance linked to the callback function
+  const observer = new MutationObserver(actualiser_image_non_trouvee);
+
+  // Start observing the target node for configured mutations
+  observer.observe(targetNode, config);
+
+}
+
+
+
+function actualiser_image_non_trouvee(new_node){
+
+  //console.log("NEW NODE!",new_node)
+
+  $("img").off("error")
+  $("img").on("error",function(e){
+    //console.log(e.target , "non trouvée ")
+    remplacer_avec_defaut(e)
+  });
+
+}
+
+
+
+function appliquer_images(){
+  //pour chaque image listée
+  $.each($(".une_image"), (key,img) => {
+    //console.log(img)
+    //console.log(img.innerText)
+
+
+    //actualiser (chaque image du site) par celle listée    
+    $.each($("img[src$='"+img.innerText+"']"), (k,img_locale) => {
+
+      $(img_locale).one("error",function(e){
+        //e.preventDefault()
+        //console.log("image non trouvée.",img_locale)
+        remplacer_avec_defaut(e)
+        
+      });
+
+
+      img_locale.src = img.parentNode.href  
+          
+    })
+
+
+    //initialiser les préférences si c'est pas encore le cas
+    if(!data_etablissement['preferences']){
+      data_etablissement['preferences'] = {}      
+    }
+
+
+    data_etablissement['preferences']['prefixe_image'] =   element_DOM("prefixe_image").value ?  element_DOM("prefixe_image").value : hebergeur_defaut()
+    
+
+  })
+
+
+
+
+}
+
+
+
+function remplacer_avec_defaut(e){
+  a_changer = e.target.src
+  //console.log("à changer: ",a_changer)
+
+  if(!a_changer.includes("undefined")){
+
+
+    var new_link = hebergeur_defaut() + "/" + a_changer.split("/").pop()
+    //console.log("NEW LINK:", new_link)
+
+    e.target.src = new_link
+    //console.log("problème de chargement de "+a_changer+": remplacé avec ",e.target.src)
+
+
+  }
+}
+
+
+
 function appliquer_couleurs(){
   if(data_etablissement['preferences']['couleurs']){
     //console.log(data_etablissement['preferences']['couleurs'])
     element_DOM("custom-css").innerText = data_etablissement['preferences']['couleurs']
   }
+}
+
+
+
+function appliquer_formes(){
+  //console.log("TODO...")
 }
