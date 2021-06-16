@@ -1,4 +1,4 @@
-var elements_menu_haut = ["Infos établissement","Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Programme", "Alerte", "Logs", "Conversations", "Visio", "Notifs", "Fichiers", "Quiz","Questions","Reponses","Rendus", "Topic", "Coms","Espace etablissement restant"]
+var elements_menu_haut = ["Infos établissement","Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Programme", "Alerte", "Logs", "Visio", "Notifs", "Fichiers", "Quiz","Questions","Reponses","Rendus", "Topic", "Coms","Espace etablissement restant"]
 
 var elements_menu_analyses = ["Analyses des connexions"]
 
@@ -12515,6 +12515,7 @@ function mode_bulletin(oui){
 		element_DOM('choix_popup').setAttribute('style','visibility: visible;overflow-y: scroll;width: 450px;max-width: 95%;overflow-x: hidden;')
 		element_DOM("file").value = "";
 		$("[value='Bulletins']")[0].style.display = ""
+		element_DOM("choix_chapitre").style.display = "none"
 
 
 	}else{
@@ -12531,6 +12532,7 @@ function mode_bulletin(oui){
 		element_DOM('choix_popup').setAttribute('style','visibility: visible')
 		$("[value='Bulletins']")[0].style.display = "none"
 		$("#categorie_choisie > [value='Manuels']")[0].style.display = !recuperer("mon_type").includes("Administration") ? "none" : "" //manuels interdits sauf aux membres de l'administration
+		element_DOM("choix_chapitre").style.display = ""
 	}
 	
 }
