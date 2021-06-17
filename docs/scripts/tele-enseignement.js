@@ -304,7 +304,7 @@ function actualiser_bilan(identifiant_eleve){
 function emettre_avis(identifiant_eleve, classe){
 	//console.log("emettre_avis: " + identifiant_eleve);
 
-	var pop_up_html  = '<div id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X"  src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Vos observations sur <b>'+identifiant_eleve+'</b>:</div><textarea id="observation" style="width: 80%;resize: none;font-size: 13px;margin-bottom: 5%;"></textarea><div style="">Passage de <b>'+identifiant_eleve+'</b> en classe supérieure:</div><select style="width: 80%;border-color: red;border-style: solid;margin-bottom: 5%;" id="avis_passage" value=""><option value=""></option><option value="Favorable">Favorable</option><option value="Non favorable">Non favorable</option></select><button type="button" class="rendre sekooly-mode-background" onclick="envoyer_avis_conseil(\''+identifiant_eleve+'\',\''+classe+'\')">Envoyer l\'avis</button></div>';
+	var pop_up_html  = '<div class="mini_popup" id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X"  src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Vos observations sur <b>'+identifiant_eleve+'</b>:</div><textarea id="observation" style="width: 80%;resize: none;font-size: 13px;margin-bottom: 5%;"></textarea><div style="">Passage de <b>'+identifiant_eleve+'</b> en classe supérieure:</div><select style="width: 80%;border-color: red;border-style: solid;margin-bottom: 5%;" id="avis_passage" value=""><option value=""></option><option value="Favorable">Favorable</option><option value="Non favorable">Non favorable</option></select><button type="button" class="rendre sekooly-mode-background" onclick="envoyer_avis_conseil(\''+identifiant_eleve+'\',\''+classe+'\')">Envoyer l\'avis</button></div>';
 
 	var pop_up = document.createElement('div');
 	pop_up.innerHTML = pop_up_html;
@@ -4589,7 +4589,7 @@ function creer_mini_popup(titre,elements_html,nom_bouton,fonction_bouton,valeur_
 	//console.log({id_bouton_html})
 	var valider_changement = '<button type="button"  '+id_bouton_html+'  class="rendre sekooly-mode-background" onclick="'+fonction_bouton+'">'+nom_bouton+'</button>'
 
-	var mini_popup_html = '<div id="mini_popup">'+bouton_quitter+titre_html+elements_html+valider_changement+'</div>';
+	var mini_popup_html = '<div class="mini_popup" id="mini_popup">'+bouton_quitter+titre_html+elements_html+valider_changement+'</div>';
 
 	var mini_popup = document.createElement('div');
 	mini_popup.innerHTML = mini_popup_html;
@@ -9518,17 +9518,40 @@ function personnaliser(id_parametre){
 		contenu_explications = "En cours de construction."	
 
 
-		
-	}else{
-		contenu_explications = "En cours de construction."
+	//si police	
+	}else if(id_parametre === "Police"){
+		contenu_explications = `
+			<h1> Choisissez parmi les polices disponibles ci-dessous:</h1>
+			<h2>			
+				<select onchange="changer_police(this)">
+					<option value="Arial">Arial</option>
+					<option value="Brush Script MT">Brush Script MT</option>
+					<option value="Courier New">Courier New</option>
+					<option value="Garamond">Garamond</option>
+					<option value="Georgia">Georgia</option>
+					<option value="Helvetica">Helvetica</option>
+					<option value="Tahoma">Tahoma</option>
+					<option value="Times New Roman">Times New Roman</option>
+					<option value="Trebuchet MS">Trebuchet MS</option>
+					<option value="Verdana">Verdana</option>
+				</select>			
+			<h2>
+
+		`
+
 	}
 
 
 
 	explications_pref(conteneur, contenu_explications, callback)
+	element_DOM("menu_params").scrollTo(0,0);
 }
 
 
+function changer_police(ceci){
+	console.log(ceci.value)
+	changer_css_selector("*","font-family",ceci.value)
+}
 
 
 function btn_prefs(fonction_reinit){
@@ -9631,7 +9654,7 @@ function changer_css_selector(selector,label_selector,value_selector, importance
 		}else  if(selector_existant){
 
 			//alert("selector_existant")
-			alert("Encore en cours de construction.")
+			//alert("Encore en cours de construction.")
 			apres = avant.replaceAll(selector_existant, selector_label + ":" + value_selector + ";"	)
 			element_DOM("custom-css").innerText = apres
 
@@ -11318,7 +11341,7 @@ function formulaire_choix_checkbox(nom_champ, e, ancienne_valeur, identifiant, l
 	
 	$("#mini_popup").remove()
 
-	var entetes = '<div id="mini_popup" style="overflow: hidden auto;"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div>'
+	var entetes = '<div id="mini_popup" class="mini_popup" style="overflow: hidden auto;"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div>'
 	var titre_formulaire = '<div>'+nom_champ+' pour <b>'+identifiant+'</b></div><div id="liste_classe_matieres" style="padding-top: 4%;padding-bottom: 4%;text-align: left;"><div>'
 	
 	//pour chaque element de la liste
@@ -11608,7 +11631,7 @@ function telecharger_donnees_parametres(id_parametre){
 	if(!id_parametre) id_parametre = $(".un_menu_orange")[0].id
 
 	//alert("Téléchargement ici.")
-	var choix_entete_ou_tout_html = '<div id="mini_popup">'
+	var choix_entete_ou_tout_html = '<div id="mini_popup" class="mini_popup">'
 	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<div id="entete-fenetre" style="display: inline-flex;float: right;">'
 	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div>'
 	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<div>Télécharger '+id_parametre+'</div><select style="width: 80%;" id="choix_download_param">'
@@ -11822,7 +11845,7 @@ function recuperer_entetes_params(id_parametre){
 
 
 function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_duplicata, une_donnee){
-	var entete = '<div style="overflow:auto;" id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Nouvelle donnée dans ' +id_parametre+ '</div><form class="donnees_saisies" id="donnees_saisies" >'
+	var entete = '<div class="mini_popup" style="overflow:auto;" id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Nouvelle donnée dans ' +id_parametre+ '</div><form class="donnees_saisies" id="donnees_saisies" >'
 	var liste_champs_html = ""
 	
 	//console.log(une_donnee)
@@ -12401,7 +12424,7 @@ function consulter(){
 /*NON UTILE*/
 function choisir_clic_bulletin(){
 
-	popup_choix = '<div id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Que voulez-vous faire?</div><select style="width: 80%;" id="choix_bulletin"><option value="upload">Mettre en ligne les bulletins</option><option value="voir">Voir les bulletins en ligne</option></select><button type="button" class="rendre sekooly-mode-background" onclick="choix_bulletin_ok()">Valider</button></div>'
+	popup_choix = '<div class="mini_popup" id="mini_popup"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div><div>Que voulez-vous faire?</div><select style="width: 80%;" id="choix_bulletin"><option value="upload">Mettre en ligne les bulletins</option><option value="voir">Voir les bulletins en ligne</option></select><button type="button" class="rendre sekooly-mode-background" onclick="choix_bulletin_ok()">Valider</button></div>'
 	$('body').append(popup_choix) 
 }
 
