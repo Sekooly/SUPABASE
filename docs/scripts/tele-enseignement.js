@@ -4244,7 +4244,7 @@ function autoriser_clic_droit_supprimer_et_renommer(e,ceci){
 
 	
 	ajouter_fonction_clic_droit(e,ceci,0,"renommer_fichier","Renommer",id_fichier);
-	ajouter_fonction_clic_droit(e,ceci,1,"changer_chapitre_fichier","Assigner un chapitre",id_fichier);
+	ajouter_fonction_clic_droit(e,ceci,1,"changer_chapitre_fichier","Chapitre",id_fichier);
 	ajouter_fonction_clic_droit(e,ceci,2,"recategoriser_fichier","Recatégoriser",id_fichier);
 	ajouter_fonction_clic_droit(e,ceci,3,"changer_date_effet","Date d\'effet",id_fichier);
 
