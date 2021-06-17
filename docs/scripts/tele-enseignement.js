@@ -16104,7 +16104,7 @@ async function gerer_sondage(){
 
 
 	//si je suis l'admin de Sekooly
-	if(recuperer("identifiant_courant").includes('admin')){
+	if(recuperer("identifiant_courant").includes('admin.tech')){
 
 		//si au moins 1 sondage pas encore executé
 		var sondages_non_majs = mes_sondages.filter(e => e['maj_reponse_sondage'] === false)
@@ -16159,6 +16159,10 @@ async function gerer_sondage(){
 
 		//console.log(mes_donnees)
 		var donnees_actuelles =  JSON.parse(recuperer("mes_donnees"))
+		/*
+		console.log({mes_donnees})
+		console.log({donnees_actuelles})
+		*/
 
 		if(!mes_donnees || (mes_donnees["Code"] !== donnees_actuelles["Code"] && mes_donnees["Code"] !== hasher(donnees_actuelles["Code"])) ){
 			//deconnexion directe

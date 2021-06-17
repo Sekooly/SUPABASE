@@ -438,7 +438,7 @@ function envoyer_log(mon_identifiant, mon_statut, ma_classe, mon_type, partir){
 
 }
 
-function fin_envoi_log(partir, mon_identifiant, ma_classe, mon_statut,
+async function fin_envoi_log(partir, mon_identifiant, ma_classe, mon_statut,
           mon_adresse_ip, ma_latitude, ma_longitude, mon_operateur,
           mon_pays, mon_type, ma_ville){
   var nouveau_data = {
@@ -455,20 +455,18 @@ function fin_envoi_log(partir, mon_identifiant, ma_classe, mon_statut,
       Ville: ma_ville
     }
 
-    ajouter_un_element("Logs",nouveau_data).then(valeur => {
-      if (partir){
+  await ajouter_un_element("Logs",nouveau_data)
 
-        if(recuperer('mes_donnees').length>0){
-          //partir sur la page tele-enseignement au bout de 1.2 seconde
-          setTimeout(function(){
-            window.location.href="tele-enseignement"
-          },1200);
-          
-        }
-        
+  if (partir){
+    if(recuperer('mes_donnees').length>0){
 
-      }  
-    })
+      //stocker le code dans mes données
+      modifier_donnee_locale("mes_donnees","Identifiant",$("#Identifiant").val(),"Code",$("#Code").val())
+      console.log(JSON.parse(recuperer('mes_donnees')))
+      window.location.href="tele-enseignement"      
+    }   
+
+  }  
 
     
 }
