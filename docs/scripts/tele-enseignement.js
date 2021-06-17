@@ -446,7 +446,7 @@ function afficher_toutes_les_observations(les_observations,identifiant_eleve){
 		var signe_avis_passage = valeur["avis_passage"] === "Favorable" ? "✅" : "❌"
 		var vient_de_moi = valeur['identifiant_remarque'].toUpperCase() === recuperer('identifiant_courant').toUpperCase() ? " (Vous)"
 							: valeur['matiere'] ? " ("+valeur['matiere']+")" : "" ;
-		une_observation= '<div style="color:black;font-size:10px;padding:5px;">'+signe_avis_passage +'<b class="sekooly-mode">'+valeur['identifiant_remarque'].toUpperCase()+ vient_de_moi+': </b>'+valeur['observation']+'<i style="color: #bfbfbf;"> ' + afficher_date(valeur['horodateur']) + '  </i></div>';	
+		une_observation= '<div style="color:black;font-size:10px;padding:5px;">'+signe_avis_passage +'<b class="sekooly-mode">'+valeur['identifiant_remarque'].toUpperCase()+ vient_de_moi+': </b>'+valeur['observation']+'<i class="date_fin"> ' + afficher_date(valeur['horodateur']) + '  </i></div>';	
 		$("#ensemble_observations").append(une_observation);
 	})
 	
@@ -886,7 +886,7 @@ function afficher_rendus_devoirs(resultats){
 	if (resultats.length === 0) element_DOM('rendu_devoir').style.height='auto';
 
 
-	if (resultats.length === 0) return liste_des_devoirs_rendus.innerHTML = '<i style="color: #bfbfbf;">Pas encore de rendus pour ce devoir/examen/quiz.</i>';
+	if (resultats.length === 0) return liste_des_devoirs_rendus.innerHTML = '<i class="date_fin">Pas encore de rendus pour ce devoir/examen/quiz.</i>';
 
 	//dans l'ordre chronologique CROISSANT
 	resultats.sort(function tri_ordre_chrono_decroissant(a, b) {
@@ -935,7 +935,7 @@ function afficher_rendus_devoirs(resultats){
 
 		un_devoir_rendu.innerHTML += est_quiz ? "" : '<a   id="telechargement" href = "https://drive.google.com/uc?export=download&id=' + un_devoir_rendu.id +'" download="mon_fichier.txt"><img alt="télécharger" class="mini-image" src="'+ prefixe_image + '/img_download.png"></a>';
 		
-		un_devoir_rendu.innerHTML += '<i style="color: #bfbfbf;">' + afficher_date(resultats[i]["date_publication"]) + '  </i>';
+		un_devoir_rendu.innerHTML += '<i class="date_fin">' + afficher_date(resultats[i]["date_publication"]) + '  </i>';
 
 		//console.log(un_devoir_rendu.innerHTML);
 
@@ -7897,7 +7897,7 @@ function ajouter_la_notif(la_notif,index,mode_notif){
 	var contenu_notif = contenu_notification(Type_notif,la_matiere_concernee,la_classe_concernee,Identifiant_originaire,Identifiant_derniere_modif, {'Horodateur':Horodateur,'Date_derniere_modif':Date_derniere_modif},intitule_notif);
 	var intitule = ' - <i><b class="sekooly-mode-darker">'+intitule_notif  +'</b></i>'
 	var icone_notif = '<span> <img src=' +  choix_image(Type_notif)  + ' class="icone_notif"> </span>'
-	var date_grise = '<div> '+icone_notif+' <i style="color: #bfbfbf;"> ' + Date_derniere_modif+ '  </i></div>';
+	var date_grise = '<div> '+icone_notif+' <i class="date_fin"> ' + Date_derniere_modif+ '  </i></div>';
 
 
 
@@ -9391,7 +9391,7 @@ function personnaliser(id_parametre){
 	element_DOM("previsualisation").innerHTML = ""
 
 	var mon_hebergeur = hebergeur_actuel()
-	var bg_checked = data_etablissement['preferences']['background'] ? "checked" : ""
+	var bg_checked = data_etablissement['preferences'] && data_etablissement['preferences']['background'] ? "checked" : ""
 
 	//si images
 	if(id_parametre === "Images"){
@@ -9448,27 +9448,23 @@ function personnaliser(id_parametre){
 
 
 					<div class="element-pref">
+						<h2 class="au-centre">Corps de la page<br>
+							<input id="body-color" type="color" onchange="changer_fond_body_apres_choix(this)" value="`+ rgb2hex($("body").css("background-color")) +`" class="palette" name="body">
+						</h2>
+
+						`
+						+night_mode_option()+
+						`
+					</div>
+					
+
+
+					<div class="element-pref">
 						<h2 class="au-centre">Titre des catégories de fichiers<br>
 							<input type="color" onchange="changer_fond_fenetre_apres_choix(this)" value="`+ couleur_fond("titre_drive") +`" class="palette" name="titre_drive">
 						</h2>
 					</div>
 
-
-
-					<div class="element-pref">
-						<h2 class="au-centre sekooly-mode">Mise en valeur de texte<br>
-							<input type="color" onchange="change_couleur_texte_apres_choix(this)" value="`+ couleur_texte("sekooly-mode") +`" class="palette" name="sekooly-mode">
-						</h2>
-						
-					</div>
-
-
-					<div class="element-pref">
-						<h2 class="au-centre sekooly-mode-darker">Objet des notifications<br>
-							<input type="color" onchange="change_couleur_texte_apres_choix(this)" value="`+ couleur_texte("sekooly-mode-darker") +`" class="palette" name="sekooly-mode-darker">
-						</h2>
-						
-					</div>
 
 					<div class="element-pref">
 						<h2 class="au-centre"><button type="button" onclick="apercu_btn()" class="btn-setup sekooly-mode-background">Bouton</button><br>
@@ -9484,22 +9480,63 @@ function personnaliser(id_parametre){
 
 
 
-					<div class="element-pref">
-						<h2 class="au-centre">Corps de la page<br>
-							<input id="body-color" type="color" onchange="changer_fond_body_apres_choix(this)" value="`+ rgb2hex($("body").css("background-color")) +`" class="palette" name="body">
-						</h2>
 
-						`
-						+night_mode_option()+
-						`
-					</div>
-					
 
 					<div class="element-pref">
 						<h2 class="au-centre">Corps de la fenêtre<br>
 							<input id="fenetre-color" type="color" onchange="changer_fond_fenetre_apres_choix(this)" value="`+ rgb2hex($("#fenetre").css("background-color")) +`" class="palette" name="ma_fenetre">
 						</h2>			
 					</div>
+
+
+					<div class="element-pref">
+						<h2 class="au-centre">Corps de mini-fenêtre<br>
+							<input id="fenetre-color" type="color" onchange="changer_fond_fenetre_apres_choix(this)" value="`+ rgb2hex($("#mini_popup").css("background-color")) +`" class="palette" name="mini_popup">
+						</h2>			
+					</div>
+
+
+
+
+					<div class="element-pref">
+						
+							
+							<div id="exemple-pannel_notif" class="pannel_notif" style="display: block;position: inherit;margin-left: 15%;">
+								<div class="une_notif"><b class="sekooly-mode">Monsieur X (Prof) </b> a publié un nouveau fichier dans  <b>Nom du cours</b> - <i><b class="sekooly-mode-darker">nom_fichier.pdf</b></i><div> <span> <img src="`+prefixe_image+`/img_ajout.png" class="icone_notif"> </span> <i class="date_fin"> `+afficher_date(maintenant())+`  </i></div></div>
+							</div>
+
+							<h3> ASPECT
+								<input type="color" onchange="changer_fond_apres_choix(this)" value="`+ couleur_fond("pannel_notif") +`" class="palette"  name="pannel_notif">
+							</h3>
+							<h3> AU SURVOL
+								<input type="color" onchange="changer_fond_apres_choix(this)" value="`+ rgb2hex($(".une_notif:hover").css("background-color")) +`" class="palette" name="une_notif:hover">
+							</h3>
+						</h2>
+						
+					</div>
+
+					<div class="element-pref">
+						<h2 class="au-centre sekooly-mode">Mise en valeur de texte<br>
+							<input type="color" onchange="change_couleur_texte_apres_choix(this)" value="`+ couleur_texte("sekooly-mode") +`" class="palette" name="sekooly-mode">
+						</h2>
+						
+					</div>
+
+					<div class="element-pref">
+						<h2 class="au-centre sekooly-mode-darker">Objet des notifications<br>
+							<input type="color" onchange="change_couleur_texte_apres_choix(this)" value="`+ couleur_texte("sekooly-mode-darker") +`" class="palette" name="sekooly-mode-darker">
+						</h2>
+						
+					</div>
+
+
+					<div class="element-pref">
+						<h2 class="au-centre">Affichage de dates<br>
+							<input type="color" onchange="change_couleur_texte_apres_choix(this)" value="`+ couleur_texte("date_fin") +`" class="palette" name="date_fin">
+						</h2>
+						
+					</div>
+
 
 				</form>
 
@@ -9523,7 +9560,7 @@ function personnaliser(id_parametre){
 		contenu_explications = `
 			<h1> Choisissez parmi les polices disponibles ci-dessous:</h1>
 			<h2>			
-				<select onchange="changer_police(this)">
+				<select onchange="changer_police(this)" style="height: 50px;width: 30%;">
 					<option value="Arial">Arial</option>
 					<option value="Brush Script MT">Brush Script MT</option>
 					<option value="Courier New">Courier New</option>
@@ -9544,7 +9581,13 @@ function personnaliser(id_parametre){
 
 
 	explications_pref(conteneur, contenu_explications, callback)
-	element_DOM("menu_params").scrollTo(0,0);
+	
+	//si changement uniquement
+	//element_DOM("menu_params").scrollTo(0,0);
+}
+
+function changer_slider(ceci){
+	//input:checked + .slider {
 }
 
 
@@ -10735,7 +10778,7 @@ function traiter_liste_JSON(id_parametre,liste_JSON, identifiant_table){
 
     		
 	}else{
-		element_DOM("menu_details").innerHTML = '<i style="color: #bfbfbf;">Pas encore de données dans ' + id_parametre +  '.</i>';
+		element_DOM("menu_details").innerHTML = '<i class="date_fin">Pas encore de données dans ' + id_parametre +  '.</i>';
 		effacer(id_parametre)
 	}
 
@@ -13521,7 +13564,7 @@ function creer_element_journee(nom_matiere,nom_fichier,date_reference,heure_refe
 
 
 	affichage_date = date_heure_ensemble ? afficher_date(date_reference) : afficher_date(date_reference,true) + heure_reference
-	return '<div class="contenu_section_journee"><b class="nom_matiere_journee sekooly-mode">'+nom_matiere+"</b> "+nom_fichier+'<i style="color: #bfbfbf;"> '+affichage_date+' </i><span class="mini-image deja_traite">'+coche_traitement+'</span> <img id="'+champ_id+'" src="'+ prefixe_image + '/img_previz.png" alt="voir" onclick="clic_de_notif(\''+type_notif+'\',\''+champ_id+'\',\''+id_classe_matiere+'\');" class="mini-image"></div>'
+	return '<div class="contenu_section_journee"><b class="nom_matiere_journee sekooly-mode">'+nom_matiere+"</b> "+nom_fichier+'<i class="date_fin"> '+affichage_date+' </i><span class="mini-image deja_traite">'+coche_traitement+'</span> <img id="'+champ_id+'" src="'+ prefixe_image + '/img_previz.png" alt="voir" onclick="clic_de_notif(\''+type_notif+'\',\''+champ_id+'\',\''+id_classe_matiere+'\');" class="mini-image"></div>'
 }
 
 

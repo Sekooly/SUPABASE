@@ -1,6 +1,6 @@
 var mon_role = "";
 var entete_heroku = "https://sekooly-server.herokuapp.com/"
-var liste_class_avec_fond_mode_nuit = ["ma_fenetre","titre_drive"]
+var liste_class_avec_fond_mode_nuit = ["ma_fenetre","titre_drive", "mini_popup"]
 
 function se_deconnecter(){
   /*
@@ -1884,9 +1884,9 @@ function appliquer_preferences(){
     //actualiser l'image de fond
     appliquer_fond(data_etablissement['preferences']['background'])
 
-
-    //actualiser les couleurs
+    //actualiser les couleurs (+ police)
     appliquer_couleurs()
+
     //actualiser les formes
     appliquer_formes()
   }
@@ -1898,12 +1898,12 @@ function appliquer_preferences(){
 function appliquer_fond(oui){
   if(oui){
     $(".sekooly-background").addClass("show")
-    $('[href="'+prefixe_image+'/img_background-image.png"]').show()
+    $('img[href="'+prefixe_image+'/img_background-image.png"]').show()
     $('[id="my-background-image"]').prop("checked",true)
     data_etablissement['preferences']['background'] = true
   }else{
     $(".sekooly-background").removeClass("show")
-    $('[href="'+prefixe_image+'/img_background-image.png"]').hide()
+    $('img[href="'+prefixe_image+'/img_background-image.png"]').hide()
     $('[id="my-background-image"]').prop("checked",false)
     delete data_etablissement['preferences']['background']
   } 
@@ -2032,7 +2032,7 @@ function remplacer_avec_defaut(e){
 
 
 function appliquer_couleurs(){
-  if(data_etablissement['preferences']['couleurs']){
+  if(data_etablissement['preferences'] && data_etablissement['preferences']['couleurs']){
     //console.log(data_etablissement['preferences']['couleurs'])
     element_DOM("custom-css").innerText = data_etablissement['preferences']['couleurs']
   }
