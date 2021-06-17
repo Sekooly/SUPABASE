@@ -358,10 +358,10 @@
 
 
 		.bye_prev {
-			width: 20px;
-			height: 20px;
-			right: 5px;
-			top: 5px;
+			width: 30px;
+			height: 30px;
+			right: 0px;
+			top: 0px;
 			cursor: pointer;
 			position: absolute;
 			z-index: 3;
@@ -1807,7 +1807,6 @@
 
 		#rendu_devoir{
 			visibility: hidden;
-			background-color: #EEEEEE;
 			height: -moz-min-content;
 			padding: 2%;
 			position: fixed; 
@@ -2166,10 +2165,10 @@
 		}
 
 		.quitter_rendu_devoir{
-			width: 20px;
-			height: 20px;
-			right: 5px;
-			top: 5px;
+			width: 30px;
+			height: 30px;
+			right: 0px;
+			top: 0px;
 			cursor:pointer;
 			position:fixed;
 			z-index:3;
@@ -2424,7 +2423,7 @@
 
 
 
-	<div id="choix_popup" class="choix_popup">
+	<div id="choix_popup" class="choix_popup mini_popup">
 		<img alt="X" src="https://sekooly.com/assets/images/quitter.png" id="bye_prev_upload" class="quitter_rendu_devoir">
 		<rouge class="mini-image" id="helper-categ">Besoin d'aide?</rouge>
 		
@@ -2536,7 +2535,7 @@
 
 	</div>​
 
-	<div id="rendu_devoir">
+	<div id="rendu_devoir" class="mini_popup">
 		<img alt="X" src="https://sekooly.com/assets/images/quitter.png" id="bye_prev_rendu"  class="quitter_rendu_devoir">		
 		<rouge class="mini-image" id="helper-dev">Besoin d'aide?</rouge>
 		Devoir/Examen à rendre:

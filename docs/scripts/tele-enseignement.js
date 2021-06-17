@@ -4022,7 +4022,7 @@ function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,d
 	var periode_bulletin = periode_bulletin ? " periode_bulletin='"+periode_bulletin+"'" : ""
 	var destinataire_par_page = destinataire_par_page ? " destinataire_par_page='"+destinataire_par_page+"'" : ""
 	var id_chapitre = id_chapitre ? " id_chapitre='" + id_chapitre + "'" : ""
-	var code_html = '<span oncontextmenu="autoriser_clic_droit_supprimer_et_renommer(event,this)" onclick="ouvrir_fichier(this)" class="span_un_fichier" id="' + id_fichier + '" ma_date_effet="'+ la_date_yyyy_mm_dd(date_effet)+'" mon_heure_effet="'+ heure_effet + '" ma_date_limite="'+ la_date_yyyy_mm_dd(date_limite)+'" mon_heure_limite="'+ heure_limite +'" est_telechargeable="'+est_telechargeable+'"    coefficient_rendu='+ coefficient_rendu + periode_bulletin  + destinataire_par_page + id_chapitre +'    >' + telecharger_le_fichier + '<img id="' + id_fichier + '" src="'+ image_fichier +'" class="un_fichier" '+padding_yt+'><span class="nom_fichier">' + nom_fichier +'</span></span>';
+	var code_html = '<span oncontextmenu="autoriser_clic_droit_supprimer_et_renommer(event,this)" onclick="ouvrir_fichier(this)" class="span_un_fichier" id="' + id_fichier + '" ma_date_effet="'+ la_date_yyyy_mm_dd(date_effet)+'" mon_heure_effet="'+ heure_effet + '" ma_date_limite="'+ la_date_yyyy_mm_dd(date_limite)+'" mon_heure_limite="'+ heure_limite +'" est_telechargeable="'+est_telechargeable+'"    coefficient_rendu='+ coefficient_rendu + periode_bulletin  + destinataire_par_page + id_chapitre +'    >' + telecharger_le_fichier + '<img id="' + id_fichier + '" src="'+ image_fichier +'" class="un_fichier" '+padding_yt+'>' + nom_fichier +'</span>';
 
 	//console.log(code_html);
 
@@ -4169,7 +4169,8 @@ function ouvrir_fichier(ceci){
 		stocker('fichier_ouvert',id_fichier);
 
 		//on ajoute le nom du fichier (TEXTE DANS LE SPAN)
-		var nom_fichier = $("[id='"+id_fichier+"'] > [class='nom_fichier']").text()
+		var nom_fichier = $("[id='"+id_fichier+"']").text().trim()
+		//console.log({nom_fichier})
 
 		nom_fichier = rfc3986EncodeURIComponent(nom_fichier);
 		//visualiser(nom_fichier,id_fichier);
