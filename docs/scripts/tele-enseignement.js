@@ -4169,7 +4169,12 @@ function ouvrir_fichier(ceci){
 		stocker('fichier_ouvert',id_fichier);
 
 		//on ajoute le nom du fichier (TEXTE DANS LE SPAN)
-		var nom_fichier = $("[id='"+id_fichier+"']").text().trim()
+		var nom_fichier = $("[id='"+id_fichier+"']")
+		    .clone()    //clone the element
+		    .children() //select all the children
+		    .remove()   //remove all the children
+		    .end()  //again go back to selected element
+			.text().trim()
 		//console.log({nom_fichier})
 
 		nom_fichier = rfc3986EncodeURIComponent(nom_fichier);
