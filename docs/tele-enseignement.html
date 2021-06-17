@@ -19,7 +19,7 @@
 
 		
 		<script type="text/javascript" src="scripts/aes.js"></script>
-		<script type="text/javascript" src="scripts/utile.min.js"></script>
+		<script type="text/javascript" src="scripts/utile.js"></script>
 		<script src="scripts/donnees_client.js"></script>
 
 
@@ -78,11 +78,37 @@
 	</head> 
 
 	<body>
-
+		<img id="background-image" class="sekooly-background">
 		<link id="style-sekooly" rel="stylesheet" href="https://sekooly.com/assets/style/sekooly.css" ></link>
 		<link id="style-sekooly" rel="stylesheet" href="https://sekooly.com/assets/style/sekooly-dark.css" ></link>
 
 	<style>
+
+		.navbar-color {
+			background-color: #333;
+		}
+
+		#background-image {
+			cursor: auto;
+		}
+
+		.contenu_alerte_vide {
+			color: #919191;
+		}
+
+		.alerte_vide {
+			margin: 100px 0 0 15px;
+			position: fixed;
+		}
+
+		.nom_fichier {
+
+		}
+
+		.img-activate {
+			margin: 2px 0 2px 15px;
+			font-size: 25px;
+		}
 
 		.palette {
 			cursor: cell;
@@ -893,7 +919,6 @@
 		    left: 0;
 		    bottom: 0;
 		    width: 270px;
-		    background: #333;
 		    color: white;
 		    z-index: 4;
 		    margin-top: 5%;
@@ -1211,7 +1236,6 @@
 		.navbar {
 
 			overflow: hidden;
-			background-color: #333;
 			position: fixed; /* la barre est fixée */
 			top: 0; /* la barre est tout en haut */
 			left: 0;
@@ -1571,15 +1595,9 @@
 			width: 35px;
 			display: block;
 			z-index: 1;
-			filter: invert();
 			overflow-wrap: anywhere;
 		}
 
-
-		.icone_navbar:hover{
-			filter: invert();
-
-		}
 
 		.bulle{
 			width: 55px;
@@ -2024,9 +2042,10 @@
 			display: none;
 		}
 		
+		/*
 		img:hover {
 		    filter: brightness(120%);
-		}
+		}*/
 
 		img{ /*images non sélecionnables*/
 			-webkit-user-select: none; /* Safari */        
@@ -2199,19 +2218,19 @@
 
 
 	<button class="add-button sekooly-mode-background" id="a2hs">Ajouter Sekooly à l'accueil en tant qu'application</button>	
-	<div class="navbar" id="mynavbar">
+	<div class="navbar navbar-color" id="mynavbar">
 		<img class="haut_droite dropdown" alt="(+)" position="50px" src="https://sekooly.com/assets/images/img_down.png" width="35" height="35">
 
 		
 		<span>
-			<img id="recup_notifs" position="50px" alt="NOTIF" class="icone_navbar" src="https://sekooly.com/assets/images/img_cloche.svg">
+			<img id="recup_notifs" position="50px" alt="🔔" class="icone_navbar" src="https://sekooly.com/assets/images/img_cloche.png">
 		</span>
 		<div id="bulle_notif" class="bulle_notif"></div>
 
 
 		
 		<span>
-			<img id="recup_msgs" position="50px" alt="MESSAGES" class="icone_navbar" src="https://sekooly.com/assets/images/img_enveloppe.svg">		
+			<img id="recup_msgs" position="50px" alt="✉️" class="icone_navbar" src="https://sekooly.com/assets/images/img_enveloppe.png">		
 		</span>
 		<div class="bulle_notif" id="bulle_notif_msg"></div>
 		
@@ -2219,7 +2238,7 @@
 
 		
 		<span>
-			<img id="rechercher_element" position="50px" alt="RECHERCHE" class="icone_navbar" src="https://sekooly.com/assets/images/img_search.svg">		
+			<img id="rechercher_element" position="50px" alt="🔍" class="icone_navbar" src="https://sekooly.com/assets/images/img_search.png">		
 		</span>
 
 
@@ -2240,7 +2259,7 @@
 
 
 
-	<div class="sidebar left">
+	<div class="sidebar left navbar-color">
 
 		<div id="side-bar-profil">Mon profil</div>
 		<div id="side-bar-edt">Emploi du temps</div>
@@ -2262,7 +2281,7 @@
 
 
 	<div id="side-bar-top-right"  style="right:0;position: fixed;z-index: 4;">
-		<div class="droite sidebar top"  style="height: min-content;float: right;position: relative;width: 650px;">
+		<div class="droite sidebar top navbar-color"  style="height: min-content;float: right;position: relative;width: 650px;">
 			<div id="recup_eleves">Liste des élèves</div>
 			<div id="recup_profs">Liste des professeurs</div>
 			<div id="recup_admin">Liste de l'Administration</div>
@@ -2281,7 +2300,7 @@
 		  <div id="par_la_date_effet" class="mode_affichage_fichiers">Date d'effet</div>
 		  <div id="par_filtre_id_chapitre" class="mode_affichage_fichiers">Chapitre</div>
 		</div>
-		<img id="config-date-prog"  class="gear" alt="CONFIG" src="https://sekooly.com/assets/images/img_gear.svg">
+		<img id="config-date-prog"  class="gear" alt="CONFIG" src="https://sekooly.com/assets/images/img_gear.png">
 		
 
 		<select id="la_date_effet" class="la_date_effet"></select>
@@ -2558,7 +2577,7 @@
 
 	<!--overwrites some local rules-->
 	<style type="text/css" id="custom-css"></style>
-	<script type="text/javascript" src="scripts/tele-enseignement.min.js"></script>
+	<script type="text/javascript" src="scripts/tele-enseignement.js"></script>
 
 	</body>
 

@@ -5,7 +5,7 @@ var elements_menu_analyses = ["Analyses des connexions"]
 var elements_menu_preferences = ["Images","Couleurs","Formes","Police"]
 
 
-var img_dynamiques = ["logo-no-background-128x128.png","img_retour.png","default-user.svg", "img_reset.png","img_import.png","img_download.png","img_dupliquer.png","img_redtrash.png","img_previz.png","img_pleinecran.png", "img_petitecran.png"]
+var img_dynamiques = ["img_background-image.png", "logo-no-background-128x128.png","img_retour.png","default-user.svg", "img_reset.png","img_import.png","img_download.png","img_dupliquer.png","img_redtrash.png","img_previz.png","img_pleinecran.png", "img_petitecran.png"]
 img_dynamiques = img_dynamiques.concat(liste_img_extensions())
 
 var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL_Mapping","URL_agenda",
@@ -2930,7 +2930,7 @@ function attribuer_les_clics(){
 	au_clic("#side-bar-bulletins", "clic_bulletin()")//
 	au_clic("#side-bar-irl", "gerer_notifs_irl()")//
 	au_clic("#side-bar-help", "retourner_site()")//
-	au_clic("#side-bar-night", "changer_mode()")//
+	au_clic("#side-bar-night", "configurer_mode()")//
 	au_clic("#side-bar-review", "emettre_avis_sekooly()")//
 
 
@@ -3404,7 +3404,7 @@ function ajouter_listener_dossier(id){
 
 function creer_nouveau_dossier() {
     var mon_div=document.createElement("div");
-    //mon_div.className = "une_matiere_en_dossier"
+    mon_div.className = "card"
     element_DOM('liste_matieres').appendChild(mon_div);
     return mon_div;
 }
@@ -3536,7 +3536,9 @@ function charger_dossier(id_dossier,final_booleen,titre){
 	//le dossier est déjà chargé
 	if (id_dossier !== "" && id_dossier !== null) {
 
-
+		chargement(true);
+		afficher_les_dossiers_dynamiques(false);
+		
 		//on a chargé un dossier: changement de la variable locale
 		stocker_temp('dossier_chargé',id_dossier);
 
@@ -3566,8 +3568,6 @@ function charger_dossier(id_dossier,final_booleen,titre){
 
 		//à l'ouverture d'une classe par un admin : il se transforme en élèves (toutes matières) avec des droits de profs (ajouter un fichier)
 
-		chargement(true);
-		afficher_les_dossiers_dynamiques(false);
 
 		//changer le titre du document 
 		element_DOM('accueil_utilisateur').innerHTML = titre;
@@ -3786,10 +3786,9 @@ function dossier_vide(garder_liste){
 
 	enlever_alerte_vide(garder_liste);
 
-	var alerte = document.createElement('div');
+	var alerte = document.createElement('span');
 	alerte.id = "alerte_vide";
-	alerte.style.top = "100px";
-	alerte.style.position = "relative";
+	alerte.className = "alerte_vide"
 
 
 	var la_date_choisie = $("#la_date_effet").find(":selected").text();
@@ -3799,7 +3798,7 @@ function dossier_vide(garder_liste){
 	var mode_date = $(".sekooly-mode-background").length > 0 ? $(".sekooly-mode-background")[0].id === "par_la_date_effet" : true
 	var element_choisi = mode_date ? la_date_choisie : le_chapitre_choisi
 
-	alerte.innerHTML = '<i style="width: max-content;color: #d9d8db;">Il n\'y a pas encore de fichiers pour ' + element_choisi + '.</i>';
+	alerte.innerHTML = '<i class="contenu_alerte_vide">Il n\'y a pas encore de fichiers pour ' + element_choisi + '.</i>';
 
 	afficher_le_drive(false);
 	document.body.insertBefore(alerte,element_DOM('gros_conteneur')); 
@@ -4023,7 +4022,7 @@ function ajouter_un_fichier(id_fichier,nom_fichier,nom_drive,extension_fichier,d
 	var periode_bulletin = periode_bulletin ? " periode_bulletin='"+periode_bulletin+"'" : ""
 	var destinataire_par_page = destinataire_par_page ? " destinataire_par_page='"+destinataire_par_page+"'" : ""
 	var id_chapitre = id_chapitre ? " id_chapitre='" + id_chapitre + "'" : ""
-	var code_html = '<span oncontextmenu="autoriser_clic_droit_supprimer_et_renommer(event,this)" onclick="ouvrir_fichier(this)" class="span_un_fichier" id="' + id_fichier + '" ma_date_effet="'+ la_date_yyyy_mm_dd(date_effet)+'" mon_heure_effet="'+ heure_effet + '" ma_date_limite="'+ la_date_yyyy_mm_dd(date_limite)+'" mon_heure_limite="'+ heure_limite +'" est_telechargeable="'+est_telechargeable+'"    coefficient_rendu='+ coefficient_rendu + periode_bulletin  + destinataire_par_page + id_chapitre +'    >' + telecharger_le_fichier + '<img id="' + id_fichier + '" src="'+ image_fichier +'" class="un_fichier" '+padding_yt+'>' + nom_fichier +'</span>';
+	var code_html = '<span oncontextmenu="autoriser_clic_droit_supprimer_et_renommer(event,this)" onclick="ouvrir_fichier(this)" class="span_un_fichier" id="' + id_fichier + '" ma_date_effet="'+ la_date_yyyy_mm_dd(date_effet)+'" mon_heure_effet="'+ heure_effet + '" ma_date_limite="'+ la_date_yyyy_mm_dd(date_limite)+'" mon_heure_limite="'+ heure_limite +'" est_telechargeable="'+est_telechargeable+'"    coefficient_rendu='+ coefficient_rendu + periode_bulletin  + destinataire_par_page + id_chapitre +'    >' + telecharger_le_fichier + '<img id="' + id_fichier + '" src="'+ image_fichier +'" class="un_fichier" '+padding_yt+'><span class="nom_fichier">' + nom_fichier +'</span></span>';
 
 	//console.log(code_html);
 
@@ -4170,9 +4169,7 @@ function ouvrir_fichier(ceci){
 		stocker('fichier_ouvert',id_fichier);
 
 		//on ajoute le nom du fichier (TEXTE DANS LE SPAN)
-		var nom_fichier = $("span#"+id_fichier+".span_un_fichier").contents().filter(function(){ 
-		  return this.nodeType == 3; 
-		})[0].nodeValue;
+		var nom_fichier = $("[id='"+id_fichier+"'] > [class='nom_fichier']").text()
 
 		nom_fichier = rfc3986EncodeURIComponent(nom_fichier);
 		//visualiser(nom_fichier,id_fichier);
@@ -9374,14 +9371,16 @@ function recuperer_preferences(){
     });
 
 
-    //clic par défaut sur Images
+    //clic par défaut
     $("[id='Couleurs']").click();
+    //$("[id='Images']").click();
     afficher_fenetre(true)
 
 
 	
 
 }
+
 
 
 function personnaliser(id_parametre){
@@ -9392,6 +9391,7 @@ function personnaliser(id_parametre){
 	element_DOM("previsualisation").innerHTML = ""
 
 	var mon_hebergeur = hebergeur_actuel()
+	var bg_checked = data_etablissement['preferences']['background'] ? "checked" : ""
 
 	//si images
 	if(id_parametre === "Images"){
@@ -9418,6 +9418,15 @@ function personnaliser(id_parametre){
 			<vert>✅ = image trouvée</vert>
 			<rouge>❌ = image non trouvée</rouge>
 		</p>
+
+
+		<div>
+		  <span class="toggle"><label class="switch">  
+		  <input onchange="appliquer_fond(this.checked)" class="ecolage" id="my-background-image" type="checkbox" `+bg_checked+`>
+		  <span class="slider round"></span></label>
+		  <span class="img-activate">image de fond</span>
+		</span>
+		</div>
 		`
 
 		//console.log(contenu_explications)
@@ -9430,6 +9439,21 @@ function personnaliser(id_parametre){
 		contenu_explications = `
 
 				<form id="color-prefs">
+
+					<div class="element-pref">
+						<h2 class="au-centre">Barre de navigation<br>
+							<input type="color" onchange="changer_fond_apres_choix(this)" value="`+ couleur_fond("navbar-color") +`" class="palette" name="navbar-color">
+						</h2>			
+					</div>
+
+
+					<div class="element-pref">
+						<h2 class="au-centre">Titre des catégories de fichiers<br>
+							<input type="color" onchange="changer_fond_fenetre_apres_choix(this)" value="`+ couleur_fond("titre_drive") +`" class="palette" name="titre_drive">
+						</h2>
+					</div>
+
+
 
 					<div class="element-pref">
 						<h2 class="au-centre sekooly-mode">Mise en valeur de texte<br>
@@ -9464,18 +9488,17 @@ function personnaliser(id_parametre){
 						<h2 class="au-centre">Corps de la page<br>
 							<input id="body-color" type="color" onchange="changer_fond_body_apres_choix(this)" value="`+ rgb2hex($("body").css("background-color")) +`" class="palette" name="body">
 						</h2>
-						`+night_mode_option()+
-						`					
+
+						`
+						+night_mode_option()+
+						`
 					</div>
 					
 
 					<div class="element-pref">
 						<h2 class="au-centre">Corps de la fenêtre<br>
 							<input id="fenetre-color" type="color" onchange="changer_fond_fenetre_apres_choix(this)" value="`+ rgb2hex($("#fenetre").css("background-color")) +`" class="palette" name="ma_fenetre">
-						</h2>	
-						`
-						+night_mode_option()+
-						`				
+						</h2>			
 					</div>
 
 				</form>
@@ -9486,7 +9509,7 @@ function personnaliser(id_parametre){
 		`
 
 		//garder le mode actuel -> 2 fois
-		callback = "configurer_mode();configurer_mode()"
+		callback = "mettre_mon_mode_t_e()"
 
 
 
@@ -9505,54 +9528,8 @@ function personnaliser(id_parametre){
 	explications_pref(conteneur, contenu_explications, callback)
 }
 
-function night_mode_option(){
-	return `
-
-		<span class="clickable au-centre" onclick="configurer_mode()">
-			<img class="mini-image my-vision-mode" alt="🌙" src="https://raw.githubusercontent.com/Sekooly/SUPABASE/main/docs/images/img_night.png" style="">
-			Mode <span class="mode-night">nuit</span>
-		</span>	
-
-	`
-}
-
-function configurer_mode(){
-	//si on est INITIALEMENT en mode jour -> on change en mode nuit
-	//configurer tous les éléments qui sont configurables en mode nuit
-	
-	//couleur dans la palette
-	$('[class="clickable au-centre"]').siblings("h2").children("input").attr( "name", function( i, val ) {
-		if(mode_nuit_oui_final === "non"){
-			return "darkmode-" + val;
-		}else if(mode_nuit_oui_final === "oui"){
-			return val.split("darkmode-")[1];
-		}
-		
-	})
-
-	
-	changer_mode()
-
-	var est_nuit = mode_nuit_oui_final === "oui" 
-	mode_night = est_nuit ? "nuit" :  "jour" 
-	
-	actualiser_class_apres_changement_mode(est_nuit,"ma_fenetre")
-
-	
-	$(".mode-night").text(mode_night)
-
-	$("#body-color")[0].value = rgb2hex($("body").css("background-color"))
-
-	$("#fenetre-color")[0].value = rgb2hex($("#fenetre").css("background-color"))
-	
-	var mode = est_nuit ? "night" :  "day" 
-	$(".my-vision-mode").attr("src","https://sekooly.com/assets/images/img_"+mode+".png")
 
 
-
-
-	
-}
 
 function btn_prefs(fonction_reinit){
 	return `
@@ -9599,22 +9576,7 @@ function changer_fond_fenetre_apres_choix(ceci){
 
 }
 
-function actualiser_class_apres_changement_mode(est_mode_nuit,className){
-	class_initiale = className.replaceAll("darkmode-","")
-	//console.log({class_initiale})
 
-	classe_a_enlever = "darkmode-" + class_initiale
-
-	selector_changement = "[class*='"+class_initiale+"']"
-	//console.log({selector_changement})
-	if(est_mode_nuit){
-		//console.log({"ajouter":classe_a_enlever})
-		$(selector_changement).addClass(classe_a_enlever)
-	}else{
-		//console.log({"enlever":classe_a_enlever})
-		$(selector_changement).removeClass(classe_a_enlever)
-	}
-}
 
 
 function changer_fond_apres_choix(ceci){
@@ -9716,6 +9678,7 @@ function reinitialiser_images(){
 
 	element_DOM("prefixe_image").value = ""
 	maj_liste_images_pref($("#previsualisation"), hebergeur_defaut())
+	appliquer_fond(false)	
 	sauvegarder_pref()
 }
 
@@ -9751,7 +9714,6 @@ function personnaliser_images(conteneur){
 	/********************* liste des images *****************/
 	//$("#prefixe_image").keyup()
 	maj_liste_images_pref(conteneur, hebergeur_actuel(true))
-
 
 
 
@@ -9826,7 +9788,7 @@ async function maj_liste_images_pref(conteneur, futur_hebergeur){
 			//console.log({mon_hebergeur})
 			var nom_image = "/" + e.split("/").pop()
 
-			if(nom_image){
+			if(e.split("/").pop()){
 
 				/*
 				la_coche = await mettre_la_coche(mon_hebergeur+nom_image)

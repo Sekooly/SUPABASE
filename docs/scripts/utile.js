@@ -1,5 +1,6 @@
 var mon_role = "";
 var entete_heroku = "https://sekooly-server.herokuapp.com/"
+var liste_class_avec_fond_mode_nuit = ["ma_fenetre","titre_drive"]
 
 function se_deconnecter(){
   /*
@@ -1231,8 +1232,121 @@ function changer_mode(sans_changer){
 
 
 function mettre_mon_mode(){
-  changer_mode(true)
+  //si t-e -> nouveau
+  if(location.href.includes("tele-enseignement")){
+    mettre_mon_mode_t_e()
+  }else {
+    //si index -> normal
+    changer_mode(true)
+
+  }
+  
+
 }
+
+function mettre_mon_mode_t_e(){
+
+  //mettre le mode nuit pour ceux qui ont en besoin
+  $('[class="element-pref"] input').attr("name",function(a,b){
+    if(liste_class_avec_fond_mode_nuit.filter(e => e.includes(b)).length > 0){
+      //console.log("ajouter le mode nuit!",b)
+      $("[name='"+b+"']").parent().parent().append(night_mode_option())
+      //console.log("avec class = name de b: ", $("[name='"+b+"']"))
+      //console.log("le parent h2: ", $("[name='"+b+"']").parent("h2"))
+      //console.log("\n")
+    }
+  })
+
+
+  configurer_mode()
+  configurer_mode()
+}
+
+function night_mode_option(){
+  return `
+
+    <h5 class="clickable au-centre" onclick="configurer_mode()">
+      <img class="mini-image my-vision-mode" alt="🌙" src="https://raw.githubusercontent.com/Sekooly/SUPABASE/main/docs/images/img_night.png" style="">
+      Mode <span class="mode-night">nuit</span>
+    </h5> 
+
+  `
+}
+
+
+function configurer_mode(){
+  //si on est INITIALEMENT en mode jour -> on change en mode nuit
+  //configurer tous les éléments qui sont configurables en mode nuit
+  
+  //couleur dans la palette
+  $('[class="clickable au-centre"]').siblings("h2").children("input").attr( "name", function( i, val ) {
+    if(mode_nuit_oui_final === "non"){
+      return "darkmode-" + val;
+    }else if(mode_nuit_oui_final === "oui"){
+      return val.split("darkmode-")[1];
+    }
+    
+  })
+
+  changer_mode()
+
+  var est_nuit = mode_nuit_oui_final === "oui" 
+  mode_night = est_nuit ? "nuit" :  "jour" 
+
+  
+
+  liste_class_avec_fond_mode_nuit.forEach(function(une_classe){
+    une_classe = est_nuit ? "darkmode-" + une_classe :  une_classe
+    actualiser_class_apres_changement_mode(est_nuit,une_classe)  
+  })
+  
+
+  
+  $(".mode-night").text(mode_night)
+
+
+
+  $("#body-color").val(rgb2hex($("body").css("background-color")))
+
+  //TODO : changer via liste_class_avec_fond_mode_nuit  
+  //$("#fenetre-color").val(rgb2hex($("#fenetre").css("background-color")))
+  liste_class_avec_fond_mode_nuit.map(e => 'input[name*="' + e + '"]' ).forEach(function(v){
+    
+    var className = $(v).attr("name")
+    //console.log(className)
+
+    if(className) $(v).val(couleur_fond(className))
+  })
+  
+
+  
+  var mode = est_nuit ? "night" :  "day" 
+  $(".my-vision-mode").attr("src","https://sekooly.com/assets/images/img_"+mode+".png")
+
+
+
+
+  
+}
+
+
+function actualiser_class_apres_changement_mode(est_mode_nuit,className){
+  class_initiale = className.replaceAll("darkmode-","")
+  //console.log({class_initiale})
+
+  classe_a_enlever = "darkmode-" + class_initiale
+
+  selector_changement = "[class*='"+class_initiale+"']"
+  //console.log({selector_changement})
+  if(est_mode_nuit){
+    //console.log({"ajouter":classe_a_enlever})
+    $(selector_changement).addClass(classe_a_enlever)
+  }else{
+    //console.log({"enlever":classe_a_enlever})
+    $(selector_changement).removeClass(classe_a_enlever)
+  }
+}
+
 
 
 function modifier_donnee_locale(nom_item, champ_reference, valeur_reference, champ_a_actualiser, nouvelle_valeur, plusieurs_elements, fonction_ordonner){
@@ -1696,6 +1810,7 @@ function couleur_fond(noms_classes,juste_un_selector){
 function appliquer_preferences(){
 
 
+  remplacer_image_par_defaut()
 
   if(data_etablissement['preferences']){
     //console.log("on a des préférences à mettre...")
@@ -1718,8 +1833,14 @@ function appliquer_preferences(){
 
     })    
 
+
     //actualiser les images
     appliquer_images()
+
+    //actualiser l'image de fond
+    appliquer_fond(data_etablissement['preferences']['background'])
+
+
     //actualiser les couleurs
     appliquer_couleurs()
     //actualiser les formes
@@ -1727,8 +1848,25 @@ function appliquer_preferences(){
   }
 
 
-  remplacer_image_par_defaut()
 }
+
+
+function appliquer_fond(oui){
+  if(oui){
+    $(".sekooly-background").addClass("show")
+    $('[href="'+prefixe_image+'/img_background-image.png"]').show()
+    $('[id="my-background-image"]').prop("checked",true)
+    data_etablissement['preferences']['background'] = true
+  }else{
+    $(".sekooly-background").removeClass("show")
+    $('[href="'+prefixe_image+'/img_background-image.png"]').hide()
+    $('[id="my-background-image"]').prop("checked",false)
+    delete data_etablissement['preferences']['background']
+  } 
+
+  mettre_source_background()
+}
+
 
 
 
@@ -1769,7 +1907,7 @@ function actualiser_image_non_trouvee(new_node){
 
   $("img").off("error")
   $("img").on("error",function(e){
-    //console.log(e.target , "non trouvée ")
+    //console.log(e.target.src , "non trouvée ")
     remplacer_avec_defaut(e)
   });
 
@@ -1812,10 +1950,22 @@ function appliquer_images(){
   })
 
 
+  mettre_source_background()
 
 
 }
 
+function mettre_source_background(){
+
+  //mettre le background si activé (par défaut: "https://sekooly.com/assets/images/img_background-image.png")
+  if(data_etablissement['preferences']['background']){
+    element_DOM("background-image").src = prefixe_image + "/img_background-image.png"
+  }
+
+
+
+
+}
 
 
 function remplacer_avec_defaut(e){
