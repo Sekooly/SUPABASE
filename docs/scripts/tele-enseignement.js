@@ -3795,7 +3795,7 @@ function dossier_vide(garder_liste){
 	var le_chapitre_choisi = $("#filtre_id_chapitre").find(":selected").text();
 
 	//en fonction du mode
-	var mode_date = $(".sekooly-mode-background").length > 0 ? $(".sekooly-mode-background")[0].id === "par_la_date_effet" : true
+	var mode_date = $('[id="la_date_effet"]:visible').length > 0
 	var element_choisi = mode_date ? la_date_choisie : le_chapitre_choisi
 
 	alerte.innerHTML = '<i class="contenu_alerte_vide">Il n\'y a pas encore de fichiers pour ' + element_choisi + '.</i>';
@@ -4595,7 +4595,9 @@ function creer_mini_popup(titre,elements_html,nom_bouton,fonction_bouton,valeur_
 	//console.log({id_bouton_html})
 	var valider_changement = '<button type="button"  '+id_bouton_html+'  class="rendre sekooly-mode-background" onclick="'+fonction_bouton+'">'+nom_bouton+'</button>'
 
-	var mini_popup_html = '<div class="mini_popup" id="mini_popup">'+bouton_quitter+titre_html+elements_html+valider_changement+'</div>';
+
+	var classe_supplementaire = mode_nuit_oui_final === "oui" ? " darkmode-mini_popup" : ""
+	var mini_popup_html = '<div class="mini_popup'+classe_supplementaire+'" id="mini_popup">'+bouton_quitter+titre_html+elements_html+valider_changement+'</div>';
 
 	var mini_popup = document.createElement('div');
 	mini_popup.innerHTML = mini_popup_html;
