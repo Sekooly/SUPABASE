@@ -5063,13 +5063,21 @@ async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_init
 
 	}
 
-
+	//si pas de telechargement -> sans clic droit
+	au_clic_droit("#previsualisation", "clic_droit_interdit(event)")
 
 	//on ajuste les boutons
 	ajuster_boutons_fenetre();
 	ajuster_boutons_fenetre(true);
 	choisir_height_viz_si_pdf();
 
+}
+
+function clic_droit_interdit(e){
+	//console.log("interdit!")
+	e.preventDefault()
+	e.stopPropagation()
+	return false
 }
 
 function est_youtube(extension){
@@ -5119,7 +5127,7 @@ function calcul_lien_de_visu(extension,id_fichier){
 
 	//si c'est un lien YOUTUBE
 	}else if(est_youtube(extension)){
-		lien_de_visu = 'https://www.youtube.com/embed/' + id_fichier + '?fs=1&loop=1&rel=0&showinfo=0';
+		lien_de_visu = 'https://www.youtube.com/embed/' + id_fichier + '?fs=1&loop=1&rel=0&showinfo=0&modestbranding=1';
 	}
 
 
@@ -18564,6 +18572,13 @@ function au_clic(selector, callback){
 }
 
 
+
+function au_clic_droit(selector, callback){
+	$(selector).off("contextmenu")
+	$(selector).on("contextmenu",function(event){
+		eval(callback)
+	})
+}
 
 
 
