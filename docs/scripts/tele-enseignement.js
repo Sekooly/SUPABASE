@@ -1,4 +1,45 @@
-var elements_menu_haut = ["Infos établissement","Cycles", "Classes", "Matieres", "Eleves","Profs", "Administration", "Maintenance", "Programme", "Alerte", "Logs", "Visio", "Notifs", "Fichiers", "Quiz","Questions","Reponses","Rendus", "Topic", "Coms","Espace etablissement restant"]
+var elements_generiques_en_haut = [{"Général": [
+										  "Alerte",
+										  "Cycles",
+										  "Espace etablissement restant",
+										  "Infos établissement",
+										  "Maintenance"
+										]
+								
+									},
+
+									{"Enseignement":[
+										  "Classes",
+										  "Matieres"
+										]
+
+									},
+
+									{"Utilisateurs":[
+										  "Administration",
+										  "Profs",
+										  "Eleves"
+										]
+
+									},
+									{"Activités":[
+										  "Logs",
+										  "Visio",
+										  "Fichiers",
+										  "Rendus",
+										  "Topic",
+										  "Coms",
+										  "Notifs"
+										]								
+
+									},
+									{"Quiz": [
+										  "Quiz",
+										  "Questions",
+										  "Reponses"
+										]										
+									}]
+var elements_menu_haut = elements_generiques_en_haut.map(e => Object.values(e) ).join(',').split(',')
 
 var elements_menu_analyses = ["Analyses des connexions"]
 
@@ -14,11 +55,15 @@ var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","UR
 								"id_formulaire_remediation", "id_fiche", "URL_Mapping","niveau",
 								"classe_bis", "id_dossier_cycle", "dossier_rendus_cycle", "liste_notifs_lues", "nombre_avis", "Numero_telephone",
 								"id", "Id_classe_matiere", "id_notif", "Id_source", "id_fichier", "id_dossier", "id_devoir", "id_dossier_sujetdevoir", "id_fichier_sujetdevoir", "Id_topic", "id_com", "ID_FICHIER", "id_msg","id_conv", "id_chapitre",
-								"id_quiz", "id_question", "id_reponse", "description"]
+								"id_quiz", "id_question", "id_reponse","id_classe_matiere", "resultat_immediat", "nb_tentatives", "questions_aleatoires", "position_question",
+								"1er_Prénom", "LV1","LV2","LV3","Option_1","Option_2","Spécialité","Numeros_telephone_original",
+								
+							]
 
 
 var elements_menu_haut_avec_modifs = ["Classes","Matieres","Eleves","Profs","Administration"]
 var elements_menu_haut_avec_reset = ["Eleves","Profs","Administration"]
+
 nom_etablissement = data_etablissement['nom_etablissement']
 
 
@@ -4596,8 +4641,8 @@ function creer_mini_popup(titre,elements_html,nom_bouton,fonction_bouton,valeur_
 	var valider_changement = '<button type="button"  '+id_bouton_html+'  class="rendre sekooly-mode-background" onclick="'+fonction_bouton+'">'+nom_bouton+'</button>'
 
 
-	var classe_supplementaire = mode_nuit_oui_final === "oui" ? " darkmode-mini_popup" : ""
-	var mini_popup_html = '<div class="mini_popup'+classe_supplementaire+'" id="mini_popup">'+bouton_quitter+titre_html+elements_html+valider_changement+'</div>';
+	
+	var mini_popup_html = '<div class="mini_popup" id="mini_popup">'+bouton_quitter+titre_html+elements_html+valider_changement+'</div>';
 
 	var mini_popup = document.createElement('div');
 	mini_popup.innerHTML = mini_popup_html;
@@ -4613,6 +4658,8 @@ function creer_mini_popup(titre,elements_html,nom_bouton,fonction_bouton,valeur_
 	ajuster_boutons_fenetre(true);
 	choisir_height_viz_si_pdf();
 }
+
+
 
 function mettre_a_jour_categorie(id_fichier_valeur){
 
@@ -9348,7 +9395,8 @@ function recuperer_analyses(){
     });
 
 
-    //clic par défaut sur Analyses des connexions
+
+    //clic par défaut sur: Analyses des connexions    
     $("[id='Analyses des connexions']").click();
 
 	afficher_fenetre(true)
@@ -9970,17 +10018,28 @@ async function sauvegarder_pref(){
 
 
 function recuperer_parametres(){
+
 	
 	if(recuperer('liste_params_colonnes_masquees') === null) stocker('liste_params_colonnes_masquees','')
 
 	vider_fenetre("Paramètres");
 	
+	/*
+	var contenu_menu_haut = ""	
 
-	var contenu_menu_haut = ""
-	
+
 	for (var i =  0; i < elements_menu_haut.length; i++) {
 		contenu_menu_haut = contenu_menu_haut + '<span class="un_menu" id ="'+elements_menu_haut[i]+'">'+elements_menu_haut[i]+'</span>' 
 	}
+	var nombre_elements = '<span style="font-weight: bold;"><span id="nombre_elements_param">'+0+'</span> éléments</span>'
+	var conteneur_menu_html = '<div id="conteneur_menu"><div id="menu_haut" class="menu_haut"> ' + contenu_menu_haut+ '</div><div id="menu_params" class="menu_params"><div id="conteneur_filtre"><span id="label_filtre_parametre"></span><select id="filtre_parametre" class="filtre_parametre"></select></div><div id="menu_details"></div>'+nombre_elements+'</div></div>'
+	*/
+
+	var contenu_menu_haut = ""
+	elements_generiques_en_haut.forEach(function(element_generique){
+		contenu_menu_haut += un_menu_generique(element_generique)
+	})
+
 	var nombre_elements = '<span style="font-weight: bold;"><span id="nombre_elements_param">'+0+'</span> éléments</span>'
 	var conteneur_menu_html = '<div id="conteneur_menu"><div id="menu_haut" class="menu_haut"> ' + contenu_menu_haut+ '</div><div id="menu_params" class="menu_params"><div id="conteneur_filtre"><span id="label_filtre_parametre"></span><select id="filtre_parametre" class="filtre_parametre"></select></div><div id="menu_details"></div>'+nombre_elements+'</div></div>'
 
@@ -9989,19 +10048,42 @@ function recuperer_parametres(){
 	$("#fenetre").append(conteneur_menu_html);
 
 
+
 	//clic -> mise en forme + actualisation de menu_details
-	$('.un_menu').click(function(e) {
+	$('.un_menu').change(function(e) {
 		chargement(true)
-		un_menu_clic(e.target.id)			
+		un_menu_clic(e.target.value)			
         chargement(false)
     });
 
 
     //clic par défaut sur Alerte
-    $("#Alerte").click();
+	choisir_ce_parametre("Alerte")
 
 	afficher_fenetre(true)
 
+}
+
+
+function un_menu_generique(element_generique){
+
+	//console.log({element_generique})
+	
+	var nom_element_generique = Object.keys(element_generique)[0]
+	//console.log({nom_element_generique})
+	var res = "<select class='un_menu'><option value='--'>--"+nom_element_generique+"--</option>"
+
+	//pour chaque élément de ce nom générique
+	element_generique[nom_element_generique].forEach(function(une_option){
+		//console.log(une_option)
+		res += "<option value='"+une_option+"'>"+une_option+"</option>"
+
+	})
+
+
+	res += "</select>"
+	//console.log({res})
+	return res
 }
 
 function appliquer_filtre_choisi(nom_champ_reference, valeur_champ_reference){
@@ -10104,11 +10186,14 @@ async function update_viz_logs(){
 
 async function un_menu_clic(id_parametre,mode_pref){
 
-
-
+	chargement(true)
 
 	$("#mini_popup").remove()
     mettre_en_forme_onglet_clicked(id_parametre);
+    $("#conteneur_filtre").hide()
+
+
+	if(id_parametre === "--") return alert("Choisissez un élément du menu déroulant.")
 
 	
 	//si c'est une analyse
@@ -10126,7 +10211,10 @@ async function un_menu_clic(id_parametre,mode_pref){
 	    actualiser_filtre_onglet(id_parametre);
 	    await actualiser_details_parametre(id_parametre);
 		await mettre_etat_espace(id_parametre)
-	
+		
+
+		$("#conteneur_filtre").show()
+
 
 	    //pas de modifs à faire
 	    if($("#boutons_params")){
@@ -10160,14 +10248,23 @@ async function un_menu_clic(id_parametre,mode_pref){
 		}
 	    
 	    
-		
 	}
 
 
 
+	$( document ).ready(function() {
+	    chargement(false)
+	});
+}
+
+function choisir_ce_parametre(id_parametre){
+	$('[value="'+id_parametre+'"]').parent("select").val(id_parametre)
+	$('[value="'+id_parametre+'"]').parent("select").change()
 }
 
 function affichage_par_defaut(id_parametre){
+
+
 	//console.log("POUR LE PARAMETRE " + id_parametre)
 	liste_params_colonnes_masquees_str = recuperer("liste_params_colonnes_masquees")
 	if(liste_params_colonnes_masquees_str){
@@ -10215,9 +10312,12 @@ function masquer_params_auto(){
 }
 
 function autoriser_les_modifs(oui){
-	$("#ajout_param")[0].style.display = oui ? "" : "none"
-	$("#suppr_param")[0].style.display = oui ? "" : "none"
-	$("#dupliquer_param")[0].style.display = oui ? "" : "none"
+	var selector = "#ajout_param, #suppr_param, #dupliquer_param, #telecharger_param, #importer_param"
+	if(oui){
+		$(selector).show()
+	}else{
+		$(selector).hide()
+	}
 }
 
 function autoriser_le_reset(oui){
@@ -10230,25 +10330,47 @@ function autoriser_tout_voir(oui){
 
 function mettre_en_forme_onglet_clicked(id_onglet){
 
+
+	$("option").removeClass("un_menu")
+	$("option").removeClass("un_menu_orange")
+	$("option").removeClass("sekooly-mode-background")
+
 	//console.log("on mettra en forme pour " + id_onglet)
 	for (var i =  0; i < $(".menu_haut")[0].children.length; i++) {
-		id_onglet_courant = $(".menu_haut")[0].children[i].id
+		id_onglet_courant = $(".menu_haut")[0].children[i].id || $(".menu_haut")[0].children[i].value
 
+		/*
+		console.log({id_onglet})
+		console.log({id_onglet_courant})
+		*/
+
+
+		valeur_ou_id = id_onglet_courant === $(".menu_haut")[0].children[i].id ? "id" : "value"
 
 		//au clic d'un menu
 		//-> tout est réinit
 		//on met en orange l'onglet choisi
 		if(id_onglet_courant===id_onglet){
+
 			//console.log(id_onglet_courant + " = id_onglet")
-			$('[id="' + id_onglet_courant + '"]')[0].className = "un_menu un_menu_orange sekooly-mode-background"
+			$('['+valeur_ou_id+'="' + id_onglet_courant + '"]')[0].className = "un_menu un_menu_orange sekooly-mode-background"
 		}else{
 			//console.log("id_onglet_courant <> id_onglet")
-			$('[id="' + id_onglet_courant + '"]')[0].className = "un_menu"
+			if(valeur_ou_id === "id"){
+				$('['+valeur_ou_id+'="' + id_onglet_courant + '"]')[0].className = "un_menu"
+			}
+
+
 		}
 
 		
 
 	}
+
+	$('select.un_menu').val("--")
+	$('select.un_menu').removeClass("sekooly-mode-background")
+	$(".un_menu_orange").parent("select").val(id_onglet)
+	$(".un_menu_orange").parent("select").addClass("sekooly-mode-background")
 
 }
 
@@ -10608,7 +10730,7 @@ function information_etablissement(id_info, etiquette_info, valeur_info, est_mod
 
 
 function actualiser_details_parametre(id_parametre){
-	chargement(true)
+	
 	$("#menu_details")[0].innerHTML = "";
 
 	//liste ARRAY (1 élement)
@@ -10775,7 +10897,7 @@ function au_changement_du_filtre(){
 		compter_nombre_de_lignes()
 	})
 
-	chargement(false)
+	//chargement(false)
 }
 
 function compter_nombre_de_lignes(){
@@ -11113,7 +11235,7 @@ function json2Table(json, id_table) {
 		json = transformer_en_array_de_JSON(json);
 	}*/
 
-	var id_parametre = $(".un_menu_orange")[0].id 
+	var id_parametre = ($(".un_menu_orange")[0].id || $(".un_menu_orange")[0].value) 
 	let cols = nom_des_champs(id_parametre) //Object.keys(json[0])
 
 	/*
@@ -11204,7 +11326,7 @@ function fonction_td_modifiable(e, sans_suite){
 	//sinon: saisie libre
 	
 	var ancienne_valeur = e.target.innerText;
-	var id_parametre = $(".un_menu_orange")[0].id 
+	var id_parametre = ($(".un_menu_orange")[0].id || $(".un_menu_orange")[0].value) 
 
 
 	var liste_index_params_auto = ',' + parametres_automatiques.map(e => $('[id="'+e+'"].header_table.entete_sticky:visible')).filter(e => e.length > 0).map(e => e[0].cellIndex).join(',') +','
@@ -11305,7 +11427,7 @@ async function suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur)
 		if(nouvelle_valeur===null) return -1;
 		chargement(true);
 
-		var nom_table = $(".un_menu_orange")[0].id
+		var nom_table = ($(".un_menu_orange")[0].id || $(".un_menu_orange")[0].value)
 		var nom_champ_reference = identifiant_par_table(nom_table)
 		var valeur_champ_reference = e.target.parentNode.id		
 		var numero_colonne = e.target.cellIndex		
@@ -11488,7 +11610,7 @@ function renommer_sur_drive(id_dossier, nom_final){
 
 
 function actualiser_parametre(id_parametre){
-	if(!id_parametre) id_parametre = $(".un_menu_orange")[0].id
+	if(!id_parametre) id_parametre = ($(".un_menu_orange")[0].id || $(".un_menu_orange")[0].value)
 
 	//console.log(id_parametre)
 	effacer(id_parametre)
@@ -11499,7 +11621,7 @@ function actualiser_parametre(id_parametre){
 }
 
 function ajouter_donnees_parametres(id_parametre){
-	if(!id_parametre) id_parametre = $(".un_menu_orange")[0].id
+	if(!id_parametre) id_parametre = ($(".un_menu_orange")[0].id || $(".un_menu_orange")[0].value)
 	var liste_champs = recuperer_entetes_params(id_parametre)
 	//console.log(liste_champs)
 	creer_formulaire_ajout_donnee_html(id_parametre, liste_champs)
@@ -11507,7 +11629,7 @@ function ajouter_donnees_parametres(id_parametre){
 
 
 function dupliquer_donnees_parametres(id_parametre){
-	if(!id_parametre) id_parametre = $(".un_menu_orange")[0].id
+	if(!id_parametre) id_parametre = ($(".un_menu_orange")[0].id || $(".un_menu_orange")[0].value)
 	id_ligne_dupliquee = 0
 
 	var liste_champs = recuperer_entetes_params(id_parametre)
@@ -11516,7 +11638,7 @@ function dupliquer_donnees_parametres(id_parametre){
 }
 
 async function supprimer_ligne_parameters(id_parametre){
-	if(!id_parametre) id_parametre = $(".un_menu_orange")[0].id
+	if(!id_parametre) id_parametre = ($(".un_menu_orange")[0].id || $(".un_menu_orange")[0].value)
 
 
 	
@@ -11687,7 +11809,7 @@ function supprimer_dossier(id_dossier, id_googlecalendar){
 
 
 function telecharger_donnees_parametres(id_parametre){
-	if(!id_parametre) id_parametre = $(".un_menu_orange")[0].id
+	if(!id_parametre) id_parametre = ($(".un_menu_orange")[0].id || $(".un_menu_orange")[0].value)
 
 	//alert("Téléchargement ici.")
 	var choix_entete_ou_tout_html = '<div id="mini_popup" class="mini_popup">'
@@ -11706,11 +11828,22 @@ function telecharger_donnees_parametres(id_parametre){
 
 async function telecharger_parametre(id_parametre){
 
-	if(!id_parametre) id_parametre = $(".un_menu_orange")[0].id
+	if(!id_parametre) id_parametre = ($(".un_menu_orange")[0].id || $(".un_menu_orange")[0].value)
 
 	var entetes_seulement = $("#choix_download_param")[0].value === "En-têtes"
+
+
+	
 	var contenu_recup = entetes_seulement ? nom_des_champs(id_parametre) : await rechercher_tout(id_parametre) // recuperer(id_parametre) ? JSON.parse(recuperer(id_parametre)) : nom_des_champs(id_parametre)
 	//console.log(contenu_recup)
+
+	//uniquement les champs utiles 
+	if(entetes_seulement){
+		contenu_recup = contenu_recup.filter(e => parametres_automatiques.indexOf(e) < 0)
+	}
+	//console.log(contenu_recup)
+
+
 	var contenu = convertir_csv(contenu_recup, entetes_seulement)
 	//console.log(contenu)
 	var suite_nom = entetes_seulement ? "-modele-" : ""
@@ -11750,7 +11883,7 @@ function importer_parametres(){
 	$('#fichier_import').remove()
 
 	//choisir un SEUL fichier pour le id_parametre
-	var id_parametre = $(".un_menu_orange")[0].id 
+	var id_parametre = ($(".un_menu_orange")[0].id || $(".un_menu_orange")[0].value) 
 	var champs_initiaux = nom_des_champs(id_parametre)//on recupere depuis la BDD directement
 	var fichier_html = '<input id="fichier_import" type="file" name="fichier_import" accept=".csv" style="display:none;">'
 	$('body').append(fichier_html)
@@ -11856,7 +11989,7 @@ function importer_parametres(){
 
 function init_donnees(){
 
-	id_parametre = $(".un_menu_orange")[0].id
+	id_parametre = ($(".un_menu_orange")[0].id || $(".un_menu_orange")[0].value)
 
 	//1 seul séléctionné
 	if ($(".selected")[0]){
@@ -12106,7 +12239,7 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 		//obliger la saisie de tous les non disabled
 		if (formulaire_rempli("donnees_saisies") === false){
 
-			if(plateforme_prete() === true){
+			if(plateforme_prete() === true && !ne_pas_actualiser){
 
 				alert("Merci de remplir tous les champs.")
 				return -1;

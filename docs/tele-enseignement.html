@@ -19,7 +19,7 @@
 
 		
 		<script type="text/javascript" src="scripts/aes.js"></script>
-		<script type="text/javascript" src="scripts/utile.min.js"></script>
+		<script type="text/javascript" src="scripts/utile.js"></script>
 		<script src="scripts/donnees_client.js"></script>
 
 
@@ -83,6 +83,20 @@
 		<link id="style-sekooly" rel="stylesheet" href="https://sekooly.com/assets/style/sekooly-dark.css" ></link>
 
 	<style>
+
+		.small-text {
+			font-size: 15px !important;
+			cursor: auto !important;
+			border-top-width: 0.25px;
+			border-top-color: white;
+			border-top-style: solid;
+
+		}
+
+		td {
+		    height: 20px;
+		}
+
 		#boutons_params {			
 		    color: #000;
 		    cursor: pointer;
@@ -581,7 +595,7 @@
 			position: relative;
 			width: 20px;
 			height: 20px;
-			top: 5px;
+			cursor: pointer;
 		}
 
 		.conteneur_bouton_ajout_chapitre{
@@ -2283,6 +2297,13 @@
 		<!--
 			<div><a style="color:white;" href="https://sekooly.com" target="_blank">Site de Sekooly</a></div>
 		-->
+
+		<!--<div id="bas_de_page" class="bas_de_page">-->
+		<div id="bas_de_page" class="small-text">
+			<span> Pour tout problème de contenu, contactez l'Administration en envoyant un mail à <a class="lien_mail" id="contact_etablissement" href=""></a> en précisant votre nom, prénom, classe(s).</span>
+			<br><br>
+			<span> Pour tout problème d'ordre <strong>technique</strong>, contactez SEKOOLY en envoyant un mail à <a class="lien_mail" href="mailto:contact@sekooly.com">contact@sekooly.com</a> en précisant votre établissement.</span>
+		</div>
 	</div>
 
 
@@ -2306,7 +2327,7 @@
 		  <div id="par_la_date_effet" class="mode_affichage_fichiers">Date d'effet</div>
 		  <div id="par_filtre_id_chapitre" class="mode_affichage_fichiers">Chapitre</div>
 		</div>
-		<img id="config-date-prog"  class="gear" alt="⚙️" src="https://sekooly.com/assets/images/img_gear.png">
+		<span id="config-date-prog" class="gear">⚙️</span>
 		
 
 		<select id="la_date_effet" class="la_date_effet"></select>
@@ -2572,18 +2593,14 @@
 
 	<img class="centered" id="img_chargement" alt="Chargement..." src="https://sekooly.com/assets/images/loading.webp" border="0" width="30"> 
 
-	<div id="bas_de_page" class="bas_de_page">
-		<span> Pour tout problème de contenu, contactez l'Administration en envoyant un mail à <a class="lien_mail" id="contact_etablissement" href=""></a> en précisant votre nom, prénom, classe(s).</span>
-		<br>
-		<span> Pour tout problème d'ordre <strong>technique</strong>, contactez SEKOOLY en envoyant un mail à <a class="lien_mail" href="mailto:contact@sekooly.com">contact@sekooly.com</a> en précisant votre établissement.</span>
-	</div>
+
 
 
 	<div id="snackbar">CONTENU</div>
 
 	<!--overwrites some local rules-->
 	<style type="text/css" id="custom-css"></style>
-	<script type="text/javascript" src="scripts/tele-enseignement.min.js"></script>
+	<script type="text/javascript" src="scripts/tele-enseignement.js"></script>
 
 	</body>
 

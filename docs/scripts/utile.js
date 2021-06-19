@@ -107,7 +107,6 @@ function rechercher_tout(nom_table, avec_where){
   table = avec_where ? nom_table : '"'+nom_table+'"'
   //alert(table)
   url = entete_heroku + convertir_db(racine_data) + '/SELECT * FROM '+table+' ' + transformer_en_sql(ordonner(nom_table))
-  //console.log(url)
   //alert(url)
   return get_resultat_asynchrone(url)
 }
@@ -462,7 +461,7 @@ async function fin_envoi_log(partir, mon_identifiant, ma_classe, mon_statut,
 
       //stocker le code dans mes données
       modifier_donnee_locale("mes_donnees","Identifiant",$("#Identifiant").val(),"Code",$("#Code").val())
-      console.log(JSON.parse(recuperer('mes_donnees')))
+      //console.log(JSON.parse(recuperer('mes_donnees')))
       window.location.href="tele-enseignement"      
     }   
 
@@ -842,10 +841,18 @@ function garder_les_colonnes_non_automatiques(arr){
   //pour chaque ligne
   arr.forEach(function(valeur,index){    
     //pour chaque colonne AUTOMATIQUE
-    parametres_automatiques.forEach(function(nom_parametre){
+    parametres_automatiques.map(function(nom_parametre,index_param){
+      //console.log({index_param:nom_parametre})
+      //console.log("   ",valeur[nom_parametre])
+
       //si ce parametre auto existe dans le arr -> on le supprime
-      if(valeur[nom_parametre]) delete valeur[nom_parametre]
+      if(valeur[nom_parametre] !== undefined){
+        //console.log("supprimer ", nom_parametre)
+        delete valeur[nom_parametre]
+      }
     })
+
+    //console.log('\n')
   })
 
   return arr
@@ -937,7 +944,7 @@ function init_mon_role(){
 function afficher_clic_droit_param(ceci){
   event.preventDefault();
   event.stopPropagation(); 
-  id_parametre = $(".un_menu_orange")[0].id
+  id_parametre = ($(".un_menu_orange")[0].id || $(".un_menu_orange")[0].value)
 
   $("#clic_droit_titres_param").remove()
   $("thead").append('<div id="clic_droit_titres_param" style="z-index: 50;position: fixed;"></div>')
@@ -962,7 +969,8 @@ function afficher_clic_droit_param(ceci){
     for (var i = 0; i < liste_params_colonnes_masquees.length ; i++) {
       parametre = liste_params_colonnes_masquees[i].split(":")[0]
       id_colonne = liste_params_colonnes_masquees[i].split(":")[1]
-      ajouter_fonction_clic_droit(event,element_DOM("clic_droit_titres_param"),i+1,"afficher_colonne","Afficher la colonne <b>"+id_colonne+"</b>",id_colonne,"clic_droit_titre_param")  
+
+      if(parametre) ajouter_fonction_clic_droit(event,element_DOM("clic_droit_titres_param"),i+1,"afficher_colonne","Afficher <b>"+id_colonne+"</b>",id_colonne,"clic_droit_titre_param")  
     }
 
     ajouter_fonction_clic_droit(event,element_DOM("clic_droit_titres_param"),i+1,"afficher_colonnes","<b>Afficher toutes les colonnes</b>",ceci.id,"clic_droit_titre_param")  
@@ -985,7 +993,7 @@ function afficher_colonnes(id_parametre, titre){
   $("th").css("display","")
   $("td").css("display","")
 
-  id_parametre = $(".un_menu_orange")[0].id
+  id_parametre = ($(".un_menu_orange")[0].id || $(".un_menu_orange")[0].value)
 
   if(titre !== ""){
 
@@ -1041,7 +1049,7 @@ function masquer_colonne(id_colonne,non_plutot_afficher){
     
 
     //si non visible -> l'enregistrer dans les préfs de l'user
-    param_actualisé = $(".un_menu_orange")[0].id + ":" + id_colonne
+    param_actualisé = ($(".un_menu_orange")[0].id || $(".un_menu_orange")[0].value) + ":" + id_colonne
     liste_params_colonnes_masquees = recuperer("liste_params_colonnes_masquees")
 
 
@@ -1953,6 +1961,15 @@ function actualiser_image_non_trouvee(new_node){
     remplacer_avec_defaut(e)
   });
 
+
+  ajouter_class_dark_mini_popup_si_besoin()
+
+
+}
+
+function ajouter_class_dark_mini_popup_si_besoin(){
+  var classe_supplementaire = mode_nuit_oui_final === "oui" ? " darkmode-mini_popup" : ""
+  if(classe_supplementaire) $(".mini_popup").addClass("darkmode-mini_popup")
 }
 
 
