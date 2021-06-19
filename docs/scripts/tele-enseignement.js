@@ -2,7 +2,8 @@ var elements_generiques_en_haut = [{"Général": [
 										  "Alerte",
 										  "Espace etablissement restant",
 										  "Infos établissement",
-										  "Maintenance"
+										  "Maintenance",
+										  "Intégrer Sekooly à mon site"
 										]
 								
 									},
@@ -10193,7 +10194,12 @@ async function un_menu_clic(id_parametre,mode_pref){
     $("#conteneur_filtre").hide()
 
 
-	if(id_parametre === "--") return alert("Choisissez un élément du menu déroulant.")
+	if(id_parametre === "--"){
+		$("#menu_params").hide()
+		return alert("Choisissez un élément du menu déroulant.")
+	}else{
+		$("#menu_params").show()
+	}
 
 	
 	//si c'est une analyse
@@ -10786,6 +10792,31 @@ function actualiser_details_parametre(id_parametre){
 		
 		$("#menu_details").append(info_etablissement_html)
 		return true
+
+	}else if(id_parametre === "Intégrer Sekooly à mon site"){
+		$("#menu_details").append(`<blockquote style="padding: 5%;" id="contenu_code_iframe" onclick="copier_liste('#contenu_code_iframe','contenu_code_iframe')"></blockquote>
+			<h3>
+				Pour intégrer Sekooly à votre site web, vous pouvez copier le code ci-dessus, puis le coller dans votre page html.
+			</h3>
+			<button onclick="copier_liste('#contenu_code_iframe','contenu_code_iframe')">COPIER LE CODE</button>`)
+		var code_iframe = `
+	<!DOCTYPE html>
+	<html>
+	<head>
+		<link rel="icon" href="https://`+nom_etablissement+`.sekooly.com/favicon.ico">
+		<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+		<title>Sekooly | `+nom_etablissement.toUpperCase()+`</title>
+	</head>
+	<body style="margin:0px;padding:0px;overflow:hidden;height: 100vh;width: 100vw;">
+		<iframe src="https://`+nom_etablissement+`.sekooly.com/tele-enseignement" frameborder="0" style="overflow:hidden;height:100%;width:100%" height="100%" width="100%"></iframe>
+	</body>
+	</html>
+
+		`
+
+
+		$("#contenu_code_iframe").text(code_iframe)
+		$("#contenu_code_iframe").attr("contenu_code_iframe",code_iframe)
 
 
 	//LISTE JSON

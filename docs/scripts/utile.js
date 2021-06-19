@@ -582,7 +582,7 @@ function copier_liste(selector,attrName){
   document.execCommand("copy");
   $temp.remove();
 
-  afficher_alerte("La liste est copiée dans votre presse-papiers.")
+  afficher_alerte("Copié dans votre presse-papiers.")
 
   return res
 
