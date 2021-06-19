@@ -1877,7 +1877,7 @@ function calculer_mes_XP(){
 
 async function switch_edition(){
 
-	var est_mode_edition = $("#valider_modifs")[0].innerText === "💾";
+	var est_mode_edition = $("#valider_modifs")[0].innerText === "Enregistrer";
 
 	//entrer en mode édition: exiger le code d'accès
 	if(!est_mode_edition){
