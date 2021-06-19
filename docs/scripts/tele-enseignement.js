@@ -10312,7 +10312,7 @@ function masquer_params_auto(){
 }
 
 function autoriser_les_modifs(oui){
-	var selector = "#ajout_param, #suppr_param, #dupliquer_param, #telecharger_param, #importer_param"
+	var selector = "#ajout_param, #suppr_param, #dupliquer_param, #importer_param"
 	if(oui){
 		$(selector).show()
 	}else{
