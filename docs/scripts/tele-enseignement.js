@@ -1,6 +1,5 @@
 var elements_generiques_en_haut = [{"Général": [
 										  "Alerte",
-										  "Cycles",
 										  "Espace etablissement restant",
 										  "Infos établissement",
 										  "Maintenance"
@@ -9,6 +8,7 @@ var elements_generiques_en_haut = [{"Général": [
 									},
 
 									{"Enseignement":[
+										  "Cycles",
 										  "Classes",
 										  "Matieres"
 										]
@@ -11429,8 +11429,8 @@ async function suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur)
 
 		var nom_table = ($(".un_menu_orange")[0].id || $(".un_menu_orange")[0].value)
 		var nom_champ_reference = identifiant_par_table(nom_table)
-		var valeur_champ_reference = e.target.parentNode.id		
-		var numero_colonne = e.target.cellIndex		
+		var valeur_champ_reference = e.target.closest("td").parentNode.id	
+		var numero_colonne = e.target.closest("td").cellIndex		
 		var champ_actualise = $(".header_table.entete_sticky")[numero_colonne].innerText
 		
 		var ancien_data = {[champ_actualise] : ancienne_valeur}
@@ -11479,14 +11479,14 @@ async function suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur)
 			actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouveau_data);
 			
 
-			e.target.innerText = nouvelle_valeur;
+			e.target.closest("td").innerText = nouvelle_valeur;
 
 			//si c'est un id qui a été mis à jour
 			//console.log(champ_actualise + " VS " + nom_champ_reference)
 			if (champ_actualise === nom_champ_reference){
 
 				//-> on met à jour le ID du parent
-				e.target.parentNode.id = nouvelle_valeur
+				e.target.closest("td").parentNode.id = nouvelle_valeur
 
 			}
 
@@ -11497,11 +11497,11 @@ async function suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur)
 
 		}catch(error) {
 			alert("Mise à jour impossible: " + error)
-			e.target.innerText = ancienne_valeur
+			e.target.closest("td").innerText = ancienne_valeur
 			if (champ_actualise === nom_champ_reference){
 
 				//-> on met comme avant le ID du parent
-				e.target.parentNode.id = ancienne_valeur
+				e.target.closest("td").parentNode.id = ancienne_valeur
 
 			}
 			//-> on remet le JSON local comme avant
