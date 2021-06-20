@@ -10943,8 +10943,9 @@ function traiter_liste_JSON(id_parametre,liste_JSON, identifiant_table){
 
 	//à l'actualisation du filtre, on filtre localement
 	if(liste_JSON !== null && liste_JSON !== undefined &&  liste_JSON !=="" && liste_JSON.length > 0 ){
-		element_DOM("menu_details").innerHTML = json2Table(liste_JSON, identifiant_table)
-
+		//element_DOM("menu_details").innerHTML = json2Table(liste_JSON, identifiant_table)
+		$("#menu_details").append(json2Table(liste_JSON, identifiant_table))
+		au_clic("[suppression_id]","clic_ligne(this)")
     		
 	}else{
 		element_DOM("menu_details").innerHTML = '<i class="date_fin">Pas encore de données dans ' + id_parametre +  '.</i>';
@@ -11293,7 +11294,7 @@ function json2Table(json, id_table) {
     .map((row,index) => {
       if(row!==null){
 	      let tds = cols.map(col => `<td>${row[col]}</td>`).join("");
-	      return `<tr suppression_id="${row[id_table]}" id="${row[id_table]}" onclick="clic_ligne(this)"  class= "border_bottom une_ligne_de_donnees">${tds}</tr>`;
+	      return `<tr suppression_id="${row[id_table]}" id="${row[id_table]}"  class= "border_bottom une_ligne_de_donnees">${tds}</tr>`;
 	  }
     })
     .join("");
@@ -11304,7 +11305,7 @@ function json2Table(json, id_table) {
 		<thead class="">
 			<tr class= "border_bottom">${headerRow}</tr>
 		</thead>
-		<tbody>
+		<tbody style="transform: rotateX(0deg);">
 			${rows}
 		</tbody>
 	</table>`;
