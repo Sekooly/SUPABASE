@@ -3,7 +3,7 @@ var elements_generiques_en_haut = [{"Général": [
 										  "Espace etablissement restant",
 										  "Infos établissement",
 										  "Maintenance",
-										  "Intégrer Sekooly à mon site"
+										  "</> Intégrer Sekooly à mon site"
 										]
 								
 									},
@@ -10793,7 +10793,7 @@ function actualiser_details_parametre(id_parametre){
 		$("#menu_details").append(info_etablissement_html)
 		return true
 
-	}else if(id_parametre === "Intégrer Sekooly à mon site"){
+	}else if(id_parametre === "</> Intégrer Sekooly à mon site"){
 		$("#menu_details").append(`<blockquote style="padding: 5%;" id="contenu_code_iframe" onclick="copier_liste('#contenu_code_iframe','contenu_code_iframe')"></blockquote>
 			<h3>
 				Pour intégrer Sekooly à votre site web, vous pouvez copier le code ci-dessus, puis le coller dans votre page html.
@@ -18743,6 +18743,68 @@ function au_clic_droit(selector, callback){
 		eval(callback)
 	})
 }
+
+
+
+
+
+function clic_utilisateur(id_utilisateur){
+	
+	//infos de la personne (todo)
+	//mon_detail(nom_detail,valeur_detail,mdp)
+
+
+
+	creer_mini_popup(id_utilisateur.toUpperCase(),"","Contacter","alert('Vous allez le contacter!')",false,false,false,false,"15","truc")
+}
+
+
+function ecrire_a(id_utilisateur){	
+	ajouter_un_tout_nouveau_msg()
+	$("#Destinataire").val(id_utilisateur)
+	faire_autocompletion_input(null,'Destinataire')
+	$("[onclick=\"choisir('Destinataire',this)\"]").click()
+	afficher_fenetre(true)
+}
+
+
+
+
+
+
+/*
+document.onpaste = function (event) {
+    var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+    console.log(JSON.stringify(items)); // might give you mime types
+    for (var index in items) {
+        var item = items[index];
+        if (item.kind === 'file') {
+            var blob = item.getAsFile();
+            var reader = new FileReader();
+            reader.onload = function (event) {
+                console.log(event.target.result); // data url!
+            }; 
+            reader.readAsDataURL(blob);
+        }
+    }
+};
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
