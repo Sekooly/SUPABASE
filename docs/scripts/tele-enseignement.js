@@ -3534,7 +3534,7 @@ function editer_description_matiere(id_matiere,la_matiere){
 	
 
 	$("#fenetre").append('<div class="edition"><div id="description_matiere">'+description+'</div></div>')	
-	rendre_riche("description_matiere",true)
+	rendre_riche("description_matiere")
 
 
 }
@@ -6871,7 +6871,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 			element_DOM('fenetre').appendChild(mon_message);
 
 
-			rendre_riche("contenu_question",true)
+			rendre_riche("contenu_question")
 
 
 			//à chaque modif du contenu: on mà le nb de carac
@@ -13258,29 +13258,53 @@ function reinitialiser_init(){
 
 
 /**************************************** textes riches *****************************************/
-function rendre_riche(id_text_area, agrandir_zone ){
+function rendre_riche(id_text_area){
 	ClassicEditor
 		.create( document.querySelector( '[id="'+id_text_area+'"]' )   , config_editor() )
-        .then( editor => {
+        .then( async (editor) => {
             //console.log( editor )
-            if(agrandir_zone){
+
+            var a = await liste_de_mes_destinataires()
+            a = a.map(e => e.split(' (')[0])
+            creer_element_cliquable(editor,a,"@",null)
+
+			
 
 
-            	/*
-            	$("[contenteditable]").on("click change", function(){
 
-            		$("[contenteditable]")[0].style.height = $("[contenteditable]")[0].offsetHeight < 300 ? "300px" : $("[contenteditable]")[0].offsetHeight + "px"
-
-            	})
-            	*/
-
-            	
-
-            } 
         } )
 	    .catch( error => {
 	        console.error( error );
 	    });
+}
+
+
+function creer_element_cliquable(editor,liste_initiale,caractere,callback){
+	$('[contenteditable="true"]').atwho({
+		at: caractere,
+		data: liste_initiale
+	});
+
+	
+
+	//quand on clique -> on insère
+	$(".atwho-view-ul").off("click enter")			
+	$(".atwho-view-ul").on("click enter",function(){
+		var texte_a_ajouter = $("li.cur").text().trim().toUpperCase() + " "
+		//enlever ce qui est entre '@' et ' '
+
+		//mettre le texte
+		//inserer_element(editor, '<div class="auteur_du_poste sekooly-mode">'+texte_a_ajouter+'</div>', null)
+		inserer_element(editor, texte_a_ajouter)
+		callback
+	})
+
+
+	//quand on est au dessus
+	$(".atwho-view-ul").off("mouseover")
+	
+			
+
 }
 
 

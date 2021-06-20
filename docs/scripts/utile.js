@@ -1165,12 +1165,29 @@ function config_editor(){
       content: "fr",
       ui: "fr"
     },
-    plugins: [ImageInsert],
-    toolbar: {items : ["heading","|", 'bold', 'italic','fontBackgroundColor',"|", "bulletedList","numberedList","|","blockQuote",'link', "insertImage"]}
+    toolbar: {items : ["heading","|", 'bold', 'italic','fontBackgroundColor',"|", "bulletedList","numberedList","|","blockQuote",'link']},
+    typing:
+      { tranformations:
+        {
+          include: ["symbols", "mathematical", "typography", "quotes" ]
+
+        }
+      }
 
   }
 
   return config;
+}
+
+function inserer_element(editor, contenu){
+  
+  editor.model.change( writer => {
+    
+    const linkedText = writer.createText( contenu );
+    editor.model.insertContent( linkedText, editor.model.document.selection );
+
+  });
+  
 }
 
 
