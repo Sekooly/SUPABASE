@@ -2,4 +2,4 @@ var racine_initiale=CryptoJS.AES.decrypt("U2FsdGVkX1+qVhXtmzuyvtxmZTuvxGQ2QPShnr
 "testo"
 :site_actuel.split("://")[1];var url=racine_initiale+"Etablissements?nom_etablissement=eq."+nom_etablissement+"&"+api_initial;var data_etablissement=get_resultat(url);if(data_etablissement)data_etablissement=data_etablissement[0];if(data_etablissement){var racine_data=data_etablissement["racine_data"];var apikey="apikey="+data_etablissement["apikey"];var contact_etablissement=data_etablissement["contact_etablissement"];var nom_fichier_logo=data_etablissement["nom_fichier_logo"];var site_etablissement=data_etablissement["site_etablissement"]};
 
-var prefixe_image = data_etablissement['preferences'] && data_etablissement['preferences']['prefixe_image'] ? data_etablissement['preferences']['prefixe_image'] : hebergeur_defaut()
+var prefixe_image = data_etablissement && data_etablissement['preferences'] && data_etablissement['preferences']['prefixe_image'] ? data_etablissement['preferences']['prefixe_image'] : hebergeur_defaut()
