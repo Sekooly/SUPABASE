@@ -2245,6 +2245,7 @@ function impossible_de_cliquer(){
 function deconnexion(){
 
 	chargement(true);
+	envoyer_mon_statut("Déconnecté")
 	var ma_classe = "";
 	mon_role = init_mon_role()
 
@@ -2958,6 +2959,8 @@ function mettre_le_contact_etablissement(){
 
 function attribuer_les_clics(){
 
+
+
 	au_clic("#a2hs", "ajouter_a_laccueil()")//
 	au_clic('[class="haut_droite dropdown"]', "switch_side_bar_top()")//
 	au_clic("#recup_notifs, #bulle_notif", "switch_pannel_notifs()")//
@@ -3379,6 +3382,8 @@ function ajouter_le_dossier(classe_matiere,URL_classe_matiere,type_identifiant, 
 	//console.log("listener ajouté");
 
 }
+
+
 
 function ajouter_listener_dossier_non_final(id){
 
@@ -5611,7 +5616,7 @@ function renvoyer_lien_embedded(id_du_dossier,grid){
 
 
 
-function configurer_profil(){
+async function configurer_profil(){
 
 	$('#accueil_utilisateur').on('click',function(){
 		afficher_modif_profil();
@@ -5637,13 +5642,78 @@ function configurer_profil(){
 		affichage_classe = 'Professeur';
 	}
 
+
+	var st = JSON.parse(recuperer("mes_donnees"))["statut"]
+	var mon_statut = st && st !== "Déconnecté" ? st : "En ligne"
+
 	//on met le nom prénoms
-	element_DOM('accueil_utilisateur').innerHTML = mes_donnees['Nom'] + " " + mes_donnees['Prénom(s)'] + "  -  " + affichage_classe;
+	element_DOM('accueil_utilisateur').innerHTML = mes_donnees['Nom'] + " " + mes_donnees['Prénom(s)'] + "  -  " + affichage_classe + " " + statut_actuel(mon_statut);
 	mettre_infos_matiere(false)
 
-	
+	$("#user-status").on("click",demande_changer_statut)
 }
 
+
+function statut_actuel(statut){
+	$("#user-status").remove()
+	var className = statut.replaceAll(" ","-").toLowerCase()
+	return '<span id="user-status"  class="statut '+className+'">'+statut+'</span>'
+}
+
+async function demande_changer_statut(e){
+	e.preventDefault()
+	e.stopPropagation()
+
+	var valeur_initiale = e.target.innerText
+	//console.log({valeur_initiale})
+	var statuts_possibles = ['En ligne', 'Absent', 'Occupé']
+	var elements_html = `
+		<select name="statut-actuel">
+			`+statuts_possibles.map(e => une_option_statut(e,valeur_initiale))+`
+		</select> 
+
+	`
+
+	creer_mini_popup("Votre statut:", elements_html, "Mettre à jour", "maj_statut()")
+
+	if(valeur_initiale === "En ligne"){
+
+		var liste_destinataires = await liste_de_mes_destinataires(true)
+		$("#mini_popup").append(`
+
+		<div>
+		  	<h3>Retrouvez ci-dessous les utilisateurs actuellement en ligne.</h3>
+			<div id="liste-en-ligne">
+				`+liste_destinataires.map(e => "<div class='statut en-ligne' onclick='ecrire_a(this.id)' id='"+e+"'>"+e+"</div>").join("")+`
+			</div>
+		</div>`
+
+		)
+	}
+}
+
+function une_option_statut(statut,valeur_initiale){
+	return '<option value="'+statut+'"  '+  (statut===valeur_initiale ? "selected" : "") +'  >'+statut+'</option>'
+}
+
+function maj_statut(){
+	chargement(true)
+	var valeur = $('[name="statut-actuel"]').val() + ":manuel"
+	var valeur_vue = valeur.split(":")[0]
+	envoyer_mon_statut(valeur)
+
+	//mettre en local
+	$('#accueil_utilisateur').append(statut_actuel(valeur_vue))
+	$("#user-status").on("click",demande_changer_statut)
+	afficher_alerte("Votre statut a été mis à jour.")
+
+	res = JSON.parse(modifier_donnee_locale("mes_donnees","Identifiant",recuperer("identifiant_courant"),"statut",valeur_vue))
+	//console.log(res)
+
+	//fermer
+	$('#mini_popup').remove()
+	chargement(false)
+}
 
 
 initialisation();
@@ -7501,7 +7571,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 
 					//console.log("l'icone poubelle = " + icone_poubelle + "\n")
 
-					var dans_fenetre_str = '<ul class="bloc_topic" onclick="clic_de_topic(this)" id="' + id_topic + '"> '+ icone_poubelle + ' <p id="' + id_topic + '" style="font-size: 25px; margin:0px;"> <b class="contenu_question" id="' + id_topic + '"> '  + titre +'  </b> <p id="' + id_topic + '" class="contenu_question"> ' + contenu + '</p><i class="petite_ecriture"> <h id="' + id_topic + '"><u id="' + id_topic + '"> Nombre de réponses</u>: <u class="nb_com_actuel" id="' + id_topic + '">' + nb_coms + '</u> </h> <h id="' + id_topic + '">  &emsp; <u id="' + id_topic + '"> Publié le</u>: ' + date + ' </h><h id="' + id_topic + '">  &emsp; <u id="' + id_topic + '"> Publié par</u>: ' + auteur + ' </h></i></ul>';
+					var dans_fenetre_str = '<ul class="bloc_topic" onclick="clic_de_topic(this)" id="' + id_topic + '"> '+ icone_poubelle + ' <p id="' + id_topic + '" class="important-p"> <b class="contenu_question" id="' + id_topic + '"> '  + titre +'  </b> <p id="' + id_topic + '" class="contenu_question"> ' + contenu + '</p><i class="petite_ecriture"> <h id="' + id_topic + '"><u id="' + id_topic + '"> Nombre de réponses</u>: <u class="nb_com_actuel" id="' + id_topic + '">' + nb_coms + '</u> </h> <h id="' + id_topic + '">  &emsp; <u id="' + id_topic + '"> Publié le</u>: ' + date + ' </h><h id="' + id_topic + '">  &emsp; <u id="' + id_topic + '"> Publié par</u>: ' + auteur + ' </h></i></ul>';
 					
 					//console.log("dans_fenetre: " + dans_fenetre_str)
 					
@@ -15192,7 +15262,7 @@ function ajouter_msg(liste_des_msgs,ma_liste,valeur){
 	var img_pp = ma_photo(titre.toLowerCase(), true) //pas de modifs de la pp
 
 	var span_nb_non_lus = nb_non_lus > 0 ? '<div class="msg_non_lu">'+nb_non_lus+'</div>' : ""
-	var dans_fenetre_str = '<ul class="bloc_msg" onclick="clic_de_msg(this.id)" id="' + id_topic + '"> '+ img_pp + '<span id="details_conv">' + icone_poubelle + ' <p id="' + id_topic + '" style="font-size: 25px; margin:0px;"> <b class="contenu_question sekooly-mode" id="' + id_topic + '"> '  + titre +'  </b> <p id="' + id_topic + '" class="contenu_question"> ' + contenu + '</p><i class="petite_ecriture"> <h id="' + id_topic + '"><u id="' + id_topic + '"> Nombre de messages</u>: <u class="nb_com_actuel" id="' + id_topic + '">' + nb_coms + '</u> </h> <h id="' + id_topic + '">  &emsp; <u id="' + id_topic + '"> Dernier message le</u>: ' + date + ' </h><h id="' + id_topic + '"></h></i></span> '+span_nb_non_lus+' </ul>';
+	var dans_fenetre_str = '<ul class="bloc_msg" onclick="clic_de_msg(this.id)" id="' + id_topic + '"> '+ img_pp + '<span id="details_conv">' + icone_poubelle + ' <p id="' + id_topic + '" class="important-p"> <b class="contenu_question sekooly-mode" id="' + id_topic + '"> '  + titre +'  </b> <p id="' + id_topic + '" class="contenu_question"> ' + contenu + '</p><i class="petite_ecriture"> <h id="' + id_topic + '"><u id="' + id_topic + '"> Nombre de messages</u>: <u class="nb_com_actuel" id="' + id_topic + '">' + nb_coms + '</u> </h> <h id="' + id_topic + '">  &emsp; <u id="' + id_topic + '"> Dernier message le</u>: ' + date + ' </h><h id="' + id_topic + '"></h></i></span> '+span_nb_non_lus+' </ul>';
 	
 	//console.log("dans_fenetre: " + dans_fenetre_str)
 	
@@ -15324,7 +15394,7 @@ function afficher_msg_conversation(le_msg){
 }
 
 
-async function liste_de_mes_destinataires(){
+async function liste_de_mes_destinataires(en_ligne){
 	var mon_type = recuperer('mon_type').split("_")[0]
 	var liste_eleves = await recuperer_eleves(true)
 	var liste_profs = await recuperer_profs(true)
@@ -15337,6 +15407,13 @@ async function liste_de_mes_destinataires(){
 
 
 	mes_destinataires = [].concat.apply([], mes_destinataires)
+	if(en_ligne){
+		//console.log("avec leur statut EN LIGNE")
+		mes_destinataires = mes_destinataires.filter(e => e.statut === "En ligne")
+		//console.log(mes_destinataires)
+	} 
+
+
 	mes_destinataires = mes_destinataires.map(function(e){
 		le_type = e['type'].includes("Admin") ? e['Role'] : e['type'].substring(0, e['type'].length - 1)
 		return e['Identifiant'].toUpperCase() + " (" + le_type + ")"
@@ -15344,6 +15421,8 @@ async function liste_de_mes_destinataires(){
 
 
 	stocker("mes_destinataires",mes_destinataires)
+
+
 	return mes_destinataires
 
 
@@ -18785,6 +18864,9 @@ function clic_utilisateur(id_utilisateur){
 
 
 function ecrire_a(id_utilisateur){	
+
+	$("#mini_popup").remove()
+
 	ajouter_un_tout_nouveau_msg()
 	$("#Destinataire").val(id_utilisateur)
 	faire_autocompletion_input(null,'Destinataire')
@@ -18796,30 +18878,13 @@ function ecrire_a(id_utilisateur){
 
 
 
+/************************ VISIBILITY ******************************/
 
-/*
-document.onpaste = function (event) {
-    var items = (event.clipboardData || event.originalEvent.clipboardData).items;
-    console.log(JSON.stringify(items)); // might give you mime types
-    for (var index in items) {
-        var item = items[index];
-        if (item.kind === 'file') {
-            var blob = item.getAsFile();
-            var reader = new FileReader();
-            reader.onload = function (event) {
-                console.log(event.target.result); // data url!
-            }; 
-            reader.readAsDataURL(blob);
-        }
-    }
-};
-*/
-
-
-
-
-
-
+document.addEventListener('visibilitychange', () => {
+  const state = document.visibilityState;
+  const mon_statut = state === "hidden" ? "Absent" : "En ligne"
+  envoyer_mon_statut(mon_statut)
+});
 
 
 

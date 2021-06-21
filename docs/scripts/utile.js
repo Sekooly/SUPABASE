@@ -2076,3 +2076,9 @@ function appliquer_couleurs(){
 function appliquer_formes(){
   //console.log("TODO...")
 }
+
+
+function envoyer_mon_statut(statut){
+  var mon_type = recuperer("mon_type").split("_")[0]
+  actualiser(mon_type,"Identifiant",recuperer("identifiant_courant"), {"statut":statut})
+}

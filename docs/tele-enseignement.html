@@ -91,6 +91,51 @@
 		<link id="style-sekooly" rel="stylesheet" href="https://sekooly.com/assets/style/sekooly-dark.css" ></link>
 
 	<style>
+		#liste-en-ligne {
+			max-height: 50%;
+		}
+
+		#liste-en-ligne > div {
+			padding: 5px;
+			border-style: solid;
+			border-width: 0.1px;
+			cursor: pointer;
+		}
+
+		.important-p {
+			font-size: 25px;
+			margin:0px;
+		}
+
+		.statut {
+			padding: 5px;
+			border-radius: 5px;
+			font-size: 10px;
+			border-width: 1px;
+			border-style: solid;
+			margin: 5px;
+		}
+
+		.en-ligne {
+			background-color: #333;
+			color: #00ff9f;		
+		}
+
+		.absent {
+			background-color: #333;
+			color: #ff6c00;		
+		}
+
+
+		.déconnecté {
+			background-color: #333;
+			color: #999;		
+		}
+
+		.occupé {
+			background-color: #333;
+			color: red;		
+		}
 
 		.atwho-view .cur {
 			background: black;
@@ -406,7 +451,7 @@
 		#remarque-exe{
 			text-align: initial;
 			padding: 0 15px;
-			height: 60vw;
+			height: 50vh;
 			overflow: auto;
 		}
 
@@ -1314,9 +1359,9 @@
 
 		/* If the screen size is 600px wide or less, set the font-size of <div> to 15px */
 		@media screen and (max-width: 600px) {
-		  .navbar> font {
+		  .navbar > font {
 		    font-size: 15px;
-		    max-width: 45%;
+		    max-width: 55%;
 		  }
 		    
   		  .sidebar> div{
@@ -1889,6 +1934,7 @@
 			height: 30px;
 			color: white; 
 			margin-bottom: 20px;
+			border-radius: 5px;
 		}
 
 		#mon_devoir_rendu{
