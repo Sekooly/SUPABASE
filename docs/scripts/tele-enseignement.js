@@ -2985,6 +2985,7 @@ function attribuer_les_clics(){
 
 
 	au_clic("#side-bar-top-right", "fermer_side_bar()")//
+	au_clic("#statut-container","demande_changer_statut(event)")
 	au_clic("#recup_eleves", "recuperer_eleves()")//
 	au_clic("#recup_profs", "recuperer_profs()")//
 	au_clic("#recup_admin", "recuperer_admin()")//
@@ -5647,15 +5648,15 @@ async function configurer_profil(){
 	var mon_statut = st && st !== "Déconnecté" ? st : "En ligne"
 
 	//on met le nom prénoms
-	element_DOM('accueil_utilisateur').innerHTML = mes_donnees['Nom'] + " " + mes_donnees['Prénom(s)'] + "  -  " + affichage_classe + " " + statut_actuel(mon_statut);
+	element_DOM('accueil_utilisateur').innerHTML = mes_donnees['Nom'] + " " + mes_donnees['Prénom(s)'] + "  -  " + affichage_classe //+ " " + statut_actuel(mon_statut);
 	mettre_infos_matiere(false)
 
-	$("#user-status").on("click",demande_changer_statut)
+	
 }
 
 
 function statut_actuel(statut){
-	$("#user-status").remove()
+	//$("#user-status").remove()
 	var className = statut.replaceAll(" ","-").toLowerCase()
 	return '<span id="user-status"  class="statut '+className+'">'+statut+'</span>'
 }
@@ -5679,17 +5680,17 @@ async function demande_changer_statut(e){
 	if(valeur_initiale === "En ligne"){
 
 		var liste_destinataires = await liste_de_mes_destinataires(true)
-		$("#online-list").remove()
-		$("#mini_popup").append(`
 
-		<div id="online-list">
+
+		$("#online-list").remove()
+		var a_ajouter = liste_destinataires.length > 0 ? `<div id="online-list">
 		  	<h3>Retrouvez ci-dessous les utilisateurs actuellement en ligne.</h3>
 			<div id="liste-en-ligne">
 				`+liste_destinataires.map(e => "<div class='statut en-ligne' onclick='ecrire_a(this.id)' id='"+e+"'>"+e+"</div>").join("")+`
 			</div>
-		</div>`
+		</div>` : `<div id="online-list" class="contenu_alerte_vide"><i>Aucun utilisateur en ligne pour l'instant.</i></div>`
 
-		)
+		$("#mini_popup").append(a_ajouter)
 	}
 }
 
@@ -5704,7 +5705,8 @@ function maj_statut(){
 	envoyer_mon_statut(valeur)
 
 	//mettre en local
-	$('#accueil_utilisateur').append(statut_actuel(valeur_vue))
+	//$('#accueil_utilisateur').append(statut_actuel(valeur_vue))
+	$("#statut-container").html(statut_actuel(valeur_vue))
 	$("#user-status").on("click",demande_changer_statut)
 	afficher_alerte("Votre statut a été mis à jour.")
 
@@ -15410,7 +15412,7 @@ async function liste_de_mes_destinataires(en_ligne){
 	mes_destinataires = [].concat.apply([], mes_destinataires)
 	if(en_ligne){
 		//console.log("avec leur statut EN LIGNE")
-		mes_destinataires = mes_destinataires.filter(e => e.statut === "En ligne")
+		mes_destinataires = mes_destinataires.filter(e => e.statut.includes("En ligne"))
 		//console.log(mes_destinataires)
 	} 
 

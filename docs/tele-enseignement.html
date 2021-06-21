@@ -91,6 +91,11 @@
 		<link id="style-sekooly" rel="stylesheet" href="https://sekooly.com/assets/style/sekooly-dark.css" ></link>
 
 	<style>
+
+		.no-padding-top {
+			padding-top: 0;
+		}
+
 		#liste-en-ligne {
 			max-height: 50%;
 		}
@@ -2381,7 +2386,10 @@
 			<div id="recup_analyses">Analyses</div>
 			<div id="recup_pref">Préférences</div>
 			<div id="recup_params">Paramètres</div>
-			<div id="disconnect">Se déconnecter</div>		
+			<div id="disconnect">Se déconnecter</div>
+			<div class="no-padding-top" id="statut-container">
+				<span id="user-status"  class="statut en-ligne">En ligne</span>
+			</div>
 		</div>
 		
 	</div>
