@@ -28,6 +28,7 @@ CREATE TABLE public."Administration"
     "3è_Prénom" text COLLATE pg_catalog."default",
     "Numero_telephone" bigint,
     "Nom_complet" text COLLATE pg_catalog."default",
+    "statut" text COLLATE pg_catalog."default" DEFAULT 'Déconnecté'::text,
     "liste_notifs_lues" text COLLATE pg_catalog."default",
     CONSTRAINT "Administration_pkey" PRIMARY KEY ("Identifiant")
 )
@@ -2035,6 +2036,22 @@ GRANT ALL ON TABLE public.total_score TO service_role;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- POSTGRES AS SUPERUSER
+ALTER USER postgres WITH SUPERUSER;
 
 
 
