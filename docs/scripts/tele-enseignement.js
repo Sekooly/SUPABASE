@@ -5679,9 +5679,10 @@ async function demande_changer_statut(e){
 	if(valeur_initiale === "En ligne"){
 
 		var liste_destinataires = await liste_de_mes_destinataires(true)
+		$("#online-list").remove()
 		$("#mini_popup").append(`
 
-		<div>
+		<div id="online-list">
 		  	<h3>Retrouvez ci-dessous les utilisateurs actuellement en ligne.</h3>
 			<div id="liste-en-ligne">
 				`+liste_destinataires.map(e => "<div class='statut en-ligne' onclick='ecrire_a(this.id)' id='"+e+"'>"+e+"</div>").join("")+`
