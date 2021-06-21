@@ -236,6 +236,7 @@ CREATE TABLE public."Eleves"
     type text COLLATE pg_catalog."default" DEFAULT 'Eleves'::text,
     "Reponse_sondage" text COLLATE pg_catalog."default",
     "Numeros_telephone_original" text COLLATE pg_catalog."default",
+    "statut" text COLLATE pg_catalog."default" DEFAULT 'Déconnecté'::text,
     "liste_notifs_lues" text COLLATE pg_catalog."default",
     CONSTRAINT "Eleves_pkey" PRIMARY KEY ("Identifiant")
 )
@@ -713,6 +714,7 @@ CREATE TABLE public."Profs"
     "Telephone" text COLLATE pg_catalog."default",
     droit_hors_maintenance text COLLATE pg_catalog."default" DEFAULT 'non'::text,
     type text COLLATE pg_catalog."default" DEFAULT 'Profs'::text,
+    "statut" text COLLATE pg_catalog."default" DEFAULT 'Déconnecté'::text,
     "liste_notifs_lues" text COLLATE pg_catalog."default",
     CONSTRAINT "Profs_pkey" PRIMARY KEY ("Identifiant")
 )
