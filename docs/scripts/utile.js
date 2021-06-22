@@ -2079,6 +2079,11 @@ function appliquer_formes(){
 
 
 function envoyer_mon_statut(statut){
-  var mon_type = recuperer("mon_type").split("_")[0]
-  actualiser(mon_type,"Identifiant",recuperer("identifiant_courant"), {"statut":statut})
+
+  if(recuperer("mon_type")){
+    var mon_type = recuperer("mon_type").split("_")[0]
+    actualiser(mon_type,"Identifiant",recuperer("identifiant_courant"), {"statut":statut})
+  }  
+
+  
 }
