@@ -2529,7 +2529,7 @@ function recuperer_eleves(sans_fenetre){
 
 	}).catch(error => {
 		console.error(error);
-		alert('Classe introuvable, veuillez réessayer.');
+		alert('Liste des élèves '+ (sans_fenetre?"destinataires ":"") +'introuvable, veuillez réessayer une fois reconnecté à internet.');
 		
 		chargement(false);
 	})
@@ -15047,6 +15047,11 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('../sw.js').then(function(registration) {
       // Registration was successful
       //console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      
+      navigator.serviceWorker.ready.then(function(serviceWorkerRegistration) { cache_all_heads_except_utile() });
+      setTimeout(cache_all_heads_except_utile,5000)
+
+
     }, function(err) {
       // registration failed :(
       console.error('ServiceWorker registration failed: ', err);
@@ -15055,14 +15060,72 @@ if ('serviceWorker' in navigator) {
 }
 
 
+function cache_all_heads_except_utile(){
+	cache_this("head > link","href", [])
+	cache_this("head > script","src", ["scripts/utile.min.js", "scripts/utile.js"])
+	cache_this("img","src", [])
+}
+
+function cache_this(selector, attributeName, exception_values){
+
+	//console.log('*************'+selector+'***************')
+	$.each($(selector), (key,valeur) => {   
+
+		var url = valeur[attributeName]
+		if(url){
+			var a_ne_pas_mettre_en_cache = exception_values ? exception_values.filter(e => url.includes(e)).length > 0 : false
+			if(a_ne_pas_mettre_en_cache){
+
+				//console.log("EXCEPTION:", url)
+				
+			}else{
+				//console.log({a_ajouter: url})	
+				manip_cache("add", url)
+			}
+		}
+
+
+
+	})
+}
+
+
+function manip_cache(manip, url){
+	sendMessage({
+      command: manip,
+      url: url
+    })
+}
 
 
 
 
+function sendMessage(message) {
+  // This wraps the message posting/response in a promise, which will resolve if the response doesn't
+  // contain an error, and reject with the error if it does. If you'd prefer, it's possible to call
+  // controller.postMessage() and set up the onmessage handler independently of a promise, but this is
+  // a convenient wrapper.
+  return new Promise(function(resolve, reject) {
+    var messageChannel = new MessageChannel();
+    messageChannel.port1.onmessage = function(event) {
+      if (event.data.error) {
+        reject(event.data.error);
+      } else {
+        resolve(event.data);
+      }
+    };
 
-
-
-
+    // This sends the message data as well as transferring messageChannel.port2 to the service worker.
+    // The service worker can then use the transferred port to reply via postMessage(), which
+    // will in turn trigger the onmessage handler on messageChannel.port1.
+    // See https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage
+    if(navigator.serviceWorker.controller){
+    	navigator.serviceWorker.controller.postMessage(message,
+      [messageChannel.port2]);
+    }
+    
+  });
+}
 
 
 
