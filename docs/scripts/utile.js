@@ -1,6 +1,6 @@
 var mon_role = "";
 var entete_heroku = "https://api.sekooly.com/" //"https://sekooly-server.herokuapp.com/"
-var liste_class_avec_fond_mode_nuit = ["ma_fenetre","titre_drive", "mini_popup"]
+var liste_class_avec_fond_mode_nuit = ["ma_fenetre","titre_drive", "mini_popup", "msg_envoye", "msg_recu"]
 
 function se_deconnecter(){
   /*

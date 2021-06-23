@@ -47,7 +47,7 @@ var elements_menu_analyses = ["Analyses des connexions"]
 var elements_menu_preferences = ["Images","Couleurs","Formes","Police"]
 
 
-var img_dynamiques = ["img_background-image.png", "logo-no-background-128x128.png","img_retour.png","default-user.svg", "img_reset.png","img_import.png","img_download.png","img_dupliquer.png","img_redtrash.png","img_previz.png","img_pleinecran.png", "img_petitecran.png"]
+var img_dynamiques = ["img_background-image.png", "logo-no-background-128x128.png","img_retour.png","default-user.png", "img_reset.png","img_import.png","img_download.png","img_dupliquer.png","img_redtrash.png","img_previz.png","img_pleinecran.png", "img_petitecran.png"]
 img_dynamiques = img_dynamiques.concat(liste_img_extensions())
 
 var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL_Mapping","URL_agenda",
@@ -1715,7 +1715,7 @@ async function supprimer_pp(identifiant_courant, sans_confirmation){
 
 				//changer localement
 				//console.log("changer localement pour " + identifiant_courant)
-				$("[id='pp_"+identifiant_courant+"']")[0].src = prefixe_image + "/default-user.svg";	
+				$("[id='pp_"+identifiant_courant+"']")[0].src = prefixe_image + "/default-user.png";	
 				$("#suppr_pp").remove()
 				
 				
@@ -2683,7 +2683,7 @@ function traitement_trombino(resultats, sans_ecolage, avec_role){
 		
 		var le_lien_pp = lien_pp(valeur['id_fichier'])
 		var bouton_modif = recuperer('mon_type').includes('Admin') ? bouton_modifier_pp(valeur['Identifiant']) : ""
-		var bouton_suppr = recuperer('mon_type').includes('Admin') && !le_lien_pp.includes("default-user.svg") ? bouton_supprimer_pp(valeur['Identifiant']) : ""
+		var bouton_suppr = recuperer('mon_type').includes('Admin') && !le_lien_pp.includes("default-user.png") ? bouton_supprimer_pp(valeur['Identifiant']) : ""
 		var la_classe_utilisateur = !sans_ecolage ? valeur['Classe'] : valeur['Classe'].split('|')[1].split(')')[0] //cas des profs
 		if(avec_role) la_classe_utilisateur = valeur['Role'] //cas des admin
 		var un_eleve = '<div class="un_eleve"><img class="pp" id="pp_'+valeur['Identifiant']+'" src='+ le_lien_pp +'>' + bouton_modif + bouton_suppr +'<div><span class="element_eleve">' + valeur['Nom'] + " " + valeur['Prénom(s)'] + " <b>" + la_classe_utilisateur + '</b></span></div>' + ecolage_eleve +'</div>';
@@ -7332,7 +7332,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 			entete.innerHTML = entete_poste;
 			element_DOM('fenetre').appendChild(entete);
 
-			var bloc_poste = '<div id="bloc_poste" style="padding: 2%;display: block;overflow-wrap: anywhere;border-bottom-style: solid;"><div class="auteur_du_poste sekooly-mode" >' + auteur_poste +' (' + role_auteur_poste + ')</div><h id="contenu_poste" style=""> '+ contenu_poste+'</h><h class="date_poste"> ' + date + '</h></div>';
+			var bloc_poste = '<div id="bloc_poste" style="padding: 2%;display: block;overflow-wrap: anywhere;border-bottom-style: solid;"><div class="auteur_du_poste sekooly-mode" >' + auteur_poste +' (' + role_auteur_poste + ')</div><h id="contenu_poste" style=""> '+ contenu_poste+'</h><h class="date_fin"> ' + date + '</h></div>';
 
 
 
@@ -7427,7 +7427,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 
 			contenu_poste = decodage(contenu_poste);
 
-			var un_com = '<div id="'+id_com+'" class="un_commentaire"><div class="auteur_du_poste sekooly-mode">'+ auteur_poste + ' ('+  role_auteur_poste  +')</div><h id="contenu_poste" style=""> ' + contenu_poste + '</h><h class="date_poste"> '+ date + '</h></div>';
+			var un_com = '<div id="'+id_com+'" class="un_commentaire"><div class="auteur_du_poste sekooly-mode">'+ auteur_poste + ' ('+  role_auteur_poste  +')</div><h id="contenu_poste" style=""> ' + contenu_poste + '</h><h class="date_fin"> '+ date + '</h></div>';
 
 			//ajouter le commentaire au DOM
 			var nouveau_com = document.createElement('div');
@@ -9629,8 +9629,40 @@ function personnaliser(id_parametre){
 
 					<div class="element-pref">
 						<h2 class="au-centre">Corps de mini-fenêtre<br>
-							<input id="fenetre-color" type="color" onchange="changer_fond_fenetre_apres_choix(this)" value="`+ rgb2hex($("#mini_popup").css("background-color")) +`" class="palette" name="mini_popup">
-						</h2>			
+							<input id="mini-fenetre-color" type="color" onchange="changer_fond_fenetre_apres_choix(this)" value="`+ rgb2hex($("#mini_popup").css("background-color")) +`" class="palette" name="mini_popup">
+						</h2>	
+						<div class="mini_popup" style="position: relative;top: 50px;"><div>Exemple mini-fênetre</div><button type="button" class="rendre sekooly-mode-background" onclick="afficher_alerte('Bouton test pour la mini-fenêtre')">TEST</button></div>
+					</div>
+
+
+
+					<div class="element-pref">
+						
+						<h2 class="au-centre">Message privé envoyé<br>
+							<input type="color" onchange="changer_fond_fenetre_apres_choix(this)" value="`+ couleur_fond("msg_envoye") +`" class="palette" name="msg_envoye">
+						</h2>
+						<div class="un_msg msg_envoye">
+							<div class="auteur_du_poste sekooly-mode">MOI-MÊME</div>
+							<h><p data-placeholder="Votre commentaire...">
+								Voici un message que j'envoie vers une personne inscrite sur la plateforme.</p>
+							</h>
+							<h class="date_fin">
+								mardi 22 juin 2021 à 09:25
+							</h>
+						</div>
+
+					</div>
+
+
+					<div class="element-pref">
+						<h2 class="au-centre">Message privé reçu<br>
+							<input type="color" onchange="changer_fond_fenetre_apres_choix(this)" value="`+ couleur_fond("msg_recu") +`" class="palette" name="msg_recu">
+						</h2>
+						<div class="un_msg msg_recu">
+							<div class="auteur_du_poste sekooly-mode">UN.UTILISATEUR</div>
+							<h><p data-placeholder="Votre commentaire...">Voici un message reçu, envoyé par un utilisateur inscrit sur la plateforme.</p></h>
+							<h class="date_fin">mardi 22 juin 2021 à 09:26</h>
+						</div>
 					</div>
 
 
@@ -9638,20 +9670,20 @@ function personnaliser(id_parametre){
 
 					<div class="element-pref">
 						
-							
-							<div id="exemple-pannel_notif" class="pannel_notif" style="display: block;position: inherit;margin-left: 15%;">
-								<div class="une_notif"><b class="sekooly-mode">Monsieur X (Prof) </b> a publié un nouveau fichier dans  <b>Nom du cours</b> - <i><b class="sekooly-mode-darker">nom_fichier.pdf</b></i><div> <span> <img src="`+prefixe_image+`/img_ajout.png" class="icone_notif"> </span> <i class="date_fin"> `+afficher_date(maintenant())+`  </i></div></div>
-							</div>
+						<h2 class="au-centre">Notifications (mode jour)<br></h2>
+						<div id="exemple-pannel_notif" class="pannel_notif" style="display: block;position: inherit;margin-left: 15%;">
+							<div class="une_notif"><b class="sekooly-mode">Monsieur X (Prof) </b> a publié un nouveau fichier dans  <b>Nom du cours</b> - <i><b class="sekooly-mode-darker">nom_fichier.pdf</b></i><div> <span> <img src="`+prefixe_image+`/img_ajout.png" class="icone_notif"> </span> <i class="date_fin"> `+afficher_date(maintenant())+`  </i></div></div>
+						</div>
 
-							<h3> ASPECT
-								<input type="color" onchange="changer_fond_apres_choix(this)" value="`+ couleur_fond("pannel_notif") +`" class="palette"  name="pannel_notif">
-							</h3>
-							<h3> AU SURVOL
-								<input type="color" onchange="changer_fond_apres_choix(this)" value="`+ rgb2hex($(".une_notif:hover").css("background-color")) +`" class="palette" name="une_notif:hover">
-							</h3>
-						</h2>
+						<h3> ASPECT
+							<input type="color" onchange="changer_fond_apres_choix(this)" value="`+ couleur_fond("pannel_notif") +`" class="palette"  name="pannel_notif">
+						</h3>
+						<h3> AU SURVOL
+							<input type="color" onchange="changer_fond_apres_choix(this)" value="`+ rgb2hex($(".une_notif:hover").css("background-color")) +`" class="palette" name="une_notif:hover">
+						</h3>
 						
 					</div>
+
 
 					<div class="element-pref">
 						<h2 class="au-centre sekooly-mode">Mise en valeur de texte<br>
@@ -9669,7 +9701,7 @@ function personnaliser(id_parametre){
 
 
 					<div class="element-pref">
-						<h2 class="au-centre">Affichage de dates<br>
+						<h2 class="au-centre">Affichage des dates<br>
 							<input type="color" onchange="change_couleur_texte_apres_choix(this)" value="`+ couleur_texte("date_fin") +`" class="palette" name="date_fin">
 						</h2>
 						
@@ -15133,7 +15165,7 @@ function sendMessage(message) {
 
 /******************** PHOTO DE PROFIL *************************/
 function lien_pp(id_pp){
-	return id_pp ? "https://drive.google.com/uc?export=download&id=" + id_pp : prefixe_image + "/default-user.svg"
+	return id_pp ? "https://drive.google.com/uc?export=download&id=" + id_pp : prefixe_image + "/default-user.png"
 }
 
 
@@ -15454,9 +15486,14 @@ function zone_envoi(id_conv){
 }
 
 function afficher_msg_conversation(le_msg){
-	la_className = "un_msg " + (le_msg['Expediteur'] === recuperer('identifiant_courant') ? "msg_envoye" : "msg_recu")	
-	Expediteur = le_msg['Expediteur'] === recuperer('identifiant_courant') ? "MOI-MÊME" :  le_msg['Expediteur'].toUpperCase()
-	return '<div class="'+la_className+'" id="'+le_msg['id_msg']+'"><div class="auteur_du_poste sekooly-mode">'+Expediteur+'</div><h id="contenu_poste"><p data-placeholder="Votre commentaire...">'+le_msg['Message']+'</p></h><h class="date_poste">'+ afficher_date(le_msg['Horodateur']) +'</h></div>'
+
+	var type_msg = (le_msg['Expediteur'] === recuperer('identifiant_courant') ?  "msg_envoye" : "msg_recu")
+	var la_className = "un_msg " + type_msg
+	var darkmode = (mode_nuit_oui_final === "oui" ? "darkmode-"+type_msg : "")
+	la_className = la_className + " " + darkmode
+	//console.log({la_className})
+	var Expediteur = le_msg['Expediteur'] === recuperer('identifiant_courant') ? "MOI-MÊME" :  le_msg['Expediteur'].toUpperCase()
+	return '<div class="'+la_className+'" id="'+le_msg['id_msg']+'"><div class="auteur_du_poste sekooly-mode">'+Expediteur+'</div><h id="contenu_poste"><p data-placeholder="Votre commentaire...">'+le_msg['Message']+'</p></h><h class="date_fin">'+ afficher_date(le_msg['Horodateur']) +'</h></div>'
 }
 
 
