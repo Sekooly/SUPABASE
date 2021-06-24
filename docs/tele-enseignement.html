@@ -19,7 +19,7 @@
 
 		
 		<script type="text/javascript" src="scripts/aes.js"></script>
-		<script type="text/javascript" src="scripts/utile.min.js"></script>
+		<script type="text/javascript" src="scripts/utile.js"></script>
 		<script type="text/javascript" src="scripts/donnees_client.js"></script>
 
 
@@ -2154,8 +2154,7 @@
 			position: fixed;
 			top: 40px;
 			max-height: 50%;
-			min-height: 9%;
-			background-color: aliceblue;
+			min-height: 9%;			
 			z-index: 4;
 			border-radius: 10px;
 			box-shadow: 0px 0px 3px 0px;
@@ -2165,9 +2164,11 @@
 			min-width: 170px;
 			overflow-wrap: break-word;
 			display: none;
+			background-color: black;
 		}
 
-		.une_notif{
+		.une_notif {
+			background-color: aliceblue;
 			padding: 5%;
 			border-bottom-width: 1px;
 			border-bottom-style: solid;
@@ -2175,7 +2176,7 @@
 		}
 
 		.une_notif:hover{
-			background-color: #6a6a6a;
+			filter: opacity(75%) contrast(2);
 		}
 
 		.non_lu{
@@ -2674,7 +2675,7 @@
 
 	<!--overwrites some local rules-->
 	<style type="text/css" id="custom-css"></style>
-	<script type="text/javascript" src="scripts/tele-enseignement.min.js"></script>
+	<script type="text/javascript" src="scripts/tele-enseignement.js"></script>
 
 	</body>
 

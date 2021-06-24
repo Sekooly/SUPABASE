@@ -8027,7 +8027,10 @@ function ajouter_la_notif(la_notif,index,mode_notif){
 
 
 	ma_notif.className =( liste_notifs_lues.includes("," + id_notif + ",") && la_date_derniere_modif <= ma_date_consultation ) ? "une_notif" : "non_lu"
-
+	//si darkmode : rajouter darkmode-une_notif
+	if(recuperer("mode_nuit_oui") === "oui"){
+		ma_notif.className += " darkmode-une_notif"
+	}
 
 
 	var identifiant_notif = '<b  class="sekooly-mode" >' + Identifiant_derniere_modif + ' ('+Role_derniere_modif+') </b>';
@@ -8323,6 +8326,11 @@ function jai_pas_lu(id_notif, envoyer_cette_non_lecture, une_notif){
 	//une_notif = $("#pannel_notif > [id='"+id_notif+"']:visible")[0]
 	if(une_notif) une_notif.className = "non_lu"
 
+	if(recuperer("mode_nuit_oui") === "oui"){
+		une_notif.className += " darkmode-une_notif"
+	}
+
+
 	if(envoyer_cette_non_lecture) envoyer_ce_que_jai_lu()
 }
 
@@ -8340,8 +8348,16 @@ function jai_lu(id_notif, envoyer_cette_lecture, une_notif){
 
 	//virer les classes non lues
 	//une_notif = $("#pannel_notif > [id='"+id_notif+"']")[0]
-	if(une_notif) une_notif.className = "une_notif"
+	if(une_notif){
+		une_notif.className = "une_notif"
 
+
+		//si darkmode : rajouter darkmode-une_notif
+		if(recuperer("mode_nuit_oui") === "oui"){
+			une_notif.className += " darkmode-une_notif"
+		}
+
+	} 
 
 	//envoyer cette notif 
 	if(envoyer_cette_lecture) {
@@ -9670,17 +9686,12 @@ function personnaliser(id_parametre){
 
 					<div class="element-pref">
 						
-						<h2 class="au-centre">Notifications (mode jour)<br></h2>
+						<h2 class="au-centre">Notifications<br>
+							<input type="color" onchange="changer_fond_fenetre_apres_choix(this)" value="`+ couleur_fond("une_notif") +`" class="palette"  name="une_notif">
+						</h2>
 						<div id="exemple-pannel_notif" class="pannel_notif" style="display: block;position: inherit;margin-left: 15%;">
 							<div class="une_notif"><b class="sekooly-mode">Monsieur X (Prof) </b> a publié un nouveau fichier dans  <b>Nom du cours</b> - <i><b class="sekooly-mode-darker">nom_fichier.pdf</b></i><div> <span> <img src="`+prefixe_image+`/img_ajout.png" class="icone_notif"> </span> <i class="date_fin"> `+afficher_date(maintenant())+`  </i></div></div>
 						</div>
-
-						<h3> ASPECT
-							<input type="color" onchange="changer_fond_apres_choix(this)" value="`+ couleur_fond("pannel_notif") +`" class="palette"  name="pannel_notif">
-						</h3>
-						<h3> AU SURVOL
-							<input type="color" onchange="changer_fond_apres_choix(this)" value="`+ rgb2hex($(".une_notif:hover").css("background-color")) +`" class="palette" name="une_notif:hover">
-						</h3>
 						
 					</div>
 
