@@ -10847,6 +10847,12 @@ function information_etablissement(id_info, etiquette_info, valeur_info, est_mod
 
 	valeur_info = est_consultable ? oeil : valeur_info
 
+	//si c'est une image -> afficher 
+	if(etiquette_info === "Logo"){
+		valeur_info = '<img id="mon_logo_etablissement" style="width: auto;" class="pp" src="'+prefixe_image+'/'+valeur_info+'">' 
+		crayon = '<img onclick="nouveau_logo()" src="'+prefixe_image+'/img_edit.png" alt="MODIFIER" class="editer">'
+	}
+
 	return '<div class="un_detail"><b class="sekooly-mode">'+etiquette_info+': </b><br><span id="' + id_info +'">'+valeur_info+crayon+'</span></div>';
 }
 
@@ -10866,7 +10872,8 @@ function actualiser_details_parametre(id_parametre){
 
 		var id_contrat = data_etablissement.donnees_contrat.id_newTempFile ? "id_newTempFile" : "id_contrat"
 
-		liste_id_infos_etablissement = ["nom_etablissement:Nom de l'établissement:false",
+		liste_id_infos_etablissement = ["nom_fichier_logo:Logo:true",
+										"nom_etablissement:Nom de l'établissement:false",
 										"date_premier_abonnement:Date de début d'abonnement:false" ,
 										"duree_contrat_en_mois:Durée du contrat (en mois):false",
 										"adresse_etablissement:Adresse:true",
@@ -19016,7 +19023,7 @@ document.addEventListener('visibilitychange', () => {
 function nouveau_logo(){
 
 	//input file
-	var elements_html = "<input type='file' id='nouveau_logo_etablissement'>"
+	var elements_html = "<input type='file' accept='.png,.jpeg,.jpg,.bmp,.svg,.gif' id='nouveau_logo_etablissement'>"
 
 	//créer un mini popup
 	//bouton upload avec au_clic = upload_nouveau_logo()
@@ -19024,12 +19031,28 @@ function nouveau_logo(){
 	
 }
 
-function upload_nouveau_logo(){
+async function upload_nouveau_logo(){
+	chargement(true)
 
-	//est image
+	var le_logo = element_DOM("nouveau_logo_etablissement").files[0]
+	//forcément une image
+	if(!le_logo.type.includes("image")) return afficher_alerte("Merci de choisir une image.")
+
+	eval(get_resultat_brut("https://sekooly.com/assets/web/assets/jquery/contact.js"))
 
 
+	try {
+		upload_image_etablissement(le_logo)
+		data_etablissement['nom_fichier_logo'] = le_logo.name
+		await actualiser_info_etablissement()
+		afficher_alerte("Nouveau logo "+nom_fichier_logo+" mis en ligne.")
+		$("#mini_popup").remove()
+		actualiser_parametre()
 
-	afficher_alerte("Nouveau logo mis en ligne.")
-	$("#mini_popup").remove()
+	}catch(e){
+		afficher_alerte("Erreur de mise en ligne: vérifiez que vous êtes toujours connecté à internet.")
+	}
+
+
+	chargement(false)
 }
