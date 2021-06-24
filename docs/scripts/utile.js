@@ -10,6 +10,17 @@ function se_deconnecter(){
   */
 }
 
+
+function recuperer_autorisations(){
+  url = CryptoJS.AES.decrypt("U2FsdGVkX19VFoAHA6uGaVw+nJmUqMm1V/wAI54lcDrc9CEoJu2NzJntc1jMydf+904/pcwg0f6gbd5g75V1HEIkENqhb4hq5zVqjqLJ/5NFwdd8kzFN7Ls8C2Ig1yKAuEZisjgxM9BrHuAzQ3bZvaJVifOpAi7RJDrRWmJWyAV9bfbIEM4iS/JIE0l7wsVB+Yy0nfXj+PAK6z0tkSfnpYKws7CxDTQvz0+wBeOmee0=","Sekooly").toString(CryptoJS.enc.Utf8)
+  autorisations = get_resultat_brut(url)
+  return autorisations
+}
+
+
+
+
+
 function mettre_le_contact_etablissement(){
   var le_contact = contact_etablissement
   

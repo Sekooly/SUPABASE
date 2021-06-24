@@ -2941,12 +2941,12 @@ function check_maintenance(){
 function mettre_le_contact_etablissement(){
   var le_contact = contact_etablissement
   
-  if($("#contact_etablissement")[0]){
+  if($(".lien_mail")[0]){
 
 
-    $("#contact_etablissement")[0].href = "mailto:"+le_contact
-    $("#contact_etablissement")[0].innerText = le_contact
-    stocker('contact_etablissement',le_contact)
+    $(".lien_mail")[0].href = "mailto:"+le_contact
+    $(".lien_mail")[0].innerText = le_contact
+    stocker('lien_mail',le_contact)
   }
 
 
@@ -19012,3 +19012,24 @@ document.addEventListener('visibilitychange', () => {
 
 
 
+/********************* NEW LOGO *************************/
+function nouveau_logo(){
+
+	//input file
+	var elements_html = "<input type='file' id='nouveau_logo_etablissement'>"
+
+	//créer un mini popup
+	//bouton upload avec au_clic = upload_nouveau_logo()
+	creer_mini_popup("Nouveau logo",elements_html,"Mettre en ligne","upload_nouveau_logo()")
+	
+}
+
+function upload_nouveau_logo(){
+
+	//est image
+
+
+
+	afficher_alerte("Nouveau logo mis en ligne.")
+	$("#mini_popup").remove()
+}
