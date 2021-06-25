@@ -2057,3 +2057,44 @@ ALTER USER postgres WITH SUPERUSER;
 
 
 
+
+
+
+
+
+
+
+
+
+
+-- FUNCTION: public.code_ok(text, text, text)
+
+-- DROP FUNCTION public.code_ok(text, text, text);
+
+CREATE OR REPLACE FUNCTION public.code_ok(
+    mon_type text,
+    mon_id text,
+    plain_code text)
+    RETURNS TABLE(code_ok boolean) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+BEGIN  return QUERY execute (  'select count("Identifiant") > 0 as code_ok  from "' || mon_type || '"  where "Identifiant" = ' || mon_id || ' and (("Code" = ' || plain_code || ' and LENGTH(code_hash)=3) or ("Code" = MD5(' || plain_code || ') and LENGTH(code_hash)=2))  group by code_hash;    '  );END;
+$BODY$;
+
+ALTER FUNCTION public.code_ok(text, text, text)
+    OWNER TO postgres;
+
+GRANT EXECUTE ON FUNCTION public.code_ok(text, text, text) TO PUBLIC;
+
+GRANT EXECUTE ON FUNCTION public.code_ok(text, text, text) TO anon;
+
+GRANT EXECUTE ON FUNCTION public.code_ok(text, text, text) TO authenticated;
+
+GRANT EXECUTE ON FUNCTION public.code_ok(text, text, text) TO postgres;
+
+GRANT EXECUTE ON FUNCTION public.code_ok(text, text, text) TO service_role;
+
