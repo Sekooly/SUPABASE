@@ -460,8 +460,10 @@ async function fin_envoi_log(partir, mon_identifiant, ma_classe, mon_statut,
   if (partir){
     if(recuperer('mes_donnees').length>0){
 
-      //stocker le code dans mes données
-      modifier_donnee_locale("mes_donnees","Identifiant",$("#Identifiant").val(),"Code",$("#Code").val())
+      //stocker le code dans mes données      
+      stocker("code_saisie",$("#Code").val())
+
+
       //console.log(JSON.parse(recuperer('mes_donnees')))
       window.location.href="tele-enseignement"      
     }   
@@ -2088,3 +2090,28 @@ function envoyer_mon_statut(statut){
 
   
 }
+
+
+function verify_local_pass(){
+  var plain_code = recuperer("code_saisie") ? recuperer("code_saisie") : ""
+
+
+  if(plain_code){
+    var mon_type = recuperer("mon_type").split('_')[0]
+    var moi = recuperer("identifiant_courant")
+
+    var res = get_resultat(racine_data + "rpc/code_ok?mon_type="+mon_type+"&mon_id='"+moi+"'&plain_code='"+plain_code+"'"  + "&" +apikey)
+    if(!res || res.length <= 0){
+      deconnexion()
+      return false
+
+    }else{
+      effacer("code_saisie")
+      return true
+    }
+
+    console.log(res)
+  }
+
+}
+

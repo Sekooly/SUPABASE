@@ -2249,40 +2249,6 @@ function deconnexion(){
 	var ma_classe = "";
 	mon_role = init_mon_role()
 
-
-	/*
-	effacer("mes_donnees");
-	effacer("mes_matieres");
-	effacer('dossier_chargé','');
-	effacer('mon_type');
-	effacer('les_topics');
-	effacer("topic_chargé");
-
-	effacer("nb_com_actuel");
-	
-	effacer("les_coms");
-	effacer("les_fichiers");
-	effacer('device_id');
-	effacer('mes_notifs');
-	effacer('ma_date_consultation');
-	effacer('fichier_ouvert');
-	effacer('dossier_rendus_cycle')
-
-	effacer('quitter_multi_visio')
-	effacer("nb_clics")
-
-	effacer('mes_destinataires')
-	effacer('mes_msgs')
-	effacer('msg_chargé')
-
-
-	effacer('mes_chapitres')
-	effacer('mode_prefere')
-	effacer('tmp_quiz')
-
-	effacer('liste_params_colonnes_masquees')
-	*/
-
 	tout_effacer_sauf(["identifiant_courant", "mode_nuit_oui", "notifs_sans_actualiser", "date_heure_depassement"])
 
 	image_temporaire = ""
@@ -2840,7 +2806,7 @@ function initialisation(){
 	chargement(true);	
 	
 	
-
+	verify_local_pass()
 	attribuer_les_clics()
 	mettre_mon_mode()
 	appliquer_preferences()
