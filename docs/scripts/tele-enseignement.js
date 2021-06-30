@@ -1563,7 +1563,7 @@ function retourner_site(){
 
 	vider_fenetre("Sekooly")
 	
-	visualiser("Tutoriels d'utilisation.docx","1HnsoX5_NQGhJ34WZ68p9SPvZ30jn4gKpf_cQjz2ZyUo",false,"Tutoriels d'utilisation")
+	visualiser("Tutoriels d'utilisation","https://tuto.sekooly.com",false,"Tutoriels d'utilisation")
 	$("#telechargement").remove()
 	afficher_fenetre(true)
 	
@@ -4901,7 +4901,7 @@ function renommer_fichier(id_fichier,ancien_nom){
 
 
 
-async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, pas_de_telechargement, mode_extrait_png_canva, mode_extrait_png_div){
+async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, pas_de_telechargement, mode_extrait_png_canva, mode_extrait_png_div, mode_site_web){
 
 	chargement(true);
 
@@ -5111,13 +5111,17 @@ function est_image(extension){
 
 function calcul_lien_de_visu(extension,id_fichier){
 
-	//console.log(extension);
+	console.log(extension);
 
 	//lien de visu par defaut
 	var lien_de_visu =  "https://drive.google.com/uc?id=" + id_fichier;
-	
+
+	//si c'est un site directement : on change
+	if(extension==="tutoriels d'utilisation"){
+		lien_de_visu = id_fichier;
+
 	//si c'est un fichier excel : on change
-	if(extension.includes("xls")){
+	} else if(extension.includes("xls")){
 		lien_de_visu = "https://docs.google.com/spreadsheets/preview?id=" + id_fichier;
 	
 	//si c'est un fichier word : on change
