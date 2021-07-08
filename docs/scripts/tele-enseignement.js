@@ -5151,7 +5151,7 @@ function calcul_lien_de_visu(extension,id_fichier){
 
 	//si c'est un lien YOUTUBE
 	}else if(est_youtube(extension)){
-		lien_de_visu = 'https://www.youtube.com/embed/' + id_fichier + '?fs=1&loop=1&rel=0&showinfo=0&modestbranding=1';
+		lien_de_visu = 'https://www.youtube.com/embed/' + id_fichier + '?fs=1&loop=1&rel=0&showinfo=0&modestbranding=1&listType=playlist&playlist=' + id_fichier;
 	}
 
 
