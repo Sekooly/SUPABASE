@@ -2938,6 +2938,7 @@ function attribuer_les_clics(){
 	au_clic("#side-bar-profil", "afficher_modif_profil()")//
 	au_clic("#side-bar-edt", "edt()")//
 	au_clic("#side-bar-day", "ma_journee()")//
+	au_clic(".sidebar","switch_side_bar()")
 	au_clic("#dashboard", "tableau_de_bord()")//
 	au_clic("#side-bar-prog", "recuperer_programme()")//
 	au_clic("#side-bar-conseil", "conseils_de_classe()")//
