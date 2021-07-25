@@ -863,7 +863,8 @@ function garder_les_colonnes_non_automatiques(arr){
 
 
 function csv_en_JSON(contenu){
-  var toutes_les_lignes = contenu.split('\r\n')
+  console.log({contenu})
+  var toutes_les_lignes = contenu.split('\n')
   var entete = toutes_les_lignes[0].split(separateur)
   console.log(entete)
 
