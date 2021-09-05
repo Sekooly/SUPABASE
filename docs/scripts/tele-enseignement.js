@@ -10156,6 +10156,12 @@ function recuperer_parametres(){
         chargement(false)
     });
 
+	$("#conteneur_filtre")[0].addEventListener('click', function (evt) {
+	    if (evt.detail === 3) {
+	        $("#boutons_params").show()
+		$("#boutons_params").children().show();
+	    }
+	});
 
     //clic par défaut sur Alerte
 	choisir_ce_parametre("Alerte")
