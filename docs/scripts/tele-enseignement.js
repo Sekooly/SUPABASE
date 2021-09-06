@@ -12060,8 +12060,8 @@ function importer_parametres(){
   			//on s'arrete dès qu'une clé est non trouvée
 			var probleme = ""
 			var cle_problematique = Object.keys(json_final[0]).some(key => {
-				probleme = key
-				return champs_initiaux.indexOf(key) < 0 
+				probleme = key.trim()
+				return champs_initiaux.indexOf(probleme) < 0 
   			})
   			if(cle_problematique){
   				alert("Problème d'import: le champ '" + probleme + "' n'est pas reconnu dans la table '"+id_parametre+"'.")
