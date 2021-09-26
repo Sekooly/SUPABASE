@@ -1209,9 +1209,12 @@ function creer_uuid(){
   return get_resultat_brut("https://www.uuidgenerator.net/api/version4")
 }
 
+function motif_conversation(){
+  return "|"
+}
 
 function ajouter_motif(identifiant){
-  return "-" + identifiant + "-"
+  return motif_conversation() + identifiant + motif_conversation()
 }
 
 function create_id_conv(destinataire, id_conv_initial){
@@ -1227,7 +1230,7 @@ function create_id_conv(destinataire, id_conv_initial){
 
 
 function recuperer_destinataire(id_conv){
-  resultat = id_conv.replaceAll(recuperer("identifiant_courant"),"").replaceAll('-','').toUpperCase()
+  resultat = id_conv.replaceAll(recuperer("identifiant_courant"),"").replaceAll(motif_conversation(),'').toUpperCase()
   if(!resultat) resultat = recuperer("identifiant_courant").toUpperCase()
   return resultat
 }
