@@ -566,7 +566,6 @@ CREATE TABLE public."Matieres"
     "Cycle" text COLLATE pg_catalog."default" NOT NULL,
     "ID_URL" text COLLATE pg_catalog."default",
     "Matiere" text COLLATE pg_catalog."default",
-    "Matiere_bis" text COLLATE pg_catalog."default",
     "URL" text COLLATE pg_catalog."default",
     "URL_Mapping" text COLLATE pg_catalog."default",
     classe_id text COLLATE pg_catalog."default",
