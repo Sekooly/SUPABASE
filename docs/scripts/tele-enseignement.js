@@ -12447,9 +12447,6 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 		if(id_parametre === "Classes"){
 		/******* POUR CLASSE ********/
 
-
-			//Classe_bis
-			$(".donnee[id='Classe_bis']")[0].value = la_classe
 			//ID_URL
 			$(".donnee[id='ID_URL']")[0].value = id_de_la_classe
 			//URL 
