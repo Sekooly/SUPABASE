@@ -52,7 +52,7 @@ img_dynamiques = img_dynamiques.concat(liste_img_extensions())
 
 var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","URL_Mapping","URL_agenda",
 								"id_googlecalendar","nb_avis_donnés", "nb_avis_max","nom_fiche","taux_conseil",
-								"Matiere_bis", "classe_id", "classe_bis", "type", "Derniere_consultation_notifs",
+								"classe_id", "classe_bis", "type", "Derniere_consultation_notifs",
 								"id_formulaire_remediation", "id_fiche", "URL_Mapping","niveau",
 								"classe_bis", "id_dossier_cycle", "dossier_rendus_cycle", "liste_notifs_lues", "nombre_avis", "Numero_telephone",
 								"id", "Id_classe_matiere", "id_notif", "Id_source", "id_fichier", "id_dossier", "id_devoir", "id_dossier_sujetdevoir", "id_fichier_sujetdevoir", "Id_topic", "id_com", "ID_FICHIER", "id_msg","id_conv", "id_chapitre",
@@ -68,7 +68,7 @@ var elements_menu_haut_avec_reset = ["Eleves","Profs","Administration"]
 nom_etablissement = data_etablissement['nom_etablissement']
 
 
-var champs_avec_listes_dynamiques = ['Classe','classe_bis','Classe_principale','Cycle','cycle','Matiere','Matiere_bis']
+var champs_avec_listes_dynamiques = ['Classe','classe_bis','Classe_principale','Cycle','cycle','Matiere']
 var champs_oui_ou_non = ['Est_délégué','Reponse_sondage','Ecolage_OK','Droits_modifs', 'Droit_acces_anticipe_examen','Droit_changer_ecolage','commun_au_cycle','droit_hors_maintenance','Est_délégué']
 var liste_couleurs = ['blanc','bleu ciel', 'bleu foncé', 'gris','jaune','marron','noir','orange','rose','rouge','vert clair','vert foncé', 'violet']
 
@@ -12468,9 +12468,7 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 			//Classe_Matiere
 			$(".donnee[id='Classe_Matiere']")[0].value = '('+ la_classe+'|'+ la_matiere +')'
 			//ID_URL
-			$(".donnee[id='ID_URL']")[0].value = id_de_la_matiere		
-			//Matiere_bis
-			$(".donnee[id='Matiere_bis']")[0].value = la_matiere		
+			$(".donnee[id='ID_URL']")[0].value = id_de_la_matiere				
 			//URL
 			$(".donnee[id='URL']")[0].value = "https://drive.google.com/drive/folders/" + id_de_la_matiere		
 			//URL_Mapping
@@ -16217,6 +16215,7 @@ async function afficher_resultats_recherche(){
 	var fichiers_trouves = mes_fichiers_intermediaires.filter(function(un_fichier, index){
 
 		//console.log("\n\n\n\non a ça: " + index)
+		console.log(un_fichier)
 
 		//chercher dans la Classe_Matiere
 		dans_classe_matiere = un_fichier['Classe_Matiere'].toLowerCase().replaceAll(" ","").includes(mot_cle)
