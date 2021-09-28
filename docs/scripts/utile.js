@@ -2119,3 +2119,10 @@ function verify_local_pass(){
 
 }
 
+function right(str, chr) {
+  return str.slice(str.length-chr,str.length);
+}
+ 
+function left(str, chr) {
+  return str.slice(0, chr - str.length);
+}

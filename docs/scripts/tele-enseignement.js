@@ -11482,6 +11482,8 @@ function fonction_td_modifiable(e, sans_suite){
 	var est_liste_options = $("#liste_options")[0] ? e.target.cellIndex === $("#liste_options")[0].cellIndex : false
 	var nest_pas_onglet_classes = id_parametre !== "Classes"
 
+	var est_optionnel = $("#nom_liste_et_coefs")[0] ? e.target.cellIndex === $("#nom_liste_et_coefs")[0].cellIndex : false
+
 	if (nest_pas_onglet_classes && (est_classe || est_classe_principale || est_liste_options)){
 
 
@@ -11511,6 +11513,10 @@ function fonction_td_modifiable(e, sans_suite){
 		}
 		
 
+	}else if(est_optionnel){
+		var index_matiere = $('.header_table:contains("Classe_Matiere")')[0].cellIndex
+		var nom_matiere = $('.une_ligne_de_donnees.selected > td')[index_matiere].innerText
+		formulaire_id_liste_options(e, nom_matiere)
 
 		
 	}else if(liste_index_params_auto.includes(','+ e.target.cellIndex +',')){
@@ -11541,6 +11547,58 @@ function fonction_td_modifiable(e, sans_suite){
 	}
 }
 
+var current_event={};
+function formulaire_id_liste_options(e, nom_matiere){
+	current_event = e
+	//console.log({e})
+	
+	var ancienne_valeur = e.target.innerText
+	//console.log({ancienne_valeur})
+
+	var id_liste = ancienne_valeur && ancienne_valeur !== "null" ? ancienne_valeur.split('|')[0].split('(')[1] : ""
+	var liste_coef = ancienne_valeur && ancienne_valeur !== "null" ? ancienne_valeur.split('|')[1].split(')')[0] : ""
+	
+
+	//console.log({id_liste})
+	//console.log({liste_coef})
+
+	var html_final =  `<form><div class="donnees_saisies"><div class="une_donnee_saisie" style="margin-bottom: 20px;"><label>Nom de liste (Exemples: science, arts, langue, spécialité, ...)</label><input class="donnee" value="`+id_liste+`" id="id_liste" name="id_liste"></div><div class="une_donnee_saisie" style="margin-bottom: 20px;"<label>Coefficients possibles séparés par une virgule (Exemple: 5,16)</label><input class="donnee" value="`+liste_coef+`" id="liste_coef" name="liste_coef"></div><rouge id="coef_nok" style="display: none;">Merci de saisir un nom de liste et des coefficients corrects.</rouge></div></form>`
+	creer_mini_popup("<rouge>En remplissant ce champ, <b>"+nom_matiere + "</b> devient une matière OPTIONNELLE pour les élèves.</rouge>", html_final,"Rattacher à la liste","assigner_liste_et_coef()")
+}
+
+
+function assigner_liste_et_coef(){
+
+	var id_liste = $("#id_liste")[0].value
+	var liste_coef = $("#liste_coef")[0].value.replaceAll(" ","")
+
+	var tout_est_ok = verif_option(id_liste,liste_coef)
+
+	if(!tout_est_ok){
+		$("#coef_nok").show()
+
+	}else{
+		$("#mini_popup").remove()
+
+		var resultat = ""
+		if (id_liste.length + liste_coef.length > 0){
+			resultat = '(' + id_liste + "|" + liste_coef + ')'
+		}
+		
+		//console.log({resultat})
+
+		suite_actualiser_double_clic(current_event, current_event.target.value, resultat)
+	}
+}
+
+function verif_option(id_liste,liste_coef){
+	var pas_tous_des_chiffres = liste_coef.replaceAll(' ','').split(',').some( function(un_coef) {
+		//console.log({un_coef})
+		return isNaN(Number(un_coef))
+	});
+
+	return ((id_liste.length > 0 && liste_coef.length > 0) || (id_liste.length + liste_coef.length === 0)) && !pas_tous_des_chiffres && right(liste_coef,1) !== ","
+}
 
 
 function valeurs_possibles_modification_classes(e, id_parametre, les_matieres, est_liste_options){
@@ -11552,13 +11610,19 @@ function valeurs_possibles_modification_classes(e, id_parametre, les_matieres, e
 		var indice_classe = $('.header_table:contains("Classe")')[0].cellIndex
 		var classe_eleve = $('.une_ligne_de_donnees.selected > td')[indice_classe].innerText;
 
-		var les_matieres_interm = les_matieres.filter(m => m['id_liste_options_et_coefs'].trim().length > 0 && m['Classe'] === classe_eleve )
+		//console.log({classe_eleve})
+
+		var les_matieres_interm = les_matieres.filter(function(m){
+			//console.log(m)
+			return m['nom_liste_et_coefs'] && m['nom_liste_et_coefs'].trim().length > 0 && m['Classe'] === classe_eleve 
+		})
 		var valeurs_possibles_interm = valeursUniquesDeCetteKey(les_matieres_interm,"Matiere")
 		valeurs_possibles_interm = valeurs_possibles_interm.filter(v => v.trim().length > 0)
 
+
 		//pour chaque option possible
 		valeurs_possibles_interm.forEach(function(une_option) {
-			les_coefs_de_loption = les_matieres.find(matiere => matiere['Classe_Matiere'] === '(' + classe_eleve + '|' + une_option  + ')' )['id_liste_options_et_coefs'].split('|')[1].replaceAll(')','').split(',')
+			les_coefs_de_loption = les_matieres.find(matiere => matiere['Classe_Matiere'] === '(' + classe_eleve + '|' + une_option  + ')' )['nom_liste_et_coefs'].split('|')[1].replaceAll(')','').split(',')
 
 			
 			//pour chaque coef, créer Matière-coef 
@@ -11569,9 +11633,6 @@ function valeurs_possibles_modification_classes(e, id_parametre, les_matieres, e
 			
 		});
 
-
-
-		//valeurs_possibles.map(   e => e + ' coef ' + les_matieres.find(m => m['Classe_Matiere'] === e)['id_liste_options_et_coefs']  )
 	}else{
 
 		var valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Classe_Matiere")
@@ -11699,7 +11760,7 @@ function formulaire_choix_checkbox(nom_champ, e, ancienne_valeur, identifiant, l
 	$("#mini_popup").remove()
 
 	var entetes = '<div id="mini_popup" class="mini_popup" style="overflow: hidden auto;"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div>'
-	var titre_formulaire = '<div>'+nom_champ+' pour <b>'+identifiant+'</b></div><div id="liste_classe_matieres" style="padding-top: 4%;padding-bottom: 4%;text-align: left;"><div>'
+	var titre_formulaire = '<div>'+nom_champ+' pour <b>'+identifiant+'</b></div><div id="liste_classe_matieres" class="liste_centree"><div>'
 	
 	//pour chaque element de la liste
 	var les_elements = ""

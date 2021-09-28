@@ -230,7 +230,8 @@ CREATE TABLE public."Eleves"
     "Reponse_sondage" text COLLATE pg_catalog."default",
     "Numeros_telephone_original" text COLLATE pg_catalog."default",
     "statut" text COLLATE pg_catalog."default" DEFAULT 'Déconnecté'::text,
-    "liste_notifs_lues" text COLLATE pg_catalog."default",
+    "liste_notifs_lues" text COLLATE pg_catalog."default",    
+    liste_options VARCHAR(300) COLLATE pg_catalog."default",
     CONSTRAINT "Eleves_pkey" PRIMARY KEY ("Identifiant")
 )
 
@@ -572,6 +573,7 @@ CREATE TABLE public."Matieres"
     commun_au_cycle character varying COLLATE pg_catalog."default" NOT NULL DEFAULT 'non'::character varying,
     coefficient_matiere real,
     description text COLLATE pg_catalog."default" NOT NULL DEFAULT 'Aucune description fournie'::text,
+    nom_liste_et_coefs VARCHAR(150) COLLATE pg_catalog."default",
     CONSTRAINT "Matieres_pkey" PRIMARY KEY ("Classe_Matiere", "Cycle")
 )
 
