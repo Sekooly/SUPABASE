@@ -11479,10 +11479,13 @@ function fonction_td_modifiable(e, sans_suite){
 
 	var est_classe = $("#Classe")[0] ? e.target.cellIndex === $("#Classe")[0].cellIndex : false
 	var est_classe_principale = $("#Classe_principale")[0] ? e.target.cellIndex === $("#Classe_principale")[0].cellIndex : false
-	var est_classe_bis = $("#classe_bis")[0] ? e.target.cellIndex === $("#classe_bis")[0].cellIndex : false
+	var est_liste_options = $("#liste_options")[0] ? e.target.cellIndex === $("#liste_options")[0].cellIndex : false
 	var nest_pas_onglet_classes = id_parametre !== "Classes"
 
-	if (nest_pas_onglet_classes && (est_classe || est_classe_principale || est_classe_bis)){
+	if (nest_pas_onglet_classes && (est_classe || est_classe_principale || est_liste_options)){
+
+
+		var titre_fenetre = est_liste_options ? "Matières optionnelles" : "Classe(s)"
 
 		//mini fenetre de checkbox
 		//avec ok et annuler
@@ -11495,15 +11498,15 @@ function fonction_td_modifiable(e, sans_suite){
 				stocker('Matieres', JSON.stringify(liste_JSON ? liste_JSON : ""))
 				les_matieres = JSON.parse(recuperer('Matieres'))
 
-				valeurs_possibles = valeurs_possibles_modification_classes(e, id_parametre, les_matieres)
-				formulaire_choix_checkbox("Classe(s)",e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'),id_parametre === "Administration")
+				valeurs_possibles = valeurs_possibles_modification_classes(e, id_parametre, les_matieres, est_liste_options)				
+				formulaire_choix_checkbox(titre_fenetre,e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'),id_parametre === "Administration")
 
 			})
 
 			
 		}else{
-			valeurs_possibles = valeurs_possibles_modification_classes(e, id_parametre, les_matieres)
-			formulaire_choix_checkbox("Classe(s)",e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'),id_parametre === "Administration")
+			valeurs_possibles = valeurs_possibles_modification_classes(e, id_parametre, les_matieres, est_liste_options)
+			formulaire_choix_checkbox(titre_fenetre,e, ancienne_valeur, e.target.parentNode.id,valeurs_possibles,ancienne_valeur.split(';'),id_parametre === "Administration")
 
 		}
 		
@@ -11540,21 +11543,50 @@ function fonction_td_modifiable(e, sans_suite){
 
 
 
-function valeurs_possibles_modification_classes(e, id_parametre, les_matieres){
-	//console.log(e.target)
-
-	var valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Classe_Matiere")
+function valeurs_possibles_modification_classes(e, id_parametre, les_matieres, est_liste_options){
 	
+	if(est_liste_options){
 
-	//si c'est un admin -> (Tous|un_cycle)
-	if(id_parametre === "Administration"){
-		valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Cycle")
-		valeurs_possibles = valeurs_possibles.map(e => '(Tous|'+e+')')
+	
+		var valeurs_possibles = []
+		var indice_classe = $('.header_table:contains("Classe")')[0].cellIndex
+		var classe_eleve = $('.une_ligne_de_donnees.selected > td')[indice_classe].innerText;
+
+		var les_matieres_interm = les_matieres.filter(m => m['id_liste_options_et_coefs'].trim().length > 0 && m['Classe'] === classe_eleve )
+		var valeurs_possibles_interm = valeursUniquesDeCetteKey(les_matieres_interm,"Matiere")
+		valeurs_possibles_interm = valeurs_possibles_interm.filter(v => v.trim().length > 0)
+
+		//pour chaque option possible
+		valeurs_possibles_interm.forEach(function(une_option) {
+			les_coefs_de_loption = les_matieres.find(matiere => matiere['Classe_Matiere'] === '(' + classe_eleve + '|' + une_option  + ')' )['id_liste_options_et_coefs'].split('|')[1].replaceAll(')','').split(',')
+
+			
+			//pour chaque coef, créer Matière-coef 
+			les_coefs_de_loption.forEach( function(le_coef) {
+				valeurs_possibles.push(une_option + " coef " + le_coef)	
+			})
+			
+			
+		});
+
+
+
+		//valeurs_possibles.map(   e => e + ' coef ' + les_matieres.find(m => m['Classe_Matiere'] === e)['id_liste_options_et_coefs']  )
 	}else{
 
-		//si c'est une classe principale (profs) OU matieres OU eleve avec 1 seule classe -> classe
-		if(id_parametre === "Eleves" || id_parametre === "Matieres" || e.target.cellIndex === $("#Classe_principale")[0].cellIndex){
-			valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Classe")
+		var valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Classe_Matiere")
+
+		//si c'est un admin -> (Tous|un_cycle)
+		if(id_parametre === "Administration"){
+			valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Cycle")
+			valeurs_possibles = valeurs_possibles.map(e => '(Tous|'+e+')')
+		}else{
+
+			//si c'est une classe principale (profs) OU matieres OU eleve avec 1 seule classe -> classe
+			if(id_parametre === "Eleves" || id_parametre === "Matieres" || e.target.cellIndex === $("#Classe_principale")[0].cellIndex){
+				valeurs_possibles = valeursUniquesDeCetteKey(les_matieres,"Classe")
+			}
+
 		}
 
 	}
@@ -11675,7 +11707,7 @@ function formulaire_choix_checkbox(nom_champ, e, ancienne_valeur, identifiant, l
 		est_coché = liste_deja_cochés ? (liste_deja_cochés.indexOf(liste_en_array[i]) >=0 ? "checked" : "" ): ""
 		classe_initiale = est_coché === "checked" ? "en_gras" : ""
 		type_element = un_seul_choix ? "radio" : "checkbox"
-		les_elements = les_elements+'<div class="'+classe_initiale+'"><input class="choix_liste_matiere" type="'+type_element+'" id="'+liste_en_array[i]+'" name="choix_liste_matiere" '+est_coché+'><label>'+liste_en_array[i]+'</label></div>'
+		les_elements = les_elements+'<div class="'+classe_initiale+'"><input class="choix_liste_matiere" type="'+type_element+'" id="'+liste_en_array[i]+'" name="choix_liste_matiere" '+est_coché+'><label for="'+liste_en_array[i]+'">'+liste_en_array[i]+'</label></div>'
 
 	}
 
