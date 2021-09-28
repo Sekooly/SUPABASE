@@ -11627,7 +11627,7 @@ function valeurs_possibles_modification_classes(e, id_parametre, les_matieres, e
 			
 			//pour chaque coef, créer Matière-coef 
 			les_coefs_de_loption.forEach( function(le_coef) {
-				valeurs_possibles.push(une_option + " coef " + le_coef)	
+				valeurs_possibles.push('('+classe_eleve+'|'+une_option+')' + " coef " + le_coef)	
 			})
 			
 			
