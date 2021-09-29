@@ -28,6 +28,7 @@ var elements_generiques_en_haut = [{"Général": [
 										  "Visio",
 										  "Fichiers",
 										  "Rendus",
+										  "Notes",
 										  "Topic",
 										  "Coms",
 										  "Notifs"
@@ -6369,7 +6370,7 @@ $(function charger_fichiers(e){
     	//console.log(select_liste_eleves)
 
 
-    	attribution = '<form id="trimestre" style=""><b><label for="periode_bulletin">Trimestre:<select style="width: 60%;" name="periode_bulletin"><option value="PREMIER TRIMESTRE">PREMIER TRIMESTRE</option><option value="DEUXIEME TRIMESTRE">DEUXIEME TRIMESTRE</option><option value="TROISIEME TRIMESTRE">TROISIEME TRIMESTRE</option><option value="ANNUEL">ANNUEL</option></select></label></b></form>'
+    	attribution = '<form id="trimestre" ><b><label for="periode_bulletin">Trimestre:<select style="width: 60%;" name="periode_bulletin"><option value="PREMIER TRIMESTRE">PREMIER TRIMESTRE</option><option value="DEUXIEME TRIMESTRE">DEUXIEME TRIMESTRE</option><option value="TROISIEME TRIMESTRE">TROISIEME TRIMESTRE</option><option value="ANNUEL">ANNUEL</option></select></label></b></form>'
     	attribution = attribution + '<form id="attribution" style="margin-top: 20px;">'
     	for (numero_page = 1 ; numero_page <= nombre_pages ; numero_page++){
     		attribution = attribution + '<div><label for="'+numero_page+'">Page n°'+numero_page+':' + select_liste_eleves.replace(/"numero_page"/g,numero_page) + '</label></div>'
@@ -12738,6 +12739,433 @@ function masquer_les_bulletins(){
 
 
 function clic_bulletin(){
+	//si prof
+	if(recuperer('mon_type').includes('Prof') ){
+		//lister les classes-matières que j'enseigne
+		var mes_matieres = JSON.parse(recuperer("mes_matieres"))
+		var toutes_les_matieres = recuperer("Matieres") ? JSON.parse(recuperer("Matieres")) : mes_matieres
+
+		creer_fenetre_bulletin(toutes_les_matieres)
+	}
+
+	//todo
+	//si admin
+	//si eleve
+}
+
+
+var bulletin_enregistre = false
+async function sauvegarder_saisie_bulletin(){
+	chargement(true)
+
+	//supprimer toutes les saisies de (identifiant_prof,Classe_Matiere,periode_bulletin,saison_note) et vérifier que c'est OK
+	var champs_refs = donnees_generiques_bulletin()
+	//console.log("suppression en cours...")
+	var retour = await supprimer_avec_ces_references('Notes',champs_refs)
+	//console.log("suppression ok!")
+
+	//transformer la saisie en JSON
+	//console.log("transformation en cours...")
+	var notes_saisies = await transformer_notes_saisies()
+	//console.log("transformation ok!")
+	//console.log(notes_saisies)
+	
+	alerte_a_afficher = "Notes saisies enregistrées."
+	if($("#saison_note").val()  === "Toutes") alerte_a_afficher = "⚠️Les enregistrement doivent se faire uniquement sur chaque période, et non dans \"Toutes\"."
+	if (notes_saisies.length === 0 || $("#saison_note").val()  === "Toutes") {
+		chargement(false)
+		bulletin_enregistre = true
+		return afficher_alerte(alerte_a_afficher)
+	}
+
+	//ajouter le JSON à la table Notes et vérifier que c'est OK
+	//console.log("envoi en cours...")
+	retour = await stocker_notes_server(notes_saisies)
+	//console.log(retour)
+
+	if(retour.error !== null){
+		alerte_a_afficher = "⚠️Enregistrement impossible, merci de réessayer."
+	}else{
+		bulletin_enregistre = true
+	}
+
+	afficher_alerte(alerte_a_afficher)
+
+	chargement(false)
+}
+
+
+function stocker_notes_server(notes_saisies){
+	return supabase
+	  .from('Notes')
+	  .upsert(notes_saisies)
+}
+
+function donnees_generiques_bulletin(){
+	var periode_bulletin = $("#periode_bulletin").val()
+	var saison_note = $("#saison_note").val()
+	var Classe_Matiere = $('.un_menu_orange').text()
+	var identifiant_prof = recuperer("identifiant_courant")
+
+	return {
+		periode_bulletin:periode_bulletin,
+		saison_note:saison_note,
+		Classe_Matiere:Classe_Matiere,
+		identifiant_prof: identifiant_prof
+	}
+}
+
+function transformer_notes_saisies(){
+	var mtn = maintenant()
+	//récupérer: periode_bulletin, saison_note, Classe_Matiere, identifiant_prof
+	var tout = donnees_generiques_bulletin()
+
+	var notes_saisies = []
+	var liste_eleves_intiale = $('.un_eleve_bulletin')
+
+	//pour chaque élève (identifiant_eleve)
+	liste_eleves_intiale.each(function(index,eleve){
+		//console.log("eleve en cours:" + eleve.innerText)
+
+		//console.log(eleve)
+		var listes_notes = $("[id='"+eleve.id+"']").children('.une_note')
+
+		//pour chaque note saisie
+		var la_note =0;
+		listes_notes.each(function(index_note,une_note){
+
+			if (une_note.innerText!==""){
+
+				la_note = Number(une_note.innerText.replace(",","."))
+				//console.log("on pousse la note " + la_note)
+				//créer 1 donnée
+				notes_saisies.push({
+					date_creation_note: mtn,
+					periode_bulletin: tout.periode_bulletin,
+					saison_note: tout.saison_note,
+					Classe_Matiere: tout.Classe_Matiere,
+					identifiant_prof: tout.identifiant_prof,
+					identifiant_eleve: eleve.id,
+					note: la_note,
+				})
+				//console.log("donnée poussée!")
+			}
+		})
+	})
+
+	return notes_saisies
+	
+}
+
+function creer_fenetre_bulletin(toutes_les_matieres){
+
+	vider_fenetre("Saisie des notes du bulletin",false,"sauvegarder_saisie_bulletin()");
+
+	var contenu_menu_haut = ""
+	
+	for (var i =  0; i < toutes_les_matieres.length; i++) {
+		contenu_menu_haut = contenu_menu_haut + '<span class="un_menu" nom_liste_et_coefs="'+toutes_les_matieres[i]['nom_liste_et_coefs']+'" id="'+toutes_les_matieres[i]['Classe_Matiere']+'">'+toutes_les_matieres[i]['Classe_Matiere']+'</span>' 
+	}
+
+	var conteneur_menu_html = '<div id="conteneur_menu"><div id="menu_haut" class="menu_haut"> ' + contenu_menu_haut+ '</div><div id="menu_params" class="menu_params"><div id="previsualisation" class="previz-pref"></div></div></div>'
+
+	$("#fenetre").append(conteneur_menu_html);
+
+
+	//clic -> mise en forme + actualisation de menu_details
+	$('.un_menu').click(async function(e) {
+		chargement(true)
+		un_menu_clic(e.target.id,true)
+		//await afficher_eleves_concernes(e.target.innerText,e.target.getAttribute('nom_liste_et_coefs'))	
+		afficher_choix_periode_bulletin()
+        chargement(false)
+    });
+
+    afficher_fenetre(true)
+
+
+	
+
+
+}
+
+
+
+var mes_eleves_initiaux = []
+async function trouver_mes_eleves(){
+	chargement(true)
+
+	//le menu existe
+	if($('.un_menu_orange')[0]){
+
+		var tout = donnees_generiques_bulletin()
+		var Classe_Matiere = tout.Classe_Matiere
+		var classe = tout.Classe_Matiere.split('|')[0].replaceAll('(','')
+
+		var nom_liste_et_coefs = $('.un_menu_orange')[0].getAttribute('nom_liste_et_coefs')
+
+		//dans le cas où on veut toute le classe
+		if(nom_liste_et_coefs === "null"){
+			var demande = await supabase.from('bulletins').select('*').eq('Classe',classe)
+			mes_eleves_initiaux = demande.body
+		
+
+		}else{
+			//TODO!!! : si la matiere possede un coef spécifiable, on veut uniquement les eleves qui ont cette classe matiere dans leur liste_options
+			var demande = await supabase.from('bulletins').select('*').like('liste_options', '%'+Classe_Matiere+'%')
+			mes_eleves_initiaux = demande.body
+
+
+
+
+
+		}
+
+
+
+		chargement(false)
+		return mes_eleves_initiaux
+
+	//le menu n'existe pas -> on quitte
+	}else{
+		chargement(false)
+		return mes_eleves_initiaux
+	}
+}
+
+function afficher_choix_periode_bulletin(){
+	var choix_periode = les_trimestres_bulletin() + les_periodes_bulletin()
+	$("#trimestre").remove()
+	$("#explications").remove()
+	$('#previsualisation').append(choix_periode)
+	au_changement("#periode_bulletin","actualiser_liste_eleves_bulletins()")
+	au_changement("#saison_note","actualiser_liste_eleves_bulletins()")
+
+
+	au_clic("#periode_bulletin","demande_enregistrement_avant_changement_periode()")
+	au_clic("#saison_note","demande_enregistrement_avant_changement_periode()")
+}
+
+function transformer_notes_en_array(mes_eleves){
+
+	//console.log({mes_eleves})
+
+	//garder les identifiants uniques
+	var les_eleves = valeursUniquesDeCetteKey(mes_eleves,"Identifiant")
+	var resultat = []
+	var eleve_en_cours = {}
+
+	//pour chaque élève UNIQUE
+	les_eleves.forEach( function(un_eleve, index) {
+
+
+		//filtrer mes_eleves pour avoir les infos de un_eleve
+		var nom=mes_eleves.find(e => e['Identifiant'] === un_eleve)['Nom']
+		var prenoms= mes_eleves.find(e => e['Identifiant'] === un_eleve)['Prénom(s)']
+
+		//ne garder que les notes de LA PERIODE et de LA SAISON
+		var tout = donnees_generiques_bulletin()
+		var periode_bulletin = tout.periode_bulletin
+		var saison_note = tout.saison_note
+
+		//si saison_note n'est pas TOUT, filtrer
+		if(saison_note!=="Toutes"){
+			var notes_de_leleve = mes_eleves.filter(e => e['Identifiant'] === un_eleve && e['periode_bulletin'] === periode_bulletin && e['saison_note'] === saison_note).map(e => e['note'] + '|' + e['coef'])	
+		
+		//si saison_note=Toutes -> on récupère toutes les notes et on rend NON MODIFIABLE!!
+		}else{
+			var notes_de_leleve = mes_eleves.filter(e => e['Identifiant'] === un_eleve && e['periode_bulletin'] === periode_bulletin).map(e =>  e['note'] + '|' + e['coef'])	
+		}
+		
+		
+		//console.log({notes_de_leleve})
+
+		//rassembler l'élève avec ses notes
+		eleve_en_cours = {
+			Identifiant: un_eleve,
+			'Nom': nom,
+			'Prénom(s)':prenoms,			
+			note: notes_de_leleve
+		}		
+		//console.log({eleve_en_cours})
+		resultat.push(eleve_en_cours)
+	});
+
+
+
+	//console.log({resultat})
+	return resultat
+}
+
+
+async function demande_enregistrement_avant_changement_periode(){
+
+	//détecter tout changement avant de faire le changement
+	//console.log({bulletin_enregistre})
+	if(bulletin_enregistre === false && $(".liste_eleves_bulletins").length > 0 && $("#periode_bulletin").val() !== "--" && $("#saison_note").val() !== "--" && $("#saison_note").val() !== "Toutes" ){
+		var enregistrer = confirm("Voulez-vous enregistrer votre saisie actuelle?")
+		if(enregistrer){
+			await sauvegarder_saisie_bulletin()
+		}else{
+			bulletin_enregistre = true	
+		}
+	}else{
+		bulletin_enregistre = true
+	}
+
+}
+
+
+
+async function actualiser_liste_eleves_bulletins(){
+
+	$(".liste_eleves_bulletins").remove()
+
+	if($("#periode_bulletin").val() === "--" || $("#saison_note").val() === "--" ){
+		//1 champ vide -> on fait rien
+
+	}else{
+
+
+		mes_eleves = await trouver_mes_eleves()
+		//console.log({mes_eleves})
+
+
+		if(mes_eleves.length === 0){
+			var liste_eleves_bulletins = `<i class="liste_eleves_bulletins contenu_alerte_vide">Aucun élève inscrit à ce cours.</i>`
+
+		}else{	
+
+			mes_eleves = transformer_notes_en_array(mes_eleves)
+			var liste_eleves_bulletins = `<div class="liste_eleves_bulletins">`+ mes_eleves.map(function(un_eleve,index){
+				//console.log(un_eleve)
+
+				var cases_de_notes = les_notes_eleve(un_eleve['note'])
+				//console.log({cases_de_notes})
+				return `
+					
+					  <div class="un_eleve_bulletin" id="`+un_eleve['Identifiant']+`">
+					    <span class="une_case"> `+un_eleve['Nom']+` `+un_eleve['Prénom(s)']+`</span>`+cases_de_notes+`
+					  </div>	
+
+				`
+			}).join('')+'</div>'
+			//console.log(liste_eleves_bulletins)
+
+		}
+
+		$('#previsualisation').append(liste_eleves_bulletins)
+		
+
+		//changer sur chaque eleve pour afficher la moyenne + une case vide de plus
+		$('.un_eleve_bulletin').each(function(index,eleve){
+
+			//actualiser ssi l'élève a au moins 1 note NON VIDE
+			if($(eleve).children('.une_note').text() !== ""){
+				$(eleve).children().last().trigger("input")	
+				bulletin_enregistre = true
+			}
+
+			
+		})
+
+		chargement(false)
+
+	}
+
+
+}
+
+function coef_note_en_cours(){
+	var saison_note = element_DOM('saison_note').value
+	return saison_note === "Examen" ? 3 :
+			!isNaN(Number(saison_note)) ? 1 : 0
+}
+
+function les_notes_eleve(notes){
+
+	var est_editable = element_DOM('saison_note').value !== "Toutes"
+	//console.log({est_editable})
+
+	//pas de note initialement
+	if(notes.length === 0){
+		return '<span class="une_note" oninput=actualiser_nb_cases(this) coef="'+coef_note_en_cours()+'" contenteditable="'+est_editable+'"></span>'
+
+	//déjà une note
+	}else{
+		//console.log("AU MOINS UNE NOTE")
+
+		return notes.map(function(la_note,numero_note){
+			//console.log(la_note)
+			if(la_note==="null"||la_note===null) la_note = ""
+			return '<span class="une_note" oninput=actualiser_nb_cases(this) coef="'+la_note.split('|')[1]+'" contenteditable="'+est_editable+'">'+la_note.split('|')[0]+'</span>'	
+		}).join('')
+	}
+
+}
+
+function actualiser_nb_cases(ceci){
+
+	var le_parent = ceci.parentNode
+
+	//supprimer la case de moyenne
+	$('[id="'+le_parent.id+'"] > .case_de_moyenne').remove()
+
+	//console.log(ceci)
+	var note = ceci.innerText
+
+	//note vide
+	if(note.length === 0){
+
+		//pas de prochaine note SSI(!) cette prochaine note est vide
+		if ($(le_parent).children().last().text().trim() === "") $(le_parent).children().last().remove();
+
+	//note non vide
+	}else{
+
+		var nb_children = le_parent.children.length-1
+		var index_ceci = Array.prototype.indexOf.call(le_parent.children, ceci)
+		
+		//console.log({nb_children})
+		//console.log({index_ceci})
+		
+
+		//rajouter une note possible à droite SSI(!) elle n'existe pas encore, càd le nombre de children = index de ceci
+		if(nb_children === index_ceci && nb_children<data_etablissement['nb_notes_max_par_periode']) $(le_parent).append(les_notes_eleve([" "]))
+	}
+
+	//ajouter la case moyenne
+	if(!ceci) ceci = $(le_parent).children().last()
+
+	var moyenne_periode = calcul_moyenne_bulletin(le_parent.id)
+	$(le_parent).append('<span class="case_de_moyenne">'+moyenne_periode+'</span>')
+	
+	bulletin_enregistre = false
+
+}
+
+function calcul_moyenne_bulletin(identifiant){
+	var total = 0;
+	var taille = 0;
+	var resultat = 0
+
+	$('[id="'+identifiant+'"] > .une_note').each(function(index,saisie){
+		total += Number(saisie.innerText) ? Number(saisie.innerText) : 0;
+		//console.log({total})
+
+		if(saisie.innerText!== "") taille=taille+1
+	})
+
+	//console.log({taille})
+
+	resultat = taille > 0 ? total/taille : ""
+	resultat = resultat ? resultat.toFixed(2) :  ""
+	//console.log(resultat)
+
+	return resultat
+}
+
+function clic_bulletin_old(){
 
 
 	chargement(true)
@@ -12833,9 +13261,39 @@ function consulter_bulletin_de_la_classe(){
 }
 
 function choisir_periode_bulletin(){
-	var elements_html = '<label for="periode_bulletin"><select style="width: 60%;" id="periode_bulletin" name="periode_bulletin"><option value="PREMIER TRIMESTRE">PREMIER TRIMESTRE</option><option value="DEUXIEME TRIMESTRE">DEUXIEME TRIMESTRE</option><option value="TROISIEME TRIMESTRE">TROISIEME TRIMESTRE</option><option value="ANNUEL">ANNUEL</option></select></label>'
+	var elements_html = les_trimestres_bulletin()
+
 	creer_mini_popup("Choisissez la période du bulletin à consulter:", elements_html,"Consulter","consulter()")
 	
+}
+
+function les_trimestres_bulletin(avec_annee){
+	return `<form id="trimestre" class="liste_deroulante">
+				<label for="periode_bulletin">Trimestre:
+					<select id="periode_bulletin" name="periode_bulletin">
+						<option value="--">--</option>
+						<option value="PREMIER TRIMESTRE">PREMIER TRIMESTRE</option>
+						<option value="DEUXIEME TRIMESTRE">DEUXIEME TRIMESTRE</option>
+						<option value="TROISIEME TRIMESTRE">TROISIEME TRIMESTRE</option>
+						`+( avec_annee ? `<option value="ANNUEL">ANNUEL</option>` : "")+`
+					</select>
+				</label>
+			</form>`
+}
+
+function les_periodes_bulletin(){
+	return `<form id="periodes" class="liste_deroulante">
+				<label for="saison_note">Période:
+					<select id="saison_note" name="saison_note">	
+						<option value="--">--</option>	
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>	
+						<option value="Examen">Examen</option>					
+						<option value="Toutes">Toutes</option>
+					</select>
+				</label>
+			</form>`
 }
 
 function consulter(){
@@ -19038,7 +19496,12 @@ function au_clic(selector, callback){
 	})
 }
 
-
+function au_changement(selector, callback){
+	$(selector).off("change")
+	$(selector).on("change",function(event){
+		eval(callback)
+	})
+}
 
 function au_clic_droit(selector, callback){
 	$(selector).off("contextmenu")
