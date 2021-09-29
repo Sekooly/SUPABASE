@@ -12937,7 +12937,8 @@ function afficher_choix_periode_bulletin(){
 	var choix_periode = les_trimestres_bulletin() + les_periodes_bulletin()
 	$("#trimestre").remove()
 	$("#explications").remove()
-	$('#previsualisation').append(choix_periode)
+	$("#menu_periode").remove()
+	$('#menu_haut').append('<div style="text-align: center;" id="menu_periode">'+choix_periode+'</div>')
 	au_changement("#periode_bulletin","actualiser_liste_eleves_bulletins()")
 	au_changement("#saison_note","actualiser_liste_eleves_bulletins()")
 
