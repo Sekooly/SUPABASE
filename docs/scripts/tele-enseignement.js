@@ -13070,6 +13070,8 @@ async function actualiser_liste_eleves_bulletins(){
 			
 		})
 
+		
+
 		chargement(false)
 
 	}
