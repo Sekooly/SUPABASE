@@ -4635,6 +4635,41 @@ function creer_mini_popup(titre,elements_html,nom_bouton,fonction_bouton,valeur_
 }
 
 
+function creer_mini_popup_2(titre,elements_html,nom_bouton,fonction_bouton,valeur_actuelle,id_element_valeur_actuelle, valeur_actuelle_bis, id_element_valeur_actuelle_bis,taille_du_titre,id_bouton){
+
+	//console.log({id_bouton})
+
+	$("#mini_popup2").remove();
+
+	//on ajoute le bouton quitter
+	var bouton_quitter = '<div id="entete-fenetre" style="display: inline-flex;float: right;"><img  alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup2\').remove()" class="bye_prev"> </div>';
+
+	var taille = taille_du_titre ? 'style="border-bottom-style: ridge;font-size: '+taille_du_titre+'px;"' : ""
+	var titre_html = '<div '+taille+' >'+titre+'</div>'
+
+	var id_bouton_html = id_bouton ? "id='" + id_bouton + "'" : ""
+	//console.log({id_bouton_html})
+	var valider_changement = '<button type="button"  '+id_bouton_html+'  class="rendre sekooly-mode-background" onclick="'+fonction_bouton+'">'+nom_bouton+'</button>'
+
+
+	
+	var mini_popup_html = '<div class="mini_popup" id="mini_popup2">'+bouton_quitter+titre_html+elements_html+valider_changement+'</div>';
+
+	var mini_popup = document.createElement('div');
+	mini_popup.innerHTML = mini_popup_html;
+	document.body.appendChild(mini_popup.firstChild);
+
+	if ($("#"+id_element_valeur_actuelle)[0]) $("#"+id_element_valeur_actuelle)[0].value=valeur_actuelle;
+	
+	if($("#"+id_element_valeur_actuelle_bis)[0])
+		$("#"+id_element_valeur_actuelle_bis)[0].value=valeur_actuelle_bis;
+
+
+	ajuster_boutons_fenetre();
+	ajuster_boutons_fenetre(true);
+	choisir_height_viz_si_pdf();
+}
+
 
 function mettre_a_jour_categorie(id_fichier_valeur){
 
@@ -12746,11 +12781,52 @@ function clic_bulletin(){
 		var toutes_les_matieres = recuperer("Matieres") ? JSON.parse(recuperer("Matieres")) : mes_matieres
 
 		creer_fenetre_bulletin(toutes_les_matieres)
+	}else if(recuperer('mon_type').includes('Admin')){
+
+		creer_mini_popup('<div style="border-bottom-style: ridge;font-size: 20px;">Bulletins<br><b>Que voulez-vous faire?</b></div>',choix_admin_bulletins(),"Valider", "valider_choix_admin_bulletins()")
 	}
 
 	//todo
 	//si admin
 	//si eleve
+}
+
+function valider_choix_admin_bulletins(){
+	var choix = $('input[name=choix_admin_bulletin]:checked').val()
+	if(choix === "choix1"){
+		configurer_periodes_bulletins()
+	}else{
+		alert("Fonctionnalité en cours de développement.")
+	}
+}
+
+function choix_admin_bulletins(){
+	return `
+	<div style="padding: 5%;" name="choix_global">
+  
+	  <div>
+	    <input type="radio" name="choix_admin_bulletin" value="choix1" id="choix1" checked="">
+	    <label for="choix1">Administrer</label>
+	  </div>
+
+	  <div>
+	    <input type="radio" name="choix_admin_bulletin" value="choix2" id="choix2">
+	    <label for="choix2">Consulter les saisies</label>
+	  </div>
+
+	  <div>
+	    <input type="radio" name="choix_admin_bulletin" id="choix3" value="choix3">
+	    <label for="choix3">Créer les fiches de Conseils de Classe</label>
+	  </div>
+
+	  <div>
+	    <input type="radio" name="choix_admin_bulletin" id="choix4" value="choix4">
+	    <label for="choix4">Créer les bulletins en format PDF</label>
+	  </div>
+
+	  
+	</div>
+	`
 }
 
 
@@ -12793,6 +12869,201 @@ async function sauvegarder_saisie_bulletin(){
 
 	chargement(false)
 }
+
+
+function configurer_periodes_bulletins(){
+	var elements_html = '<div class="donnees_saisies">'
+	var nom_periode_bulletin = un_element_de_config_bulletin("saisie_des_periodes_principales()",'Identifiant des périodes principales (Exemples: <b>Trimestres</b> ou <b>Semestres</b> ...)', 'nom_periode_bulletin', recuperer_nom_periodes_principales_bulletin())
+	var nom_saison_note = un_element_de_config_bulletin("saisie_des_periodes_secondaires()",'Identifiant des périodes secondaires (Exemples: <b>Périodes</b> ou <b>Mois</b> ...)', 'nom_saison_note',recuperer_nom_periodes_secondaires_bulletin() )
+	elements_html = elements_html + nom_periode_bulletin + nom_saison_note + '</div>'
+
+	creer_mini_popup('<div style="border-bottom-style: ridge;font-size: 20px;">Configuration des périodes de notation</div>',elements_html,'Enregistrer', 'enregistrer_config_bulletins(1)')
+
+
+
+}
+
+function recuperer_nom_periodes_principales_bulletin(){	
+	return data_etablissement['config_notes']['nom_periode_bulletin'] ? data_etablissement['config_notes']['nom_periode_bulletin'].trim() : ""
+
+}
+
+function recuperer_nom_periodes_secondaires_bulletin(){	
+	return  data_etablissement['config_notes']['nom_saison_note'] ? data_etablissement['config_notes']['nom_saison_note'].trim() : ""
+
+}
+
+
+function recuperer_liste_periodes_principales(){
+
+	var nom_periode_bulletin = recuperer_nom_periodes_principales_bulletin()
+	var liste_initiale = data_etablissement['config_notes'][nom_periode_bulletin] ? Object.keys(data_etablissement['config_notes'][nom_periode_bulletin]).join(',').trim() : false
+	liste_initiale = liste_initiale ? liste_initiale : ""
+
+	return liste_initiale
+}
+
+function recuperer_liste_periodes_secondaires(index_periode_principale){
+
+
+	var nom_periode_bulletin = recuperer_nom_periodes_principales_bulletin()
+	var liste_initiale = data_etablissement['config_notes'][nom_periode_bulletin] && index_periode_principale >= 0 ? Object.values(data_etablissement['config_notes'][nom_periode_bulletin])[index_periode_principale].trim() : false
+	liste_initiale = liste_initiale ? liste_initiale : ""
+
+	return liste_initiale
+}
+
+function saisie_des_periodes_principales(){
+	var liste_initiale = recuperer_liste_periodes_principales()
+
+	if(!$("#nom_periode_bulletin").val().trim()){
+		alert("Merci de d'abord saisir l'identifiant des périodes principales.")
+	}else{
+		enregistrer_config_bulletins(1, false, true)
+
+		var les_periodes_principales = prompt("Liste des périodes principales séparées par une virgule. Exemple: PREMIER TRIMESTRE,DEUXIEME TRIMESTRE,TROISIEME TRIMESTRE", liste_initiale)
+
+		//console.log({les_periodes_principales})
+
+		if(les_periodes_principales){
+			enregistrer_config_bulletins(2,les_periodes_principales)
+		}
+
+	}
+
+}
+
+function saisie_des_periodes_secondaires(){
+	var nom_periode_bulletin = recuperer_nom_periodes_principales_bulletin()
+	var liste_principale = recuperer_liste_periodes_principales()
+	//console.log({liste_principale})
+
+	if(!nom_periode_bulletin){
+		alert("Merci de d'abord saisir l'identifiant des périodes principales.")
+
+	}else if(!liste_principale){
+		alert("Merci de d'abord saisir la liste des " + nom_periode_bulletin + " (les périodes principales).")
+
+	}else if(!$("#nom_saison_note").val().trim()){
+		alert("Merci de d'abord saisir l'identifiant des périodes secondaires.")
+	
+
+	}else{
+		enregistrer_config_bulletins(1, false, true)
+
+
+		//créer un popup global
+		var elements_html = '<div class="donnees_saisies">'
+		var liste_principale_array = liste_principale.split(',')
+
+		//pour chaque element de la liste principale
+		liste_principale_array.forEach( function(une_periode_principale, index_periode_principale) {
+
+			//créer input à virgules	
+			elements_html +=  un_element_de_config_bulletin(false, une_periode_principale, une_periode_principale, recuperer_liste_periodes_secondaires(index_periode_principale))
+
+		});
+
+		elements_html += '</div>'
+
+
+
+		creer_mini_popup_2('<div style="border-bottom-style: ridge;font-size: 15px;">Configuration des périodes des '+nom_periode_bulletin+', séparées par une virgule. Exemple: <b>Période 1,Période 2,Période 3</b></div>',elements_html,'Enregistrer', 'enregistrer_config_bulletins(3)')
+
+	}
+}
+
+async function enregistrer_config_bulletins(numero_etape,les_periodes_principales, sans_alerte){
+	chargement(true)
+	var alerte_a_afficher = ""
+
+	//nom des périodes
+	if(numero_etape === 1){
+
+		data_etablissement['config_notes']['nom_periode_bulletin'] = element_DOM('nom_periode_bulletin').value.trim()
+		data_etablissement['config_notes']['nom_saison_note'] = element_DOM('nom_saison_note').value.trim()
+		alerte_a_afficher = 'Périodes enregistrées avec succès.'
+
+
+	//liste des périodes principales
+	}else if(numero_etape === 2){
+
+		var nom_periode_bulletin = recuperer_nom_periodes_principales_bulletin()
+		var liste_array = les_periodes_principales.split(',')
+		var liste_finale = {}
+
+		liste_array.forEach( function(une_periode_principale, index) {
+			liste_finale[une_periode_principale.trim()] = ""
+		});
+		//console.log({liste_finale})
+		data_etablissement['config_notes'][nom_periode_bulletin] = liste_finale
+
+
+		alerte_a_afficher = 'Liste des '+ nom_periode_bulletin +' enregistrée.'
+
+
+	//liste des périodes secondaires pour chaque période principale
+	}else if(numero_etape ===3) {
+		var nom_periode_bulletin = recuperer_nom_periodes_principales_bulletin()
+		var nom_saison_note = recuperer_nom_periodes_secondaires_bulletin()
+		var resultat_final = {}
+
+		//console.log({nom_periode_bulletin})
+		//console.log({nom_saison_note})
+
+		var liste_principale = recuperer_liste_periodes_principales()
+		var liste_principale_array = liste_principale.split(',')
+
+		/*
+		console.log({liste_principale})
+		console.log({liste_principale_array})
+		*/
+
+		//pour chaque période principale P
+		liste_principale_array.forEach( function(une_periode_principale, index_periode_principale) {
+			//créer le champ P: [p.value]
+			resultat_final[une_periode_principale] = $("[id='"+une_periode_principale+"']").val()
+			
+		});
+		
+		//Modifier data_etablissement['config_notes'][nom_periode_bulletin]	 avec le resultat_final
+		//console.log({resultat_final})
+		data_etablissement['config_notes'][nom_periode_bulletin] = resultat_final
+
+		alerte_a_afficher = 'Liste des '+ nom_saison_note +' dans les ' + nom_periode_bulletin +' enregistrée.'
+		$("#mini_popup2").remove()
+
+	}
+
+
+
+	await actualiser_info_etablissement()
+	
+	if(!sans_alerte) afficher_alerte(alerte_a_afficher)
+
+	chargement(false)
+
+}
+
+function un_element_de_config_bulletin(avec_bouton_voir, intitule_label, id_input, valeur_initiale){
+
+	var bouton_voir = avec_bouton_voir ? `<button onclick="`+avec_bouton_voir+`">VOIR</button>` : ""
+
+	//Nom qui identifie les périodes principales (Exemples: Trimestres, Semestres, ...)
+	//Nom qui identifie les périodes secondaires (Exemples: Période n°1, Mois de septembre, ...)
+	//Liste des périodes secondaires séparées par une virgule (Exemple: 1er trimestre,2ème trimestre,3ème trimestre) 
+
+	return `
+	<div class="une_donnee_saisie" style="margin-bottom: 20px;">
+	  <label>
+	   `+intitule_label+`
+	  </label>
+	  <input class="donnee" value="`+valeur_initiale+`" id="`+id_input+`" name="`+id_input+`">
+	  `+bouton_voir+`
+	</div>
+	`
+}
+
 
 
 function stocker_notes_server(notes_saisies){
@@ -12933,13 +13204,22 @@ async function trouver_mes_eleves(){
 	}
 }
 
+function remplacer_liste_saison_note(){
+	$("form#periodes").remove()
+	$("#menu_periode").append(les_periodes_bulletin())
+	au_changement("#saison_note","actualiser_liste_eleves_bulletins()")
+	au_clic("#saison_note","demande_enregistrement_avant_changement_periode()")
+}
+
 function afficher_choix_periode_bulletin(){
 	var choix_periode = les_trimestres_bulletin() + les_periodes_bulletin()
 	$("#trimestre").remove()
 	$("#explications").remove()
 	$("#menu_periode").remove()
 	$('#menu_haut').append('<div style="text-align: center;" id="menu_periode">'+choix_periode+'</div>')
+
 	au_changement("#periode_bulletin","actualiser_liste_eleves_bulletins()")
+	au_changement("#periode_bulletin","remplacer_liste_saison_note()")
 	au_changement("#saison_note","actualiser_liste_eleves_bulletins()")
 
 
@@ -13271,13 +13551,19 @@ function choisir_periode_bulletin(){
 }
 
 function les_trimestres_bulletin(avec_annee){
+
+	var liste_periodes_principales = recuperer_liste_periodes_principales().split(',')
+
+
 	return `<form id="trimestre" class="liste_deroulante">
-				<label for="periode_bulletin">Trimestre:
+				<label for="periode_bulletin">`+data_etablissement['config_notes']['nom_periode_bulletin']+`:
 					<select id="periode_bulletin" name="periode_bulletin">
 						<option value="--">--</option>
-						<option value="PREMIER TRIMESTRE">PREMIER TRIMESTRE</option>
-						<option value="DEUXIEME TRIMESTRE">DEUXIEME TRIMESTRE</option>
-						<option value="TROISIEME TRIMESTRE">TROISIEME TRIMESTRE</option>
+						`+
+
+							liste_periodes_principales.map(e => '<option value="'+e+'">'+e+'</option>')
+
+						+`
 						`+( avec_annee ? `<option value="ANNUEL">ANNUEL</option>` : "")+`
 					</select>
 				</label>
@@ -13285,14 +13571,17 @@ function les_trimestres_bulletin(avec_annee){
 }
 
 function les_periodes_bulletin(){
+	var liste_periodes_secondaires = element_DOM("periode_bulletin") ? recuperer_liste_periodes_secondaires(element_DOM("periode_bulletin").selectedIndex-1).split(',') : []
 	return `<form id="periodes" class="liste_deroulante">
 				<label for="saison_note">Période:
 					<select id="saison_note" name="saison_note">	
 						<option value="--">--</option>	
-						<option value="1">1</option>
-						<option value="2">2</option>
-						<option value="3">3</option>	
-						<option value="Examen">Examen</option>					
+
+						`
+						+liste_periodes_secondaires.map(e => '<option value="'+e+'">'+e+'</option>')+
+
+						`
+
 						<option value="Toutes">Toutes</option>
 					</select>
 				</label>
