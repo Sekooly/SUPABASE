@@ -12968,7 +12968,7 @@ function saisie_des_periodes_secondaires(){
 
 
 
-		creer_mini_popup_2('<div style="border-bottom-style: ridge;font-size: 15px;">Configuration des périodes des '+nom_periode_bulletin+', séparées par une virgule. Exemple: <b>Période 1,Période 2,Période 3</b></div>',elements_html,'Enregistrer', 'enregistrer_config_bulletins(3)')
+		creer_mini_popup_2('<div style="border-bottom-style: ridge;font-size: 15px;">Configuration des '+recuperer_liste_periodes_secondaires()+' des '+nom_periode_bulletin+', séparées par une virgule. Exemple: <b>Période 1,Période 2,Période 3</b></div>',elements_html,'Enregistrer', 'enregistrer_config_bulletins(3)')
 
 	}
 }
