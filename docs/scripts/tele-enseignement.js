@@ -12847,7 +12847,7 @@ async function sauvegarder_saisie_bulletin(){
 	//console.log(notes_saisies)
 	
 	alerte_a_afficher = "Notes saisies enregistrées."
-	if($("#saison_note").val()  === "Toutes") alerte_a_afficher = "⚠️Les enregistrement doivent se faire uniquement sur chaque période, et non dans \"Toutes\"."
+	if($("#saison_note").val()  === "Toutes") alerte_a_afficher = "⚠️Les enregistrement doivent se faire uniquement sur une valeur de "+recuperer_nom_periodes_secondaires_bulletin()+", et non dans \"Toutes\"."
 	if (notes_saisies.length === 0 || $("#saison_note").val()  === "Toutes") {
 		chargement(false)
 		bulletin_enregistre = true
@@ -13556,7 +13556,7 @@ function les_trimestres_bulletin(avec_annee){
 
 
 	return `<form id="trimestre" class="liste_deroulante">
-				<label for="periode_bulletin">`+data_etablissement['config_notes']['nom_periode_bulletin']+`:
+				<label for="periode_bulletin">`+recuperer_nom_periodes_principales_bulletin()+`:
 					<select id="periode_bulletin" name="periode_bulletin">
 						<option value="--">--</option>
 						`+
@@ -13573,7 +13573,7 @@ function les_trimestres_bulletin(avec_annee){
 function les_periodes_bulletin(){
 	var liste_periodes_secondaires = element_DOM("periode_bulletin") ? recuperer_liste_periodes_secondaires(element_DOM("periode_bulletin").selectedIndex-1).split(',') : []
 	return `<form id="periodes" class="liste_deroulante">
-				<label for="saison_note">Période:
+				<label for="saison_note">`+recuperer_nom_periodes_secondaires_bulletin()+`:
 					<select id="saison_note" name="saison_note">	
 						<option value="--">--</option>	
 
