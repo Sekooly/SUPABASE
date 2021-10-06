@@ -231,7 +231,7 @@ CREATE TABLE public."Eleves"
     "Numeros_telephone_original" text COLLATE pg_catalog."default",
     "statut" text COLLATE pg_catalog."default" DEFAULT 'Déconnecté'::text,
     "liste_notifs_lues" text COLLATE pg_catalog."default",    
-    liste_options character varying(300) COLLATE pg_catalog."default",
+    liste_options text COLLATE pg_catalog."default",
     CONSTRAINT "Eleves_pkey" PRIMARY KEY ("Identifiant")
 )
 
