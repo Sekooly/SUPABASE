@@ -12773,6 +12773,37 @@ function masquer_les_bulletins(){
 }
 
 
+
+function choix_classe_bulletin(){
+	les_matieres = JSON.parse(recuperer("mes_matieres"))
+	les_classes = valeursUniquesDeCetteKey(les_matieres,'Classe')
+	les_classes.sort()
+	//console.log(les_classes) 
+
+	elements_html = "Classe:<select id='classe_saisie_bulletin'>"
+	for (i = 0; i< les_classes.length;i++){
+		elements_html += '<option value="'+les_classes[i]+'">'+les_classes[i]+'</option>'
+	}
+	elements_html += "</select>"
+	
+
+	creer_mini_popup("Choisissez la classe à consulter",elements_html, "Voir les saisies de note","voir_bulletin_classe_choisie()")
+	
+}
+
+function voir_bulletin_classe_choisie(){
+	var la_classe= $("#classe_saisie_bulletin").val()
+	$('#mini_popup').remove()
+	
+	var toutes = JSON.parse(recuperer('mes_matieres'))
+	var matieres_de_classe = toutes.filter(e => e['Classe'] = la_classe).sort()
+	console.log(matieres_de_classe)
+
+	creer_fenetre_bulletin(matieres_de_classe)
+}
+
+
+
 function clic_bulletin(){
 	//si prof
 	if(recuperer('mon_type').includes('Prof') ){
@@ -12793,8 +12824,12 @@ function clic_bulletin(){
 
 function valider_choix_admin_bulletins(){
 	var choix = $('input[name=choix_admin_bulletin]:checked').val()
+	
+
 	if(choix === "choix1"){
 		configurer_periodes_bulletins()
+	}else if(choix === "choix2"){
+		choix_classe_bulletin()
 	}else{
 		alert("Fonctionnalité en cours de développement.")
 	}
