@@ -12796,8 +12796,9 @@ function voir_bulletin_classe_choisie(){
 	$('#mini_popup').remove()
 	
 	var toutes = JSON.parse(recuperer('mes_matieres'))
-	var matieres_de_classe = toutes.filter(e => e['Classe'] = la_classe).sort()
-	console.log(matieres_de_classe)
+	var matieres_de_classe = toutes.filter(e => e['Classe'] === la_classe).sort()
+	//console.log(la_classe)
+	//console.log(matieres_de_classe)
 
 	creer_fenetre_bulletin(matieres_de_classe)
 }
