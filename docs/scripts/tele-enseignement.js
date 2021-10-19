@@ -10494,17 +10494,24 @@ function mettre_en_forme_onglet_clicked(id_onglet){
 
 		valeur_ou_id = id_onglet_courant === $(".menu_haut")[0].children[i].id ? "id" : "value"
 
+		/*
+		console.log('\n\n\n\n')
+		console.log({valeur_ou_id})
+		console.log({id_onglet})
+		console.log({id_onglet_courant})
+		*/
+
 		//au clic d'un menu
 		//-> tout est réinit
 		//on met en orange l'onglet choisi
-		if(id_onglet_courant===id_onglet){
+		if(id_onglet_courant===id_onglet && id_onglet_courant !== ""){
 
 			//console.log(id_onglet_courant + " = id_onglet")
 			$('['+valeur_ou_id+'="' + id_onglet_courant + '"]')[0].className = "un_menu un_menu_orange sekooly-mode-background"
 		}else{
 			//console.log("id_onglet_courant <> id_onglet")
 			if(valeur_ou_id === "id"){
-				$('['+valeur_ou_id+'="' + id_onglet_courant + '"]')[0].className = "un_menu"
+				if($('['+valeur_ou_id+'="' + id_onglet_courant + '"]')[0]) $('['+valeur_ou_id+'="' + id_onglet_courant + '"]')[0].className = "un_menu"
 			}
 
 
@@ -13168,13 +13175,17 @@ function creer_fenetre_bulletin(toutes_les_matieres){
 
 	vider_fenetre("Saisie des notes du bulletin",false,"sauvegarder_saisie_bulletin()");
 
-	var contenu_menu_haut = ""
+	var contenu_menu_haut = '<select class="un_menu">'
 	
 	for (var i =  0; i < toutes_les_matieres.length; i++) {
-		contenu_menu_haut = contenu_menu_haut + '<span class="un_menu" nom_liste_et_coefs="'+toutes_les_matieres[i]['nom_liste_et_coefs']+'" id="'+toutes_les_matieres[i]['Classe_Matiere']+'">'+toutes_les_matieres[i]['Classe_Matiere']+'</span>' 
+		//contenu_menu_haut = contenu_menu_haut + '<span class="un_menu" nom_liste_et_coefs="'+toutes_les_matieres[i]['nom_liste_et_coefs']+'" id="'+toutes_les_matieres[i]['Classe_Matiere']+'">'+toutes_les_matieres[i]['Classe_Matiere']+'</span>' 
+
+		contenu_menu_haut += '<option nom_liste_et_coefs="'+toutes_les_matieres[i]['nom_liste_et_coefs']+'" value="'+toutes_les_matieres[i]['Classe_Matiere']+'" id="'+toutes_les_matieres[i]['Classe_Matiere']+'">'+toutes_les_matieres[i]['Classe_Matiere']+'</option>'
 	}
 
-	var conteneur_menu_html = '<div id="conteneur_menu"><div id="menu_haut" class="menu_haut"> ' + contenu_menu_haut+ '</div><div id="menu_params" class="menu_params"><div id="previsualisation" class="previz-pref"></div></div></div>'
+	contenu_menu_haut += '</select>'
+
+	var conteneur_menu_html = '<div id="conteneur_menu"><div id="menu_haut" class="menu_haut" style="text-align: center;"> ' + contenu_menu_haut+ '</div><div id="menu_params" class="menu_params"><div id="previsualisation" class="previz-pref"></div></div></div>'
 
 	$("#fenetre").append(conteneur_menu_html);
 

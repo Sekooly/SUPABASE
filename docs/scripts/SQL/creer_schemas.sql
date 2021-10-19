@@ -2145,10 +2145,6 @@ CREATE TABLE public."Notes"
     CONSTRAINT "Notes_duplicate_identifiant_eleve_fkey" FOREIGN KEY (identifiant_eleve)
         REFERENCES public."Eleves" ("Identifiant") MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
-    CONSTRAINT "Notes_duplicate_identifiant_prof_fkey" FOREIGN KEY (identifiant_prof)
-        REFERENCES public."Profs" ("Identifiant") MATCH SIMPLE
-        ON UPDATE NO ACTION
         ON DELETE NO ACTION
 )
 
