@@ -13191,7 +13191,7 @@ function creer_fenetre_bulletin(toutes_les_matieres){
 
 
 	//clic -> mise en forme + actualisation de menu_details
-	$('.un_menu').change(async function(e) {
+	$('.un_menu').click(async function(e) {
 		chargement(true)
 		un_menu_clic(e.target.id,true)
 		//await afficher_eleves_concernes(e.target.innerText,e.target.getAttribute('nom_liste_et_coefs'))	
