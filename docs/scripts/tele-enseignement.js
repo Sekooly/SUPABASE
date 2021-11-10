@@ -10326,12 +10326,12 @@ async function update_viz_logs(){
 
 }
 
-async function un_menu_clic(id_parametre,mode_pref){
+async function un_menu_clic(id_parametre,mode_pref,sans_changement){
 
 	chargement(true)
 
 	$("#mini_popup").remove()
-    mettre_en_forme_onglet_clicked(id_parametre);
+    mettre_en_forme_onglet_clicked(id_parametre,sans_changement);
     $("#conteneur_filtre").hide()
 
 
@@ -10475,7 +10475,7 @@ function autoriser_tout_voir(oui){
 	$("#tout_voir")[0].style.display = oui ? "" : "none"
 }
 
-function mettre_en_forme_onglet_clicked(id_onglet){
+function mettre_en_forme_onglet_clicked(id_onglet, sans_changement){
 
 
 	$("option").removeClass("un_menu")
@@ -10521,7 +10521,8 @@ function mettre_en_forme_onglet_clicked(id_onglet){
 
 	}
 
-	$('select.un_menu').val("--")
+	if(!sans_changement) $('select.un_menu').val("--")
+
 	$('select.un_menu').removeClass("sekooly-mode-background")
 	$(".un_menu_orange").parent("select").val(id_onglet)
 	$(".un_menu_orange").parent("select").addClass("sekooly-mode-background")
@@ -13175,7 +13176,7 @@ function creer_fenetre_bulletin(toutes_les_matieres){
 
 	vider_fenetre("Saisie des notes du bulletin",false,"sauvegarder_saisie_bulletin()");
 
-	var contenu_menu_haut = '<select class="un_menu">'
+	var contenu_menu_haut = '<select class="un_menu"><option nom_liste_et_coefs="null" value="" id="--">--</option>'
 	
 	for (var i =  0; i < toutes_les_matieres.length; i++) {
 		//contenu_menu_haut = contenu_menu_haut + '<span class="un_menu" nom_liste_et_coefs="'+toutes_les_matieres[i]['nom_liste_et_coefs']+'" id="'+toutes_les_matieres[i]['Classe_Matiere']+'">'+toutes_les_matieres[i]['Classe_Matiere']+'</span>' 
@@ -13193,9 +13194,8 @@ function creer_fenetre_bulletin(toutes_les_matieres){
 	//clic -> mise en forme + actualisation de menu_details
 	$('.un_menu').click(async function(e) {
 		chargement(true)
-		un_menu_clic(e.target.id,true)
-		//await afficher_eleves_concernes(e.target.innerText,e.target.getAttribute('nom_liste_et_coefs'))	
-		afficher_choix_periode_bulletin()
+		un_menu_clic(e.target.id,true,true)	
+		afficher_choix_periode_bulletin(e.target.value)
         chargement(false)
     });
 
@@ -13258,11 +13258,19 @@ function remplacer_liste_saison_note(){
 	au_clic("#saison_note","demande_enregistrement_avant_changement_periode()")
 }
 
-function afficher_choix_periode_bulletin(){
-	var choix_periode = les_trimestres_bulletin() + les_periodes_bulletin()
+function afficher_choix_periode_bulletin(id_classe_matiere){
+
 	$("#trimestre").remove()
 	$("#explications").remove()
 	$("#menu_periode").remove()
+	
+	//console.log({id_classe_matiere})
+	if(id_classe_matiere.trim() === "") return false
+
+	var choix_periode = les_trimestres_bulletin() + les_periodes_bulletin()
+
+
+
 	$('#menu_haut').append('<div style="text-align: center;" id="menu_periode">'+choix_periode+'</div>')
 
 	au_changement("#periode_bulletin","actualiser_liste_eleves_bulletins()")
