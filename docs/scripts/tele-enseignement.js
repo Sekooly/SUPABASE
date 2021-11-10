@@ -13221,20 +13221,27 @@ async function trouver_mes_eleves(){
 		var classe = tout.Classe_Matiere.split('|')[0].replaceAll('(','')
 
 		var nom_liste_et_coefs = $('.un_menu').find('option:selected').attr("nom_liste_et_coefs")
+		//console.log({nom_liste_et_coefs})
 
-		//dans le cas où on veut toute le classe
+
+
+		//dans le cas où on veut tous les élèves de la classe, avec leur éventuelle note
 		if(nom_liste_et_coefs === "null"){
+
+			//on récupére tou 
 			var demande = await supabase.from('bulletins').select('*').eq('Classe',classe)
 
 			//console.log({demande})
 			mes_eleves_initiaux = demande.body
+
 
 			chargement(false)
 			return mes_eleves_initiaux
 		
 
 		}else{
-			//TODO!!! : si la matiere possede un coef spécifiable, on veut uniquement les eleves qui ont cette classe matiere dans leur liste_options
+
+			//si la matiere possede un coef spécifiable, on veut uniquement les eleves qui ont cette classe matiere dans leur liste_options
 			var demande = await supabase.from('bulletins').select('*').like('liste_options', '%'+Classe_Matiere+'%')
 
 			//console.log({demande})
@@ -13316,14 +13323,15 @@ function transformer_notes_en_array(mes_eleves){
 		var tout = donnees_generiques_bulletin()
 		var periode_bulletin = tout.periode_bulletin
 		var saison_note = tout.saison_note
-
+		var Classe_Matiere = tout.Classe_Matiere
+ 
 		//si saison_note n'est pas TOUT, filtrer
 		if(saison_note!=="Toutes"){
-			var notes_de_leleve = mes_eleves.filter(e => e['Identifiant'] === un_eleve && e['periode_bulletin'] === periode_bulletin && e['saison_note'] === saison_note).map(e => e['note'] + '|' + e['coef'])	
+			var notes_de_leleve = mes_eleves.filter(e =>  e['Classe_Matiere'] === Classe_Matiere && e['Identifiant'] === un_eleve && e['periode_bulletin'] === periode_bulletin && e['saison_note'] === saison_note).map(e => e['note'] + '|' + e['coef'])	
 		
 		//si saison_note=Toutes -> on récupère toutes les notes et on rend NON MODIFIABLE!!
 		}else{
-			var notes_de_leleve = mes_eleves.filter(e => e['Identifiant'] === un_eleve && e['periode_bulletin'] === periode_bulletin).map(e =>  e['note'] + '|' + e['coef'])	
+			var notes_de_leleve = mes_eleves.filter(e =>  e['Classe_Matiere'] === Classe_Matiere && e['Identifiant'] === un_eleve && e['periode_bulletin'] === periode_bulletin).map(e =>  e['note'] + '|' + e['coef'])	
 		}
 		
 		
