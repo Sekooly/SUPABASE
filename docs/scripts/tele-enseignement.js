@@ -13119,7 +13119,7 @@ function stocker_notes_server(notes_saisies){
 function donnees_generiques_bulletin(){
 	var periode_bulletin = $("#periode_bulletin").val()
 	var saison_note = $("#saison_note").val()
-	var Classe_Matiere = $('.un_menu_orange').text()
+	var Classe_Matiere =  $('.un_menu > option:selected').text()
 	var identifiant_prof = recuperer("identifiant_courant")
 
 	return {
@@ -13214,24 +13214,36 @@ async function trouver_mes_eleves(){
 	chargement(true)
 
 	//le menu existe
-	if($('.un_menu_orange')[0]){
+	//if($('.un_menu_orange')[0]){
 
 		var tout = donnees_generiques_bulletin()
 		var Classe_Matiere = tout.Classe_Matiere
 		var classe = tout.Classe_Matiere.split('|')[0].replaceAll('(','')
 
-		var nom_liste_et_coefs = $('.un_menu_orange')[0].getAttribute('nom_liste_et_coefs')
+		var nom_liste_et_coefs = $('.un_menu').find('option:selected').attr("nom_liste_et_coefs")
 
 		//dans le cas où on veut toute le classe
 		if(nom_liste_et_coefs === "null"){
 			var demande = await supabase.from('bulletins').select('*').eq('Classe',classe)
+
+			//console.log({demande})
 			mes_eleves_initiaux = demande.body
+
+			chargement(false)
+			return mes_eleves_initiaux
 		
 
 		}else{
 			//TODO!!! : si la matiere possede un coef spécifiable, on veut uniquement les eleves qui ont cette classe matiere dans leur liste_options
 			var demande = await supabase.from('bulletins').select('*').like('liste_options', '%'+Classe_Matiere+'%')
+
+			//console.log({demande})
 			mes_eleves_initiaux = demande.body
+
+
+
+			chargement(false)
+			return mes_eleves_initiaux
 
 
 
@@ -13241,14 +13253,15 @@ async function trouver_mes_eleves(){
 
 
 
-		chargement(false)
-		return mes_eleves_initiaux
+
+
+
 
 	//le menu n'existe pas -> on quitte
-	}else{
-		chargement(false)
-		return mes_eleves_initiaux
-	}
+	//}else{
+	//	chargement(false)
+	//	return mes_eleves_initiaux
+	//}
 }
 
 function remplacer_liste_saison_note(){
@@ -13263,7 +13276,7 @@ function afficher_choix_periode_bulletin(id_classe_matiere){
 	$("#trimestre").remove()
 	$("#explications").remove()
 	$("#menu_periode").remove()
-	
+
 	//console.log({id_classe_matiere})
 	if(id_classe_matiere.trim() === "") return false
 
