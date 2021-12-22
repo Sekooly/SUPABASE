@@ -13327,11 +13327,35 @@ function transformer_notes_en_array(mes_eleves){
  
 		//si saison_note n'est pas TOUT, filtrer
 		if(saison_note!=="Toutes"){
-			var notes_de_leleve = mes_eleves.filter(e =>  e['Classe_Matiere'] === Classe_Matiere && e['Identifiant'] === un_eleve && e['periode_bulletin'] === periode_bulletin && e['saison_note'] === saison_note).map(e => e['note'] + '|' + e['coef'])	
+			var notes_de_leleve = mes_eleves.filter(e =>  e['Classe_Matiere'] === Classe_Matiere && e['Identifiant'] === un_eleve && e['periode_bulletin'] === periode_bulletin && e['saison_note'] === saison_note).map(e => e['note'] + '|' + e['coef'] + '|' + e['saison_note'])	
 		
-		//si saison_note=Toutes -> on récupère toutes les notes et on rend NON MODIFIABLE!!
+		//si saison_note=Toutes
+		//-> on récupère toutes les notes et on rend NON MODIFIABLE!!
+		//-> on rajoute la moyenne périodique si demandé
 		}else{
-			var notes_de_leleve = mes_eleves.filter(e =>  e['Classe_Matiere'] === Classe_Matiere && e['Identifiant'] === un_eleve && e['periode_bulletin'] === periode_bulletin).map(e =>  e['note'] + '|' + e['coef'])	
+			var notes_de_leleve = mes_eleves.filter(e =>  e['Classe_Matiere'] === Classe_Matiere && e['Identifiant'] === un_eleve && e['periode_bulletin'] === periode_bulletin).map(e =>  e['note'] + '|' + e['coef'] + '|' + e['saison_note'] )	
+			//console.log({notes_de_leleve})
+
+			var moyenne_periodique = calculer_moyenne_periodique(notes_de_leleve)
+			
+			if(moyenne_periodique!==""){
+				//console.log("on doit rajouter la moyenne périodique de " + un_eleve + " = " + moyenne_periodique)
+				notes_de_leleve.push(moyenne_periodique + '|' + 'coef' + '|' + 'moyenne_periode')
+				//console.log({notes_de_leleve})
+			}
+
+			//si examen existe
+			//enlever puis remettre (pour que ce soit à la fin)
+			var index_note_examen = notes_de_leleve.findIndex(e => e.includes('Examen'))
+			if(index_note_examen > -1){
+				//on stocke la valeur
+				//on l'enlève
+				var la_note_examen = notes_de_leleve.splice(index_note_examen, 1)[0]
+				//on la remet
+				notes_de_leleve.push(la_note_examen)
+			}
+
+
 		}
 		
 		
@@ -13354,6 +13378,29 @@ function transformer_notes_en_array(mes_eleves){
 	return resultat
 }
 
+function calculer_moyenne_periodique(notes_de_leleve){
+	//console.log({notes_de_leleve})
+
+	//on filtre pour ne garder que ceux qui ne contiennent pas le terme 'Examen'
+	var notes_periodiques = notes_de_leleve.filter(e => !e.includes('Examen')).map(une_note => Number(une_note.split('|')[0]))
+	//console.log("*********************************")
+	//console.log({notes_periodiques})
+
+	//on fait le calcul
+	const average = function (arr) {
+		if(arr.length > 0){
+			return (arr.reduce( ( p, c ) => p + c, 0 ) / arr.length).toFixed(2);	
+		}else{
+			return ""
+		}		
+	}
+
+
+	const result = average(notes_periodiques); 
+	//console.log({result})
+
+	return result
+}
 
 async function demande_enregistrement_avant_changement_periode(){
 
@@ -13395,7 +13442,7 @@ async function actualiser_liste_eleves_bulletins(){
 
 			mes_eleves = transformer_notes_en_array(mes_eleves)
 			var liste_eleves_bulletins = `<div class="liste_eleves_bulletins">`+ mes_eleves.map(function(un_eleve,index){
-				//console.log(un_eleve)
+				//console.log({un_eleve})
 
 				var cases_de_notes = les_notes_eleve(un_eleve['note'])
 				//console.log({cases_de_notes})
@@ -13443,6 +13490,8 @@ function coef_note_en_cours(){
 
 function les_notes_eleve(notes){
 
+	//console.log({notes})
+
 	var est_editable = element_DOM('saison_note').value !== "Toutes"
 	//console.log({est_editable})
 
@@ -13457,7 +13506,16 @@ function les_notes_eleve(notes){
 		return notes.map(function(la_note,numero_note){
 			//console.log(la_note)
 			if(la_note==="null"||la_note===null) la_note = ""
-			return '<span class="une_note" oninput=actualiser_nb_cases(this) coef="'+la_note.split('|')[1]+'" contenteditable="'+est_editable+'">'+la_note.split('|')[0]+'</span>'	
+
+			classe_de_la_note = "une_note"
+
+			if(la_note.length > 0){
+				//console.log({la_note})
+				classe_de_la_note = classe_de_la_note + (la_note.split('|')[2] === "Examen" ? " est_examen " : "")
+				classe_de_la_note = classe_de_la_note + (la_note.split('|')[2] === 'moyenne_periode' ? " est_moyenne_periodique" : "")
+			}
+
+			return '<span class="'+classe_de_la_note+'" oninput=actualiser_nb_cases(this) coef="'+la_note.split('|')[1]+'" contenteditable="'+est_editable+'">'+la_note.split('|')[0].trim()+'</span>'	
 		}).join('')
 	}
 
@@ -13489,39 +13547,65 @@ function actualiser_nb_cases(ceci){
 		//console.log({index_ceci})
 		
 
-		//rajouter une note possible à droite SSI(!) elle n'existe pas encore, càd le nombre de children = index de ceci
-		if(nb_children === index_ceci && nb_children<data_etablissement['nb_notes_max_par_periode']) $(le_parent).append(les_notes_eleve([" "]))
+		//rajouter une note possible à droite SSI(!) elle n'existe pas encore ET ON N'EST PAS DANS LES APPRECIATIONS, càd le nombre de children = index de ceci
+		if(nb_children === index_ceci && nb_children<data_etablissement['nb_notes_max_par_periode'] && $("#saison_note").val()!=="Toutes") $(le_parent).append(les_notes_eleve([" "]))
+
+
 	}
 
 	//ajouter la case moyenne
 	if(!ceci) ceci = $(le_parent).children().last()
 
-	var moyenne_periode = calcul_moyenne_bulletin(le_parent.id)
-	$(le_parent).append('<span class="case_de_moyenne">'+moyenne_periode+'</span>')
+	var est_moyenne_generale = $('[id="saison_note"]').val() === "Toutes"
+
+	var moyenne_periode = calcul_moyenne_bulletin(le_parent.id,est_moyenne_generale)
+	//console.log({moyenne_periode})
+	var classe_case_moyenne = "case_de_moyenne"
+	classe_case_moyenne = classe_case_moyenne + (est_moyenne_generale || moyenne_periode.trim() === ""? "" :' est_moyenne_periodique')
+	$(le_parent).append('<span class="'+classe_case_moyenne+'">'+moyenne_periode+'</span>')
 	
 	bulletin_enregistre = false
 
 }
 
-function calcul_moyenne_bulletin(identifiant){
+function calcul_moyenne_bulletin(identifiant, moyenne_generale){
 	var total = 0;
 	var taille = 0;
 	var resultat = 0
 
-	$('[id="'+identifiant+'"] > .une_note').each(function(index,saisie){
-		total += Number(saisie.innerText) ? Number(saisie.innerText) : 0;
-		//console.log({total})
+	if (!moyenne_generale){
 
-		if(saisie.innerText!== "") taille=taille+1
-	})
+		//par défaut on ignore l'examen
+		$('[id="'+identifiant+'"] > .une_note').not('.est_examen').each(function(index,saisie){
 
-	//console.log({taille})
+			total += Number(saisie.innerText) ? Number(saisie.innerText) : 0;	
+			
+			
+			//console.log({total})
 
-	resultat = taille > 0 ? total/taille : ""
-	resultat = resultat ? resultat.toFixed(2) :  ""
-	//console.log(resultat)
+			if(saisie.innerText!== "") taille=taille+1
+		})
 
-	return resultat
+
+
+
+		//console.log({taille})
+
+		resultat = taille > 0 ? total/taille : ""
+		resultat = resultat ? resultat.toFixed(2) :  ""
+		//console.log(resultat)
+
+		return resultat
+
+
+	//moyenne générale = 0.30 * moyenne bulletin + 0.70 * examen
+	}else{
+
+		var note_examen = Number($('[id="'+identifiant+'"].un_eleve_bulletin > .est_examen').text())
+		return (Number(calcul_moyenne_bulletin(identifiant)) * 0.3 + note_examen * 0.7).toFixed(2)
+
+	}
+
 }
 
 function clic_bulletin_old(){
@@ -13658,7 +13742,7 @@ function les_periodes_bulletin(){
 
 						`
 
-						<option value="Toutes">Toutes</option>
+						<option value="Toutes">Appréciations</option>
 					</select>
 				</label>
 			</form>`
