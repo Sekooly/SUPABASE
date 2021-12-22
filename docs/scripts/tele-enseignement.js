@@ -12899,7 +12899,7 @@ function transformer_en_appreciations(){
 		if(contenu.trim().length >0) {
 
 			resultats.push({
-				Classe_Matiere: $('.un_menu.sekooly-mode-background').val(),
+				Classe_Matiere: $('.un_menu > option:selected').text(),
 				identifiant_appreciateur: champs_refs_tout.identifiant_prof,
 				identifiant_eleve:identifiant_eleve,
 				periode_principale: champs_refs_tout.periode_bulletin,
@@ -12934,7 +12934,7 @@ async function sauvegarder_saisie_bulletin(){
 		//supprimer toutes les anciennes appréciations de CE prof sur CETTE CLASSE MATIERE pour CETTE PERIODE PRINCIPALE
 		var champs_refs_tout = donnees_generiques_bulletin()
 		var champs_refs = {
-			Classe_Matiere: $('.un_menu.sekooly-mode-background').val(),
+			Classe_Matiere: $('.un_menu > option:selected').text(),
 			identifiant_appreciateur: champs_refs_tout.identifiant_prof,
 			periode_principale: champs_refs_tout.periode_bulletin
 		}
@@ -13875,7 +13875,7 @@ function les_enseignants(){
 
 	if(recuperer('mon_type').includes('Admin')){
 
-		var classe_matiere = $('.un_menu.sekooly-mode-background').val()
+		var classe_matiere = $('.un_menu > option:selected').text()
 		var url = racine_data + 'Profs?Classe=like.*'+classe_matiere + "*&" +apikey
 		var les_profs = get_resultat(url)
 
