@@ -29,6 +29,7 @@ var elements_generiques_en_haut = [{"Général": [
 										  "Fichiers",
 										  "Rendus",
 										  "Notes",
+										  "Appreciations",
 										  "Topic",
 										  "Coms",
 										  "Notifs"
@@ -12874,44 +12875,141 @@ function choix_admin_bulletins(){
 }
 
 
+
+
+function stocker_appreciations_server(appreciations){
+	return supabase
+	  .from('Appreciations')
+	  .upsert(appreciations)
+}
+
+function transformer_en_appreciations(){
+
+	var resultats = []
+
+	var champs_refs_tout = donnees_generiques_bulletin()
+
+	$('.un_eleve_bulletin> .bloc_appreciation').each(function(e,a){
+		identifiant_eleve = a.parentNode.id;
+		//console.log(identifiant_eleve);
+
+		contenu = a.firstChild.value
+		//console.log(contenu);
+
+		if(contenu.trim().length >0) {
+
+			resultats.push({
+				Classe_Matiere: $('.un_menu.sekooly-mode-background').val(),
+				identifiant_appreciateur: champs_refs_tout.identifiant_prof,
+				identifiant_eleve:identifiant_eleve,
+				periode_principale: champs_refs_tout.periode_bulletin,
+				contenu:contenu
+			})
+
+		}
+
+
+	})
+
+	//console.log({resultats})
+
+	return resultats
+
+
+}
+
+
 var bulletin_enregistre = false
 async function sauvegarder_saisie_bulletin(){
 	chargement(true)
 
-	//supprimer toutes les saisies de (identifiant_prof,Classe_Matiere,periode_bulletin,saison_note) et vérifier que c'est OK
-	var champs_refs = donnees_generiques_bulletin()
-	//console.log("suppression en cours...")
-	var retour = await supprimer_avec_ces_references('Notes',champs_refs)
-	//console.log("suppression ok!")
+	if($("#saison_note").val()  === "Toutes"){
 
-	//transformer la saisie en JSON
-	//console.log("transformation en cours...")
-	var notes_saisies = await transformer_notes_saisies()
-	//console.log("transformation ok!")
-	//console.log(notes_saisies)
-	
-	alerte_a_afficher = "Notes saisies enregistrées."
-	if($("#saison_note").val()  === "Toutes") alerte_a_afficher = "⚠️Les enregistrement doivent se faire uniquement sur une valeur de "+recuperer_nom_periodes_secondaires_bulletin()+", et non dans \"Toutes\"."
-	if (notes_saisies.length === 0 || $("#saison_note").val()  === "Toutes") {
+
+		//POUR LES APPRECIATIONS
+		//alerte_a_afficher = "⚠️Les enregistrement doivent se faire uniquement sur une valeur de "+recuperer_nom_periodes_secondaires_bulletin()+", et non dans \"Toutes\"."
+		
+
+		
+		//supprimer toutes les anciennes appréciations de CE prof sur CETTE CLASSE MATIERE pour CETTE PERIODE PRINCIPALE
+		var champs_refs_tout = donnees_generiques_bulletin()
+		var champs_refs = {
+			Classe_Matiere: $('.un_menu.sekooly-mode-background').val(),
+			identifiant_appreciateur: champs_refs_tout.identifiant_prof,
+			periode_principale: champs_refs_tout.periode_bulletin
+		}
+
+		var retour = await supprimer_avec_ces_references('Appreciations',champs_refs)
+
+
+		var appreciations = await transformer_en_appreciations()
+		//console.log({appreciations})
+		alerte_a_afficher = "Les appréciations saisies ont bien été enregistrées."
+
+		if(appreciations.length === 0){
+			chargement(false)
+			bulletin_enregistre = true
+			return afficher_alerte(alerte_a_afficher)			
+		}
+
+
+		retour = await stocker_appreciations_server(appreciations)
+		//console.log(retour)
+
+		if(retour.error !== null){
+			alerte_a_afficher = "⚠️Enregistrement des appréciations impossible: merci de réessayer."
+		}else{
+			bulletin_enregistre = true
+		}
+
+
+		afficher_alerte(alerte_a_afficher)
 		chargement(false)
-		bulletin_enregistre = true
-		return afficher_alerte(alerte_a_afficher)
-	}
 
-	//ajouter le JSON à la table Notes et vérifier que c'est OK
-	//console.log("envoi en cours...")
-	retour = await stocker_notes_server(notes_saisies)
-	//console.log(retour)
 
-	if(retour.error !== null){
-		alerte_a_afficher = "⚠️Enregistrement impossible, merci de réessayer."
 	}else{
-		bulletin_enregistre = true
+
+
+
+		//supprimer toutes les saisies de (identifiant_prof,Classe_Matiere,periode_bulletin,saison_note) et vérifier que c'est OK
+		var champs_refs = donnees_generiques_bulletin()
+		//console.log("suppression en cours...")
+		var retour = await supprimer_avec_ces_references('Notes',champs_refs)
+		//console.log("suppression ok!")
+
+		//transformer la saisie en JSON
+		//console.log("transformation en cours...")
+		var notes_saisies = await transformer_notes_saisies()
+		//console.log("transformation ok!")
+		//console.log(notes_saisies)
+		
+		alerte_a_afficher = "Notes saisies enregistrées."
+
+
+		if (notes_saisies.length === 0) {
+			chargement(false)
+			bulletin_enregistre = true
+			return afficher_alerte(alerte_a_afficher)
+		}
+
+		//ajouter le JSON à la table Notes et vérifier que c'est OK
+		//console.log("envoi en cours...")
+		retour = await stocker_notes_server(notes_saisies)
+		//console.log(retour)
+
+		if(retour.error !== null){
+			alerte_a_afficher = "⚠️Enregistrement impossible, merci de réessayer."
+		}else{
+			bulletin_enregistre = true
+		}
+
+
+		afficher_alerte(alerte_a_afficher)
+		chargement(false)
 	}
 
-	afficher_alerte(alerte_a_afficher)
 
-	chargement(false)
+
 }
 
 
@@ -13116,11 +13214,13 @@ function stocker_notes_server(notes_saisies){
 	  .upsert(notes_saisies)
 }
 
+
+
 function donnees_generiques_bulletin(){
 	var periode_bulletin = $("#periode_bulletin").val()
 	var saison_note = $("#saison_note").val()
 	var Classe_Matiere =  $('.un_menu > option:selected').text()
-	var identifiant_prof = recuperer("identifiant_courant")
+	var identifiant_prof = recuperer('mon_type').includes("Admin") ? $("#enseignant").val() : recuperer("identifiant_courant")
 
 	return {
 		periode_bulletin:periode_bulletin,
@@ -13273,6 +13373,7 @@ async function trouver_mes_eleves(){
 
 function remplacer_liste_saison_note(){
 	$("form#periodes").remove()
+	$("form#les_enseignants").remove()
 	$("#menu_periode").append(les_periodes_bulletin())
 	au_changement("#saison_note","actualiser_liste_eleves_bulletins()")
 	au_clic("#saison_note","demande_enregistrement_avant_changement_periode()")
@@ -13287,7 +13388,8 @@ function afficher_choix_periode_bulletin(id_classe_matiere){
 	//console.log({id_classe_matiere})
 	if(id_classe_matiere.trim() === "") return false
 
-	var choix_periode = les_trimestres_bulletin() + les_periodes_bulletin()
+	var choix_periode = les_trimestres_bulletin() + les_periodes_bulletin() 
+
 
 
 
@@ -13550,7 +13652,6 @@ function actualiser_nb_cases(ceci){
 		//rajouter une note possible à droite SSI(!) elle n'existe pas encore ET ON N'EST PAS DANS LES APPRECIATIONS, càd le nombre de children = index de ceci
 		if(nb_children === index_ceci && nb_children<data_etablissement['nb_notes_max_par_periode'] && $("#saison_note").val()!=="Toutes") $(le_parent).append(les_notes_eleve([" "]))
 
-
 	}
 
 	//ajouter la case moyenne
@@ -13563,6 +13664,25 @@ function actualiser_nb_cases(ceci){
 	var classe_case_moyenne = "case_de_moyenne"
 	classe_case_moyenne = classe_case_moyenne + (est_moyenne_generale || moyenne_periode.trim() === ""? "" :' est_moyenne_periodique')
 	$(le_parent).append('<span class="'+classe_case_moyenne+'">'+moyenne_periode+'</span>')
+
+
+
+	//si on est sur TOUTES -> rajouter la case d'appréciation
+	if($("#saison_note").val()==="Toutes"){
+		var tout = donnees_generiques_bulletin()
+		var identifiant_appreciateur = tout.identifiant_prof 
+		url = racine_data + 'Appreciations?identifiant_appreciateur=eq.'+identifiant_appreciateur+'&identifiant_eleve=eq.'+ le_parent.id + "&" +apikey
+		var contenu_appreciation = get_resultat(url)
+		if(contenu_appreciation.length > 0){
+			contenu_appreciation = contenu_appreciation[0]['contenu']
+		}else{
+			contenu_appreciation = ""
+		}
+		//console.log({contenu_appreciation})
+
+		$(le_parent).append('<div class="bloc_appreciation"><textarea placeholder="Votre appréciation ici..." type="text" class="appreciation">'+contenu_appreciation+'</textarea></div>')
+	}
+
 	
 	bulletin_enregistre = false
 
@@ -13730,6 +13850,8 @@ function les_trimestres_bulletin(avec_annee){
 			</form>`
 }
 
+
+
 function les_periodes_bulletin(){
 	var liste_periodes_secondaires = element_DOM("periode_bulletin") ? recuperer_liste_periodes_secondaires(element_DOM("periode_bulletin").selectedIndex-1).split(',') : []
 	return `<form id="periodes" class="liste_deroulante">
@@ -13738,14 +13860,41 @@ function les_periodes_bulletin(){
 						<option value="--">--</option>	
 
 						`
-						+liste_periodes_secondaires.map(e => '<option value="'+e+'">'+e+'</option>')+
+						+liste_periodes_secondaires.map(e => '<option value="'+e+'">'+e+'</option>').join('')+
 
 						`
 
 						<option value="Toutes">Appréciations</option>
 					</select>
 				</label>
-			</form>`
+			</form>` + les_enseignants()
+}
+
+function les_enseignants(){
+	var resultat = ""
+
+	if(recuperer('mon_type').includes('Admin')){
+
+		var classe_matiere = $('.un_menu.sekooly-mode-background').val()
+		var url = racine_data + 'Profs?Classe=like.*'+classe_matiere + "*&" +apikey
+		var les_profs = get_resultat(url)
+
+		resultat = `
+			<form id="les_enseignants" class="liste_deroulante"><label for="enseignant">Enseignant:
+					<select id="enseignant" name="enseignant">
+						`
+						+les_profs.map(e => '<option value="'+e['Identifiant']+'">'+e['Nom'] + " " + e['Prénom(s)'] +'</option>').join('')+
+
+						`
+					</select>
+				</label>
+			</form>
+
+		`
+	}
+
+	return resultat 
+
 }
 
 function consulter(){
