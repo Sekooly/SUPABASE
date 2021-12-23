@@ -13286,7 +13286,7 @@ function creer_fenetre_bulletin(toutes_les_matieres){
 
 	contenu_menu_haut += '</select>'
 
-	var conteneur_menu_html = '<div id="conteneur_menu"><div id="menu_haut" class="menu_haut" style="text-align: center;"> ' + contenu_menu_haut+ '</div><div id="menu_params" class="menu_params"><div id="previsualisation" class="previz-pref"></div></div></div>'
+	var conteneur_menu_html = '<div id="conteneur_menu"><div id="menu_haut" class="menu_haut" style="text-align: center;"> ' + contenu_menu_haut+ '</div><div id="menu_params" style="max-height: 90%;" class="menu_params"><div id="previsualisation" class="previz-pref"></div></div></div>'
 
 	$("#fenetre").append(conteneur_menu_html);
 
