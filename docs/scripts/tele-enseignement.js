@@ -13319,6 +13319,8 @@ async function trouver_mes_eleves(){
 		var tout = donnees_generiques_bulletin()
 		var Classe_Matiere = tout.Classe_Matiere
 		var classe = tout.Classe_Matiere.split('|')[0].replaceAll('(','')
+		var periode_bulletin = tout.periode_bulletin
+		var saison_note = tout.saison_note 
 
 		var nom_liste_et_coefs = $('.un_menu').find('option:selected').attr("nom_liste_et_coefs")
 		//console.log({nom_liste_et_coefs})
@@ -13328,10 +13330,67 @@ async function trouver_mes_eleves(){
 		//dans le cas où on veut tous les élèves de la classe, avec leur éventuelle note
 		if(nom_liste_et_coefs === "null" || nom_liste_et_coefs === "" || nom_liste_et_coefs === null ){
 
-			//on récupére tou 
+			//on récupére tout
 			var demande = await supabase.from('bulletins').select('*').eq('Classe',classe)
+			console.log("1",{demande})
 
-			//console.log({demande})
+
+			//si ça renvoie + de 1000 -> limiter à la matiere
+			if(demande.body.length >= 1000){
+				demande = await supabase.from('bulletins').select('*').eq('Classe_Matiere',Classe_Matiere)
+				console.log("2",{demande})
+			} 
+
+			//si la matière ne renvoie rien -> renvoyer toute la classe avec aucune note
+			if(demande.body.length === 0){
+				demande = await supabase.from('Eleves').select('Identifiant,Nom,"Prénom(s)"').eq('Classe',classe).order('Identifiant')
+				console.log("3",{demande})
+			
+			//la matière renvoie qqchose mais pas toute la classe -> rajouter les élèves sans notes
+			}else{
+				demande_classe = await supabase.from('Eleves').select('Identifiant,Nom,"Prénom(s)",liste_options').eq('Classe',classe).order('Identifiant')
+
+				
+				console.log('demande_classe',demande_classe.body)
+				console.log('demande',demande.body)
+
+				if(demande.body.length < demande_classe.body.length){
+
+					demande_classe.body.forEach( function(un_eleve, index_note) {
+
+						//si l'identifiant un_eleve['Identifiant'] n'est pas listé dans demande -> rajouter dans demande
+						identifiant_non_liste = demande.body.filter(e => e['Identifiant'] === un_eleve['Identifiant']).length === 0
+
+						if(identifiant_non_liste){
+
+							nouvelle_note = {
+							  "id_note": 0,
+							  "Classe": classe,
+							  "Nom": un_eleve['Nom'],
+							  "Prénom(s)": un_eleve['Prénom(s)'],
+							  "Identifiant": un_eleve['Identifiant'],
+							  "Classe_Matiere": Classe_Matiere,
+							  "identifiant_prof": null,
+							  "periode_bulletin": periode_bulletin,
+							  "saison_note": saison_note,
+							  "note": '',
+							  "liste_options": un_eleve['liste_options'],
+							  "coef": 0
+							}
+
+							demande.body.push(nouvelle_note)
+						}
+
+
+					});
+				}
+
+
+				//console.log(demande_classe.body)
+				//console.log(demande.body)
+
+			}
+
 			mes_eleves_initiaux = demande.body
 
 

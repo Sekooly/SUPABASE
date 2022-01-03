@@ -1,0 +1,44 @@
+--------------------------------
+ANCIEN
+
+
+ SELECT DISTINCT "Notes".id_note,
+    "Eleves"."Classe",
+    "Eleves"."Nom",
+    "Eleves"."Prénom(s)",
+    "Eleves"."Identifiant",
+    "Notes"."Classe_Matiere",
+    "Notes".identifiant_prof,
+    "Notes".periode_bulletin,
+    "Notes".saison_note,
+    "Notes".note,
+    "Eleves".liste_options,
+    "Matieres".coefficient_matiere AS coef
+   FROM "Eleves"
+     LEFT JOIN "Notes" ON "Eleves"."Identifiant" = "Notes".identifiant_eleve
+     LEFT JOIN "Matieres" ON "Notes"."Classe_Matiere" = "Matieres"."Classe_Matiere"
+  ORDER BY "Eleves"."Nom", "Eleves"."Prénom(s)", "Notes".id_note;
+
+
+
+--------------------------------
+NOUVEAU
+
+
+
+ SELECT DISTINCT "Notes".id_note,
+    "Eleves"."Classe",
+    "Eleves"."Nom",
+    "Eleves"."Prénom(s)",
+    "Eleves"."Identifiant",
+    "Notes"."Classe_Matiere",
+    "Notes".identifiant_prof,
+    "Notes".periode_bulletin,
+    "Notes".saison_note,
+    "Notes".note,
+    "Eleves".liste_options,
+    "Matieres".coefficient_matiere AS coef
+   FROM "Eleves"
+     LEFT JOIN "Notes" ON "Eleves"."Identifiant" = "Notes".identifiant_eleve
+     LEFT JOIN "Matieres" ON "Eleves"."Classe" = "Matieres"."Classe"
+  ORDER BY "Notes"."Classe_Matiere" desc, "Eleves"."Nom", "Eleves"."Prénom(s)", "Notes".id_note;
