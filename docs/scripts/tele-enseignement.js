@@ -13351,10 +13351,17 @@ async function trouver_mes_eleves(){
 				demande_classe = await supabase.from('Eleves').select('Identifiant,Nom,"Prénom(s)",liste_options').eq('Classe',classe).order('Identifiant')
 
 				
-				console.log('demande_classe',demande_classe.body)
-				console.log('demande',demande.body)
+				//console.log('demande_classe',demande_classe.body)
+				//console.log('demande',demande.body)
 
-				if(demande.body.length < demande_classe.body.length){
+				nb_identifiants_notes = valeursUniquesDeCetteKey(demande.body,'Identifiant').length
+				nb_identifiants_classe = valeursUniquesDeCetteKey(demande_classe.body,'Identifiant').length
+
+				//console.log({nb_identifiants_notes})
+				//console.log({nb_identifiants_classe})
+
+				//if(demande.body.length < demande_classe.body.length){
+				if(nb_identifiants_notes < nb_identifiants_classe){
 
 					demande_classe.body.forEach( function(un_eleve, index_note) {
 
