@@ -13326,7 +13326,7 @@ async function trouver_mes_eleves(){
 
 
 		//dans le cas où on veut tous les élèves de la classe, avec leur éventuelle note
-		if(nom_liste_et_coefs === "null"){
+		if(nom_liste_et_coefs === "null" || nom_liste_et_coefs === "" ){
 
 			//on récupére tou 
 			var demande = await supabase.from('bulletins').select('*').eq('Classe',classe)
