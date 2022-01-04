@@ -12875,7 +12875,7 @@ async function render_fiche(ignorer_absence_classe){
 	var les_eleves = await rechercher("Eleves", "Classe", la_classe, "")
 	//console.log({les_eleves})
 
-	console.log('\n\n\n')
+	//console.log('\n\n\n')
 
 	creer_fiche(la_classe, matieres_de_classe, les_eleves)
 
@@ -12939,7 +12939,7 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes)
 
 
 	//créer la premiere ligne: Numéro, Nom, Prénom(s), Ancien/Nouveau, Date de naissance, Sexe, [matieres], Moyenne, Rang, Absence(s) demi-journée(s), Retards, Epreuve facultative
-	var premiere_ligne = 'Numéro,Nom,Prénom(s),Ancien/Nouveau,Date de naissance,Sexe,'+matieres_de_classe.map(e => e['Matiere']).join(',')+',Moyenne,Rang,Absence(s) demi-journée(s),Retards,Epreuve facultative'
+	var premiere_ligne = 'Numéro,Nom,Prénom(s),Ancien/Nouveau,Date de naissance,Sexe,'+matieres_de_classe.map(e => e['Matiere']).join(',')+',Moyenne générale,Rang,Absence(s) demi-journée(s),Retards,Epreuve facultative'
 	premiere_ligne = premiere_ligne.split(',')
 	//console.log({premiere_ligne})
 	//console.log('\n\n\n')
@@ -12971,6 +12971,7 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes)
 		if(indice_eleve === les_eleves.length-1){
 			setTimeout(function(){
 				rajouter_min_max_moy(matieres_de_classe)
+				rajouter_rangs_eleves()
 			},1000)
 			
 		}
@@ -13162,8 +13163,8 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe){
 
 	if(cumul_eleves > 0 && somme_coef_eleves > 0) moyenne_generale = Number(cumul_eleves/somme_coef_eleves).toFixed(2)
 
-	$('tr[id="'+identifiant_eleve+'"]').append('<th class="border_bottom">'+moyenne_generale+'</th>')
-
+	$('tr[id="'+identifiant_eleve+'"]').append('<th class="border_bottom moyenne_generale">'+moyenne_generale+'</th>')
+	
 
 
 
@@ -13172,6 +13173,20 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe){
 }
 
 
+
+function rajouter_rangs_eleves(){
+	var arr = $(".moyenne_generale").map(function(){return Number($(this).text())}).get()
+	var sorted = arr.slice().sort(function(a,b){return b-a})
+	var ranks = arr.map(function(v){ return sorted.indexOf(v)+1 });
+	console.log({ranks});
+
+	$('tbody > tr.une_ligne_de_donnees').each(function(index,element_eleve){
+		//console.log({element_eleve})
+		$(element_eleve).append('<th class="border_bottom">'+ranks[index]+'</th>')
+	})
+
+	return ranks
+}
 
 
 function voir_bulletin_classe_choisie(){
