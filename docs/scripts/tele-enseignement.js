@@ -11600,8 +11600,8 @@ function formulaire_id_liste_options(e, nom_matiere){
 	var ancienne_valeur = e.target.innerText
 	//console.log({ancienne_valeur})
 
-	var id_liste = ancienne_valeur && ancienne_valeur !== "null" ? ancienne_valeur.split('|')[0].split('(')[1] : ""
-	var liste_coef = ancienne_valeur && ancienne_valeur !== "null" ? ancienne_valeur.split('|')[1].split(')')[0] : ""
+	var id_liste = ancienne_valeur && ancienne_valeur !== "null" && ancienne_valeur.includes('|') ? ancienne_valeur.split('|')[0].split('(')[1] : ""
+	var liste_coef = ancienne_valeur && ancienne_valeur !== "null" && ancienne_valeur.includes('|') ? ancienne_valeur.split('|')[1].split(')')[0] : ""
 	
 
 	//console.log({id_liste})
@@ -11628,6 +11628,11 @@ function assigner_liste_et_coef(){
 		var resultat = ""
 		if (id_liste.length + liste_coef.length > 0){
 			resultat = '(' + id_liste + "|" + liste_coef + ')'
+		
+		//vider
+		}else{
+			alert("Matiere devenue non optionnelle.")
+			resultat = null
 		}
 		
 		//console.log({resultat})
@@ -12800,6 +12805,79 @@ function choix_classe_bulletin(){
 	
 }
 
+function choix_classe_fiche(){
+	voir_fiche_classe_choisie()
+	
+
+}
+
+function voir_fiche_classe_choisie(){
+
+	$("#mini_popup").remove()
+	vider_fenetre("Fiches de Conseil de classe")
+
+	les_matieres = JSON.parse(recuperer("mes_matieres"))
+	les_classes = valeursUniquesDeCetteKey(les_matieres,'Classe')
+	les_classes.sort()
+	//console.log({les_classes}) 
+
+
+
+	//rajouter la liste des classes
+	$('#fenetre').append(`<div id="conteneur_menu">
+		<div id="menu_haut" class="menu_haut" style="text-align: center;">
+		<select onchange="render_fiche()" class="un_menu" id="la_classe_fiche">
+			<option value="" id="--">--</option>
+			`+ les_classes.map(classe => '<option nom_liste_et_coefs="null" value="'+classe+'" id="'+classe+'">'+classe+'</option>') +`
+		</select>
+		</div>
+		<div id="menu_params" style="max-height: 90%;" class="menu_params">
+			<div id="previsualisation" class="previz-pref"></div>
+		</div>
+	</div>`)
+
+
+	afficher_fenetre(true)
+
+}
+
+async function render_fiche(){
+
+	var la_classe = $('#la_classe_fiche').val()
+
+	if(!la_classe) return alert("Merci de choisir une classe pour créer la fiche.")
+	
+	//afficher les matières en colonnes
+	var toutes = JSON.parse(recuperer('mes_matieres'))
+	var matieres_de_classe = toutes.filter(e => e['Classe'] === la_classe).sort()
+	console.log({matieres_de_classe})
+
+	//afficher les eleves en lignes
+	var les_eleves = await rechercher("Trombinoscope", "Classe", la_classe, "")
+	console.log({les_eleves})
+
+	console.log('\n\n\n')
+
+	creer_fiche(la_classe, matieres_de_classe, les_eleves)
+
+	
+}
+
+
+function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes){
+	
+	//pour chaque matiere
+	//afficher les notes saisies dans les cases
+	matieres_de_classe.forEach( async function(la_matiere, index) {		
+		les_notes = await rechercher_contenant_motif("Notes", "Classe_Matiere", la_matiere['Classe_Matiere'])
+		console.log(la_matiere['Classe_Matiere'])
+		console.log({les_notes})
+	});
+
+
+	//calculer la moyenne
+}
+
 function voir_bulletin_classe_choisie(){
 	var la_classe= $("#classe_saisie_bulletin").val()
 	$('#mini_popup').remove()
@@ -12840,6 +12918,8 @@ function valider_choix_admin_bulletins(){
 		configurer_periodes_bulletins()
 	}else if(choix === "choix2"){
 		choix_classe_bulletin()
+	}else if(choix === "choix3"){
+		choix_classe_fiche()
 	}else{
 		alert("Fonctionnalité en cours de développement.")
 	}
@@ -13737,7 +13817,7 @@ function actualiser_nb_cases(ceci){
 	if($("#saison_note").val()==="Toutes"){
 		var tout = donnees_generiques_bulletin()
 		var identifiant_appreciateur = tout.identifiant_prof 
-		url = racine_data + 'Appreciations?identifiant_appreciateur=eq.'+identifiant_appreciateur+'&identifiant_eleve=eq.'+ le_parent.id + "&" +apikey
+		url = racine_data + 'Appreciations?identifiant_appreciateur=eq.'+identifiant_appreciateur+'&identifiant_eleve=eq.'+ le_parent.id +'&Classe_Matiere=eq.'+ tout.Classe_Matiere + "&" +apikey
 		var contenu_appreciation = get_resultat(url)
 		if(contenu_appreciation.length > 0){
 			contenu_appreciation = contenu_appreciation[0]['contenu']
