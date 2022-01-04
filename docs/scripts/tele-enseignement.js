@@ -12829,8 +12829,11 @@ function voir_fiche_classe_choisie(){
 	liste_periodes = Object.keys(data_etablissement['config_notes'][nom_periode_bulletin])
 
 	//rajouter le bouton de téléchargement
+	$("#entete-fenetre").append('<img id="actualiser-fiche" alt="télécharger" class="download-btn window-btn" src="'+ prefixe_image + '/img_actualiser.png">')
 	$("#entete-fenetre").append('<img id="download-fiche" alt="télécharger" class="download-btn window-btn" src="'+ prefixe_image + '/img_download.png">')
 
+
+	au_clic("#actualiser-fiche","render_fiche()")
 	au_clic("#download-fiche","telecharger_fiche_en_cours()")
 
 	//rajouter la liste des classes
