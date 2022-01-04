@@ -2248,7 +2248,7 @@ CREATE TABLE public."Appreciations"
     identifiant_eleve character varying COLLATE pg_catalog."default" NOT NULL,
     periode_principale character varying COLLATE pg_catalog."default" NOT NULL,
     contenu text COLLATE pg_catalog."default",
-    CONSTRAINT "Appreciations_pkey" PRIMARY KEY (identifiant_appreciateur, identifiant_eleve, periode_principale)
+    CONSTRAINT "Appreciations_pkey" PRIMARY KEY (identifiant_appreciateur, identifiant_eleve, periode_principale, "Classe_Matiere")
 )
 
 TABLESPACE pg_default;
