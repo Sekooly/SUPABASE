@@ -12811,6 +12811,10 @@ function choix_classe_fiche(){
 
 }
 
+function telecharger_fiche_en_cours(){
+	alert("Téléchargement disponible plus tard.")
+}
+
 function voir_fiche_classe_choisie(){
 
 	$("#mini_popup").remove()
@@ -12821,17 +12825,27 @@ function voir_fiche_classe_choisie(){
 	les_classes.sort()
 	//console.log({les_classes}) 
 
+	nom_periode_bulletin=data_etablissement['config_notes']['nom_periode_bulletin']
+	liste_periodes = Object.keys(data_etablissement['config_notes'][nom_periode_bulletin])
 
+	//rajouter le bouton de téléchargement
+	$("#entete-fenetre").append('<img id="download-fiche" alt="télécharger" class="download-btn window-btn" src="'+ prefixe_image + '/img_download.png">')
+
+	au_clic("#download-fiche","telecharger_fiche_en_cours()")
 
 	//rajouter la liste des classes
 	$('#fenetre').append(`<div id="conteneur_menu">
 		<div id="menu_haut" class="menu_haut" style="text-align: center;">
+		<select onchange="render_fiche(true)" class="un_menu" id="la_periode_bulletin">
+			<option value="" id="--">`+nom_periode_bulletin+`</option>
+			`+ liste_periodes.map(periode => '<option value="'+periode+'" id="'+periode+'">'+periode+'</option>') +`
+		</select>
 		<select onchange="render_fiche()" class="un_menu" id="la_classe_fiche">
-			<option value="" id="--">--</option>
-			`+ les_classes.map(classe => '<option nom_liste_et_coefs="null" value="'+classe+'" id="'+classe+'">'+classe+'</option>') +`
+			<option value="" id="--">Classe</option>
+			`+ les_classes.map(classe => '<option value="'+classe+'" id="'+classe+'">'+classe+'</option>') +`
 		</select>
 		</div>
-		<div id="menu_params" style="max-height: 90%;" class="menu_params">
+		<div id="menu_params" style="max-height: 90%;overflow-x: auto;" class="menu_params">
 			<div id="previsualisation" class="previz-pref"></div>
 		</div>
 	</div>`)
@@ -12841,20 +12855,25 @@ function voir_fiche_classe_choisie(){
 
 }
 
-async function render_fiche(){
+async function render_fiche(ignorer_absence_classe){
+
+
+	$("#fiche_conseil").remove()
 
 	var la_classe = $('#la_classe_fiche').val()
+	var la_periode_bulletin = $('#la_periode_bulletin').val()
 
-	if(!la_classe) return alert("Merci de choisir une classe pour créer la fiche.")
+	if(!la_periode_bulletin) return alert("Merci de choisir une période.")
+	if(!la_classe) return ignorer_absence_classe ? false : alert("Merci de choisir une classe pour créer la fiche.")
 	
 	//afficher les matières en colonnes
 	var toutes = JSON.parse(recuperer('mes_matieres'))
 	var matieres_de_classe = toutes.filter(e => e['Classe'] === la_classe).sort()
-	console.log({matieres_de_classe})
+	//console.log({matieres_de_classe})
 
 	//afficher les eleves en lignes
-	var les_eleves = await rechercher("Trombinoscope", "Classe", la_classe, "")
-	console.log({les_eleves})
+	var les_eleves = await rechercher("Eleves", "Classe", la_classe, "")
+	//console.log({les_eleves})
 
 	console.log('\n\n\n')
 
@@ -12863,20 +12882,297 @@ async function render_fiche(){
 	
 }
 
+function nouveau_tableau_avec_ce_titre(id_tableau, array_ligne){
 
-function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes){
-	
-	//pour chaque matiere
-	//afficher les notes saisies dans les cases
-	matieres_de_classe.forEach( async function(la_matiere, index) {		
-		les_notes = await rechercher_contenant_motif("Notes", "Classe_Matiere", la_matiere['Classe_Matiere'])
-		console.log(la_matiere['Classe_Matiere'])
-		console.log({les_notes})
-	});
+  let headerRow = array_ligne
+    .map(col => `<th id="${col}" class="header_table entete_sticky sekooly-mode-background">${col}</th>`)
+    .join("");
 
+  //build the table
+  const table = `
+	<table id="`+id_tableau+`">
+		<thead class="">
+			<tr class= "border_bottom">${headerRow}</tr>
+		</thead>
+		<tbody id="contenu_`+id_tableau+`" style="transform: rotateX(0deg);">
+		</tbody>
+	</table>`;
+ 
+  
 
-	//calculer la moyenne
+  return table;
+
 }
+
+
+
+function une_ligne_eleve(id_tableau,objet_une_ligne,numero){
+
+	//console.log(objet_une_ligne)
+	return `<tr class= "border_bottom une_ligne_de_donnees" liste_options="${objet_une_ligne["liste_options"]}" id="${objet_une_ligne["Identifiant"]}" >
+				<th class="border_bottom">
+					${numero}
+				</th>
+				<th class="border_bottom">
+					${objet_une_ligne["Nom"]}
+				</th>
+				<th class="border_bottom">
+					${objet_une_ligne["Prénom(s)"]} 
+				</th>
+				<th class="border_bottom">
+					A/N
+				</th>
+				<th class="border_bottom">
+					${objet_une_ligne["Date_de_naissance"]} 
+				</th>
+				<th class="border_bottom">
+					F/M
+				</th>
+			</tr>`
+
+}
+
+
+async function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes){
+
+	var la_periode_bulletin = $("#la_periode_bulletin").val()
+
+
+	//créer la premiere ligne: Numéro, Nom, Prénom(s), Ancien/Nouveau, Date de naissance, Sexe, [matieres], Moyenne, Rang, Absence(s) demi-journée(s), Retards, Epreuve facultative
+	var premiere_ligne = 'Numéro,Nom,Prénom(s),Ancien/Nouveau,Date de naissance,Sexe,'+matieres_de_classe.map(e => e['Matiere']).join(',')+',Moyenne,Rang,Absence(s) demi-journée(s),Retards,Epreuve facultative'
+	premiere_ligne = premiere_ligne.split(',')
+	//console.log({premiere_ligne})
+	//console.log('\n\n\n')
+
+	//créer un tableau
+	$('#previsualisation').append(nouveau_tableau_avec_ce_titre('fiche_conseil',premiere_ligne))
+
+
+	//rajouter les coefficients SI CEST PAS UNE OPTION PARTICULIERE à partir de la colonne 7 (indice 6)
+	var ligne_coefs = ',,,,,COEFF,' + matieres_de_classe.map(e => !e['nom_liste_et_coefs'] && e['coefficient_matiere'] > 0 ? e['coefficient_matiere'] :  "-").join(',')
+	ligne_coefs = ligne_coefs.split(',')
+	//console.log({ligne_coefs})
+	$("#contenu_fiche_conseil").append('<tr class="ligne_coefs">'+ligne_coefs.map(un_coef => `<th>${un_coef}</th>`)+'</tr>')
+
+
+	//pour chaque élève	
+	les_eleves.forEach(async function(un_eleve,indice_eleve){
+		$("#contenu_fiche_conseil").append(une_ligne_eleve('fiche_conseil',un_eleve,indice_eleve+1))
+
+
+		//récupérer les notes de l'élève pour la période
+		//rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher, nombrelimite, orderby)
+		les_notes = await rechercher("Notes", "identifiant_eleve", un_eleve['Identifiant'], false, false, "Classe_Matiere,saison_note")
+		//console.log({les_notes})
+
+		rajouter_notes_eleves(un_eleve['Identifiant'],les_notes,matieres_de_classe)
+		
+		//apres le dernier élève -> rajouter la valeur des min-max-moy
+		if(indice_eleve === les_eleves.length-1){
+			setTimeout(function(){
+				rajouter_min_max_moy(matieres_de_classe)
+			},1000)
+			
+		}
+
+	})
+
+
+	au_clic("tr.une_ligne_de_donnees","clic_ligne(this)")
+	
+	//console.log({matieres_de_classe})
+
+
+	
+
+
+
+}
+
+function rajouter_min_max_moy(matieres_de_classe){
+
+		var ligne_min = ',,,,,Min:'
+		var ligne_max = ',,,,,Max:'
+		var ligne_moy = ',,,,,Moy:'
+
+		//pour chaque matière (le dernier +1 c'est pour la moyenne)
+		for (numero_matiere=7;numero_matiere<7+matieres_de_classe.length+1;numero_matiere++){
+			la_matiere = $( "th.header_table:nth-child("+numero_matiere+")").text()
+			
+			//console.log('\n\n\n')
+					
+			var maximum = ''
+			var minimum = ''
+			var moyenne = ''
+
+			//calculer les min, max, moy, rang
+			var toutes_les_notes_de_la_matiere = []
+			//console.log(numero_matiere)
+
+
+			$("th.border_bottom:nth-child("+numero_matiere+")").each(function(index,e){
+				if(e.innerText.length > 0){
+					//console.log(Number(e.innerText))
+					toutes_les_notes_de_la_matiere.push(Number(e.innerText))
+				}else{
+					//console.log("(vide)")
+				}
+
+			}) 
+
+			
+
+
+			//console.log('************'+la_matiere+'*************')
+			//console.log({toutes_les_notes_de_la_matiere})
+
+			if(toutes_les_notes_de_la_matiere.length > 0){
+
+				minimum = Math.min(...toutes_les_notes_de_la_matiere).toFixed(2) 
+				maximum = Math.max(...toutes_les_notes_de_la_matiere).toFixed(2) 
+
+				const sum = toutes_les_notes_de_la_matiere.reduce((a, b) => a + b, 0);
+				moyenne = (sum / toutes_les_notes_de_la_matiere.length).toFixed(2) || "";
+
+
+			}
+
+
+			/*
+			console.log({minimum})
+			console.log({maximum})
+			console.log({moyenne})
+			*/
+
+			ligne_min += ','+minimum 
+			ligne_max += ','+maximum 
+			ligne_moy += ','+moyenne 
+
+		}
+
+
+
+
+		ligne_min = ligne_min.split(',')
+		ligne_max = ligne_max.split(',')
+		ligne_moy = ligne_moy.split(',')
+		$("#contenu_fiche_conseil").append('<tr>'+ligne_min.map(note => `<th>${note}</th>`)+'</tr>')
+		$("#contenu_fiche_conseil").append('<tr>'+ligne_max.map(note => `<th>${note}</th>`)+'</tr>')
+		$("#contenu_fiche_conseil").append('<tr>'+ligne_moy.map(note => `<th>${note}</th>`)+'</tr>')
+
+}
+
+function moyenne_de_larray(times){
+	const sum = times.reduce((a, b) => a + b, 0);
+	const avg = (sum / times.length) || "";
+
+	return avg
+}
+
+function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe){
+	//console.log('\n\n\n-------------'+identifiant_eleve+'-------------')
+
+	var colonnes_notes = les_notes.map(function(une_note,indice_note){
+		la_matiere = une_note['Classe_Matiere'].split('|')[1].replaceAll(')','')
+		indice_matiere_sur_tableau = $(`[id="${la_matiere}"]`)[0].cellIndex
+		return indice_matiere_sur_tableau + ':'+ une_note['identifiant_eleve'] + ':' + la_matiere  + ':' + une_note['saison_note']+ ':' +une_note['note']
+	})
+
+	//console.log(colonnes_notes)
+	var notes_a_rajouter = ""
+
+	//pour chaque matière: calculer la moyenne de l'élève 
+	matieres_de_classe.forEach(function(une_matiere,index_matiere){
+
+		//console.log('\n\n\n')
+		notes_de_la_matiere = colonnes_notes.map(e => e.includes(une_matiere['Matiere']) ? e.split(':')[3] + ':' + e.split(':')[4] : "" ).filter(e => e!== "")
+		//console.log(notes_de_la_matiere)
+
+		//recuperer les notes NON examen -> faire la moyenne
+		moyenne_journaliere = notes_de_la_matiere.filter(e => !e.includes('Examen')).map(e =>  Number(e.split(':')[1]))
+		moyenne_journaliere = moyenne_de_larray(moyenne_journaliere)
+		//console.log({[une_matiere['Matiere']]: moyenne_journaliere})
+
+
+		//recuperer la note examen
+		note_examen = notes_de_la_matiere.filter(e => e.includes('Examen')).map(e =>  Number(e.split(':')[1]))
+		note_examen = moyenne_de_larray(note_examen)
+		//console.log({[une_matiere['Matiere'] + ' EXAMEN']: note_examen})
+
+
+
+		//faire la moyenne générale (moyenne_journaliere*0.7+note_examen*0.3) et l'ajouter
+		//les coefs valent 1 si l'autre est vide
+		coef_examen = moyenne_journaliere>0 ? 0.7 : 1
+		coef_journalier = note_examen>0 ? 0.3 : 1
+		moyenne_generale_matiere = moyenne_journaliere * coef_journalier + note_examen * coef_examen
+
+
+		if(moyenne_generale_matiere === 0){
+			moyenne_generale_matiere = ""
+		}else{
+			moyenne_generale_matiere = moyenne_generale_matiere.toFixed(2)
+		} 
+
+		//if(identifiant_eleve==='hasiniatsy.fanambisoa' && une_matiere['Matiere'] === 'Physique Chimie') alert(moyenne_journaliere + ' et ' + note_examen + ' donc ' + moyenne_generale_matiere)
+		
+
+
+		//check les coefs utiles
+		liste_options_eleve = $("[id='"+identifiant_eleve+"']")[0].getAttribute('liste_options')
+		coefficient_matiere = liste_options_eleve.includes(une_matiere['Classe_Matiere']) ? liste_options_eleve.split(';').filter(e => e.includes(une_matiere['Classe_Matiere']))[0].split(' coef ')[1] : $('.ligne_coefs > :nth-child('+(7+index_matiere)+')').text()
+		//console.log({coefficient_matiere})
+
+		notes_a_rajouter += '<th class="border_bottom moyenne_eleve" coef="'+coefficient_matiere+'">'+moyenne_generale_matiere+'</th>'
+
+
+
+
+	})
+
+
+	//console.log({[identifiant_eleve]:notes_a_rajouter})
+	//trouver la ligne à mettre à jour et mettre la valeur de la moyenne
+	$('tr[id="'+identifiant_eleve+'"]').append(notes_a_rajouter)
+
+
+	//pour chaque moyenne-matiere de l'élève
+	cumul_eleves = 0
+	somme_coef_eleves = 0
+	moyenne_generale = 0
+	$('[id="'+identifiant_eleve+'"] > .moyenne_eleve').each(function(index,moyenne_matiere){
+
+
+
+		la_moyenne = Number(moyenne_matiere.innerText)
+		le_coef = Number(moyenne_matiere.getAttribute('coef'))
+
+		//console.log({la_moyenne})
+		//console.log({le_coef})
+
+		//cumuler
+		if(la_moyenne){
+			cumul_eleves += la_moyenne*le_coef
+			somme_coef_eleves += le_coef
+		}
+
+	}) 
+	//console.log({cumul_eleves})
+	//console.log({somme_coef_eleves})
+
+	if(cumul_eleves > 0 && somme_coef_eleves > 0) moyenne_generale = Number(cumul_eleves/somme_coef_eleves).toFixed(2)
+
+	$('tr[id="'+identifiant_eleve+'"]').append('<th class="border_bottom">'+moyenne_generale+'</th>')
+
+
+
+
+
+	
+}
+
+
+
 
 function voir_bulletin_classe_choisie(){
 	var la_classe= $("#classe_saisie_bulletin").val()
@@ -13867,7 +14163,21 @@ function calcul_moyenne_bulletin(identifiant, moyenne_generale){
 	//moyenne générale = 0.30 * moyenne bulletin + 0.70 * examen
 	}else{
 
-		var note_examen = Number($('[id="'+identifiant+'"].un_eleve_bulletin > .est_examen').text())
+		$('[id="'+identifiant+'"] > .une_note.est_examen').each(function(index,saisie){
+
+			total += Number(saisie.innerText) ? Number(saisie.innerText) : 0;	
+			
+			
+			//console.log({total})
+
+			if(saisie.innerText!== "") taille=taille+1
+		})
+
+		var note_examen = taille > 0 ? total/taille : ""
+		note_examen = note_examen ? note_examen.toFixed(2) :  ""
+		//console.log({note_examen})
+
+		 //  Number($('[id="'+identifiant+'"].un_eleve_bulletin > .est_examen').text())
 		return (Number(calcul_moyenne_bulletin(identifiant)) * 0.3 + note_examen * 0.7).toFixed(2)
 
 	}
