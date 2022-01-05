@@ -12829,7 +12829,7 @@ function telecharger_fiche_en_cours(){
     var printWindow = window.open('', '', 'height=400,width=800');
     printWindow.document.write('<html><head><title>'+nom_fichier+'</title>');
     printWindow.document.write('<style>'+le_style+'</style>');
-    printWindow.document.write('</head><body><p>'+nom_fichier_sans_extension+'</p>');
+    printWindow.document.write('</head><body style="max-width:100%;min-width:100%;"><h2>'+nom_fichier_sans_extension+'</h2>');
     printWindow.document.write(divContents);
     printWindow.document.write('</body></html>');
     printWindow.document.close();
@@ -12864,7 +12864,6 @@ function voir_fiche_classe_choisie(){
 	$('#fenetre').append(`<div id="conteneur_menu">
 		
 		<div id="menu_haut" class="menu_haut" style="text-align: center;">
-			<rouge style="cursor: pointer;" id="aide_fiche">(?)</rouge>
 			<select onchange="render_fiche(true)" class="un_menu" id="la_periode_bulletin">
 				<option value="" id="--">`+nom_periode_bulletin+`</option>
 				`+ liste_periodes.map(periode => '<option value="'+periode+'" id="'+periode+'">'+periode+'</option>') +`
@@ -12873,6 +12872,7 @@ function voir_fiche_classe_choisie(){
 				<option value="" id="--">Classe</option>
 				`+ les_classes.map(classe => '<option value="'+classe+'" id="'+classe+'">'+classe+'</option>') +`
 			</select>
+			<rouge style="cursor: pointer;" id="aide_fiche">(?)</rouge>
 		</div>
 		<div id="menu_params" style="overflow-x: auto;" class="menu_params">
 			<div id="previsualisation"></div>
@@ -12885,7 +12885,7 @@ function voir_fiche_classe_choisie(){
 }
 
 function alerte_aide_fiche(){
-	alert("Pour télécharger/imprimer la fiche sous format pdf, fixez la Mise à l'échelle à environ 60% avant d'enregistrer.")
+	alert("Pour télécharger/imprimer la fiche sous format pdf, pensez à ajuster l'échelle de mise en page à la largeur de la page avant d'enregistrer.")
 }
 
 async function render_fiche(ignorer_absence_classe){
