@@ -12812,7 +12812,29 @@ function choix_classe_fiche(){
 }
 
 function telecharger_fiche_en_cours(){
-	alert("Téléchargement disponible plus tard.")
+	chargement(true)
+
+	periode = $("#la_periode_bulletin>option")[0].innerText + ' ' + $("#la_periode_bulletin").val()
+	classe = $("#la_classe_fiche").val()
+
+	//alert("Téléchargement disponible plus tard.")
+	var element = document.getElementById('conteneur_menu');
+    var options = {
+      margin: 0,
+      filename: 'FICHE CC '+periode+' - '+classe+'.pdf',
+      html2canvas: {
+        scale: 4,
+        y: -100
+      },
+      jsPDF: {
+        unit: 'cm',
+        format: 'a1',
+        orientation: 'landscape'
+      }
+    };
+
+    html2pdf().set(options).from(element).save();
+	chargement(false)
 }
 
 function voir_fiche_classe_choisie(){
@@ -12941,8 +12963,8 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes)
 	var la_periode_bulletin = $("#la_periode_bulletin").val()
 
 
-	//créer la premiere ligne: Numéro, Nom, Prénom(s), Ancien/Nouveau, Date de naissance, Sexe, [matieres], Moyenne, Rang, Absence(s) demi-journée(s), Retards, Epreuve facultative
-	var premiere_ligne = 'Numéro,Nom,Prénom(s),Ancien/Nouveau,Date de naissance,Sexe,'+matieres_de_classe.map(e => e['Matiere']).join(',')+',Moyenne générale,Rang,Absence(s) demi-journée(s),Retards,Epreuve facultative'
+	//créer la premiere ligne: Numéro, Nom, Prénom(s), Ancien/Nouveau, Date de naissance, Sexe, [matieres], Moyenne, Rang, Absence(s) demi-journée(s), Retards//, Epreuve facultative
+	var premiere_ligne = 'Numéro,Nom,Prénom(s),Ancien/Nouveau,Date de naissance,Sexe,'+matieres_de_classe.map(e => e['Matiere']).join(',')+',Moyenne générale,Rang,Absence(s) demi-journée(s),Retards'
 	premiere_ligne = premiere_ligne.split(',')
 	//console.log({premiere_ligne})
 	//console.log('\n\n\n')
@@ -13181,7 +13203,7 @@ function rajouter_rangs_eleves(){
 	var arr = $(".moyenne_generale").map(function(){return Number($(this).text())}).get()
 	var sorted = arr.slice().sort(function(a,b){return b-a})
 	var ranks = arr.map(function(v){ return sorted.indexOf(v)+1 });
-	console.log({ranks});
+	//console.log({ranks});
 
 	$('tbody > tr.une_ligne_de_donnees').each(function(index,element_eleve){
 		//console.log({element_eleve})
