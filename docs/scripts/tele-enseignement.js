@@ -14148,6 +14148,18 @@ function les_notes_eleve(notes){
 
 function actualiser_nb_cases(ceci){
 
+	touche = right(ceci.innerText,1)
+
+	//si c'est une virgule -> remplacer par un point
+	if(touche.trim()===","){
+		alert("⚠️ Merci d'utiliser le point (.) pour les nombres à virgule.")
+		return false
+	}else if (isNaN(Number(ceci.innerText))){
+		alert("⚠️ Merci de saisir une note sous forme de nombre.")
+		return false
+
+	}
+
 	var le_parent = ceci.parentNode
 
 	//supprimer la case de moyenne
@@ -14175,6 +14187,7 @@ function actualiser_nb_cases(ceci){
 		//rajouter une note possible à droite SSI(!) elle n'existe pas encore ET ON N'EST PAS DANS LES APPRECIATIONS, càd le nombre de children = index de ceci
 		if(nb_children === index_ceci && nb_children<data_etablissement['nb_notes_max_par_periode'] && $("#saison_note").val()!=="Toutes") $(le_parent).append(les_notes_eleve([" "]))
 
+		//si la personne a saisi une virgule, annuler
 	}
 
 	//ajouter la case moyenne
