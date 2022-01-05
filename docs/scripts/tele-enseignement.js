@@ -12981,6 +12981,27 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes)
 	$('#previsualisation').append(nouveau_tableau_avec_ce_titre('fiche_conseil',premiere_ligne))
 
 
+	/*
+	//pour chaque matiere, assigner le nom_liste_et_coefs
+	//console.log({matieres_de_classe})
+	for (numero_matiere=7;numero_matiere<7+matieres_de_classe.length+1;numero_matiere++){
+		la_colonne_matiere = $( "th.header_table:nth-child("+numero_matiere+")")
+		la_matiere = la_colonne_matiere.text().trim()
+		nom_liste_et_coefs = matieres_de_classe.find(e => e['Matiere'] === la_matiere)
+
+		if(nom_liste_et_coefs){
+			nom_liste_et_coefs = nom_liste_et_coefs['nom_liste_et_coefs'] === 'null' || nom_liste_et_coefs['nom_liste_et_coefs'] === null ? '' :  nom_liste_et_coefs['nom_liste_et_coefs']
+		}else{
+			nom_liste_et_coefs = ""
+		}
+
+
+		la_colonne_matiere.append('<nom_liste_et_coefs style="display:none;">'+nom_liste_et_coefs+'</nom_liste_et_coefs>')	
+		
+
+	}
+	*/
+
 	//rajouter les coefficients SI CEST PAS UNE OPTION PARTICULIERE à partir de la colonne 7 (indice 6)
 	var ligne_coefs = ',,,,,COEFF,' + matieres_de_classe.map(e => !e['nom_liste_et_coefs'] && e['coefficient_matiere'] > 0 ? e['coefficient_matiere'] :  "-").join(',')
 	ligne_coefs = ligne_coefs.split(',')
@@ -13157,7 +13178,8 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe){
 		coefficient_matiere = liste_options_eleve.includes(une_matiere['Classe_Matiere']) ? liste_options_eleve.split(';').filter(e => e.includes(une_matiere['Classe_Matiere']))[0].split(' coef ')[1] : $('.ligne_coefs > :nth-child('+(7+index_matiere)+')').text()
 		//console.log({coefficient_matiere})
 
-		notes_a_rajouter += '<th class="border_bottom moyenne_eleve" coef="'+coefficient_matiere+'">'+moyenne_generale_matiere+'</th>'
+		est_bonus = une_matiere['nom_liste_et_coefs'] && une_matiere['nom_liste_et_coefs'].toLowerCase().includes("bonus")
+		notes_a_rajouter += '<th class="border_bottom moyenne_eleve" coef="'+coefficient_matiere+'" est_bonus="'+est_bonus+'">'+moyenne_generale_matiere+'</th>'
 
 
 
@@ -13178,16 +13200,26 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe){
 
 
 
-		la_moyenne = Number(moyenne_matiere.innerText)
-		le_coef = Number(moyenne_matiere.getAttribute('coef'))
+		est_bonus = moyenne_matiere.getAttribute('est_bonus')
+		le_coef =  Number(moyenne_matiere.getAttribute('coef'))
+		la_moyenne = moyenne_matiere.innerText
 
+		//on prend le dernier digit + les chiffres apres la virgule si bonus
+		if(est_bonus==="true") la_moyenne = right(la_moyenne,4)
+
+
+		la_moyenne = Number(la_moyenne)
 		//console.log({la_moyenne})
 		//console.log({le_coef})
 
 		//cumuler
 		if(la_moyenne){
 			cumul_eleves += la_moyenne*le_coef
-			somme_coef_eleves += le_coef
+
+			//si c'est PAS UN BONUS, alors on cumule la somme de coef
+			if(est_bonus!=="true"){
+				somme_coef_eleves += le_coef
+			}
 		}
 
 	}) 
