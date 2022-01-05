@@ -12832,6 +12832,34 @@ function telecharger_fiche_en_cours(){
     printWindow.document.write('</head><body style="max-width:100%;min-width:100%;"><h2>'+nom_fichier_sans_extension+'</h2>');
     printWindow.document.write(divContents);
     printWindow.document.write('</body></html>');
+
+    les_coches = $('#coches_colonnes_export')[0]
+    console.log({les_coches})
+
+    for(numero_colonne=0;numero_colonne<les_coches.childNodes.length;numero_colonne++){
+    	indice_colonne=numero_colonne+1
+    	ma_case=les_coches.childNodes[numero_colonne].childNodes[0]
+    	la_colonne_entiere = $(printWindow.document.body).find('td:nth-child('+indice_colonne+'),th:nth-child('+indice_colonne+')')
+
+    	/*
+    	console.log('\n\n\n')
+    	console.log({ma_case})
+    	console.log({la_colonne_entiere})
+    	*/
+
+    	console.log({indice_colonne})
+    	if(!ma_case.checked){
+    		//console.log("on masque la colonne " + indice_colonne)
+    		la_colonne_entiere.hide();	
+    	}else{
+    		//console.log("on garde la colonne " + indice_colonne)
+    		la_colonne_entiere.show();
+    	}
+    }
+
+    //ne pas afficher les coches à l'impression
+    printWindow.document.getElementById('coches_colonnes_export').remove()
+
     printWindow.document.close();
     printWindow.print();
 
@@ -12885,7 +12913,7 @@ function voir_fiche_classe_choisie(){
 }
 
 function alerte_aide_fiche(){
-	alert("Pour télécharger/imprimer la fiche sous format pdf, pensez à ajuster l'échelle de mise en page vers 60% avant d'enregistrer.")
+	alert("ℹ️ Pour télécharger/imprimer la fiche des colonnes cochées sous format pdf, pensez à ajuster l'échelle de mise en page vers 60% avant d'enregistrer.")
 }
 
 async function render_fiche(ignorer_absence_classe){
@@ -12965,11 +12993,35 @@ function une_ligne_eleve(id_tableau,objet_une_ligne,numero){
 
 }
 
+function actualiser_liste_champs_masques(){
+	var cases_non_coches = $('[name="exporter_colonne"]')
+	var liste_colonnes_masquees_fiche = recuperer("liste_colonnes_masquees_fiche") || ""
+
+	cases_non_coches.each(function(index_case,la_case){
+		//console.log("\n\n\n")
+		nom_colonne = $('th.header_table')[index_case].innerText
+		//console.log("la case:",nom_colonne)
+		//console.log("checked:",la_case.checked)
+
+
+		if(!la_case.checked){
+			if(!liste_colonnes_masquees_fiche.includes(','+nom_colonne+',')) liste_colonnes_masquees_fiche += ',' + nom_colonne + ','
+		}else{
+			if(liste_colonnes_masquees_fiche.includes(','+nom_colonne+',')) liste_colonnes_masquees_fiche = liste_colonnes_masquees_fiche.replaceAll(','+nom_colonne+',','')
+		}
+	})
+
+	if(liste_colonnes_masquees_fiche.length > 0) stocker('liste_colonnes_masquees_fiche',liste_colonnes_masquees_fiche)
+
+}
+
 
 async function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes){
 
 	var la_periode_bulletin = $("#la_periode_bulletin").val()
 
+
+	
 
 	//créer la premiere ligne: Numéro, Nom, Prénom(s), Ancien/Nouveau, Date de naissance, Sexe, [matieres], Moyenne, Rang, Absence(s) demi-journée(s), Retards//, Epreuve facultative
 	var premiere_ligne = 'Numéro,Nom,Prénom(s),Ancien/Nouveau,Date de naissance,Sexe,'+matieres_de_classe.map(e => e['Matiere']).join(',')+',Moyenne générale,Rang,Absence(s) demi-journée(s),Retards'
@@ -12977,36 +13029,55 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes)
 	//console.log({premiere_ligne})
 	//console.log('\n\n\n')
 
+
+
 	//créer un tableau
 	$('#previsualisation').append(nouveau_tableau_avec_ce_titre('fiche_conseil',premiere_ligne))
 
 
-	/*
-	//pour chaque matiere, assigner le nom_liste_et_coefs
-	//console.log({matieres_de_classe})
-	for (numero_matiere=7;numero_matiere<7+matieres_de_classe.length+1;numero_matiere++){
-		la_colonne_matiere = $( "th.header_table:nth-child("+numero_matiere+")")
-		la_matiere = la_colonne_matiere.text().trim()
-		nom_liste_et_coefs = matieres_de_classe.find(e => e['Matiere'] === la_matiere)
-
-		if(nom_liste_et_coefs){
-			nom_liste_et_coefs = nom_liste_et_coefs['nom_liste_et_coefs'] === 'null' || nom_liste_et_coefs['nom_liste_et_coefs'] === null ? '' :  nom_liste_et_coefs['nom_liste_et_coefs']
-		}else{
-			nom_liste_et_coefs = ""
-		}
 
 
-		la_colonne_matiere.append('<nom_liste_et_coefs style="display:none;">'+nom_liste_et_coefs+'</nom_liste_et_coefs>')	
-		
 
-	}
-	*/
+
+	//créer une ligne de coche si on veut ou non exporter la colonne en pdf
+	var nb_de_cases = premiere_ligne.length
+	//console.log({premiere_ligne})
+	//console.log({nb_de_cases})
+	var liste_colonnes_masquees_fiche = recuperer('liste_colonnes_masquees_fiche') || ""
+	var coches_des_matieres = premiere_ligne.map(function(e) {
+		checked = liste_colonnes_masquees_fiche.includes(','+e+',') ? "" : "checked"
+		//console.log({[e]:checked})
+		return '<th><input class="header_table entete_sticky sekooly-mode-background" name="exporter_colonne" type="checkbox" '+checked+'></th>' 
+	}).join('')
+	//console.log({coches_des_matieres})
+
+	var html_cases = '<tr class="border_bottom" id="coches_colonnes_export">'+ coches_des_matieres +'</tr>'
+	//console.log({html_cases})
+	$('thead').prepend(html_cases)
+
+	//au moment de changer le checked de [name="exporter_colonne"], actualiser la liste des colonnes masquées sur les fiches
+	au_clic('[name="exporter_colonne"]', 'actualiser_liste_champs_masques()')
+
+
+
+
+
+
+
+
+
 
 	//rajouter les coefficients SI CEST PAS UNE OPTION PARTICULIERE à partir de la colonne 7 (indice 6)
 	var ligne_coefs = ',,,,,COEFF,' + matieres_de_classe.map(e => !e['nom_liste_et_coefs'] && e['coefficient_matiere'] > 0 ? e['coefficient_matiere'] :  "-").join(',')
 	ligne_coefs = ligne_coefs.split(',')
 	//console.log({ligne_coefs})
 	$("#contenu_fiche_conseil").append('<tr class="ligne_coefs">'+ligne_coefs.map(un_coef => `<th>${un_coef}</th>`)+'</tr>')
+
+
+
+
+
+
 
 
 	//pour chaque élève	
