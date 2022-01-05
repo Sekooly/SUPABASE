@@ -13204,8 +13204,9 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe){
 		le_coef =  Number(moyenne_matiere.getAttribute('coef'))
 		la_moyenne = moyenne_matiere.innerText
 
+		//si la note vaut plus de 10
 		//on prend le dernier digit + les chiffres apres la virgule si bonus
-		if(est_bonus==="true") la_moyenne = right(la_moyenne,4)
+		if(est_bonus==="true" && Number(la_moyenne) > 10) la_moyenne = right(la_moyenne,4)
 
 
 		la_moyenne = Number(la_moyenne)
