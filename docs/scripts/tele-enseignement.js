@@ -13677,7 +13677,7 @@ function donnees_generiques_bulletin(){
 	var periode_bulletin = $("#periode_bulletin").val()
 	var saison_note = $("#saison_note").val()
 	var Classe_Matiere =  $('.un_menu > option:selected').text()
-	var identifiant_prof = recuperer('mon_type').includes("Admin") ? $("#enseignant").val() : recuperer("identifiant_courant")
+	var identifiant_prof = recuperer('mon_type').includes("Admin") && $("#enseignant").val() ? $("#enseignant").val() : recuperer("identifiant_courant")
 
 	return {
 		periode_bulletin:periode_bulletin,
@@ -14258,8 +14258,14 @@ function calcul_moyenne_bulletin(identifiant, moyenne_generale){
 		note_examen = note_examen ? note_examen.toFixed(2) :  ""
 		//console.log({note_examen})
 
+
+		moyenne_journaliere = calcul_moyenne_bulletin(identifiant)
+		coef_examen = moyenne_journaliere>0 ? 0.7 : 1
+		coef_journalier = note_examen>0 ? 0.3 : 1
+		moyenne_generale_matiere = Number(moyenne_journaliere * coef_journalier + note_examen * coef_examen)
+
 		 //  Number($('[id="'+identifiant+'"].un_eleve_bulletin > .est_examen').text())
-		return (Number(calcul_moyenne_bulletin(identifiant)) * 0.3 + note_examen * 0.7).toFixed(2)
+		return moyenne_generale_matiere.toFixed(2)
 
 	}
 
