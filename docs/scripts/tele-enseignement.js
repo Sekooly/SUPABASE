@@ -12814,26 +12814,28 @@ function choix_classe_fiche(){
 function telecharger_fiche_en_cours(){
 	chargement(true)
 
+
+
 	periode = $("#la_periode_bulletin>option")[0].innerText + ' ' + $("#la_periode_bulletin").val()
 	classe = $("#la_classe_fiche").val()
 
-	//alert("Téléchargement disponible plus tard.")
-	var element = document.getElementById('conteneur_menu');
-    var options = {
-      margin: 0,
-      filename: 'FICHE CC '+periode+' - '+classe+'.pdf',
-      html2canvas: {
-        scale: 4,
-        y: -100
-      },
-      jsPDF: {
-        unit: 'cm',
-        format: 'a1',
-        orientation: 'landscape'
-      }
-    };
 
-    html2pdf().set(options).from(element).save();
+	nom_fichier_sans_extension = 'FICHE CC '+periode+' - '+classe
+	nom_fichier = nom_fichier_sans_extension+'.pdf'
+	le_style = $('style#mon_style')[0].innerText
+
+
+    var divContents = $("#menu_params").html();
+    var printWindow = window.open('', '', 'height=400,width=800');
+    printWindow.document.write('<html><head><title>'+nom_fichier+'</title>');
+    printWindow.document.write('<style>'+le_style+'</style>');
+    printWindow.document.write('</head><body><p>'+nom_fichier_sans_extension+'</p>');
+    printWindow.document.write(divContents);
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.print();
+
+
 	chargement(false)
 }
 
@@ -12860,24 +12862,30 @@ function voir_fiche_classe_choisie(){
 
 	//rajouter la liste des classes
 	$('#fenetre').append(`<div id="conteneur_menu">
+		
 		<div id="menu_haut" class="menu_haut" style="text-align: center;">
-		<select onchange="render_fiche(true)" class="un_menu" id="la_periode_bulletin">
-			<option value="" id="--">`+nom_periode_bulletin+`</option>
-			`+ liste_periodes.map(periode => '<option value="'+periode+'" id="'+periode+'">'+periode+'</option>') +`
-		</select>
-		<select onchange="render_fiche()" class="un_menu" id="la_classe_fiche">
-			<option value="" id="--">Classe</option>
-			`+ les_classes.map(classe => '<option value="'+classe+'" id="'+classe+'">'+classe+'</option>') +`
-		</select>
+			<rouge style="cursor: pointer;" id="aide_fiche">(?)</rouge>
+			<select onchange="render_fiche(true)" class="un_menu" id="la_periode_bulletin">
+				<option value="" id="--">`+nom_periode_bulletin+`</option>
+				`+ liste_periodes.map(periode => '<option value="'+periode+'" id="'+periode+'">'+periode+'</option>') +`
+			</select>
+			<select onchange="render_fiche()" class="un_menu" id="la_classe_fiche">
+				<option value="" id="--">Classe</option>
+				`+ les_classes.map(classe => '<option value="'+classe+'" id="'+classe+'">'+classe+'</option>') +`
+			</select>
 		</div>
-		<div id="menu_params" style="max-height: 90%;overflow-x: auto;" class="menu_params">
-			<div id="previsualisation" class="previz-pref"></div>
+		<div id="menu_params" style="overflow-x: auto;" class="menu_params">
+			<div id="previsualisation"></div>
 		</div>
 	</div>`)
 
-
+	au_clic("#aide_fiche","alerte_aide_fiche()")
 	afficher_fenetre(true)
 
+}
+
+function alerte_aide_fiche(){
+	alert("Pour télécharger/imprimer la fiche sous format pdf, fixez la Mise à l'échelle à environ 60% avant d'enregistrer.")
 }
 
 async function render_fiche(ignorer_absence_classe){
