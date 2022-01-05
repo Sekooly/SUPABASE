@@ -14211,15 +14211,16 @@ function les_notes_eleve(notes){
 				classe_de_la_note = classe_de_la_note + (la_note.split('|')[2] === 'moyenne_periode' ? " est_moyenne_periodique" : "")
 			}
 
-			return '<span class="'+classe_de_la_note+'" oninput=actualiser_nb_cases(this) coef="'+la_note.split('|')[1]+'" contenteditable="'+est_editable+'">'+la_note.split('|')[0].trim()+'</span>'	
+			return '<span class="'+classe_de_la_note+'"  oninput="actualiser_nb_cases(this)" coef="'+la_note.split('|')[1]+'" contenteditable="'+est_editable+'">'+la_note.split('|')[0].trim()+'</span>'	
 		}).join('')
 	}
 
 }
 
-function actualiser_nb_cases(ceci){
+function verif_touches_notes(ceci){
 
 	touche = right(ceci.innerText,1)
+	console.log({touche})
 
 	//si c'est une virgule -> remplacer par un point
 	if(touche.trim()===","){
@@ -14231,6 +14232,14 @@ function actualiser_nb_cases(ceci){
 
 	}
 
+	return true
+
+}
+
+function actualiser_nb_cases(ceci){
+
+	verif_touches_notes(ceci)
+
 	var le_parent = ceci.parentNode
 
 	//supprimer la case de moyenne
@@ -14239,11 +14248,12 @@ function actualiser_nb_cases(ceci){
 	//console.log(ceci)
 	var note = ceci.innerText
 
+
 	//note vide
 	if(note.length === 0){
 
-		//pas de prochaine note SSI(!) cette prochaine note est vide
-		if ($(le_parent).children().last().text().trim() === "") $(le_parent).children().last().remove();
+		//pas de prochaine note SSI(!) cette prochaine note est vide ET AU MOINS 2 NOTES
+		if ($(le_parent).children().last().text().trim() === "" && $(le_parent).children('.une_note').length > 1) $(le_parent).children().last().remove();
 
 	//note non vide
 	}else{
