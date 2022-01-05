@@ -12885,7 +12885,7 @@ function voir_fiche_classe_choisie(){
 }
 
 function alerte_aide_fiche(){
-	alert("Pour télécharger/imprimer la fiche sous format pdf, pensez à ajuster l'échelle de mise en page à la largeur de la page avant d'enregistrer.")
+	alert("Pour télécharger/imprimer la fiche sous format pdf, pensez à ajuster l'échelle de mise en page vers 60% avant d'enregistrer.")
 }
 
 async function render_fiche(ignorer_absence_classe){
