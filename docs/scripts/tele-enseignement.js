@@ -11587,8 +11587,85 @@ function fonction_td_modifiable(e, sans_suite){
 		formulaire_choix_checkbox(nom_champ_dblclic, e, ancienne_valeur, e.target.parentNode.id,["oui","non"],ancienne_valeur,true)
 
 	}else{
+
+
+
+
+
+
+		//actualiser la case
 		var nouvelle_valeur = prompt("Indiquez la nouvelle valeur",ancienne_valeur);
-		suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur)
+
+
+
+
+
+
+
+
+
+		//récupérer la table ET le nom du champ mise à jour
+		//si on a mis à jour Matiere dans Matieres -> Mettre à jour (Classe_Matiere)
+		var numero_colonne_modifiee = e.target.cellIndex
+		var indice_matiere = -1
+		$('.header_table:contains("Matiere")').each(function(index,element){if(element.innerText === 'Matiere') indice_matiere = element.cellIndex })
+
+		//console.log({numero_colonne_modifiee})
+		//console.log({indice_matiere})
+
+
+		if(id_parametre==='Matieres' && numero_colonne_modifiee === indice_matiere){
+			ancienne_valeur_classe_matiere = $('.selected')[0].id
+			valeur_classe = ancienne_valeur_classe_matiere.split('|')[0].replaceAll('(','')
+			nouveau_data = {
+				"Classe_Matiere": '(' + valeur_classe + '|' +nouvelle_valeur+ ')'
+			}
+
+			//on actualiser d'abord le Classe_Matiere
+			console.log("Remplacer",ancienne_valeur_classe_matiere,"par",nouveau_data.Classe_Matiere)			
+			actualiser('Matieres', 'Classe_Matiere', ancienne_valeur_classe_matiere, nouveau_data).then(async function(retour){
+
+
+				//console.log(retour)
+				nom_table = 'Matieres'
+				table_JSON_local = await rechercher_tout(nom_table)
+
+
+				//mettre à jour la colonne Classe_Matiere
+				var indice_classe_matiere = $('.header_table:contains("Classe_Matiere")')[0].cellIndex
+				$('.selected')[0].children[indice_classe_matiere].innerText = nouveau_data.Classe_Matiere;
+
+
+				//mettre à jour les données locales
+				//actualiser_json_local_et_drive(nom_table, table, champ_actualise, ancienne_valeur, nouvelle_valeur, valeur_champ_reference)
+				actualiser_json_local_et_drive(nom_table, table_JSON_local, 'Classe_Matiere', ancienne_valeur_classe_matiere, nouveau_data.Classe_Matiere, ancienne_valeur_classe_matiere)
+
+				//actualiser le id
+				e.target.closest("td").parentNode.id = nouveau_data.Classe_Matiere
+
+				//actualiser la matière
+				suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur)
+			})
+			
+		}else{
+
+			suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur)
+
+
+		}
+
+
+
+
+
+
+
+
+
+
+
+		
+
 	}
 }
 
@@ -11717,6 +11794,7 @@ async function suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur,
 		var nom_table = ($(".un_menu_orange")[0].id || $(".un_menu_orange")[0].value)
 		var nom_champ_reference = identifiant_par_table(nom_table)
 		var valeur_champ_reference = e.target.closest("td").parentNode.id	
+		//console.log({valeur_champ_reference})
 		var numero_colonne = e.target.closest("td").cellIndex		
 		var champ_actualise = $(".header_table.entete_sticky")[numero_colonne].innerText
 		
@@ -11763,8 +11841,8 @@ async function suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur,
 
 		try{
 
-			actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouveau_data);
-			
+			retour = actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouveau_data);
+			//console.log({retour})
 
 			e.target.closest("td").innerText = nouvelle_valeur;
 
