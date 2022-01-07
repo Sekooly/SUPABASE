@@ -11637,7 +11637,7 @@ function assigner_liste_et_coef(){
 		
 		//console.log({resultat})
 
-		suite_actualiser_double_clic(current_event, current_event.target.value, resultat)
+		suite_actualiser_double_clic(current_event, current_event.target.value, resultat, true)
 	}
 }
 
@@ -11708,10 +11708,10 @@ function valeurs_possibles_modification_classes(e, id_parametre, les_matieres, e
 }
 
 
-async function suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur){
+async function suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur, forcing){
 
 
-		if(nouvelle_valeur===null) return -1;
+		if(nouvelle_valeur===null && !forcing) return -1;
 		chargement(true);
 
 		var nom_table = ($(".un_menu_orange")[0].id || $(".un_menu_orange")[0].value)
