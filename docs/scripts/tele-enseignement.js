@@ -11621,31 +11621,58 @@ function fonction_td_modifiable(e, sans_suite){
 				"Classe_Matiere": '(' + valeur_classe + '|' +nouvelle_valeur+ ')'
 			}
 
-			//on actualiser d'abord le Classe_Matiere
-			console.log("Remplacer",ancienne_valeur_classe_matiere,"par",nouveau_data.Classe_Matiere)			
-			actualiser('Matieres', 'Classe_Matiere', ancienne_valeur_classe_matiere, nouveau_data).then(async function(retour){
+
+			if(nouvelle_valeur !== null && nouvelle_valeur.length > 0){
 
 
-				//console.log(retour)
-				nom_table = 'Matieres'
-				table_JSON_local = await rechercher_tout(nom_table)
+				//on actualise d'abord le Classe_Matiere
+				console.log("Remplacer",ancienne_valeur_classe_matiere,"par",nouveau_data.Classe_Matiere)			
+				actualiser('Matieres', 'Classe_Matiere', ancienne_valeur_classe_matiere, nouveau_data).then(async function(retour){
 
 
-				//mettre à jour la colonne Classe_Matiere
-				var indice_classe_matiere = $('.header_table:contains("Classe_Matiere")')[0].cellIndex
-				$('.selected')[0].children[indice_classe_matiere].innerText = nouveau_data.Classe_Matiere;
+					//console.log(retour)
+					nom_table = 'Matieres'
+					table_JSON_local = await rechercher_tout(nom_table)
 
 
-				//mettre à jour les données locales
-				//actualiser_json_local_et_drive(nom_table, table, champ_actualise, ancienne_valeur, nouvelle_valeur, valeur_champ_reference)
-				actualiser_json_local_et_drive(nom_table, table_JSON_local, 'Classe_Matiere', ancienne_valeur_classe_matiere, nouveau_data.Classe_Matiere, ancienne_valeur_classe_matiere)
+					//mettre à jour la colonne Classe_Matiere
+					var indice_classe_matiere = $('.header_table:contains("Classe_Matiere")')[0].cellIndex
+					$('.selected')[0].children[indice_classe_matiere].innerText = nouveau_data.Classe_Matiere;
 
-				//actualiser le id
-				e.target.closest("td").parentNode.id = nouveau_data.Classe_Matiere
 
-				//actualiser la matière
-				suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur)
-			})
+					//mettre à jour les données locales
+					//actualiser_json_local_et_drive(nom_table, table, champ_actualise, ancienne_valeur, nouvelle_valeur, valeur_champ_reference)
+					actualiser_json_local_et_drive(nom_table, table_JSON_local, 'Classe_Matiere', ancienne_valeur_classe_matiere, nouveau_data.Classe_Matiere, ancienne_valeur_classe_matiere)
+
+					//actualiser le id
+					e.target.closest("td").parentNode.id = nouveau_data.Classe_Matiere
+
+
+					//mettre à jour toutes les notes de cette ancienne Classe_Matiere vers la nouvelle
+					mettre_a_jour_table('Notes','Classe_Matiere',ancienne_valeur_classe_matiere,'Classe_Matiere',nouveau_data.Classe_Matiere)
+
+					//mettre à jour toutes les appreciations de cette ancienne Classe_Matiere vers la nouvelle
+					mettre_a_jour_table('Appreciations','Classe_Matiere',ancienne_valeur_classe_matiere,'Classe_Matiere',nouveau_data.Classe_Matiere)
+
+					//mettre à jour toutes les NOTIFS de cette ancienne Classe_Matiere vers la nouvelle
+					mettre_a_jour_table('Notifs','Classe_matiere',ancienne_valeur_classe_matiere,'Classe_matiere',nouveau_data.Classe_Matiere)
+
+
+					//mettre à jour toutes les VISIO de cette ancienne Classe_Matiere vers la nouvelle
+					mettre_a_jour_table('Visio','Classe_matiere',ancienne_valeur_classe_matiere,'Classe_matiere',nouveau_data.Classe_Matiere)
+
+					//réassigner les profs de la matiere
+					reassigner_prof(ancienne_valeur_classe_matiere, nouveau_data.Classe_Matiere)
+
+
+					//actualiser la matière
+					suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur)
+
+
+				})
+
+
+			}
 			
 		}else{
 
@@ -11668,6 +11695,34 @@ function fonction_td_modifiable(e, sans_suite){
 
 	}
 }
+
+async function reassigner_prof(ancienne_valeur_classe_matiere, nouvelle_valeur_classe_matiere){
+	var les_profs = get_les_profs(ancienne_valeur_classe_matiere)
+	console.log({les_profs})
+	les_profs.forEach(function(un_prof){
+		console.log(un_prof['Classe'])
+		ses_nouvelles_matieres = un_prof['Classe'].replaceAll(ancienne_valeur_classe_matiere,nouvelle_valeur_classe_matiere)
+		console.log(ses_nouvelles_matieres)
+		mettre_a_jour_table('Profs','Identifiant',un_prof['Identifiant'],'Classe',ses_nouvelles_matieres)
+	})
+}
+
+
+async function mettre_a_jour_table(nom_table,champ_reference,valeur_champ_reference,champ_a_update,valeur_champ_update){
+	const { data, error } = await supabase
+		.from(nom_table)
+		.update({ [champ_a_update]: valeur_champ_update })
+		.match({ [champ_reference]: valeur_champ_reference })
+
+	console.log({[nom_table]: data})
+	console.log({error})
+
+	if(error!==null){
+		alert("Erreur de mise à jour de la table " + nom_table+ ":",error)
+	}
+}
+
+
 
 var current_event={};
 function formulaire_id_liste_options(e, nom_matiere){
@@ -14298,7 +14353,7 @@ function les_notes_eleve(notes){
 function verif_touches_notes(ceci){
 
 	touche = right(ceci.innerText,1)
-	console.log({touche})
+	//console.log({touche})
 
 	//si c'est une virgule -> remplacer par un point
 	if(touche.trim()===","){
@@ -14585,14 +14640,20 @@ function les_periodes_bulletin(){
 			</form>` + les_enseignants()
 }
 
+
+function get_les_profs(classe_matiere){
+	var url = racine_data + 'Profs?Classe=like.*'+classe_matiere + "*&" +apikey
+	var les_profs = get_resultat(url)
+	return les_profs
+}
+
 function les_enseignants(){
 	var resultat = ""
 
 	if(recuperer('mon_type').includes('Admin')){
 
-		var classe_matiere = $('.un_menu > option:selected').text()
-		var url = racine_data + 'Profs?Classe=like.*'+classe_matiere + "*&" +apikey
-		var les_profs = get_resultat(url)
+		var classe_matiere = $('.un_menu > option:selected').text()		
+		var les_profs = get_les_profs(classe_matiere)
 
 		resultat = `
 			<form id="les_enseignants" class="liste_deroulante"><label for="enseignant">Enseignant:
