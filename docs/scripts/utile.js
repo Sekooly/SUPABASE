@@ -92,11 +92,16 @@ function supprimer_element_de_la_liste(liste,nom_element){
 
 function actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouveau_data){
   
+  if(elements_menu_haut_generiques.indexOf(nom_table)>=0 ){
+    url = racine_initiale + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+api_initial
+  }else{
+    url = racine_data + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+apikey
+  }
 
-  url = racine_data + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+apikey
-  //nouveau_data[nom_champ_reference] = valeur_champ_reference
-  /*console.log(url)
-  console.log(nouveau_data)*/
+  
+
+
+
   return patch_resultat_asynchrone(url,nouveau_data)
 
 
@@ -107,10 +112,17 @@ function rechercher_tout(nom_table, avec_where){
   //url = racine_data + nom_table + "?" + apikey + "&limit=5000" + ordonner(nom_table)
   table = avec_where ? nom_table : '"'+nom_table+'"'
   //alert(table)
-  url = entete_heroku + convertir_db(racine_data) + '/SELECT * FROM '+table+' ' + transformer_en_sql(ordonner(nom_table))
+
+  if(elements_menu_haut_generiques.indexOf(nom_table)>=0 ){
+    url = entete_heroku + convertir_db(racine_initiale) + '/SELECT * FROM '+table+' ' + transformer_en_sql(ordonner(nom_table))
+  }else{
+    url = entete_heroku + convertir_db(racine_data) + '/SELECT * FROM '+table+' ' + transformer_en_sql(ordonner(nom_table))
+  }
+
   //alert(url)
   return get_resultat_asynchrone(url)
 }
+
 
 function execute_sql(racine_data, requete_sql, coche_checked){
   var suffix = !coche_checked ? "/False" : ""
@@ -189,8 +201,11 @@ function ordonner(nom_table){
     return '&order=date_effet.asc,heure_effet.asc,id_dossier.asc'
   }else if(nom_table==="Reponses"){
     return '&order=id_quiz.asc,id_question.asc,position_reponse.asc'
+  }else if(nom_table==="Appreciations"){
+    return '&order=id.desc'
   }else{
-    return ""
+    le_id_table = identifiant_par_table(nom_table)
+    return "&order="+le_id_table+".asc"
   
   }
 
@@ -302,7 +317,14 @@ function nouvel_id(nom_table, nom_champ_id){
 
 
 function supprimer(nom_table,nom_champ_reference,valeur_champ_reference){
-  url = racine_data + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+apikey
+  if(elements_menu_haut_generiques.indexOf(nom_table)>=0 ){
+    url = racine_initiale + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+api_initial
+  }else{
+    url = racine_data + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+apikey
+  }
+
+
+  
   return delete_resultat_asynchrone(url)
 }
 
@@ -344,14 +366,27 @@ function supprimer_initial(nom_table,nom_champ_reference,valeur_champ_reference)
 
 
 function supprimer_tout(nom_table){
-  url = racine_data + nom_table + "?"+apikey
+  if(elements_menu_haut_generiques.indexOf(nom_table)>=0 ){
+    url = racine_initiale + nom_table + "?"+api_initial
+  }else{
+    url = racine_data + nom_table + "?"+apikey
+  }
   return delete_resultat_asynchrone(url)
 }
 
 function nom_des_champs(nom_table){
-  url = racine_data + "?"+apikey
-  var resultat = get_resultat(url)
-  return Object.keys(resultat['definitions'][nom_table]['properties'])
+
+  try{
+    url = racine_data + "?"+apikey
+    var resultat = get_resultat(url)
+    return Object.keys(resultat['definitions'][nom_table]['properties'])
+
+  }catch(e){
+    url = racine_initiale + "?"+api_initial
+    resultat = get_resultat(url)
+    return Object.keys(resultat['definitions'][nom_table]['properties'])
+
+  }
 
 }
 
@@ -382,7 +417,12 @@ function retour_promise(requete){
 
 function ajouter_un_element(nom_table, nouveau_data){
 
-  url = racine_data + nom_table + "?"+apikey
+  if(elements_menu_haut_generiques.indexOf(nom_table)>=0 ){
+    url = racine_initiale + nom_table + "?"+api_initial
+  }else{
+    url = racine_data + nom_table + "?"+apikey
+  }
+
   //console.log(url)
   return post_resultat_asynchrone(url,nouveau_data)
 
@@ -902,7 +942,16 @@ function csv_en_JSON(contenu){
 
 
 function identifiant_par_table(nom_table){
-  var resultat = get_resultat(racine_data+'?'+apikey)
+
+  if(elements_menu_haut_generiques.indexOf(nom_table) >= 0){
+    var resultat = get_resultat(racine_initiale+'?'+api_initial)
+  }else{
+    var resultat = get_resultat(racine_data+'?'+apikey)  
+  }
+  
+
+
+
   var resultat_intermediaire = resultat['definitions'][nom_table] ? resultat['definitions'][nom_table]['properties'] : {}
 
 

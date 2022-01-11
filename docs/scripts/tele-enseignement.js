@@ -32,7 +32,8 @@ var elements_generiques_en_haut = [{"Général": [
 										  "Appreciations",
 										  "Topic",
 										  "Coms",
-										  "Notifs"
+										  "Notifs",
+										  "Liste_appreciations"
 										]								
 
 									},
@@ -60,12 +61,15 @@ var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","UR
 								"id", "Id_classe_matiere", "id_notif", "Id_source", "id_fichier", "id_dossier", "id_devoir", "id_dossier_sujetdevoir", "id_fichier_sujetdevoir", "Id_topic", "id_com", "ID_FICHIER", "id_msg","id_conv", "id_chapitre",
 								"id_quiz", "id_question", "id_reponse","id_classe_matiere", "resultat_immediat", "nb_tentatives", "questions_aleatoires", "position_question",
 								"1er_Prénom", "LV1","LV2","LV3","Option_1","Option_2","Spécialité","Numeros_telephone_original",
+								"created_at","id_etablissement"
 								
 							]
 
 
-var elements_menu_haut_avec_modifs = ["Classes","Matieres","Eleves","Profs","Administration"]
+var elements_menu_haut_avec_modifs = ["Classes","Matieres","Eleves","Profs","Administration","Liste_appreciations"]
 var elements_menu_haut_avec_reset = ["Eleves","Profs","Administration"]
+
+var elements_menu_haut_generiques = ['Liste_appreciations']
 
 nom_etablissement = data_etablissement['nom_etablissement']
 
@@ -10990,24 +10994,6 @@ function actualiser_details_parametre(id_parametre){
 		//Logs: 
 
 		var identifiant_table = identifiant_par_table(id_parametre)
-		//console.log(identifiant_table)
-
-		//si le local existe déjà -> on récupère celui la
-		/*
-		liste_deja_stockee_JSON = false//recuperer(id_parametre)
-		if(liste_deja_stockee_JSON){
-
-			liste_JSON = JSON.parse(liste_deja_stockee_JSON)			
-			traiter_liste_JSON(id_parametre,liste_JSON, identifiant_table)
-			$("#nombre_elements_param")[0].innerText = liste_JSON.length
-			affichage_par_defaut(id_parametre);
-			masquer_params_auto()
-
-			au_changement_du_filtre()
-			return liste_JSON
-				
-		}else{
-			*/
 
 
 			return rechercher_tout(id_parametre).then(function(snapshot){
@@ -11026,9 +11012,6 @@ function actualiser_details_parametre(id_parametre){
 
 
 			});
-
-		//}
-
 
 
 
@@ -12967,7 +12950,7 @@ function telecharger_fiche_en_cours(){
     printWindow.document.write('</body></html>');
 
     les_coches = $('#coches_colonnes_export')[0]
-    console.log({les_coches})
+    //console.log({les_coches})
 
     for(numero_colonne=0;numero_colonne<les_coches.childNodes.length;numero_colonne++){
     	indice_colonne=numero_colonne+1
@@ -12980,7 +12963,7 @@ function telecharger_fiche_en_cours(){
     	console.log({la_colonne_entiere})
     	*/
 
-    	console.log({indice_colonne})
+    	//console.log({indice_colonne})
     	if(!ma_case.checked){
     		//console.log("on masque la colonne " + indice_colonne)
     		la_colonne_entiere.hide();	
@@ -13157,7 +13140,7 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes)
 	
 
 	//créer la premiere ligne: Numéro, Nom, Prénom(s), Ancien/Nouveau, Date de naissance, Sexe, [matieres], Moyenne, Rang, Absence(s) demi-journée(s), Retards//, Epreuve facultative
-	var premiere_ligne = 'Numéro,Nom,Prénom(s),Ancien/Nouveau,Date de naissance,Sexe,'+matieres_de_classe.map(e => e['Matiere']).join(',')+',Moyenne générale,Rang,Absence(s) demi-journée(s),Retards'
+	var premiere_ligne = 'Numéro,Nom,Prénom(s),Ancien/Nouveau,Date de naissance,Sexe,'+matieres_de_classe.map(e => e['Matiere']).join(',')+',Moyenne générale,Rang,Absence(s) demi-journée(s),Retards,Appréciations de la Vie Scolaire'
 	premiere_ligne = premiere_ligne.split(',')
 	//console.log({premiere_ligne})
 	//console.log('\n\n\n')
@@ -13230,6 +13213,7 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes)
 			setTimeout(function(){
 				rajouter_min_max_moy(matieres_de_classe)
 				rajouter_rangs_eleves()
+				rajouter_absences_et_retards_eleves()
 			},1000)
 			
 		}
@@ -13442,6 +13426,36 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe){
 	
 }
 
+async function rajouter_absences_et_retards_eleves(){
+	var periode_bulletin = $("#la_periode_bulletin").val();
+	var la_classe = $("#la_classe_fiche").val();
+
+	var les_appreciations_globales = await supabase
+		.from('Appreciations')
+		.select('*')
+		.eq('periode_principale', periode_bulletin)
+		.eq('Classe_Matiere', '('+la_classe+'|Vie scolaire)')
+
+	console.log({les_appreciations_globales})
+	les_appreciations_globales = les_appreciations_globales.data
+
+	//pour chaque eleve avec des appreciations: rajouter l'absence, le retard et l'appréciation globale
+	les_appreciations_globales.forEach(function(un_eleve){
+		console.log({un_eleve})
+		var tout = un_eleve['contenu']
+		if(tout){
+			tout = JSON.parse(tout)
+			absences = tout['absences']
+			retards = tout['retards']
+			contenu = tout['contenu']
+
+			$('tr[id="'+un_eleve['identifiant_eleve']+'"]').append('<th class="border_bottom">'+absences+'</th><th class="border_bottom">'+retards+'</th><th class="border_bottom">'+contenu+'</th>')
+
+		}
+
+	})
+}
+
 
 
 function rajouter_rangs_eleves(){
@@ -13550,27 +13564,68 @@ function transformer_en_appreciations(){
 
 	var champs_refs_tout = donnees_generiques_bulletin()
 
-	$('.un_eleve_bulletin> .bloc_appreciation').each(function(e,a){
-		identifiant_eleve = a.parentNode.id;
-		//console.log(identifiant_eleve);
 
-		contenu = a.firstChild.value
-		//console.log(contenu);
 
-		if(contenu.trim().length >0) {
+	//si c'est du VIE SCOLAIRE + TOUTES
+	if($('select.un_menu').val().includes("Vie scolaire") && $("select#saison_note").val() === "Toutes"){
 
-			resultats.push({
-				Classe_Matiere: $('.un_menu > option:selected').text(),
-				identifiant_appreciateur: champs_refs_tout.identifiant_prof,
-				identifiant_eleve:identifiant_eleve,
-				periode_principale: champs_refs_tout.periode_bulletin,
-				contenu:contenu
+		//pour chaque eleve
+		$('.un_eleve_bulletin').each(function(index_element,element){
+			contenu = {}
+			$('[id="'+element.id+'"] > .bloc_appreciation').each(function(i,e){
+				//console.log(e.firstChild.name);
+				//console.log(e.firstChild.value)
+
+				if(e.firstChild.value.trim()!=="") contenu[e.firstChild.name] = e.firstChild.value.trim()
 			})
 
-		}
+
+			if(Object.keys(contenu).length > 0){
+				console.log('\n\n\n')
+				console.log({contenu})
+				resultats.push({
+					Classe_Matiere: $('.un_menu > option:selected').text(),
+					identifiant_appreciateur: champs_refs_tout.identifiant_prof,
+					identifiant_eleve: element.id,
+					periode_principale: champs_refs_tout.periode_bulletin,
+					contenu: JSON.stringify(contenu)
+				})
+
+			}
+
+		})
 
 
-	})
+
+
+
+	}else{
+
+		$('.un_eleve_bulletin> .bloc_appreciation').each(function(e,a){
+			identifiant_eleve = a.parentNode.id;
+			//console.log(identifiant_eleve);
+
+			contenu = a.firstChild.value
+			//console.log(contenu);
+
+			if(contenu.trim().length >0) {
+
+				resultats.push({
+					Classe_Matiere: $('.un_menu > option:selected').text(),
+					identifiant_appreciateur: champs_refs_tout.identifiant_prof,
+					identifiant_eleve:identifiant_eleve,
+					periode_principale: champs_refs_tout.periode_bulletin,
+					contenu:contenu
+				})
+
+			}
+
+
+		})
+
+
+
+	}
 
 	//console.log({resultats})
 
@@ -13678,7 +13733,8 @@ function configurer_periodes_bulletins(){
 	var elements_html = '<div class="donnees_saisies">'
 	var nom_periode_bulletin = un_element_de_config_bulletin("saisie_des_periodes_principales()",'Identifiant des périodes principales (Exemples: <b>Trimestres</b> ou <b>Semestres</b> ...)', 'nom_periode_bulletin', recuperer_nom_periodes_principales_bulletin())
 	var nom_saison_note = un_element_de_config_bulletin("saisie_des_periodes_secondaires()",'Identifiant des périodes secondaires (Exemples: <b>Périodes</b> ou <b>Mois</b> ...)', 'nom_saison_note',recuperer_nom_periodes_secondaires_bulletin() )
-	elements_html = elements_html + nom_periode_bulletin + nom_saison_note + '</div>'
+	var liste_des_appreciations_auto = ''
+	elements_html = elements_html + nom_periode_bulletin + nom_saison_note +liste_des_appreciations_auto+ '</div>'
 
 	creer_mini_popup('<div style="border-bottom-style: ridge;font-size: 20px;">Configuration des périodes de notation</div>',elements_html,'Enregistrer', 'enregistrer_config_bulletins(1)')
 
@@ -14162,6 +14218,7 @@ function transformer_notes_en_array(mes_eleves){
 		//-> on récupère toutes les notes et on rend NON MODIFIABLE!!
 		//-> on rajoute la moyenne périodique si demandé
 		}else{
+
 			var notes_de_leleve = mes_eleves.filter(e =>  e['Classe_Matiere'] === Classe_Matiere && e['Identifiant'] === un_eleve && e['periode_bulletin'] === periode_bulletin).map(e =>  e['note'] + '|' + e['coef'] + '|' + e['saison_note'] )	
 			//console.log({notes_de_leleve})
 
@@ -14270,10 +14327,32 @@ async function actualiser_liste_eleves_bulletins(){
 		}else{	
 
 			mes_eleves = transformer_notes_en_array(mes_eleves)
+
+
+			var tout = donnees_generiques_bulletin()
+			var identifiant_appreciateur = tout.identifiant_prof 
+			var la_classe_matiere = tout.Classe_Matiere
+
+			//on récup les appreciations 1 fois pour toutes
+			var url = racine_data + 'Appreciations?identifiant_appreciateur=eq.'+identifiant_appreciateur+'&Classe_Matiere=eq.'+ la_classe_matiere + "&" +apikey
+			var toutes_les_appreciations = get_resultat(url)
+			//console.log({toutes_les_appreciations})
+
+
 			var liste_eleves_bulletins = `<div class="liste_eleves_bulletins">`+ mes_eleves.map(function(un_eleve,index){
 				//console.log({un_eleve})
 
 				var cases_de_notes = les_notes_eleve(un_eleve['note'])
+
+				//si c'est la vie scolaire -> RETARDS + ABSENCES + APPRECIATIONS
+				if($('select.un_menu').val().includes('Vie scolaire') && $('[id="saison_note"]').val() === "Toutes"){
+
+
+
+					cases_de_notes = mode_vie_scolaire(toutes_les_appreciations, un_eleve['Identifiant'],true)
+				}
+
+
 				//console.log({cases_de_notes})
 				return `
 					
@@ -14288,25 +14367,29 @@ async function actualiser_liste_eleves_bulletins(){
 		}
 
 		$('#previsualisation').append(liste_eleves_bulletins)
+
 		
-
-		//changer sur chaque eleve pour afficher la moyenne + une case vide de plus
-		$('.un_eleve_bulletin').each(function(index,eleve){
-
-			//actualiser ssi l'élève a au moins 1 note NON VIDE
-			if($(eleve).children('.une_note').text() !== ""){
-				$(eleve).children().last().trigger("input")	
-				bulletin_enregistre = true
-			}
-
-			
-		})
+	}	
 
 		
 
-		chargement(false)
+	//changer sur chaque eleve pour afficher la moyenne + une case vide de plus
+	$('.un_eleve_bulletin').each(function(index,eleve){
 
-	}
+		//actualiser ssi l'élève a au moins 1 note NON VIDE
+		if($(eleve).children('.une_note').text() !== ""){
+			$(eleve).children().last().trigger("input")	
+			bulletin_enregistre = true
+		}
+
+		
+	})
+
+	
+
+	chargement(false)
+
+	
 
 
 }
@@ -14346,6 +14429,10 @@ function les_notes_eleve(notes){
 
 			return '<span class="'+classe_de_la_note+'"  oninput="actualiser_nb_cases(this)" coef="'+la_note.split('|')[1]+'" contenteditable="'+est_editable+'">'+la_note.split('|')[0].trim()+'</span>'	
 		}).join('')
+
+
+
+
 	}
 
 }
@@ -14416,25 +14503,82 @@ function actualiser_nb_cases(ceci){
 	$(le_parent).append('<span class="'+classe_case_moyenne+'">'+moyenne_periode+'</span>')
 
 
-
-	//si on est sur TOUTES -> rajouter la case d'appréciation
 	if($("#saison_note").val()==="Toutes"){
+
 		var tout = donnees_generiques_bulletin()
 		var identifiant_appreciateur = tout.identifiant_prof 
 		url = racine_data + 'Appreciations?identifiant_appreciateur=eq.'+identifiant_appreciateur+'&identifiant_eleve=eq.'+ le_parent.id +'&Classe_Matiere=eq.'+ tout.Classe_Matiere + "&" +apikey
 		var contenu_appreciation = get_resultat(url)
-		if(contenu_appreciation.length > 0){
-			contenu_appreciation = contenu_appreciation[0]['contenu']
-		}else{
-			contenu_appreciation = ""
-		}
-		//console.log({contenu_appreciation})
+		//console.log({appreciation: contenu_appreciation[0]})
 
-		$(le_parent).append('<div class="bloc_appreciation"><textarea placeholder="Votre appréciation ici..." type="text" class="appreciation">'+contenu_appreciation+'</textarea></div>')
+		appreciation = contenu_appreciation[0] ? contenu_appreciation[0]['contenu'] : ""
+
+		rajouter_champ_appreciations(appreciation,le_parent,'Votre appréciation ici...','contenu','appreciation')
 	}
 
-	
+
 	bulletin_enregistre = false
+
+}
+
+function mode_vie_scolaire(toutes_les_appreciations,identifiant_eleve){
+	var le_parent = document.createElement('div')
+	le_parent.id = identifiant_eleve
+
+	var retards = ""
+	var absences = ""
+	var contenu = ""
+
+	if(toutes_les_appreciations.length > 0){
+
+		//console.log('on cherche 1 appreciation pour ',identifiant_eleve)
+
+		//console.log({toutes_les_appreciations})
+		var contenu_appreciation = {}
+		contenu_appreciation = toutes_les_appreciations.find(function(appreciation){
+			//console.log(appreciation,'  VS  ', identifiant_eleve)
+			return appreciation['identifiant_eleve'] === identifiant_eleve
+		})
+
+
+
+		if(contenu_appreciation && Object.keys(contenu_appreciation).length > 0){
+
+			var contenu_appreciation_json = JSON.parse(contenu_appreciation['contenu'])
+
+			console.log({contenu_appreciation_json})
+
+			retards = contenu_appreciation_json['retards'] || ""
+			absences = contenu_appreciation_json['absences'] || ""
+			contenu = contenu_appreciation_json['contenu'] || ""
+
+		}
+
+	}
+
+	var res = rajouter_champ_appreciations(retards,le_parent,'Nombre de retards...','retards','case_nombre',true)
+	res += rajouter_champ_appreciations(absences,le_parent,'Nombre d\'absences (demi-journées)...','absences','case_nombre',true)
+	res += rajouter_champ_appreciations(contenu,le_parent,'Votre appréciation globale ici...','contenu','appreciation',true)
+	return res
+}
+
+function rajouter_champ_appreciations(contenu_appreciation, le_parent,contenu_place_holder,nom_champ,nom_classe,rendre_contenu){
+
+
+	//si on est sur TOUTES -> rajouter la case d'appréciation
+	
+
+
+		//console.log({contenu_appreciation})
+
+		var contenu_final = '<div class="bloc_appreciation"><textarea placeholder="'+contenu_place_holder+'" type="text" class="'+nom_classe+'" name="'+nom_champ+'">'+contenu_appreciation+'</textarea></div>'
+		if(!rendre_contenu){
+			$(le_parent).append(contenu_final)
+		}else{
+			return contenu_final
+		}
+		
+	
 
 }
 
@@ -14623,7 +14767,9 @@ function les_trimestres_bulletin(avec_annee){
 
 
 function les_periodes_bulletin(){
+
 	var liste_periodes_secondaires = element_DOM("periode_bulletin") ? recuperer_liste_periodes_secondaires(element_DOM("periode_bulletin").selectedIndex-1).split(',') : []
+	if($('select.un_menu').val().includes('Vie scolaire')) liste_periodes_secondaires = []
 	return `<form id="periodes" class="liste_deroulante">
 				<label for="saison_note">`+recuperer_nom_periodes_secondaires_bulletin()+`:
 					<select id="saison_note" name="saison_note">	
@@ -14647,6 +14793,14 @@ function get_les_profs(classe_matiere){
 	return les_profs
 }
 
+function get_les_admin(le_cycle){
+	var url = racine_data + 'Administration?Cycle=like.*'+le_cycle + "*&" +apikey
+	var les_profs = get_resultat(url)
+	les_profs = les_profs.filter(e => !e['Identifiant'].includes('admin.tech'))
+	return les_profs
+
+}
+
 function les_enseignants(){
 	var resultat = ""
 
@@ -14654,9 +14808,16 @@ function les_enseignants(){
 
 		var classe_matiere = $('.un_menu > option:selected').text()		
 		var les_profs = get_les_profs(classe_matiere)
+		var label_enseignant = 'Enseignant'
+
+		if($('select.un_menu').val().includes('Vie scolaire')){
+			mon_cycle = JSON.parse(recuperer('mes_matieres'))[0]['Cycle']
+			les_profs = [JSON.parse(recuperer('mes_donnees'))] //get_les_admin(mon_cycle)
+			label_enseignant = 'Administrateur'
+		}
 
 		resultat = `
-			<form id="les_enseignants" class="liste_deroulante"><label for="enseignant">Enseignant:
+			<form id="les_enseignants" class="liste_deroulante"><label for="enseignant">`+label_enseignant+`:
 					<select id="enseignant" name="enseignant">
 						`
 						+les_profs.map(e => '<option value="'+e['Identifiant']+'">'+e['Nom'] + " " + e['Prénom(s)'] +'</option>').join('')+
