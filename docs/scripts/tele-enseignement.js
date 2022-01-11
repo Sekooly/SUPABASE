@@ -12947,9 +12947,11 @@ function telecharger_fiche_en_pdf(){
 
 	periode = $("#la_periode_bulletin>option")[0].innerText + ' ' + $("#la_periode_bulletin").val()
 	classe = $("#la_classe_fiche").val()
+    var avec_coef = $("#avec_coef:checked").length > 0
 
 
 	nom_fichier_sans_extension = 'FICHE CC '+periode+' - '+classe
+	if(avec_coef) nom_fichier_sans_extension = nom_fichier_sans_extension + " (coefs personnels)"
 	nom_fichier = nom_fichier_sans_extension+'.pdf'
 	le_style = $('style#mon_style')[0].innerText
 
@@ -12962,10 +12964,46 @@ function telecharger_fiche_en_pdf(){
     printWindow.document.write(divContents);
     printWindow.document.write('</body></html>');
 
+
+
+    //si AVEC coef par élève
+    if(avec_coef){
+    	//supprimer la ligne de coef globale
+    	printWindow.document.getElementsByClassName('ligne_coefs')[0].remove()
+
+    	les_eleves = printWindow.document.querySelectorAll('.une_ligne_de_donnees')
+
+    	//pour chaque ligne d'élève
+    	les_eleves.forEach(function(un_eleve){
+    		//récupérer les coefs
+    		ses_coefs = ["","","","","","COEFF"]
+    		toutes_ses_notes = $('[id="'+un_eleve.id+'"] > .moyenne_eleve')
+    		toutes_ses_notes.each(function(i,v){
+				ses_coefs.push((v.getAttribute('coef') === "-" || !v.getAttribute('coef')) ? "" : v.getAttribute('coef')  )
+			})
+
+
+    		//console.log(un_eleve.id,ses_coefs)
+    		//insérer au-dessus sa ligne de coeff
+    		nouvelle_ligne_coef = document.createElement('tr')
+    		nouvelle_ligne_coef.innerHTML = ses_coefs.map(e => '<th>'+e+'</th>').join('')
+    		//console.log(nouvelle_ligne_coef.innerHTML)
+    		$(nouvelle_ligne_coef).insertBefore(un_eleve)
+		})
+
+
+
+    }
+
+
+
+
+
     les_coches = $('#coches_colonnes_export')[0]
     //console.log({les_coches})
 
     for(numero_colonne=0;numero_colonne<les_coches.childNodes.length;numero_colonne++){
+
     	indice_colonne=numero_colonne+1
     	ma_case=les_coches.childNodes[numero_colonne].childNodes[0]
     	la_colonne_entiere = $(printWindow.document.body).find('td:nth-child('+indice_colonne+'),th:nth-child('+indice_colonne+')')
@@ -12986,6 +13024,7 @@ function telecharger_fiche_en_pdf(){
     	}
     }
 
+
     //ne pas afficher les coches à l'impression
     printWindow.document.getElementById('coches_colonnes_export').remove()
 
@@ -13002,22 +13041,55 @@ function telecharger_fiche_en_csv(nom_fichier){
 	htmlToCSV(nom_fichier)
 }
 
+
+
 function htmlToCSV(filename) {
 	var data = [];
 	var rows = document.querySelectorAll("table tr");
-			
+	var avec_coef = $("#avec_coef:checked").length > 0
+	
+	if(avec_coef) filename = filename + " (coefs personnels)"
+
+	//pour chaque ligne
 	for (var i = 0; i < rows.length; i++) {
+
+		//on récupère les valeur colonnes de la ligne i
 		var row = [], cols = rows[i].querySelectorAll("td, th");
-				
-		for (var j = 0; j < cols.length; j++) {
-			valeur_cellule = cols[j].innerText
-			if(!isNaN(Number(valeur_cellule))) valeur_cellule = valeur_cellule.replaceAll('.',',')
-	        row.push(valeur_cellule);
-        }
-		        
-		data.push(row.join("\t")); 		
+
+		//avant chaque nouvelle ligne d'élève: si avec_coef: rajouter ',,,,,COEFF,' + matieres_de_classe.map(e => !e['nom_liste_et_coefs'] && e['coefficient_matiere'] > 0 ? e['coefficient_matiere'] :  "-").join(',')
+		//si on doit rajouter la colonne
+		if(avec_coef && rows[i].className.includes('une_ligne_de_donnees')){
+			for (var j = 0; j < cols.length; j++) {
+
+				//si on est sur une ligne de données d'élève
+				valeur_coef = cols[j].getAttribute('coef') ? cols[j].getAttribute('coef').replaceAll('.',',') : ""
+		        row.push(valeur_coef);
+	        }
+
+
+	        //rajouter un saut de ligne
+	        data.push(row.join("\t")); 
+	        row = []
+		}
+
+		//si AVEC COEF PERSONNELS et qu'on est sur la ligne des coefs génériques -> on zappe
+		if(avec_coef && rows[i].className.includes('ligne_coefs')){
+
+		//si sans coef ou si on n'est pas sur la ligne des coefs génériques
+		}else{
+			for (var j = 0; j < cols.length; j++) {
+				valeur_cellule = cols[j].innerText
+
+				//forcer la virgule des décimales
+				if(!isNaN(Number(valeur_cellule))) valeur_cellule = valeur_cellule.replaceAll('.',',')
+		        row.push(valeur_cellule);
+	        }
+			        
+			data.push(row.join("\t")); 	
+
+		}	
 	}
-	//console.log({data})
+	console.log({data})
 	downloadCSVFile(data.join("\n"), filename);
 }
 
@@ -13066,7 +13138,10 @@ function telecharger_fiche_en_cours(){
 	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<div>Télécharger '+id_parametre+'</div><select style="width: 80%;" id="choix_download_fiche">'
 	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<option value="csv">EN CSV</option>'
 	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<option value="pdf">EN PDF</option></select>'
-	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<button type="button" class="rendre sekooly-mode-background" onclick="choix_telechargement_fiche()">Télécharger</button></div>'
+	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<button type="button" class="rendre sekooly-mode-background" onclick="choix_telechargement_fiche()">Télécharger</button>'
+															+'<div><input name="avec_coef" type="checkbox" checked="false" id="avec_coef"><label for="avec_coef">Exporter avec les coefficients par élève</label></div>'
+															+'</div>'
+
 
 	$("#mini_popup").remove()
 	$("body").append(choix_entete_ou_tout_html)
@@ -13585,8 +13660,8 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe){
 
 
 		la_moyenne = Number(la_moyenne)
-		console.log({la_moyenne})
-		console.log({le_coef})
+		//console.log({la_moyenne})
+		//console.log({le_coef})
 
 		//cumuler
 		if(la_moyenne){
