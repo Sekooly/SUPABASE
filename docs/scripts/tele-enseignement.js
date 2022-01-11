@@ -12987,53 +12987,40 @@ function telecharger_fiche_en_pdf(){
 
 function telecharger_fiche_en_csv(nom_fichier){
 	
-	/*
-	var separateur = ","
-    var csv_data = [];
- 
-    // Get each row data
-    var rows = document.getElementsByTagName('tr');
-    for (var i = 0; i < rows.length; i++) {
- 
-        // Get each column data
-        var cols = rows[i].querySelectorAll('td,th');
- 
-        // Stores each csv row data
-        var csvrow = [];
-        for (var j = 0; j < cols.length; j++) {
- 
-            // Get the text data of each cell of
-            // a row and push it to csvrow
-            csvrow.push(cols[j].innerHTML);
+	htmlToCSV(nom_fichier)
+}
+
+function htmlToCSV(filename) {
+	var data = [];
+	var rows = document.querySelectorAll("table tr");
+			
+	for (var i = 0; i < rows.length; i++) {
+		var row = [], cols = rows[i].querySelectorAll("td, th");
+				
+		for (var j = 0; j < cols.length; j++) {
+			valeur_cellule = cols[j].innerText
+			if(!isNaN(Number(valeur_cellule))) valeur_cellule = valeur_cellule.replaceAll('.',',')
+	        row.push(valeur_cellule);
         }
- 
-        // Combine each column value with comma
-        csv_data.push(csvrow.join(separateur));
-    }
-    // combine each row data with new line character
-    csv_data = csv_data.join('\n');
-
-    console.log({csv_data})
+		        
+		data.push(row.join("\t")); 		
+	}
+	//console.log({data})
+	downloadCSVFile(data.join("\n"), filename);
+}
 
 
+function downloadCSVFile(csv, filename) {
 	var universalBOM = "\uFEFF";
 	var a = window.document.createElement('a');
-	a.setAttribute('href', 'data:text/csv; charset=utf-8,' + encodeURIComponent(universalBOM+csv_data));
-	a.setAttribute('download', nom_fichier + '.csv');
+	a.setAttribute('href', 'data:text/csv; charset=utf-8,' + encodeURIComponent(universalBOM+csv));
+	a.setAttribute('download', filename+'.csv');
 	window.document.body.appendChild(a);
 	a.click();
-	document.body.removeChild(a);
-	*/
-
-	alert("Développement en cours.")
-
-
-
-
-
-
-
+	a.remove()
 }
+
+
 
 function choix_telechargement_fiche(){
 
