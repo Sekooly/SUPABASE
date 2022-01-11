@@ -657,11 +657,7 @@ function nombre_de_rows(xmlHttp){
 }
 
 
-function get_resultat(url){
-    if(url.includes('https://kqvbwkftfpyajpskbxsj.supabase.co/rest/v1/?apikey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYwODE5ODc5MywiZXhwIjoxOTIzNzc0NzkzfQ.Dy91qut0tsSISyiWYlRh3UguSo3lzPYYQ12O_Txpbio')){
-      console.log("caller is " + get_resultat.caller);  
-    }
-    
+function get_resultat(url){    
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.open( "GET", url, false ); // false for synchronous request
     //xmlHttp.setRequestHeader("Prefer", "count=exact")
