@@ -11784,10 +11784,22 @@ function valeurs_possibles_modification_classes(e, id_parametre, les_matieres, e
 		var valeurs_possibles_interm = valeursUniquesDeCetteKey(les_matieres_interm,"Matiere")
 		valeurs_possibles_interm = valeurs_possibles_interm.filter(v => v.trim().length > 0)
 
+		console.log({valeurs_possibles_interm})
 
 		//pour chaque option possible
 		valeurs_possibles_interm.forEach(function(une_option) {
-			les_coefs_de_loption = les_matieres.find(matiere => matiere['Classe_Matiere'] === '(' + classe_eleve + '|' + une_option  + ')' )['nom_liste_et_coefs'].split('|')[1].replaceAll(')','').split(',')
+			//console.log({une_option})
+			//console.log({classe_eleve})
+			les_coefs_de_loption = les_matieres.find(matiere => matiere['Classe_Matiere'] === '(' + classe_eleve + '|' + une_option  + ')' )
+
+			if(les_coefs_de_loption['nom_liste_et_coefs'].includes('|')){
+				console.log({les_coefs_de_loption})
+				les_coefs_de_loption = les_coefs_de_loption['nom_liste_et_coefs'].split('|')[1].replaceAll(')','').split(',')
+
+			}else{
+				les_coefs_de_loption = []
+			}
+			
 
 			
 			//pour chaque coef, créer Matière-coef 
@@ -13573,8 +13585,8 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe){
 
 
 		la_moyenne = Number(la_moyenne)
-		//console.log({la_moyenne})
-		//console.log({le_coef})
+		console.log({la_moyenne})
+		console.log({le_coef})
 
 		//cumuler
 		if(la_moyenne){
