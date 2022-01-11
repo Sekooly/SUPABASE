@@ -2,7 +2,7 @@ var mon_role = "";
 var entete_heroku = "https://sekooly-server.herokuapp.com/"//"https://api.sekooly.com/"
 var liste_class_avec_fond_mode_nuit = ["ma_fenetre","titre_drive", "mini_popup", "msg_envoye", "msg_recu", "une_notif"]
 var mode_nuit_oui_final = recuperer("mode_nuit_oui") === "oui" ? "non" : "oui"
-elements_menu_haut_generiques = elements_menu_haut_generiques || []
+var elements_menu_haut_generiques_local = typeof(elements_menu_haut_generiques)=== 'undefined' ? [] : elements_menu_haut_generiques 
 
 function se_deconnecter(){
   /*
@@ -93,7 +93,7 @@ function supprimer_element_de_la_liste(liste,nom_element){
 
 function actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouveau_data){
   
-  if(elements_menu_haut_generiques.indexOf(nom_table)>=0 ){
+  if(elements_menu_haut_generiques_local.indexOf(nom_table)>=0 ){
     url = racine_initiale + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+api_initial
   }else{
     url = racine_data + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+apikey
@@ -114,7 +114,7 @@ function rechercher_tout(nom_table, avec_where){
   table = avec_where ? nom_table : '"'+nom_table+'"'
   //alert(table)
 
-  if(elements_menu_haut_generiques.indexOf(nom_table)>=0 ){
+  if(elements_menu_haut_generiques_local.indexOf(nom_table)>=0 ){
     url = entete_heroku + convertir_db(racine_initiale) + '/SELECT * FROM '+table+' ' + transformer_en_sql(ordonner(nom_table))
   }else{
     url = entete_heroku + convertir_db(racine_data) + '/SELECT * FROM '+table+' ' + transformer_en_sql(ordonner(nom_table))
@@ -206,7 +206,8 @@ function ordonner(nom_table){
     return '&order=id.desc'
   }else{
     le_id_table = identifiant_par_table(nom_table)
-    return "&order="+le_id_table+".asc"
+    if(le_id_table.length > 0) return "&order="+le_id_table+".asc"
+    return ''
   
   }
 
@@ -318,7 +319,7 @@ function nouvel_id(nom_table, nom_champ_id){
 
 
 function supprimer(nom_table,nom_champ_reference,valeur_champ_reference){
-  if(elements_menu_haut_generiques.indexOf(nom_table)>=0 ){
+  if(elements_menu_haut_generiques_local.indexOf(nom_table)>=0 ){
     url = racine_initiale + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+api_initial
   }else{
     url = racine_data + nom_table + "?"+nom_champ_reference+"=eq."+valeur_champ_reference+ "&"+apikey
@@ -367,7 +368,7 @@ function supprimer_initial(nom_table,nom_champ_reference,valeur_champ_reference)
 
 
 function supprimer_tout(nom_table){
-  if(elements_menu_haut_generiques.indexOf(nom_table)>=0 ){
+  if(elements_menu_haut_generiques_local.indexOf(nom_table)>=0 ){
     url = racine_initiale + nom_table + "?"+api_initial
   }else{
     url = racine_data + nom_table + "?"+apikey
@@ -418,7 +419,7 @@ function retour_promise(requete){
 
 function ajouter_un_element(nom_table, nouveau_data){
 
-  if(elements_menu_haut_generiques.indexOf(nom_table)>=0 ){
+  if(elements_menu_haut_generiques_local.indexOf(nom_table)>=0 ){
     url = racine_initiale + nom_table + "?"+api_initial
   }else{
     url = racine_data + nom_table + "?"+apikey
@@ -944,7 +945,7 @@ function csv_en_JSON(contenu){
 
 function identifiant_par_table(nom_table){
 
-  if(elements_menu_haut_generiques.indexOf(nom_table) >= 0){
+  if(elements_menu_haut_generiques_local.indexOf(nom_table) >= 0){
     var resultat = get_resultat(racine_initiale+'?'+api_initial)
   }else{
     var resultat = get_resultat(racine_data+'?'+apikey)  
