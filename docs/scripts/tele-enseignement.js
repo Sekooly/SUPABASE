@@ -78,7 +78,7 @@ var champs_avec_listes_dynamiques = ['Classe','classe_bis','Classe_principale','
 var champs_oui_ou_non = ['Est_délégué','Reponse_sondage','Ecolage_OK','Droits_modifs', 'Droit_acces_anticipe_examen','Droit_changer_ecolage','commun_au_cycle','droit_hors_maintenance','Est_délégué']
 var liste_couleurs = ['blanc','bleu ciel', 'bleu foncé', 'gris','jaune','marron','noir','orange','rose','rouge','vert clair','vert foncé', 'violet']
 
-
+var identifiants_appreciations = ['admin.tech','admin.tech2','ramiandriray.pierrot','ramiandriray-pierrot']
 	
 var numero_etape = recuperer("numero_etape") ? Number(recuperer("numero_etape")) : 0
 var nb_etapes = 8
@@ -12927,7 +12927,8 @@ function choix_classe_fiche(){
 
 }
 
-function telecharger_fiche_en_cours(){
+
+function telecharger_fiche_en_pdf(){
 	chargement(true)
 
 
@@ -12981,6 +12982,96 @@ function telecharger_fiche_en_cours(){
 
 
 	chargement(false)
+
+}
+
+function telecharger_fiche_en_csv(nom_fichier){
+	
+	/*
+	var separateur = ","
+    var csv_data = [];
+ 
+    // Get each row data
+    var rows = document.getElementsByTagName('tr');
+    for (var i = 0; i < rows.length; i++) {
+ 
+        // Get each column data
+        var cols = rows[i].querySelectorAll('td,th');
+ 
+        // Stores each csv row data
+        var csvrow = [];
+        for (var j = 0; j < cols.length; j++) {
+ 
+            // Get the text data of each cell of
+            // a row and push it to csvrow
+            csvrow.push(cols[j].innerHTML);
+        }
+ 
+        // Combine each column value with comma
+        csv_data.push(csvrow.join(separateur));
+    }
+    // combine each row data with new line character
+    csv_data = csv_data.join('\n');
+
+    console.log({csv_data})
+
+
+	var universalBOM = "\uFEFF";
+	var a = window.document.createElement('a');
+	a.setAttribute('href', 'data:text/csv; charset=utf-8,' + encodeURIComponent(universalBOM+csv_data));
+	a.setAttribute('download', nom_fichier + '.csv');
+	window.document.body.appendChild(a);
+	a.click();
+	document.body.removeChild(a);
+	*/
+
+	alert("Développement en cours.")
+
+
+
+
+
+
+
+}
+
+function choix_telechargement_fiche(){
+
+
+	var la_periode_bulletin = $('#la_periode_bulletin').val()
+	var la_classe_fiche = $('#la_classe_fiche').val()
+
+
+	if(!la_periode_bulletin) return alert("Merci de choisir une période.")
+	if(!la_classe_fiche) return alert("Merci de choisir une classe.")
+
+
+
+	if($("#choix_download_fiche").val()==='csv'){
+		telecharger_fiche_en_csv('FICHE CC '+ la_classe_fiche)
+	}else if($("#choix_download_fiche").val()==='pdf'){
+		telecharger_fiche_en_pdf()
+	}
+
+	$('#mini_popup').remove()
+}
+
+function telecharger_fiche_en_cours(){
+
+	id_parametre = 'Fiche CC ' + $("#la_classe_fiche").val()
+
+	//alert("Téléchargement ici.")
+	var choix_entete_ou_tout_html = '<div id="mini_popup" class="mini_popup">'
+	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<div id="entete-fenetre" style="display: inline-flex;float: right;">'
+	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div>'
+	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<div>Télécharger '+id_parametre+'</div><select style="width: 80%;" id="choix_download_fiche">'
+	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<option value="csv">EN CSV</option>'
+	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<option value="pdf">EN PDF</option></select>'
+	choix_entete_ou_tout_html =  choix_entete_ou_tout_html + '<button type="button" class="rendre sekooly-mode-background" onclick="choix_telechargement_fiche()">Télécharger</button></div>'
+
+	$("#mini_popup").remove()
+	$("body").append(choix_entete_ou_tout_html)
+
 }
 
 function voir_fiche_classe_choisie(){
@@ -13004,6 +13095,9 @@ function voir_fiche_classe_choisie(){
 	au_clic("#actualiser-fiche","render_fiche()")
 	au_clic("#download-fiche","telecharger_fiche_en_cours()")
 
+
+	html_bouton_appreciations  = identifiants_appreciations.indexOf(recuperer('identifiant_courant'))>=0 ? `<button class="sekooly-mode" onclick="generer_appreciations()">Génerer les appréciations</button>` : ''
+
 	//rajouter la liste des classes
 	$('#fenetre').append(`<div id="conteneur_menu">
 		
@@ -13017,7 +13111,7 @@ function voir_fiche_classe_choisie(){
 				`+ les_classes.map(classe => '<option value="'+classe+'" id="'+classe+'">'+classe+'</option>') +`
 			</select>
 			<rouge style="cursor: pointer;" id="aide_fiche">(?)</rouge>
-			<button class="sekooly-mode" onclick="generer_appreciations()">Génerer les appréciations</button>
+			`+html_bouton_appreciations+`
 		</div>
 		<div id="menu_params" style="overflow-x: auto;" class="menu_params">
 			<div id="previsualisation"></div>
@@ -13615,6 +13709,13 @@ function valider_choix_admin_bulletins(){
 }
 
 function choix_admin_bulletins(){
+	var creation_bulletin = identifiants_appreciations.indexOf(recuperer('identifiant_courant')) >= 0 ? `
+	  <div>
+	    <input type="radio" name="choix_admin_bulletin" id="choix4" value="choix4">
+	    <label for="choix4">Créer les bulletins en format PDF</label>
+	  </div>` : ""
+
+
 	return `
 	<div style="padding: 5%;" name="choix_global">
   
@@ -13632,11 +13733,7 @@ function choix_admin_bulletins(){
 	    <input type="radio" name="choix_admin_bulletin" id="choix3" value="choix3">
 	    <label for="choix3">Créer les fiches de Conseils de Classe</label>
 	  </div>
-
-	  <div>
-	    <input type="radio" name="choix_admin_bulletin" id="choix4" value="choix4">
-	    <label for="choix4">Créer les bulletins en format PDF</label>
-	  </div>
+	  `+creation_bulletin+`
 
 	  
 	</div>
