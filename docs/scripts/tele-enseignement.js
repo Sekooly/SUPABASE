@@ -4194,7 +4194,7 @@ function ouvrir_fichier(ceci){
 		stocker('fichier_ouvert',id_fichier);
 
 		//on ajoute le nom du fichier (TEXTE DANS LE SPAN)
-		var nom_fichier = $("[id='"+id_fichier+"']")
+		var nom_fichier = $("span[id='"+id_fichier+"']")
 		    .clone()    //clone the element
 		    .children() //select all the children
 		    .remove()   //remove all the children
