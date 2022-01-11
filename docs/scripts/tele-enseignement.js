@@ -13033,18 +13033,99 @@ function alerte_aide_fiche(){
 	alert("ℹ️ Pour télécharger/imprimer la fiche des colonnes cochées sous format pdf, pensez à ajuster l'échelle de mise en page vers 60% avant d'enregistrer.")
 }
 
-function generer_appreciations(){
-	la_periode_bulletin = $('#la_periode_bulletin').val()
-	la_classe_fiche = $('#la_classe_fiche').val()
+async function generer_appreciations(){
 
-	//récupérer toutes les appréciations possibles
 
-	//pour chaque élève affiché
-	//récupérer la moyenne
-	//
+	var appreciations_generees = []
+	var la_periode_bulletin = $('#la_periode_bulletin').val()
+	var la_classe_fiche = $('#la_classe_fiche').val()
+
+
+	if(!la_periode_bulletin) return alert("Merci de choisir une période.")
+	if(!la_classe_fiche) return alert("Merci de choisir une classe.")
+
+
+	var confirmation = confirm("⚠️ Voulez-vous regénérer les appréciations pour la classe de "+la_classe_fiche+"? Cette action est irréversible.")
+	if(!confirmation) return false
+
+	//récupérer les éventuelles appréciations de la vie scolaire (retard / absence notamment)
+	var toutes_les_appreciations_de_la_classe = await supabase
+												.from('Appreciations')
+												.select('*')
+												.eq('Classe_Matiere','('+la_classe_fiche+'|Vie scolaire)')
+	toutes_les_appreciations_de_la_classe = toutes_les_appreciations_de_la_classe.data
+	//console.log({toutes_les_appreciations_de_la_classe})
+
+
+	//récupérer toutes les appréciations possibles de la classe
+	var toutes_les_phrases_appreciations = await supabaseInit
+												.from('Liste_appreciations')
+												.select('*')
+												.eq('nom_etablissement',data_etablissement['nom_etablissement'])
+	toutes_les_phrases_appreciations = toutes_les_phrases_appreciations.data
+	console.log({toutes_les_phrases_appreciations})
+
+	//pour chaque moyenne générale
+	$('.moyenne_generale').each(function(index,la_moyenne){
+
+		temp = {}
+
+		valeur = Number(la_moyenne.innerText)
+		identifiant_eleve = la_moyenne.parentNode.id
+		prenom_eleve =  identifiant_eleve.includes('.') ? identifiant_eleve.split('.')[1] : identifiant_eleve
+		prenom_eleve = prenom_eleve[0].toUpperCase() + prenom_eleve.slice(1); 
+		console.log({[prenom_eleve]:valeur})
+
+		//filtrer pour ne garder que les appréciations [min;max[
+		appreciations_possibles = toutes_les_phrases_appreciations.filter(e => valeur >= Number(e['note_min_inclus']) && valeur < Number(e['note_max_exclus'])  )
+		//console.log({appreciations_possibles})
+
+		choix_appreciation = piocher_aleatoirement(appreciations_possibles)
+		choix_appreciation = choix_appreciation['contenu']
+		choix_appreciation = choix_appreciation.replaceAll('#X#',prenom_eleve)
+		//console.log({choix_appreciation})
+
+		appreciation_initiale = toutes_les_appreciations_de_la_classe.filter(e => e['identifiant_eleve'] === identifiant_eleve)
+		if(appreciation_initiale.length > 0){
+			temp['id'] = appreciation_initiale[0]['id']	
+			temp['identifiant_appreciateur'] = appreciation_initiale[0]['identifiant_appreciateur']
+			tout = JSON.parse(appreciation_initiale[0]['contenu'])
+			//console.log({tout})
+			retards = tout['retards'] || ""
+			absences = tout['absences'] || ""
+		}else{
+			temp['identifiant_appreciateur'] = recuperer('identifiant_courant')
+			retards = ""
+			absences = ""
+		}
+
+
+		//pousser le [id] eleve,admin,class|vie scolaire,periode,contenu
+		temp['Classe_Matiere'] = '('+la_classe_fiche+'|Vie scolaire)'
+		temp['identifiant_eleve'] = identifiant_eleve
+		temp['periode_principale'] = la_periode_bulletin
+		temp['contenu'] = JSON.stringify({"retards":retards,"absences":absences,"contenu":choix_appreciation})
+		appreciations_generees.push(temp)
+
+
+
+	})
+
+	console.log({appreciations_generees})
+
+
+	//PEUT ETRE: supprimer toutes les appréciations de la (classe|Vie scolaire)
+
+
+	await stocker_appreciations_server(appreciations_generees)
+	render_fiche()
 
 }
 
+function piocher_aleatoirement(mon_array){
+	const random = Math.floor(Math.random() * mon_array.length);
+	return mon_array[random];
+}
 
 async function render_fiche(ignorer_absence_classe){
 
@@ -13449,7 +13530,7 @@ async function rajouter_absences_et_retards_eleves(){
 		.eq('periode_principale', periode_bulletin)
 		.eq('Classe_Matiere', '('+la_classe+'|Vie scolaire)')
 
-	console.log({les_appreciations_globales})
+	//console.log({les_appreciations_globales})
 	les_appreciations_globales = les_appreciations_globales.data
 
 	//pour chaque eleve avec des appreciations: rajouter l'absence, le retard et l'appréciation globale
@@ -14171,7 +14252,13 @@ function remplacer_liste_saison_note(){
 	$("form#periodes").remove()
 	$("form#les_enseignants").remove()
 	$("#menu_periode").append(les_periodes_bulletin())
+
+	//me mettre comme enseignant/admin
+	$('#enseignant').val(recuperer('identifiant_courant'))
+
 	au_changement("#saison_note","actualiser_liste_eleves_bulletins()")
+	au_changement("#enseignant","actualiser_liste_eleves_bulletins()")
+
 	au_clic("#saison_note","demande_enregistrement_avant_changement_periode()")
 }
 
@@ -14190,6 +14277,11 @@ function afficher_choix_periode_bulletin(id_classe_matiere){
 
 
 	$('#menu_haut').append('<div style="text-align: center;" id="menu_periode">'+choix_periode+'</div>')
+
+
+	//me mettre comme enseignant/admin
+	$('#enseignant').val(recuperer('identifiant_courant'))
+
 
 	au_changement("#periode_bulletin","actualiser_liste_eleves_bulletins()")
 	au_changement("#periode_bulletin","remplacer_liste_saison_note()")
@@ -14559,7 +14651,7 @@ function mode_vie_scolaire(toutes_les_appreciations,identifiant_eleve){
 
 			var contenu_appreciation_json = JSON.parse(contenu_appreciation['contenu'])
 
-			console.log({contenu_appreciation_json})
+			//console.log({contenu_appreciation_json})
 
 			retards = contenu_appreciation_json['retards'] || ""
 			absences = contenu_appreciation_json['absences'] || ""
@@ -14825,7 +14917,7 @@ function les_enseignants(){
 
 		if($('select.un_menu').val().includes('Vie scolaire')){
 			mon_cycle = JSON.parse(recuperer('mes_matieres'))[0]['Cycle']
-			les_profs = [JSON.parse(recuperer('mes_donnees'))] //get_les_admin(mon_cycle)
+			les_profs = get_les_admin(mon_cycle) //[JSON.parse(recuperer('mes_donnees'))] 
 			label_enseignant = 'Administrateur'
 		}
 

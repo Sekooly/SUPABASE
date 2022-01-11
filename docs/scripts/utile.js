@@ -210,6 +210,8 @@ function ordonner(nom_table){
     return '&order=id.desc'
   }else if(nom_table==="Notes"){
     return '&order=date_creation_note.desc'
+  }else if(nom_table==="Liste_appreciations"){
+    return '&order=id_appreciation.desc'
   }else{
     /*
     le_id_table = identifiant_par_table(nom_table)
