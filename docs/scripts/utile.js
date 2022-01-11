@@ -2,7 +2,11 @@ var mon_role = "";
 var entete_heroku = "https://sekooly-server.herokuapp.com/"//"https://api.sekooly.com/"
 var liste_class_avec_fond_mode_nuit = ["ma_fenetre","titre_drive", "mini_popup", "msg_envoye", "msg_recu", "une_notif"]
 var mode_nuit_oui_final = recuperer("mode_nuit_oui") === "oui" ? "non" : "oui"
-var elements_menu_haut_generiques_local = typeof(elements_menu_haut_generiques)=== 'undefined' ? [] : elements_menu_haut_generiques 
+var elements_menu_haut_generiques_local = []
+setTimeout(function(){
+  elements_menu_haut_generiques_local = typeof(elements_menu_haut_generiques)=== 'undefined' ? [] : elements_menu_haut_generiques   
+},1000)
+
 
 function se_deconnecter(){
   /*

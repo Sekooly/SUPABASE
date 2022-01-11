@@ -11163,7 +11163,7 @@ function actualiser_filtre_onglet(id_parametre){
 	//maintenance: filtre = etablissement
 	//alerte:  filtre = etablissement
 	//un seul établissement
-	if(id_parametre === "Cycles" || id_parametre === "Maintenance" || id_parametre === "Alerte" || id_parametre === "Logs"  || id_parametre === "Espace etablissement restant" || id_parametre === "Infos établissement"){
+	if(id_parametre === "Cycles" || id_parametre === "Maintenance" || id_parametre === "Alerte" || id_parametre === "Logs"  || id_parametre === "Espace etablissement restant" || id_parametre === "Infos établissement" || id_parametre === "Liste_appreciations"){
 
 		etiquette_filtre = "Etablissement"
 		filtre_liste = [nom_etablissement];
@@ -13017,6 +13017,7 @@ function voir_fiche_classe_choisie(){
 				`+ les_classes.map(classe => '<option value="'+classe+'" id="'+classe+'">'+classe+'</option>') +`
 			</select>
 			<rouge style="cursor: pointer;" id="aide_fiche">(?)</rouge>
+			<button class="sekooly-mode" onclick="generer_appreciations()">Génerer les appréciations</button>
 		</div>
 		<div id="menu_params" style="overflow-x: auto;" class="menu_params">
 			<div id="previsualisation"></div>
@@ -13031,6 +13032,19 @@ function voir_fiche_classe_choisie(){
 function alerte_aide_fiche(){
 	alert("ℹ️ Pour télécharger/imprimer la fiche des colonnes cochées sous format pdf, pensez à ajuster l'échelle de mise en page vers 60% avant d'enregistrer.")
 }
+
+function generer_appreciations(){
+	la_periode_bulletin = $('#la_periode_bulletin').val()
+	la_classe_fiche = $('#la_classe_fiche').val()
+
+	//récupérer toutes les appréciations possibles
+
+	//pour chaque élève affiché
+	//récupérer la moyenne
+	//
+
+}
+
 
 async function render_fiche(ignorer_absence_classe){
 
