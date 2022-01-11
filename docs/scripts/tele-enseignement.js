@@ -13196,7 +13196,7 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes)
 
 
 
-	//pour chaque élève	
+	//pour chaque élève		
 	les_eleves.forEach(async function(un_eleve,indice_eleve){
 		$("#contenu_fiche_conseil").append(une_ligne_eleve('fiche_conseil',un_eleve,indice_eleve+1))
 
@@ -13205,9 +13205,9 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes)
 		//rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher, nombrelimite, orderby)
 		les_notes = await rechercher("Notes", "identifiant_eleve", un_eleve['Identifiant'], false, false, "Classe_Matiere,saison_note")
 		//console.log({les_notes})
-
+	
 		rajouter_notes_eleves(un_eleve['Identifiant'],les_notes,matieres_de_classe)
-		
+
 		//apres le dernier élève -> rajouter la valeur des min-max-moy
 		if(indice_eleve === les_eleves.length-1){
 			setTimeout(function(){
@@ -13219,7 +13219,6 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes)
 		}
 
 	})
-
 
 	au_clic("tr.une_ligne_de_donnees","clic_ligne(this)")
 	
@@ -13441,13 +13440,13 @@ async function rajouter_absences_et_retards_eleves(){
 
 	//pour chaque eleve avec des appreciations: rajouter l'absence, le retard et l'appréciation globale
 	les_appreciations_globales.forEach(function(un_eleve){
-		console.log({un_eleve})
+		//console.log({un_eleve})
 		var tout = un_eleve['contenu']
 		if(tout){
 			tout = JSON.parse(tout)
-			absences = tout['absences']
-			retards = tout['retards']
-			contenu = tout['contenu']
+			absences = tout['absences'] || ""
+			retards = tout['retards'] || ""
+			contenu = tout['contenu'] || ""
 
 			$('tr[id="'+un_eleve['identifiant_eleve']+'"]').append('<th class="border_bottom">'+absences+'</th><th class="border_bottom">'+retards+'</th><th class="border_bottom">'+contenu+'</th>')
 

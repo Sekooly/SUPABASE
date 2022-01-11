@@ -204,11 +204,15 @@ function ordonner(nom_table){
     return '&order=id_quiz.asc,id_question.asc,position_reponse.asc'
   }else if(nom_table==="Appreciations"){
     return '&order=id.desc'
+  }else if(nom_table==="Notes"){
+    return '&order=date_creation_note.desc'
   }else{
+    /*
     le_id_table = identifiant_par_table(nom_table)
     if(le_id_table.length > 0) return "&order="+le_id_table+".asc"
     return ''
-  
+    */
+    return ""
   }
 
 
@@ -654,6 +658,10 @@ function nombre_de_rows(xmlHttp){
 
 
 function get_resultat(url){
+    if(url.includes('https://kqvbwkftfpyajpskbxsj.supabase.co/rest/v1/?apikey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYwODE5ODc5MywiZXhwIjoxOTIzNzc0NzkzfQ.Dy91qut0tsSISyiWYlRh3UguSo3lzPYYQ12O_Txpbio')){
+      console.log("caller is " + get_resultat.caller);  
+    }
+    
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.open( "GET", url, false ); // false for synchronous request
     //xmlHttp.setRequestHeader("Prefer", "count=exact")
