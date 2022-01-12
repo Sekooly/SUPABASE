@@ -11462,12 +11462,22 @@ function json2Table(json, id_table) {
 
 
 function clic_ligne(ceci){
+
+
+	/*
 	//on enleve la selection précédente
 	if ($(".une_ligne_de_donnees.selected")[0]) $(".une_ligne_de_donnees.selected")[0].className = "une_ligne_de_donnees"
 
 
 	//on selectionne la cible Ceci
 	ceci.className = "une_ligne_de_donnees selected"
+	*/
+
+	$('.une_ligne_de_donnees').removeClass('selected')
+
+	//on enleve toute selection précedente
+	//on selectionne la cible
+	$(ceci).addClass('selected')
 
 }
 
@@ -12956,6 +12966,7 @@ function telecharger_fiche_en_pdf(){
 	le_style = $('style#mon_style')[0].innerText
 
 
+
     var divContents = $("#menu_params").html();
     var printWindow = window.open('', '', 'height=400,width=800');
     printWindow.document.write('<html><head><title>'+nom_fichier+'</title>');
@@ -12965,11 +12976,14 @@ function telecharger_fiche_en_pdf(){
     printWindow.document.write('</body></html>');
 
 
+	//supprimer toutes les lignes à ignorer
+	printWindow.document.querySelectorAll('.ignore').forEach(e => e.remove())
 
     //si AVEC coef par élève
     if(avec_coef){
     	//supprimer la ligne de coef globale
     	printWindow.document.getElementsByClassName('ligne_coefs')[0].remove()
+
 
     	les_eleves = printWindow.document.querySelectorAll('.une_ligne_de_donnees')
 
@@ -13045,13 +13059,15 @@ function telecharger_fiche_en_csv(nom_fichier){
 
 function htmlToCSV(filename) {
 	var data = [];
-	var rows = document.querySelectorAll("table tr");
+	var rows = document.querySelectorAll("tr:not(.ignore)"); //uniquement les lignes non ignorées
 	var avec_coef = $("#avec_coef:checked").length > 0
 	
 	if(avec_coef) filename = filename + " (coefs personnels)"
 
 	//pour chaque ligne
 	for (var i = 0; i < rows.length; i++) {
+
+
 
 		//on récupère les valeur colonnes de la ligne i
 		var row = [], cols = rows[i].querySelectorAll("td, th");
@@ -13089,7 +13105,7 @@ function htmlToCSV(filename) {
 
 		}	
 	}
-	console.log({data})
+	//console.log({data})
 	downloadCSVFile(data.join("\n"), filename);
 }
 
@@ -13348,8 +13364,13 @@ function nouveau_tableau_avec_ce_titre(id_tableau, array_ligne){
 
 function une_ligne_eleve(id_tableau,objet_une_ligne,numero){
 
+	//si l'éleve est ignoré -> on le met dans .ignore
+	var eleves_ignores = recuperer('eleves_ignores') || ""
+	var classe_supplementaire = eleves_ignores.includes("," + objet_une_ligne["Identifiant"] +",") ? " ignore " : " une_ligne_de_donnees "
+	//console.log({[objet_une_ligne["Identifiant"]]:classe_supplementaire})
+
 	//console.log(objet_une_ligne)
-	return `<tr class= "border_bottom une_ligne_de_donnees" liste_options="${objet_une_ligne["liste_options"]}" id="${objet_une_ligne["Identifiant"]}" >
+	return `<tr class= "border_bottom `+classe_supplementaire+`" liste_options="${objet_une_ligne["liste_options"]}" id="${objet_une_ligne["Identifiant"]}" >
 				<th class="border_bottom">
 					${numero}
 				</th>
@@ -13484,6 +13505,8 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes)
 	})
 
 	au_clic("tr.une_ligne_de_donnees","clic_ligne(this)")
+
+	au_clic_droit("tr.une_ligne_de_donnees,tr.ignore","afficher_ou_masquer_ligne_entiere(event)")
 	
 	//console.log({matieres_de_classe})
 
@@ -13494,7 +13517,53 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes)
 
 }
 
+
+function afficher_ou_masquer_ligne_entiere(event){
+	event.preventDefault()
+	event.stopPropagation()
+	var ceci = event.target.parentNode
+	
+	//console.log({ceci})
+	var nom_complet = ceci.children[1].innerText + " " + ceci.children[2].innerText
+	var verbe = ceci.className.includes('ignore') ? 're-afficher':'masquer'
+	var emoji_ask = verbe === 're-afficher' ? '👀' : '❌'
+	var choisir_affichage = confirm(emoji_ask+' Voulez-vous '+verbe+' la ligne de '+nom_complet +' lors de l\'export ?')
+
+	//console.log({choisir_affichage})
+
+	if(choisir_affichage){
+		$(ceci).toggleClass('ignore')
+		$(ceci).toggleClass('une_ligne_de_donnees')
+		
+		//recalculer les min/max/moy
+		rajouter_min_max_moy()
+
+		//recalculer les rangs
+		rajouter_rangs_eleves()
+
+		//si on masque -> rajouter dans la liste à masquer
+		var eleves_ignores = recuperer('eleves_ignores') || ""
+		if(verbe==='masquer'){
+			eleves_ignores += ',' +  ceci.id + ','
+			
+		//si on affiche -> retirer de la liste des masqués
+		}else{
+			eleves_ignores = eleves_ignores.replaceAll(','+ceci.id+',','')
+		}
+		//console.log({eleves_ignores})
+		stocker('eleves_ignores',eleves_ignores)
+	}
+
+
+}
+
 function rajouter_min_max_moy(matieres_de_classe){
+
+		if(!matieres_de_classe){
+			var toutes = JSON.parse(recuperer('mes_matieres'))
+			var la_classe = $("#la_classe_fiche").val()
+			var matieres_de_classe = toutes.filter(e => e['Classe'] === la_classe).sort()			
+		}
 
 		var ligne_min = ',,,,,Min:'
 		var ligne_max = ',,,,,Max:'
@@ -13515,7 +13584,7 @@ function rajouter_min_max_moy(matieres_de_classe){
 			//console.log(numero_matiere)
 
 
-			$("th.border_bottom:nth-child("+numero_matiere+")").each(function(index,e){
+			$("tr:not(.ignore) > th.border_bottom:nth-child("+numero_matiere+")").each(function(index,e){
 				if(e.innerText.length > 0){
 					//console.log(Number(e.innerText))
 					toutes_les_notes_de_la_matiere.push(Number(e.innerText))
@@ -13555,15 +13624,17 @@ function rajouter_min_max_moy(matieres_de_classe){
 
 		}
 
-
+		$('#ligne_min').remove()
+		$('#ligne_max').remove()
+		$('#ligne_moy').remove()
 
 
 		ligne_min = ligne_min.split(',')
 		ligne_max = ligne_max.split(',')
 		ligne_moy = ligne_moy.split(',')
-		$("#contenu_fiche_conseil").append('<tr>'+ligne_min.map(note => `<th>${note}</th>`)+'</tr>')
-		$("#contenu_fiche_conseil").append('<tr>'+ligne_max.map(note => `<th>${note}</th>`)+'</tr>')
-		$("#contenu_fiche_conseil").append('<tr>'+ligne_moy.map(note => `<th>${note}</th>`)+'</tr>')
+		$("#contenu_fiche_conseil").append('<tr id="ligne_min">'+ligne_min.map(note => `<th>${note}</th>`)+'</tr>')
+		$("#contenu_fiche_conseil").append('<tr id="ligne_max">'+ligne_max.map(note => `<th>${note}</th>`)+'</tr>')
+		$("#contenu_fiche_conseil").append('<tr id="ligne_moy">'+ligne_moy.map(note => `<th>${note}</th>`)+'</tr>')
 
 }
 
@@ -13679,8 +13750,14 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe){
 
 	if(cumul_eleves > 0 && somme_coef_eleves > 0) moyenne_generale = Number(cumul_eleves/somme_coef_eleves).toFixed(2)
 
-	$('tr[id="'+identifiant_eleve+'"]').append('<th class="border_bottom moyenne_generale">'+moyenne_generale+'</th>')
-	
+
+	//on met la valeur de la colonne de moyenne générale
+	//$('tr[id="'+identifiant_eleve+'"]').append('<th class="border_bottom moyenne_generale">'+moyenne_generale+'</th>')
+	var indice_moyenne_generale = $('[id="Moyenne générale"]')[0].cellIndex
+	//on supprime l'éventuelle ancienne valeur de moyenne
+	$('tr[id="'+identifiant_eleve+'"] > .moyenne_generale').remove()
+	//on rajoute la nouvelle valeur de moyenne
+	$('tr[id="'+identifiant_eleve+'"]').children('th:nth-child('+indice_moyenne_generale+')').after('<th class="border_bottom moyenne_generale">'+moyenne_generale+'</th>');
 
 
 
@@ -13721,14 +13798,29 @@ async function rajouter_absences_et_retards_eleves(){
 
 
 function rajouter_rangs_eleves(){
-	var arr = $(".moyenne_generale").map(function(){return Number($(this).text())}).get()
+	var arr = $('tr:not(.ignore) > .moyenne_generale').map(function(){return Number($(this).text())}).get()
 	var sorted = arr.slice().sort(function(a,b){return b-a})
 	var ranks = arr.map(function(v){ return sorted.indexOf(v)+1 });
 	//console.log({ranks});
 
-	$('tbody > tr.une_ligne_de_donnees').each(function(index,element_eleve){
+	//vider les rangs des ignorés
+	$('tbody > tr.ignore').each(function(index,element_eleve){
+		$(element_eleve).children('.rang_eleve').remove()
+		$(element_eleve).children('.moyenne_generale').after('<th class="border_bottom rang_eleve"></th>');
+	})
+
+
+
+	$('tbody > tr:not(.ignore).une_ligne_de_donnees').each(function(index,element_eleve){
 		//console.log({element_eleve})
-		$(element_eleve).append('<th class="border_bottom">'+ranks[index]+'</th>')
+		//$(element_eleve).append('<th class="border_bottom rang_eleve">'+ranks[index]+'</th>')
+
+		//supprimer le rang de cet eleve s'il existe
+		$(element_eleve).children('.rang_eleve').remove()
+
+		//insérer apres la moyenne générale
+		$(element_eleve).children('.moyenne_generale').after('<th class="border_bottom rang_eleve">'+ranks[index]+'</th>');
+
 	})
 
 	return ranks
