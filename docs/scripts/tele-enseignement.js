@@ -14485,7 +14485,7 @@ async function trouver_mes_eleves(){
 			var demande = await supabase.from('bulletins').select('*').like('liste_options', '%'+Classe_Matiere+'%').like('Classe_Matiere', '%'+Classe_Matiere+'%')
 			console.log("1",{demande})
 
-			/*
+			
 			//si ça renvoie + de 1000 -> limiter à la matiere
 			if(demande.body.length >= 1000){
 				demande = await supabase.from('bulletins').select('*').like('Classe_Matiere', '%'+Classe_Matiere+'%')
@@ -14500,7 +14500,7 @@ async function trouver_mes_eleves(){
 				console.log("3",{demande})
 
 			}
-			*/
+			
 
 			//console.log({demande})
 			mes_eleves_initiaux = demande.body
