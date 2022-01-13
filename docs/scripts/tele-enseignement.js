@@ -14482,7 +14482,25 @@ async function trouver_mes_eleves(){
 		}else{
 
 			//si la matiere possede un coef spécifiable, on veut uniquement les eleves qui ont cette classe matiere dans leur liste_options
-			var demande = await supabase.from('bulletins').select('*').like('liste_options', '%'+Classe_Matiere+'%')
+			var demande = await supabase.from('bulletins').select('*').like('liste_options', '%'+Classe_Matiere+'%').like('Classe_Matiere', '%'+Classe_Matiere+'%')
+			console.log("1",{demande})
+
+			/*
+			//si ça renvoie + de 1000 -> limiter à la matiere
+			if(demande.body.length >= 1000){
+				demande = await supabase.from('bulletins').select('*').like('Classe_Matiere', '%'+Classe_Matiere+'%')
+				console.log("2",{demande})
+
+
+
+			//si la matière ne renvoie rien -> renvoyer tous les inscrits à la matière
+			}else if(demande.body.length === 0){			
+
+				demande = await supabase.from('Eleves').select('Identifiant,Nom,"Prénom(s)",liste_options').like('liste_options', '%'+Classe_Matiere+'%').order('Identifiant')
+				console.log("3",{demande})
+
+			}
+			*/
 
 			//console.log({demande})
 			mes_eleves_initiaux = demande.body
@@ -14686,7 +14704,7 @@ async function actualiser_liste_eleves_bulletins(){
 
 
 		mes_eleves = await trouver_mes_eleves()
-		//console.log({mes_eleves})
+		console.log({mes_eleves})
 
 
 		if(mes_eleves.length === 0){
