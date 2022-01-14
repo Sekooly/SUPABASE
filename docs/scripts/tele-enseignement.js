@@ -14483,13 +14483,49 @@ async function trouver_mes_eleves(){
 
 			//si la matiere possede un coef spécifiable, on veut uniquement les eleves qui ont cette classe matiere dans leur liste_options
 			var demande = await supabase.from('bulletins').select('*').like('liste_options', '%'+Classe_Matiere+'%').like('Classe_Matiere', '%'+Classe_Matiere+'%')
+			var nb_identifiants_notes = valeursUniquesDeCetteKey(demande.body,'Identifiant').length
 			console.log("1",{demande})
 
+			var eleves_inscrits = await supabase.from('Eleves').select('*').like('liste_options', '%'+Classe_Matiere+'%')
+			var nb_identifiants_classe = valeursUniquesDeCetteKey(eleves_inscrits.body,'Identifiant').length
 			
 			//si ça renvoie + de 1000 -> limiter à la matiere
 			if(demande.body.length >= 1000){
 				demande = await supabase.from('bulletins').select('*').like('Classe_Matiere', '%'+Classe_Matiere+'%')
 				console.log("2",{demande})
+
+
+
+
+			//si le nombre d'élèves renvoyés n'est pas le même que le nombre d'inscrits
+			}else if(nb_identifiants_classe > nb_identifiants_notes){			
+				console.log("2 BIS",{eleves_inscrits})
+
+				eleves_inscrits.body.forEach( function(un_eleve, index_note) {
+
+					//si l'identifiant un_eleve['Identifiant'] n'est pas listé dans demande -> rajouter dans demande
+					identifiant_non_liste = demande.body.filter(e => e['Identifiant'] === un_eleve['Identifiant']).length === 0
+
+					if(identifiant_non_liste){
+
+						nouvelle_note = {
+						  "id_note": 0,
+						  "Classe": classe,
+						  "Nom": un_eleve['Nom'],
+						  "Prénom(s)": un_eleve['Prénom(s)'],
+						  "Identifiant": un_eleve['Identifiant'],
+						  "Classe_Matiere": Classe_Matiere,
+						  "identifiant_prof": null,
+						  "periode_bulletin": periode_bulletin,
+						  "saison_note": saison_note,
+						  "note": '',
+						  "liste_options": un_eleve['liste_options'],
+						  "coef": 0
+						}
+
+						demande.body.push(nouvelle_note)
+					}
+				})
 
 
 
@@ -14504,7 +14540,7 @@ async function trouver_mes_eleves(){
 
 			//console.log({demande})
 			mes_eleves_initiaux = demande.body
-
+			mes_eleves_initiaux = mes_eleves_initiaux.sort((a,b) =>  a['Identifiant']-b['Identifiant'] )
 
 
 			chargement(false)
