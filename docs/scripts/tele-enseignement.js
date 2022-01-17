@@ -13233,7 +13233,8 @@ function voir_fiche_classe_choisie(){
 
 function alerte_aide_fiche(){
 	var mon_type = recuperer('mon_type')
-	var texte = mon_type === 'Profs' ? "ℹ️ Pour chaque élève, émettez votre avis en cliquant sur le bouton de la dernière colonne 'Avis du Conseil de classe'." : "ℹ️ Pour télécharger/imprimer la fiche des colonnes cochées sous format pdf, pensez à ajuster l'échelle de mise en page vers 60% avant d'enregistrer."
+	var texte = mon_type.includes('Admin') ?  "ℹ️ Pour télécharger/imprimer la fiche des colonnes cochées sous format pdf, pensez à ajuster l'échelle de mise en page vers 60% avant d'enregistrer."
+				: "ℹ️ Pour chaque élève, émettez votre avis en cliquant sur le bouton de la dernière colonne 'Avis du Conseil de classe'." 
 	alert(texte)
 }
 
