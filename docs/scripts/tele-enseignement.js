@@ -2949,7 +2949,7 @@ function attribuer_les_clics(){
 	au_clic("#dashboard", "tableau_de_bord()")//
 	au_clic("#side-bar-prog", "recuperer_programme()")//
 	//au_clic("#side-bar-conseil", "conseils_de_classe()")//
-	au_clic("#side-bar-conseil", "voir_fiche_classe_choisie()")
+	au_clic("#side-bar-conseil", "choix_classe_fiche()")
 	au_clic("#side-bar-remed", "remediations()")//
 	au_clic("#side-bar-bulletins", "clic_bulletin()")//
 	au_clic("#side-bar-irl", "gerer_notifs_irl()")//
