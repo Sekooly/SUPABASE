@@ -2449,7 +2449,8 @@ function recuperer_eleves(sans_fenetre){
 	if (impossible_de_cliquer()) return -1;
 
 	//si dossier vie scolaire et non admin: pas de dépôt
-	if(!recuperer('mon_type').includes('Admin') && element_DOM('accueil_utilisateur').innerText.includes('Vie scolaire') ){
+	console.log({sans_fenetre})
+	if(!recuperer('mon_type').includes('Admin') && element_DOM('accueil_utilisateur').innerText.includes('Vie scolaire') && sans_fenetre === false){
 		alert("Vous n'avez pas les droits pour consulter cette liste.");
 		return -1;
 	}
@@ -16096,6 +16097,8 @@ function reinitialiser_init(){
 
 /**************************************** textes riches *****************************************/
 function rendre_riche(id_text_area){
+
+	//console.log({id_text_area})
 	ClassicEditor
 		.create( document.querySelector( '[id="'+id_text_area+'"]' )   , config_editor() )
         .then( async (editor) => {
