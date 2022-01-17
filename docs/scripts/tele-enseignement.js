@@ -66,6 +66,8 @@ var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","UR
 								
 							]
 
+var parametres_facultatifs = ['description','nom_liste_et_coefs', 'position']
+
 
 var elements_menu_haut_avec_modifs = ["Classes","Matieres","Eleves","Profs","Administration","Liste_appreciations"]
 var elements_menu_haut_avec_reset = ["Eleves","Profs","Administration"]
@@ -12837,14 +12839,31 @@ function convertir_saisie_en_JSON(id_form,id_parametre){
 
 		//si c'est une classe pour prof -> récupérer $('#Classe.donnee').val().join(";");
 		valeur_saisie = (nom_champ === "Classe" && id_parametre ==="Profs" && $("#Classe.donnee")[0].nodeName !== "INPUT") ?  $('#Classe.donnee').val().join(";") : $(".donnee[id='"+nom_champ+"']")[0].value
-		saisie = saisie + '"' + [nom_champ]  + '"' + ":"+ '"' +   valeur_saisie  +'"'
-		virgule = i===liste_champs_saisie.length-1 ? "" : ","
+		
+
+		est_obligatoire = parametres_facultatifs.indexOf(nom_champ) < 0
+
+
+		//vide et non obligatoire : on rajoute pas
+		if(valeur_saisie.trim() === "" && !est_obligatoire){
+
+			virgule = ""
+
+		//non vide OU obligatoire : on rajoute
+		}else{
+			saisie = saisie + '"' + [nom_champ]  + '"' + ":"+ '"' +   valeur_saisie  +'"'
+			virgule = i===liste_champs_saisie.length-1 ? "" : ","
+		}
+
 		saisie = saisie + virgule
+
 	}
 	
+	//on enleve la derniere virgule si besoin
+	if(right(saisie,1)===',') saisie = left(saisie,saisie.length-1)
 
 	saisie = saisie + "}"
-
+	//console.log({saisie})
 	return saisie
 }
 
@@ -12855,10 +12874,10 @@ function formulaire_rempli(nom_formulaire){
 		//console.log(valeur.id)
 		est_actif = !$(".donnee[id='"+valeur.id+"']")[0].disabled
 		est_vide = $(".donnee[id='"+valeur.id+"']")[0].value === ""
-		
+		est_obligatoire = parametres_facultatifs.indexOf(valeur.id) < 0
 		//console.log(valeur.id + " : " + (est_actif && est_vide))
 
-		return est_actif && est_vide 
+		return est_actif && est_vide && est_obligatoire
 	});
 
 
