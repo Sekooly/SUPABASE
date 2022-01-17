@@ -2299,8 +2299,10 @@ CREATE TABLE public."Jury"
 (
     id_appreciation bigint NOT NULL,
     id_commentateur text COLLATE pg_catalog."default" NOT NULL,
+    role_commentateur text COLLATE pg_catalog."default",
     contenu_commentaire text COLLATE pg_catalog."default",
     horodateur timestamp without time zone DEFAULT now(),
+    
     CONSTRAINT "Jury_pkey" PRIMARY KEY (id_appreciation, id_commentateur),
     CONSTRAINT "Jury_id_appreciation_key" UNIQUE (id_appreciation)
 )

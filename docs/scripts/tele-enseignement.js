@@ -13465,27 +13465,33 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes)
 
 
 
-
-	//créer une ligne de coche si on veut ou non exporter la colonne en pdf
-	var nb_de_cases = premiere_ligne.length
-	//console.log({premiere_ligne})
-	//console.log({nb_de_cases})
-	var liste_colonnes_masquees_fiche = recuperer('liste_colonnes_masquees_fiche') || ""
-	var coches_des_matieres = premiere_ligne.map(function(e) {
-		checked = liste_colonnes_masquees_fiche.includes(','+e+',') ? "" : "checked"
-		//console.log({[e]:checked})
-		return '<th><input class="header_table entete_sticky sekooly-mode-background" name="exporter_colonne" type="checkbox" '+checked+'></th>' 
-	}).join('')
-	//console.log({coches_des_matieres})
-
-	var html_cases = '<tr class="border_bottom" id="coches_colonnes_export">'+ coches_des_matieres +'</tr>'
-	//console.log({html_cases})
-	$('thead').prepend(html_cases)
-
-	//au moment de changer le checked de [name="exporter_colonne"], actualiser la liste des colonnes masquées sur les fiches
-	au_clic('[name="exporter_colonne"]', 'actualiser_liste_champs_masques()')
+	if(recuperer('mon_type').includes('Admin')){
 
 
+		//créer une ligne de coche si on veut ou non exporter la colonne en pdf
+		var nb_de_cases = premiere_ligne.length
+		//console.log({premiere_ligne})
+		//console.log({nb_de_cases})
+		var liste_colonnes_masquees_fiche = recuperer('liste_colonnes_masquees_fiche') || ""
+		var coches_des_matieres = premiere_ligne.map(function(e) {
+			checked = liste_colonnes_masquees_fiche.includes(','+e+',') ? "" : "checked"
+			//console.log({[e]:checked})
+			return '<th><input class="header_table entete_sticky sekooly-mode-background" name="exporter_colonne" type="checkbox" '+checked+'></th>' 
+		}).join('')
+		//console.log({coches_des_matieres})
+
+		var html_cases = '<tr class="border_bottom" id="coches_colonnes_export">'+ coches_des_matieres +'</tr>'
+		//console.log({html_cases})
+		$('thead').prepend(html_cases)
+
+		//au moment de changer le checked de [name="exporter_colonne"], actualiser la liste des colonnes masquées sur les fiches
+		au_clic('[name="exporter_colonne"]', 'actualiser_liste_champs_masques()')
+
+
+
+
+		
+	}
 
 
 
@@ -13859,9 +13865,12 @@ async function emettre_avis_conseil(ceci){
 	var nom_complet = ceci.parentNode.children[1].innerText + " " + ceci.parentNode.children[2].innerText
 	var index_avis_vie_scolaire = $('[id="Appréciations de la Vie Scolaire"]')[0].cellIndex
 	var avis_vie_scolaire = ceci.parentNode.children[index_avis_vie_scolaire].innerText.trim()
-	var boutons = avis_vie_scolaire.length === 0 ? ''
+	var boutons = avis_vie_scolaire.length === 0 ? `<i class="contenu_alerte_vide">Il n'y a pas encore d'appréciation Vie Scolaire pour cet élève.</i>`
 				: `<button type="button" id="ok_avis_conseil" class="rendre sekooly-mode-background">✅ Je suis d'accord</button>
 					<button type="button" id="pas_ok_avis_conseil" class="rendre sekooly-mode-background">❌Je ne suis PAS d'accord</button>`
+
+	//console.log({boutons})
+
 
 
 	var id_appreciation = $('[id="'+eleve_en_cours+'"] > th[id_appreciation]')[0].getAttribute('id_appreciation')
@@ -13883,7 +13892,7 @@ async function emettre_avis_conseil(ceci){
 
 	var liste_profs_ok = les_profs_daccord.length > 0 ? `
 		<div class="description_conseil">
-			<strong class="sekooly-mode">✅ `+les_profs_daccord.map(e => e['id_commentateur'].toUpperCase()).join(', ')+`</strong>
+			<strong class="sekooly-mode">✅ `+les_profs_daccord.map(e => e['id_commentateur'].toUpperCase() + ' (' +  e['role_commentateur'] + ')').join(', ')+`</strong>
 			<span style="margin-left: 5px;">`+verbe_approuver+` approuvé l'avis de la Vie Scolaire</span>
 		</div>
 	` : ""
@@ -13897,7 +13906,7 @@ async function emettre_avis_conseil(ceci){
 
 				bouton_suppr = un_prof['id_commentateur'].toLowerCase() === recuperer('identifiant_courant').toLowerCase() ? bouton_supprimer_avis(): ""
 				return `
-				<strong class="sekooly-mode">❌ `+un_prof['id_commentateur'].toUpperCase()+`:</strong>
+				<strong class="sekooly-mode">❌ `+un_prof['id_commentateur'].toUpperCase() + ' (' +  un_prof['role_commentateur'] + ')' +`:</strong>
 				<span style="margin-left: 5px;">`+un_prof['contenu_commentaire']+`</span>
 				`+bouton_suppr+`
 				`}).join('<br>') +`
@@ -13973,6 +13982,7 @@ async function approuver_avis(oui){
 	data['id_appreciation'] = $('.selected > th[id_appreciation]')[0].getAttribute('id_appreciation')
 	data['contenu_commentaire'] = phrase_approbation()
 	data['id_commentateur'] = recuperer('identifiant_courant')
+	data['role_commentateur'] = $('.votre_matiere').text() || mon_role
 
 	if(oui){
 		afficher_alerte("✅ Vous avez approuvé l'appréciation de la Vie Scolaire.")
