@@ -574,6 +574,7 @@ CREATE TABLE public."Matieres"
     coefficient_matiere real,
     description text COLLATE pg_catalog."default" NOT NULL DEFAULT 'Aucune description fournie'::text,
     nom_liste_et_coefs VARCHAR(150) COLLATE pg_catalog."default",
+    "position" real,
     CONSTRAINT "Matieres_pkey" PRIMARY KEY ("Classe_Matiere", "Cycle")
 )
 

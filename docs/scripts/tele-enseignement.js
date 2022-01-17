@@ -13346,10 +13346,10 @@ async function render_fiche(ignorer_absence_classe){
 	
 	//afficher les matières en colonnes
 	//var toutes = JSON.parse(recuperer('mes_matieres'))
-	var toutes = await supabase.from('Matieres').select('*').eq('Classe',la_classe) //toutes les matieres de la classe
-	//console.log({toutes})
+	var toutes = await rechercher('Matieres', 'Classe', la_classe, '*') 
+	console.log({toutes})
 	
-	toutes = toutes.body
+	//toutes = toutes.body
 	var matieres_de_classe = toutes.filter(e => e['Classe'] === la_classe).sort()
 	//console.log({matieres_de_classe})
 

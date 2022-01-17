@@ -191,7 +191,8 @@ function ordonner(nom_table){
   if(nom_table==="Classes"){
     return "&order=cycle.desc,niveau.asc,Classe.asc"
   } else if(nom_table==="Matieres"){
-    return "&order=Cycle.desc,Classe.asc,Matiere.asc" 
+    return '&order=Cycle.desc,Classe.asc,position.asc,Matiere.asc'
+    //return "&order=Cycle.desc,Classe.asc,Matiere.asc" 
   } else if(nom_table==="Eleves"){
     return "&order=Cycle.desc,Classe.desc,Identifiant.asc"
   } else if(nom_table==="Profs" || nom_table==="Administration"){
