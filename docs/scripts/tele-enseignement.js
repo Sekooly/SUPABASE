@@ -30,6 +30,7 @@ var elements_generiques_en_haut = [{"Général": [
 										  "Rendus",
 										  "Notes",
 										  "Appreciations",
+										  "Jury",
 										  "Topic",
 										  "Coms",
 										  "Notifs",
@@ -2948,6 +2949,7 @@ function attribuer_les_clics(){
 	au_clic("#dashboard", "tableau_de_bord()")//
 	au_clic("#side-bar-prog", "recuperer_programme()")//
 	//au_clic("#side-bar-conseil", "conseils_de_classe()")//
+	au_clic("#side-bar-conseil", "voir_fiche_classe_choisie()")
 	au_clic("#side-bar-remed", "remediations()")//
 	au_clic("#side-bar-bulletins", "clic_bulletin()")//
 	au_clic("#side-bar-irl", "gerer_notifs_irl()")//
@@ -12944,7 +12946,15 @@ function choix_classe_bulletin(){
 }
 
 function choix_classe_fiche(){
-	voir_fiche_classe_choisie()
+
+	//si c'est un prof ou un admin
+	var mon_type = recuperer('mon_type')
+	if(mon_type.includes("Admin") || mon_type.includes("Profs") ){
+		voir_fiche_classe_choisie()	
+	}else{
+		alert("Fonctionnalité en cours de développement.")
+	}
+	
 	
 
 }
@@ -13174,12 +13184,15 @@ function voir_fiche_classe_choisie(){
 	les_classes.sort()
 	//console.log({les_classes}) 
 
+
 	nom_periode_bulletin=data_etablissement['config_notes']['nom_periode_bulletin']
 	liste_periodes = Object.keys(data_etablissement['config_notes'][nom_periode_bulletin])
 
 	//rajouter le bouton de téléchargement
 	$("#entete-fenetre").append('<img id="actualiser-fiche" alt="télécharger" class="download-btn window-btn" src="'+ prefixe_image + '/img_actualiser.png">')
-	$("#entete-fenetre").append('<img id="download-fiche" alt="télécharger" class="download-btn window-btn" src="'+ prefixe_image + '/img_download.png">')
+
+	//si on est admin -> on peut telecharger la fiche
+	if(recuperer('mon_type').includes('Admin')) $("#entete-fenetre").append('<img id="download-fiche" alt="télécharger" class="download-btn window-btn" src="'+ prefixe_image + '/img_download.png">')
 
 
 	au_clic("#actualiser-fiche","render_fiche()")
@@ -13214,7 +13227,9 @@ function voir_fiche_classe_choisie(){
 }
 
 function alerte_aide_fiche(){
-	alert("ℹ️ Pour télécharger/imprimer la fiche des colonnes cochées sous format pdf, pensez à ajuster l'échelle de mise en page vers 60% avant d'enregistrer.")
+	var mon_type = recuperer('mon_type')
+	var texte = mon_type === 'Profs' ? "ℹ️ Pour chaque élève, émettez votre avis en cliquant sur le bouton de la dernière colonne 'Avis du Conseil de classe'." : "ℹ️ Pour télécharger/imprimer la fiche des colonnes cochées sous format pdf, pensez à ajuster l'échelle de mise en page vers 60% avant d'enregistrer."
+	alert(texte)
 }
 
 async function generer_appreciations(){
@@ -13323,7 +13338,11 @@ async function render_fiche(ignorer_absence_classe){
 	if(!la_classe) return ignorer_absence_classe ? false : alert("Merci de choisir une classe pour créer la fiche.")
 	
 	//afficher les matières en colonnes
-	var toutes = JSON.parse(recuperer('mes_matieres'))
+	//var toutes = JSON.parse(recuperer('mes_matieres'))
+	var toutes = await supabase.from('Matieres').select('*').eq('Classe',la_classe) //toutes les matieres de la classe
+	//console.log({toutes})
+	
+	toutes = toutes.body
 	var matieres_de_classe = toutes.filter(e => e['Classe'] === la_classe).sort()
 	//console.log({matieres_de_classe})
 
@@ -13340,8 +13359,16 @@ async function render_fiche(ignorer_absence_classe){
 
 function nouveau_tableau_avec_ce_titre(id_tableau, array_ligne){
 
+	var mes_matieres = JSON.parse(recuperer("mes_matieres"))
+	mes_matieres = valeursUniquesDeCetteKey(mes_matieres,"Matiere")
+	var mon_type =recuperer('mon_type')
+
+
   let headerRow = array_ligne
-    .map(col => `<th id="${col}" class="header_table entete_sticky sekooly-mode-background">${col}</th>`)
+    .map(function(col){
+    	classe_supplementaire = mes_matieres.indexOf(col) >= 0 &&  mon_type === "Profs" ? 'votre_matiere ' : ""
+    	return `<th id="${col}" class="`+classe_supplementaire+`header_table entete_sticky sekooly-mode-background">${col}</th>`
+    })
     .join("");
 
   //build the table
@@ -13424,7 +13451,7 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes)
 	
 
 	//créer la premiere ligne: Numéro, Nom, Prénom(s), Ancien/Nouveau, Date de naissance, Sexe, [matieres], Moyenne, Rang, Absence(s) demi-journée(s), Retards//, Epreuve facultative
-	var premiere_ligne = 'Numéro,Nom,Prénom(s),Ancien/Nouveau,Date de naissance,Sexe,'+matieres_de_classe.map(e => e['Matiere']).join(',')+',Moyenne générale,Rang,Absence(s) demi-journée(s),Retards,Appréciations de la Vie Scolaire'
+	var premiere_ligne = 'Numéro,Nom,Prénom(s),Ancien/Nouveau,Date de naissance,Sexe,'+matieres_de_classe.map(e => e['Matiere']).join(',')+',Moyenne générale,Rang,Absence(s) demi-journée(s),Retards,Appréciations de la Vie Scolaire,Avis du Conseil de classe'
 	premiere_ligne = premiere_ligne.split(',')
 	//console.log({premiere_ligne})
 	//console.log('\n\n\n')
@@ -13498,6 +13525,7 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes)
 				rajouter_min_max_moy(matieres_de_classe)
 				rajouter_rangs_eleves()
 				rajouter_absences_et_retards_eleves()
+				
 			},1000)
 			
 		}
@@ -13788,11 +13816,186 @@ async function rajouter_absences_et_retards_eleves(){
 			retards = tout['retards'] || ""
 			contenu = tout['contenu'] || ""
 
-			$('tr[id="'+un_eleve['identifiant_eleve']+'"]').append('<th class="border_bottom">'+absences+'</th><th class="border_bottom">'+retards+'</th><th class="border_bottom">'+contenu+'</th>')
+			$('tr[id="'+un_eleve['identifiant_eleve']+'"]').append('<th class="border_bottom">'+absences+'</th><th class="border_bottom">'+retards+'</th><th class="border_bottom" id_appreciation="'+un_eleve['id']+'" >'+contenu+'</th>')
 
 		}
 
 	})
+
+	rajouter_bouton_emettre_avis()
+}
+
+function rajouter_bouton_emettre_avis(){
+
+	//dans la colonne Avis du Conseil de classe
+	var derniere_colonne = $('[id="Appréciations de la Vie Scolaire"]')[0].cellIndex +1
+	//console.log({derniere_colonne})
+
+	$("tr:not(.ignore) > th.border_bottom:nth-child("+derniere_colonne+")").each(function(index,avis){
+		//console.log(index,avis)
+		$( "<button class='avis_conseil'>Emettre un avis</button>" ).insertAfter(avis)
+	})
+
+	au_clic('.avis_conseil','emettre_avis_conseil(this)')
+
+}
+
+
+
+
+
+
+
+function phrase_approbation(){
+	return "J'approuve."
+}
+
+
+
+
+async function emettre_avis_conseil(ceci){
+
+	var eleve_en_cours = ceci.parentNode.id
+	var nom_complet = ceci.parentNode.children[1].innerText + " " + ceci.parentNode.children[2].innerText
+	var index_avis_vie_scolaire = $('[id="Appréciations de la Vie Scolaire"]')[0].cellIndex
+	var avis_vie_scolaire = ceci.parentNode.children[index_avis_vie_scolaire].innerText.trim()
+	var boutons = avis_vie_scolaire.length === 0 ? ''
+				: `<button type="button" id="ok_avis_conseil" class="rendre sekooly-mode-background">✅ Je suis d'accord</button>
+					<button type="button" id="pas_ok_avis_conseil" class="rendre sekooly-mode-background">❌Je ne suis PAS d'accord</button>`
+
+
+	var id_appreciation = $('[id="'+eleve_en_cours+'"] > th[id_appreciation]')[0].getAttribute('id_appreciation')
+	//console.log({id_appreciation})
+	var tous_les_avis_jury = await supabase
+							.from('Jury')
+							.select('*')
+							.eq('id_appreciation',id_appreciation)
+
+	tous_les_avis_jury = tous_les_avis_jury.body
+	//console.log({tous_les_avis_jury})
+
+	var les_profs_daccord = tous_les_avis_jury.filter(e => e['contenu_commentaire'] === phrase_approbation()) //['Prof1', 'Prof2', 'Prof3']
+	var les_profs_pas_daccord = tous_les_avis_jury.filter(e => e['contenu_commentaire'] !== phrase_approbation())/*[{'id_commentateur':'Prof4', 'contenu_commentaire':"Je ne suis pas d'accord car"},
+								{'id_commentateur':'Prof5', 'contenu_commentaire':"Je ne suis pas d'accord car"}, 
+								{'id_commentateur':'Prof6', 'contenu_commentaire':"Je ne suis pas d'accord car"}]*/
+	var verbe_approuver = les_profs_daccord.length > 1 ? "ont" : "a"
+
+
+	var liste_profs_ok = les_profs_daccord.length > 0 ? `
+		<div class="description_conseil">
+			<strong class="sekooly-mode">✅ `+les_profs_daccord.map(e => e['id_commentateur'].toUpperCase()).join(', ')+`</strong>
+			<span style="margin-left: 5px;">`+verbe_approuver+` approuvé l'avis de la Vie Scolaire</span>
+		</div>
+	` : ""
+
+
+
+	var liste_profs_pas_ok = les_profs_pas_daccord.length > 0 ? `
+
+		<div class="description_conseil">
+			`+les_profs_pas_daccord.map(function(un_prof){
+
+				bouton_suppr = un_prof['id_commentateur'].toLowerCase() === recuperer('identifiant_courant').toLowerCase() ? bouton_supprimer_avis(): ""
+				return `
+				<strong class="sekooly-mode">❌ `+un_prof['id_commentateur'].toUpperCase()+`:</strong>
+				<span style="margin-left: 5px;">`+un_prof['contenu_commentaire']+`</span>
+				`+bouton_suppr+`
+				`}).join('<br>') +`
+		</div>
+
+	` : ""
+
+
+	$("#mini_popup").remove();
+
+	var html_emettre_avis = `
+	<div class="mini_popup darkmode-mini_popup" id="mini_popup" style="cursor: all-scroll;">
+		<div id="entete-fenetre" style="display: inline-flex;float: right;">
+			<img alt="X" src="`+ prefixe_image + `/quitter.png" id="bye_prev" onclick="$('#mini_popup').remove()" class="bye_prev">
+		</div>
+		<div id_appreciation_actuel="`+id_appreciation+`" style="border-bottom-style: ridge;font-size: 25px;">Votre avis sur <strong>`+nom_complet+`</strong></div>
+		<div class="description_conseil">
+			<span style="margin-left: 5px;">`+avis_vie_scolaire+`</span>
+		</div>
+
+		`+boutons+`
+
+		`+liste_profs_ok+`
+
+		`+liste_profs_pas_ok+`
+
+
+
+	</div>
+
+	`
+
+	$('body').append(html_emettre_avis)
+	dragElement($("#mini_popup")[0])
+
+	au_clic("#ok_avis_conseil","approuver_avis(true)")
+	au_clic("#pas_ok_avis_conseil","approuver_avis(false)")
+
+}
+
+function bouton_supprimer_avis(){
+	return '<img onclick="supprimer_avis_jury(this)" src="'+prefixe_image+'/img_trash.png" alt="Supprimer" class="editer">'
+}
+
+async function supprimer_avis_jury(ceci){
+
+	var id_appreciation = $('[id_appreciation_actuel]')[0].getAttribute('id_appreciation_actuel')
+	var id_commentateur = recuperer('identifiant_courant')
+	var a_supprimer = {
+		id_appreciation: id_appreciation,
+		id_commentateur: id_commentateur
+	}
+
+	//supprimer
+	const { data, error } = await supabase
+	  .from('Jury')
+	  .delete()
+	  .match(a_supprimer)
+
+	/*
+	console.log({data})
+	console.log({error})
+	*/
+
+
+	//actualiser
+	$('.selected > button').click()
+
+}
+
+async function approuver_avis(oui){
+	var data = {}
+	data['id_appreciation'] = $('.selected > th[id_appreciation]')[0].getAttribute('id_appreciation')
+	data['contenu_commentaire'] = phrase_approbation()
+	data['id_commentateur'] = recuperer('identifiant_courant')
+
+	if(oui){
+		afficher_alerte("✅ Vous avez approuvé l'appréciation de la Vie Scolaire.")
+	}else{
+		data['contenu_commentaire'] = prompt("Pour quelles raisons vous n'êtes pas d'accord?", "")
+
+		if(!data['contenu_commentaire']){
+			return alert("Merci de justifier votre désapprobation.")			
+		}else{
+			data['contenu_commentaire'] = data['contenu_commentaire'].trim()
+			afficher_alerte("❌ Vous avez désapprouvé l'appréciation de la Vie Scolaire.")
+		}
+	}
+
+
+	//console.log({data})
+	await supabase
+		.from('Jury')
+		.upsert(data)
+		.match({id_appreciation: data['id_appreciation'], id_commentateur: data['id_commentateur'] })
+
+	$('.selected > button').click()
+
 }
 
 

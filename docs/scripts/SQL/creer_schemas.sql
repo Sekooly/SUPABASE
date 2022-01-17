@@ -2265,3 +2265,57 @@ GRANT ALL ON TABLE public."Appreciations" TO postgres;
 GRANT ALL ON TABLE public."Appreciations" TO service_role;
 
 GRANT ALL ON TABLE public."Appreciations" TO supabase_admin;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- Table: public.Jury
+
+-- DROP TABLE public."Jury";
+
+CREATE TABLE public."Jury"
+(
+    id_appreciation bigint NOT NULL,
+    id_commentateur text COLLATE pg_catalog."default" NOT NULL,
+    contenu_commentaire text COLLATE pg_catalog."default",
+    horodateur timestamp without time zone DEFAULT now(),
+    CONSTRAINT "Jury_pkey" PRIMARY KEY (id_appreciation, id_commentateur),
+    CONSTRAINT "Jury_id_appreciation_key" UNIQUE (id_appreciation)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public."Jury"
+    OWNER to supabase_admin;
+
+GRANT ALL ON TABLE public."Jury" TO anon;
+
+GRANT ALL ON TABLE public."Jury" TO authenticated;
+
+GRANT ALL ON TABLE public."Jury" TO postgres;
+
+GRANT ALL ON TABLE public."Jury" TO service_role;
+
+GRANT ALL ON TABLE public."Jury" TO supabase_admin;
