@@ -12952,7 +12952,12 @@ function choix_classe_fiche(){
 	if(mon_type.includes("Admin") || mon_type.includes("Profs") ){
 		voir_fiche_classe_choisie()	
 	}else{
-		alert("Fonctionnalité en cours de développement.")
+		if(JSON.parse(recuperer("mes_donnees"))['Est_délégué'] === "oui"){
+			voir_fiche_classe_choisie()	
+		}else{
+			alert("❌ Vous n'avez pas accès au conseil de classe car vous n'êtes pas délégué.")
+		}
+		
 	}
 	
 	
@@ -13490,7 +13495,7 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, les_notes)
 
 
 
-		
+
 	}
 
 
