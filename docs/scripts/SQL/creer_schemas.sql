@@ -2303,8 +2303,7 @@ CREATE TABLE public."Jury"
     contenu_commentaire text COLLATE pg_catalog."default",
     horodateur timestamp without time zone DEFAULT now(),
     
-    CONSTRAINT "Jury_pkey" PRIMARY KEY (id_appreciation, id_commentateur),
-    CONSTRAINT "Jury_id_appreciation_key" UNIQUE (id_appreciation)
+    CONSTRAINT "Jury_pkey" PRIMARY KEY (id_appreciation, id_commentateur)
 )
 
 TABLESPACE pg_default;
