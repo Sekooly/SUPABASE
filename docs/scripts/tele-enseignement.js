@@ -15179,9 +15179,18 @@ function remplacer_liste_saison_note(){
 	$('#enseignant').val(recuperer('identifiant_courant'))
 
 	au_changement("#saison_note","actualiser_liste_eleves_bulletins()")
-	au_changement("#enseignant","actualiser_liste_eleves_bulletins()")
+	au_changement("#enseignant","actualiser_liste_eleves_bulletins(true)")
 
 	au_clic("#saison_note","demande_enregistrement_avant_changement_periode()")
+}
+
+function mettre_le_bon_enseignant(){
+	//me mettre comme enseignant/admin
+	$('#enseignant').val(recuperer('identifiant_courant'))
+
+	//si je suis pas dans la liste -> mettre le premier rencontré
+	if(!$('#enseignant').val()) $("#enseignant").val($("#enseignant option:first").val());
+
 }
 
 function afficher_choix_periode_bulletin(id_classe_matiere){
@@ -15199,10 +15208,7 @@ function afficher_choix_periode_bulletin(id_classe_matiere){
 
 
 	$('#menu_haut').append('<div style="text-align: center;" id="menu_periode">'+choix_periode+'</div>')
-
-
-	//me mettre comme enseignant/admin
-	$('#enseignant').val(recuperer('identifiant_courant'))
+	mettre_le_bon_enseignant()
 
 
 	au_changement("#periode_bulletin","actualiser_liste_eleves_bulletins()")
@@ -15334,7 +15340,7 @@ async function demande_enregistrement_avant_changement_periode(){
 
 
 
-async function actualiser_liste_eleves_bulletins(){
+async function actualiser_liste_eleves_bulletins(changement_enseignant){
 
 	$(".liste_eleves_bulletins").remove()
 
@@ -15343,6 +15349,13 @@ async function actualiser_liste_eleves_bulletins(){
 
 	}else{
 
+
+		//si on a pas mis à jour l'enseignant -> mettre l'enseignant
+		
+		if (!changement_enseignant){
+			mettre_le_bon_enseignant()
+		}
+		
 
 		mes_eleves = await trouver_mes_eleves()
 		console.log({mes_eleves})
