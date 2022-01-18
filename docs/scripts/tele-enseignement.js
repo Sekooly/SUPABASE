@@ -13535,6 +13535,7 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 
 
 	//console.log({pour_bulletin})
+	var liste_profs = await recuperer_profs(true)
 
 	//pour chaque élève		
 	les_eleves.forEach(async function(un_eleve,indice_eleve){
@@ -13554,12 +13555,10 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 			//console.log("dernier élève!")
 			setTimeout(async function(){
 
-				await rajouter_min_max_moy(matieres_de_classe)
-				console.log("min max OK")
+				await rajouter_min_max_moy(matieres_de_classe)				
 				await rajouter_rangs_eleves()
-				console.log("rangs OK")
 				await rajouter_absences_et_retards_eleves()
-				console.log("absences et retards OK")
+				
 
 				//console.log({pour_bulletin})
 
@@ -13574,8 +13573,8 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 						$('tr[id="'+pour_bulletin['leleve']+'"]').click()
 						//console.log("avant")
 						
-						creer_et_envoyer_donnees_bulletin_eleve(pour_bulletin['leleve'],pour_bulletin['la_periode'],pour_bulletin['la_classe'])
-						afficher_fenetre(false) //à décommenter
+						creer_et_envoyer_donnees_bulletin_eleve(pour_bulletin['leleve'],pour_bulletin['la_periode'],pour_bulletin['la_classe'],liste_profs)
+						
 
 						//console.log("apres")
 						chargement(false)
@@ -13675,9 +13674,9 @@ async function rajouter_min_max_moy(matieres_de_classe){
 
 
 			$("tr:not(.ignore) > th.border_bottom:nth-child("+numero_matiere+")").each(function(index,e){
-				if(e.innerText.length > 0){
+				if(e.textContent.length > 0){
 					//console.log(Number(e.innerText))
-					toutes_les_notes_de_la_matiere.push(Number(e.innerText))
+					toutes_les_notes_de_la_matiere.push(Number(e.textContent))
 				}else{
 					//console.log("(vide)")
 				}
@@ -13726,6 +13725,8 @@ async function rajouter_min_max_moy(matieres_de_classe){
 		$("#contenu_fiche_conseil").append('<tr id="ligne_max">'+ligne_max.map(note => `<th>${note}</th>`)+'</tr>')
 		$("#contenu_fiche_conseil").append('<tr id="ligne_moy">'+ligne_moy.map(note => `<th>${note}</th>`)+'</tr>')
 
+
+		console.log("min max OK")
 		return true
 }
 
@@ -13814,7 +13815,7 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe){
 
 		est_bonus = moyenne_matiere.getAttribute('est_bonus')
 		le_coef =  Number(moyenne_matiere.getAttribute('coef'))
-		la_moyenne = moyenne_matiere.innerText
+		la_moyenne = moyenne_matiere.textContent
 
 		//si la note vaut plus de 10
 		//on prend le dernier digit + les chiffres apres la virgule si bonus
@@ -13896,6 +13897,7 @@ async function rajouter_absences_et_retards_eleves(){
 	})
 
 	rajouter_bouton_emettre_avis()
+	console.log("absences et retards OK")
 	return true
 }
 
@@ -14104,6 +14106,8 @@ async function rajouter_rangs_eleves(){
 
 	})
 
+
+	console.log("rangs OK")
 	return ranks
 }
 
@@ -14218,6 +14222,7 @@ async function voir_bulletin_eleve(){
 
 	//mettre la fiche de la classe sans l'afficher
 	voir_fiche_classe_choisie()
+	afficher_fenetre(false) //à décommenter
 	
 
 	//mettre la période + la classe
@@ -14288,27 +14293,31 @@ function mention_moyenne(moyenne){
 	return res
 }
 
-async function creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_classe){
+async function creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_classe, liste_profs){
 
 	//alert(id_eleve)
 	//alert(la_periode)
 	//alert(la_classe)
 
 	var annee_scolaire = calcul_annee_scolaire()
-	var prof_principal = get_les_profs('('+la_classe+'|Vie de classe)')[0]
+	var prof_principal = liste_profs.find(e => e['Classe'].includes('(' + la_classe + '|Vie de classe)')) //get_les_profs('('+la_classe+'|Vie de classe)')[0]
+	console.log({prof_principal})
 
+	if(prof_principal) prof_principal = prof_principal['Nom_complet']
+	/*
 	if(prof_principal){
 		prof_principal = prof_principal['Nom'] + ' ' + prof_principal['Prénom(s)'] + " " + (prof_principal['2è_Prénom'] || "") + " " + (prof_principal['3è_Prénom'] || "")
 	}else{
 		prof_principal = ""
-	}
+	}*/
+
 	//console.log({annee_scolaire})
 
-	var index_moyenne_generale = $('[id="Moyenne générale"]')[0].cellIndex
+	var index_moyenne_generale = index_de_cette_colonne('Moyenne générale')
 	var moy_generale = recuperer_dans_le_selected(id_eleve,"Moyenne générale")
 	var nb_eleves = $('.une_ligne_de_donnees').length
 	var id_responsable_vie_sco = $('[identifiant_appreciateur]')[0].getAttribute('identifiant_appreciateur')
-	var responsable_vie_sco = id_responsable_vie_sco.split('.')[0].toUpperCase() + " " + id_responsable_vie_sco.split('.')[1]
+	var responsable_vie_sco = id_responsable_vie_sco.split('.')[0].toUpperCase() + " " + left(id_responsable_vie_sco.split('.')[1].toUpperCase(),1)+ right(id_responsable_vie_sco.split('.')[1],id_responsable_vie_sco.split('.')[1].length-1)
 
 	var datas = {
 		nom_etablissement: data_etablissement['nom_etablissement'].toUpperCase(),
@@ -14412,7 +14421,7 @@ async function creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_cl
 
 	stocker('les_matieres_bulletin',JSON.stringify(les_matieres))
 	stocker('datas_bulletin',JSON.stringify(datas))
-	var fenetre_bulletin = window.open("./BULLETINS/index.html","");
+	var fenetre_bulletin = window.open("./BULLETINS/index.html", '', 'height=400,width=800'); //window.open("./BULLETINS/index.html","");
 
 
 	return true
