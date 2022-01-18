@@ -13,8 +13,11 @@ function init(){
 	document.title = "Bulletin de " + datas['nom'] + ' ' + datas['prenoms'] 
 	remplir_bulletins(datas, les_matieres)
 
-	window.document.close();
-    window.print();
+
+	setTimeout(function(){ 
+		window.document.close();
+	    window.print();
+	}, 1000);
 }
 
 
