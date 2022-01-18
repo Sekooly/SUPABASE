@@ -12,17 +12,17 @@ window.addEventListener('message', function(e) {
 
 	//console.log("on a recu: ",e.data)
 
-	if(e.data.datas){
+	if(e.data.datas && e.data.les_matieres){
 		datas = e.data.datas
-	}else if(e.data.les_matieres){
 		les_matieres = e.data.les_matieres
-	}
-
-	if(datas && les_matieres && Object.keys(datas).length  > 0 && les_matieres.length > 0 ){
+	}else if(e.data === 'remplissage'){
 		document.title = "Bulletin de " + datas['nom'] + ' ' + datas['prenoms'] 
 		console.log({datas})
 		console.log({les_matieres})
 		remplir_bulletins(datas, les_matieres)		
+	}else if(e.data === 'impression'){
+		window.document.close();
+		window.print();
 	}
 
 })
@@ -81,11 +81,15 @@ function remplir_bulletins(datas,les_matieres){
 				mon_element.src = datas[cle]
 
 				//imprimer la page dès que l'image est prete
+				/*
 		        mon_element.onload = function () {
             		window.document.close();
 	    			window.print();
-		        };
 
+	    			//on n'imprime qu'une fois
+	    			mon_element.onload = ""
+		        };
+		        */
 
 
 			//si pas une image : assigner le text

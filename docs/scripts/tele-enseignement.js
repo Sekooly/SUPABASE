@@ -13759,7 +13759,7 @@ function moyenne_de_larray(times){
 function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe,appreciations_classe){
 	//console.log('\n\n\n-------------'+identifiant_eleve+'-------------')
 
-	console.log({appreciations_classe})
+	//console.log({appreciations_classe})
 
 	var colonnes_notes = les_notes.map(function(une_note,indice_note){
 		la_matiere = une_note['Classe_Matiere'].split('|')[1].replaceAll(')','')
@@ -14457,8 +14457,9 @@ async function creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_cl
 
 	setTimeout(function(){
 		console.log("on envoie les données")
-		fenetre_bulletin.postMessage({les_matieres}, domaine)
-		fenetre_bulletin.postMessage({datas}, domaine)
+		fenetre_bulletin.postMessage({les_matieres: les_matieres, datas: datas}, domaine)
+		fenetre_bulletin.postMessage("remplissage", domaine)
+		fenetre_bulletin.postMessage("impression", domaine)
 	},1000)
 
 	return true
