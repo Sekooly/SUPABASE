@@ -14,10 +14,6 @@ function init(){
 	remplir_bulletins(datas, les_matieres)
 
 
-	setTimeout(function(){ 
-		window.document.close();
-	    window.print();
-	}, 1000);
 }
 
 
@@ -71,6 +67,14 @@ function remplir_bulletins(datas,les_matieres){
 			if (mon_element.localName === 'img'){
 
 				mon_element.src = datas[cle]
+
+				//imprimer la page dès que l'image est prete
+		        mon_element.onload = function () {
+            		window.document.close();
+	    			window.print();
+		        };
+
+
 
 			//si pas une image : assigner le text
 			}else{
