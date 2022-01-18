@@ -14390,8 +14390,8 @@ async function creer_et_envoyer_donnees_bulletin_eleve(index,nb_eleves_a_generer
 		moy_min: $("#ligne_min")[0].children[index_moyenne_generale].textContent,
 		moy_classe: $("#ligne_moy")[0].children[index_moyenne_generale].textContent,
 		moy_max: $("#ligne_max")[0].children[index_moyenne_generale].textContent,
-		rang_eleve: recuperer_dans_le_selected(id_eleve,"Rang")
-
+		rang_eleve: recuperer_dans_le_selected(id_eleve,"Rang"),
+		identifiant_eleve: id_eleve
 	}
 
 	//console.log({datas})

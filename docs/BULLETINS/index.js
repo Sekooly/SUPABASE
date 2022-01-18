@@ -25,19 +25,38 @@ window.addEventListener('message', function(e) {
 
 
 		page_courante =  page_modele.cloneNode(true)
-		page_courante.removeAttribute('id')
+		page_courante.id = datas['identifiant_eleve']
 		page_courante.style.display = ''
 
 		remplir_bulletins(datas, les_matieres)		
 	}else if(e.data === 'impression'){
 		//imprimer sous 1 seconde
 		setTimeout(function(){
+			trier_les_pages()
 			window.document.close();
 			window.print();		
 		},1000)
 	}
 
 })
+
+
+function trier_les_pages(){
+	var mylist = document.getElementById('dossier');
+	var divs = mylist.getElementsByClassName('page');
+	var listitems = [];
+	for (i = 0; i < divs.length; i++) {
+	        listitems.push(divs.item(i));
+	}
+	listitems.sort(function(a, b) {
+	    var compA = a.getAttribute('id').toUpperCase();
+	    var compB = b.getAttribute('id').toUpperCase();
+	    return (compA < compB) ? -1 : (compA > compB) ? 1 : 0;
+	});
+	for (i = 0; i < listitems.length; i++) {
+	    mylist.appendChild(listitems[i]);
+	}
+}
 
 function afficher(selector){
 	var nb_elements = document.querySelectorAll(selector).length
