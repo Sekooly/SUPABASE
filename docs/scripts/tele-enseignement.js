@@ -14265,6 +14265,7 @@ function valeur_colonne_numero(id_eleve,un_index){
 
 	*/
 	res = $('tr[id="'+id_eleve+'"]')[0].children[un_index] ? $('tr[id="'+id_eleve+'"]')[0].children[un_index].textContent : "(?)"
+	console.log({valeur: res})
 	return res.trim()
 }
 
@@ -14368,33 +14369,35 @@ async function creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_cl
 
 				premier_prof = premier_prof[0]
 				premier_prof = premier_prof['Nom'] + ' ' + premier_prof['Prénom(s)'] + " " + (premier_prof['2è_Prénom'] || "") + " " + (premier_prof['3è_Prénom'] || "")
-
-
-				le_coef = $('tr[id="'+id_eleve+'"]')[0].children[mon_index].getAttribute("coef")
-				appreciation_matiere = les_appreciations_eleve.filter(e => e['Classe_Matiere'] === la_classe_matiere)
-				
-
-				if(appreciation_matiere.length > 0){
-					appreciation_matiere = appreciation_matiere[0]['contenu']
-				}else{
-					appreciation_matiere = "(vide)"
-				}
-
-
-
-				les_matieres.push({
-					Matiere: nom_champ,
-					identifiant_appreciateur: premier_prof,
-					coef: le_coef,
-					moy_eleve: moy_eleve,
-					moy_ponderee_eleve: (Number(le_coef) * Number(moy_eleve)).toFixed(2),
-					moy_min: $("#ligne_min")[0].children[mon_index].textContent,
-					moy_classe: $("#ligne_moy")[0].children[mon_index].textContent,
-					moy_max: $("#ligne_max")[0].children[mon_index].textContent,
-					contenu_appreciation: appreciation_matiere
-				})
-
+			}else{
+				premier_prof = '(Professeur introuvable)'
 			}
+
+			le_coef = $('tr[id="'+id_eleve+'"]')[0].children[mon_index].getAttribute("coef")
+			appreciation_matiere = les_appreciations_eleve.filter(e => e['Classe_Matiere'] === la_classe_matiere)
+			
+
+			if(appreciation_matiere.length > 0){
+				appreciation_matiere = appreciation_matiere[0]['contenu']
+			}else{
+				appreciation_matiere = "(vide)"
+			}
+
+
+
+			les_matieres.push({
+				Matiere: nom_champ,
+				identifiant_appreciateur: premier_prof,
+				coef: le_coef,
+				moy_eleve: moy_eleve,
+				moy_ponderee_eleve: (Number(le_coef) * Number(moy_eleve)).toFixed(2),
+				moy_min: $("#ligne_min")[0].children[mon_index].textContent,
+				moy_classe: $("#ligne_moy")[0].children[mon_index].textContent,
+				moy_max: $("#ligne_max")[0].children[mon_index].textContent,
+				contenu_appreciation: appreciation_matiere
+			})
+
+			
 
 
 		}else{
