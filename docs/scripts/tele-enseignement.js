@@ -111,6 +111,9 @@ var mySubscription_conv = null
 var ma_tentative = {}
 var mes_reponses = {}
 
+var fenetre_bulletin;
+var domaine_bulletin = window.location.href.replaceAll('tele-enseignement',"") + "BULLETINS/index.html"
+
 const { createClient } = supabase
 supabase = createClient(racine_data.replace("/rest/v1/",""),  data_etablissement["apikey"])
 supabaseInit = createClient(racine_initiale.replace("/rest/v1/",""),  api_initial.split('=')[1])
@@ -13540,6 +13543,8 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 	var liste_profs = await recuperer_profs(true)
 	var appreciations_classe = await rechercher_contenant_motif('Appreciations','Classe_Matiere','('+la_classe+'|')
 
+
+
 	//pour chaque élève		
 	les_eleves.forEach(async function(un_eleve,indice_eleve){
 		$("#contenu_fiche_conseil").append(une_ligne_eleve('fiche_conseil',un_eleve,indice_eleve+1))
@@ -13575,12 +13580,29 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 
 
 						if(pour_bulletin['leleve'] === 'tous'){
-							id_eleve = "---"
-							alert("CREATION DES BULLETINS DE TOUTE LA CLASSE EN COURS DE DEVELOPPEMENT.")
+							//id_eleve = "---"
+							//alert("CREATION DES BULLETINS DE TOUTE LA CLASSE EN COURS DE DEVELOPPEMENT.")
+
+							
+							var nb_eleves = les_eleves.length
+
+							//pour chaque eleve NON IGNORE
+							$('tr.une_ligne_de_donnees').not('.ignore').each(function(index_eleve,eleve){
+								id_eleve = eleve.id
+								est_dernier = index_eleve===nb_eleves-1
+
+								console.log({index_eleve})
+
+								//réassigner la fenetre a ce qui est déjà ouvert
+								faire_le_bulletin(1+index_eleve,nb_eleves,id_eleve,pour_bulletin['la_periode'],pour_bulletin['la_classe'],liste_profs,est_dernier)
+							})
+
+
 						}else{
 							id_eleve = pour_bulletin['leleve']
-							faire_le_bulletin(pour_bulletin['leleve'],pour_bulletin['la_periode'],pour_bulletin['la_classe'],liste_profs)
+							faire_le_bulletin(1,1,pour_bulletin['leleve'],pour_bulletin['la_periode'],pour_bulletin['la_classe'],liste_profs,true)
 						}
+
 
 
 
@@ -13588,7 +13610,7 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 
 				}
 				
-			},1000)
+			},1)
 
 			
 		}
@@ -13612,17 +13634,15 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 }
 
 
-function faire_le_bulletin(id_eleve,la_periode,la_classe,liste_profs){
+function faire_le_bulletin(index,nb_eleves,id_eleve,la_periode,la_classe,liste_profs,imprimer){
 	chargement(true)
 	$('tr[id="'+id_eleve+'"]').click()
 	//console.log("avant")
 	
-	creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_classe,liste_profs)
-	
-
+	creer_et_envoyer_donnees_bulletin_eleve(index,nb_eleves,id_eleve,la_periode,la_classe,liste_profs,imprimer)
 	//console.log("apres")
-	afficher_alerte("Ouverture du bulletin en cours...")
 	chargement(false)
+
 
 }
 
@@ -14195,7 +14215,7 @@ function generer_bulletin(){
 		les_classes.sort()
 		//console.log(les_classes) 
 
-		elements_html = "<div class='bloc' style='padding: 20px;'>Classe:<br><select onclick='lister_eleves_bulletins()' id='classe_saisie_bulletin'>"
+		elements_html = "<div class='bloc' style='padding: 20px;'>Classe:<br><select onchange='lister_eleves_bulletins()' onclick='lister_eleves_bulletins()' id='classe_saisie_bulletin'>"
 		for (i = 0; i< les_classes.length;i++){
 			elements_html += '<option value="'+les_classes[i]+'">'+les_classes[i]+'</option>'
 		}
@@ -14321,7 +14341,7 @@ function mention_moyenne(moyenne){
 	return res
 }
 
-async function creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_classe, liste_profs){
+async function creer_et_envoyer_donnees_bulletin_eleve(index,nb_eleves_a_generer,id_eleve,la_periode,la_classe, liste_profs, imprimer){
 
 	//alert(id_eleve)
 	//alert(la_periode)
@@ -14329,10 +14349,12 @@ async function creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_cl
 
 	var annee_scolaire = calcul_annee_scolaire()
 	var prof_principal = liste_profs.find(e => e['Classe'].includes('(' + la_classe + '|Vie de classe)')) //get_les_profs('('+la_classe+'|Vie de classe)')[0]
-	console.log({prof_principal})
-
+	
 	if(prof_principal) prof_principal = prof_principal['Nom_complet']
-	/*
+	if(!prof_principal) prof_principal = ""
+	//console.log({prof_principal})
+
+/*
 	if(prof_principal){
 		prof_principal = prof_principal['Nom'] + ' ' + prof_principal['Prénom(s)'] + " " + (prof_principal['2è_Prénom'] || "") + " " + (prof_principal['3è_Prénom'] || "")
 	}else{
@@ -14372,7 +14394,7 @@ async function creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_cl
 
 	}
 
-	console.log({datas})
+	//console.log({datas})
 
 	//récupérer toutes les appréciations de l'éleve
 	var les_appreciations_eleve = await rechercher("Appreciations", "identifiant_eleve",id_eleve)
@@ -14380,7 +14402,7 @@ async function creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_cl
 	les_appreciations_eleve = les_appreciations_eleve.filter(e => e['periode_principale'] === la_periode)
 	console.log({les_appreciations_eleve})
 
-
+	afficher_alerte("Ouverture du bulletin de "+id_eleve.toUpperCase() +" en cours... ("+index +"/" + nb_eleves_a_generer + ")" )
 	
 	//pour chaque matière càd entre ]sexe , Moyenne générale[
 	var index_sexe = index_de_cette_colonne("Sexe")
@@ -14444,7 +14466,7 @@ async function creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_cl
 	}
 
 
-	console.log({les_matieres})
+	//console.log({les_matieres})
 
 
 	/*
@@ -14452,19 +14474,58 @@ async function creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_cl
 	stocker('datas_bulletin',JSON.stringify(datas))
 	*/
 
+	//on n'ouvre la fenetre qu'une fois
+	ouvrir_fenetre_bulletin()
 
-	var domaine = window.location.href.replaceAll('tele-enseignement',"") + "BULLETINS/index.html"
-	var fenetre_bulletin = window.open(domaine, '', 'height=400,width=800'); //window.open("./BULLETINS/index.html","");
-
-	setTimeout(function(){
+	//on envoie les données le temps d'ouvrir la fenetre bulletin
+	return await setTimeout(function(){
+		
 		console.log("on envoie les données")
-		fenetre_bulletin.postMessage({les_matieres: les_matieres, datas: datas}, domaine)
-		fenetre_bulletin.postMessage("remplissage", domaine)
-		fenetre_bulletin.postMessage("impression", domaine)
+		fenetre_bulletin.postMessage({les_matieres: les_matieres, datas: datas}, domaine_bulletin)
+		fenetre_bulletin.postMessage("remplissage", domaine_bulletin)
+
+		if(imprimer){
+			fenetre_bulletin.postMessage("impression", domaine_bulletin)	
+		}
+
+		return fenetre_bulletin
+		
 	},1000)
 
-	return true
 }
+
+
+function ouvrir_fenetre_bulletin(){
+
+
+	/*
+	if(!fenetre_bulletin){
+		var domaine_bulletin = window.location.href.replaceAll('tele-enseignement',"") + "BULLETINS/index.html"
+		fenetre_bulletin = window.open(domaine_bulletin, '', 'height=400,width=800'); //window.open("./BULLETINS/index.html","");
+	}else{
+
+	}
+	*/
+
+
+	//pas encore ouvert -> à ouvrir
+	if(typeof(fenetre_bulletin) == 'undefined' || fenetre_bulletin.closed){
+		//ouvrir un nouveau
+		fenetre_bulletin = window.open('', 'winPop', 'height=400,width=800');
+		if(fenetre_bulletin == null || fenetre_bulletin.document.location.href != domaine_bulletin){
+			fenetre_bulletin = window.open(domaine_bulletin, 'winPop');
+		}
+
+	//déjà ouvert
+	} else {
+		//give it focus (in case it got burried)
+		fenetre_bulletin.focus();
+	} 
+
+
+}
+
+
 
 async function lister_eleves_bulletins(){
 	tous_les_eleves =  await rechercher("Eleves", "Classe", $('#classe_saisie_bulletin').val())

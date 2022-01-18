@@ -9,8 +9,8 @@
     <link href="./index.css" rel="stylesheet" />
 </head>
 <body>
-    <div class="book">
-        <div class="page">
+    <div class="book" id="dossier">
+        <div class="page" id="modele_page" style="display: none;">
             <div class="subpage">
 
                 <table>    
@@ -18,15 +18,15 @@
                         <tr>
                             <th style="max-width: 100px;">
                                 <div>
-                                    <strong id="nom_etablissement"></strong>
+                                    <strong name="nom_etablissement"></strong>
                                 </div>
-                                <span id="adresse_etablissement">
+                                <span name="adresse_etablissement">
                                 </span>                                        
                             </th>
 
                             <th>
                                 <div style="text-align: right;">
-                                    <img class="logo" id="logo_etablissement" src="">
+                                    <img class="logo" name="logo_etablissement" src="">
                                 </div>
                             </th>
 
@@ -41,39 +41,39 @@
 
 
 
-                <div class="titre_bulletin">BULLETIN DU <span id="periode_principale"></span>
+                <div class="titre_bulletin">BULLETIN DU <span name="periode_principale"></span>
                     <br>
-                    <span id="annee_scolaire"></span>
+                    <span name="annee_scolaire"></span>
                 </div>
 
                 <table>
                     <tbody>
                         <tr>
                             <th class="titre_element">Nom de famille:</th>
-                            <th id="nom"></th>
+                            <th name="nom"></th>
 
                             <th class="titre_element">Classe:</th>
-                            <th id="classe"></th>
+                            <th name="classe"></th>
 
                             <th class="titre_element">Effectif:</th>
-                            <th id="effectif"></th>
+                            <th name="effectif"></th>
 
                         </tr>
                         <tr>
                             <th class="titre_element">Prénoms:</th>
-                            <th id="prenoms"></th>
+                            <th name="prenoms"></th>
 
 
                             <th class="titre_element">Responsable Vie Scolaire:</th>
-                            <th id="respo_vie_sco"></th>
+                            <th name="respo_vie_sco"></th>
 
                         </tr>
                         <tr>
                             <th class="titre_element">Né(e) le:</th>
-                            <th id="date_naissance"></th>
+                            <th name="date_naissance"></th>
 
                             <th class="titre_element">Professeur(e) principal(e):</th>
-                            <th id="prof_principal"></th>
+                            <th name="prof_principal"></th>
 
                         </tr>
 
@@ -129,9 +129,9 @@
                 </table>
 
                 <div class="bas_page">
-                    <span><strong>Absence: </strong><span id="absences">3</span> demi-journée(s)</span>
-                    <span><strong>Retards: </strong><span id="retards">5</span></span>
-                    <span><strong>Mention: </strong><span id="mention">ASSEZ BIEN</span></span>
+                    <span><strong>Absence: </strong><span name="absences">3</span> demi-journée(s)</span>
+                    <span><strong>Retards: </strong><span name="retards">5</span></span>
+                    <span><strong>Mention: </strong><span name="mention">ASSEZ BIEN</span></span>
                 </div>
 
 
@@ -141,7 +141,7 @@
                         <td>
                           <strong>Avis du Conseil de classe: </strong>
                           <br>                          
-                          <span id="contenu">Excellent trimestre!</span>                        
+                          <span name="contenu">Excellent trimestre!</span>                        
                         </td>
                         
                         <td>

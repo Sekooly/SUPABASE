@@ -1,32 +1,50 @@
 var datas = {}
 var les_matieres = []
+var nb_datas = 0
+var page_modele = document.getElementById('modele_page')
+var page_courante;
+
+
 window.addEventListener('message', function(e) {
 
-
-	/*
-	console.log({datas})
-	console.log({les_matieres})
-	document.title = "Bulletin de " + datas['nom'] + ' ' + datas['prenoms'] 
-	remplir_bulletins(datas, les_matieres)
-	*/
 
 	//console.log("on a recu: ",e.data)
 
 	if(e.data.datas && e.data.les_matieres){
 		datas = e.data.datas
 		les_matieres = e.data.les_matieres
+		nb_datas = nb_datas+1
 	}else if(e.data === 'remplissage'){
-		document.title = "Bulletin de " + datas['nom'] + ' ' + datas['prenoms'] 
+		if(nb_datas === 1){
+			document.title = "Bulletin de " + datas['nom'] + ' ' + datas['prenoms'] //todo: changer le titre si classe entier
+		}else{
+			document.title = "Bulletins de la classe de " + datas['classe']
+		}
 		console.log({datas})
 		console.log({les_matieres})
+
+
+		page_courante =  page_modele.cloneNode(true)
+		page_courante.removeAttribute('id')
+		page_courante.style.display = ''
+
 		remplir_bulletins(datas, les_matieres)		
 	}else if(e.data === 'impression'){
-		window.document.close();
-		window.print();
+		//imprimer sous 1 seconde
+		setTimeout(function(){
+			window.document.close();
+			window.print();		
+		},1000)
 	}
 
 })
 
+function afficher(selector){
+	var nb_elements = document.querySelectorAll(selector).length
+	for (numero_element = 0 ; numero_element < nb_elements ; numero_element++ ){
+		document.querySelectorAll(selector)[numero_element].style.display = ''
+	}
+}
 
 
 function une_ligne_matiere(data){
@@ -62,7 +80,11 @@ function une_ligne_matiere(data){
 	return res;
 }
 
+
+
 function remplir_bulletins(datas,les_matieres){
+
+
 
 	//console.log({datas})
 
@@ -71,7 +93,7 @@ function remplir_bulletins(datas,les_matieres){
 		//console.log(cle, datas[cle])
 
 		//pour chaque clé, remplacer la donnée 
-		mon_element = document.getElementById(cle)
+		mon_element = page_courante.querySelectorAll('[name="'+cle+'"]')[0] //page_courante.getElementsByName(cle)[0]
 
 		if(mon_element){
 
@@ -112,6 +134,12 @@ function remplir_bulletins(datas,les_matieres){
 
 	ajouter_ligne_moyennes(datas)
 
+	//rajouter les notes de leleve
+	console.log({page_courante})
+	document.getElementById('dossier').append(page_courante)
+
+	//masquer le modele
+	//document.getElementById('modele_page').style.display = 'none'
 
 }
 
@@ -136,8 +164,8 @@ function ajouter_ligne_moyennes(datas){
 
 	`
 
-	var source = document.querySelector('.liste_matieres > tbody')
-	var nouveau_noeud = document.createElement('tr')
+	var source =  page_courante.querySelector('.liste_matieres > tbody')
+	var nouveau_noeud =  document.createElement('tr')
 	nouveau_noeud.innerHTML = html_ligne_moyennes
 	source.append(nouveau_noeud)
 }
@@ -145,8 +173,8 @@ function ajouter_ligne_moyennes(datas){
 
 function ajouter_une_matiere(les_matieres){
 
-	var source = document.querySelector('.liste_matieres > tbody')
-	var nouveau_noeud = document.createElement('tr')
+	var source =  page_courante.querySelector('.liste_matieres > tbody')
+	var nouveau_noeud =  document.createElement('tr')
 	var contenu_html = une_ligne_matiere(les_matieres)
 
 	//console.log({contenu_html})
