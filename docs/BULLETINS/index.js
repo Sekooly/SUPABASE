@@ -1,20 +1,32 @@
+var datas = {}
+var les_matieres = []
+window.addEventListener('message', function(e) {
 
 
-function init(){
-
-
-
-	var datas = JSON.parse(window.localStorage.getItem('datas_bulletin'))
-	var les_matieres = JSON.parse(window.localStorage.getItem('les_matieres_bulletin'))
-
-
+	/*
 	console.log({datas})
 	console.log({les_matieres})
 	document.title = "Bulletin de " + datas['nom'] + ' ' + datas['prenoms'] 
 	remplir_bulletins(datas, les_matieres)
+	*/
 
+	//console.log("on a recu: ",e.data)
 
-}
+	if(e.data.datas){
+		datas = e.data.datas
+	}else if(e.data.les_matieres){
+		les_matieres = e.data.les_matieres
+	}
+
+	if(datas && les_matieres && Object.keys(datas).length  > 0 && les_matieres.length > 0 ){
+		document.title = "Bulletin de " + datas['nom'] + ' ' + datas['prenoms'] 
+		console.log({datas})
+		console.log({les_matieres})
+		remplir_bulletins(datas, les_matieres)		
+	}
+
+})
+
 
 
 function une_ligne_matiere(data){
@@ -141,7 +153,3 @@ function ajouter_une_matiere(les_matieres){
 	source.append(nouveau_noeud)
 }
 
-//init sous 1 seconde
-setTimeout(function(){
-	init()
-}, 1000)

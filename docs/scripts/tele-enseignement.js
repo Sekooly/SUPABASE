@@ -14259,7 +14259,7 @@ async function voir_bulletin_eleve(){
 }
 
 function index_de_cette_colonne(nom_champ){
-	console.log({nom_champ})
+	//console.log({nom_champ})
 	return $('thead > tr > [id="'+nom_champ+'"]')[0].cellIndex
 }
 
@@ -14277,7 +14277,7 @@ function recuperer_dans_le_selected(id_eleve,nom_champ){
 function valeur_colonne_numero(id_eleve,un_index){
 	//console.log({id_eleve})
 
-	console.log({un_index})
+	//console.log({un_index})
 
 	
 	/*
@@ -14287,7 +14287,7 @@ function valeur_colonne_numero(id_eleve,un_index){
 
 	*/
 	res = $('tr[id="'+id_eleve+'"]')[0].children[un_index] ? $('tr[id="'+id_eleve+'"]')[0].children[un_index].textContent : "(?)"
-	console.log({valeur: res})
+	//console.log({valeur: res})
 	return res.trim()
 }
 
@@ -14437,10 +14437,20 @@ async function creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_cl
 	console.log({les_matieres})
 
 
+	/*
 	stocker('les_matieres_bulletin',JSON.stringify(les_matieres))
 	stocker('datas_bulletin',JSON.stringify(datas))
-	var fenetre_bulletin = window.open("./BULLETINS/index.html", '', 'height=400,width=800'); //window.open("./BULLETINS/index.html","");
+	*/
 
+
+	var domaine = window.location.href.replaceAll('tele-enseignement',"") + "BULLETINS/index.html"
+	var fenetre_bulletin = window.open(domaine, '', 'height=400,width=800'); //window.open("./BULLETINS/index.html","");
+
+	setTimeout(function(){
+		console.log("on envoie les données")
+		fenetre_bulletin.postMessage({les_matieres}, domaine)
+		fenetre_bulletin.postMessage({datas}, domaine)
+	},1000)
 
 	return true
 }
