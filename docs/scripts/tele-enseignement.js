@@ -13465,7 +13465,8 @@ function actualiser_liste_champs_masques(){
 		}
 	})
 
-	if(liste_colonnes_masquees_fiche.length > 0) stocker('liste_colonnes_masquees_fiche',liste_colonnes_masquees_fiche)
+	//stocker quoi qu'il arrive
+	stocker('liste_colonnes_masquees_fiche',liste_colonnes_masquees_fiche)
 
 }
 
