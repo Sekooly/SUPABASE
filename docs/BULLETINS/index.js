@@ -55,7 +55,7 @@ function traiter_bulletins(e){
 
 
 	//si les variables sont prêtes 
-	if((variables_bulletins_pretes || e.data === 'impression') && liste_datas_bulletin.length === liste_matieres_bulletin.length){
+	if((variables_bulletins_pretes || (e && e.data === 'impression')) && liste_datas_bulletin.length === liste_matieres_bulletin.length){
 		console.log({liste_datas_bulletin})
 		console.log({liste_matieres_bulletin})
 
