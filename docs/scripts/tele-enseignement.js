@@ -13610,7 +13610,7 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 
 				}
 				
-			},1)
+			},1000)
 
 			
 		}
@@ -14401,6 +14401,7 @@ async function creer_et_envoyer_donnees_bulletin_eleve(index,nb_eleves_a_generer
 	//de la période principale
 	les_appreciations_eleve = les_appreciations_eleve.filter(e => e['periode_principale'] === la_periode)
 	console.log({les_appreciations_eleve})
+
 
 	afficher_alerte("Ouverture du bulletin de "+id_eleve.toUpperCase() +" en cours... ("+index +"/" + nb_eleves_a_generer + ")" )
 	
