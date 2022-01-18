@@ -13240,6 +13240,7 @@ function voir_fiche_classe_choisie(){
 			</select>
 			<rouge style="cursor: pointer;" id="aide_fiche">(?)</rouge>
 			`+html_bouton_appreciations+`
+			<div><i style="font-size: 12px;">Les éventuelles cases en rouge sont sans appréciations saisies.</i></div>
 		</div>
 		<div id="menu_params" style="overflow-x: auto;" class="menu_params">
 			<div id="previsualisation"></div>
@@ -13536,6 +13537,7 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 
 	//console.log({pour_bulletin})
 	var liste_profs = await recuperer_profs(true)
+	var appreciations_classe = await rechercher_contenant_motif('Appreciations','Classe_Matiere','('+la_classe+'|')
 
 	//pour chaque élève		
 	les_eleves.forEach(async function(un_eleve,indice_eleve){
@@ -13547,7 +13549,7 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 		les_notes = await rechercher("Notes", "identifiant_eleve", un_eleve['Identifiant'], false, false, "Classe_Matiere,saison_note")
 		//console.log({les_notes})
 	
-		rajouter_notes_eleves(un_eleve['Identifiant'],les_notes,matieres_de_classe)
+		rajouter_notes_eleves(un_eleve['Identifiant'],les_notes,matieres_de_classe,appreciations_classe)
 		
 
 		//apres le dernier élève -> rajouter la valeur des min-max-moy
@@ -13754,8 +13756,10 @@ function moyenne_de_larray(times){
 	return avg
 }
 
-function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe){
+function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe,appreciations_classe){
 	//console.log('\n\n\n-------------'+identifiant_eleve+'-------------')
+
+	console.log({appreciations_classe})
 
 	var colonnes_notes = les_notes.map(function(une_note,indice_note){
 		la_matiere = une_note['Classe_Matiere'].split('|')[1].replaceAll(')','')
@@ -13809,7 +13813,12 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe){
 		//console.log({coefficient_matiere})
 
 		est_bonus = une_matiere['nom_liste_et_coefs'] && une_matiere['nom_liste_et_coefs'].toLowerCase().includes("bonus")
-		notes_a_rajouter += '<th class="border_bottom moyenne_eleve" coef="'+coefficient_matiere+'" est_bonus="'+est_bonus+'">'+moyenne_generale_matiere+'</th>'
+		
+		//si on a une note sans appréciation -> en rouge
+		var nb_appreciations_note = appreciations_classe.filter(e => e['Classe_Matiere'] === une_matiere['Classe_Matiere'] && e['identifiant_eleve'] === identifiant_eleve ).length
+		sans_appreciation = nb_appreciations_note === 0 && moyenne_generale_matiere !== "" ? "sans_appreciation " : ""
+
+		notes_a_rajouter += '<th class="'+sans_appreciation+'border_bottom moyenne_eleve" coef="'+coefficient_matiere+'" est_bonus="'+est_bonus+'">'+moyenne_generale_matiere+'</th>'
 
 
 
