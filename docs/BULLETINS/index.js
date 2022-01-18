@@ -4,7 +4,14 @@ var nb_datas = 0
 var page_modele = document.getElementById('modele_page')
 var page_courante;
 
+document.addEventListener('click',trier_et_imprimer)
+document.addEventListener("DOMContentLoaded", traiter_bulletins);
+window.addEventListener('message',traiter_bulletins)
 
+//TODO
+//au moment de changer variables_bulletins_pretes, on appelle traiter_bulletins
+
+/*
 window.addEventListener('message', function(e) {
 
 
@@ -15,11 +22,7 @@ window.addEventListener('message', function(e) {
 		les_matieres = e.data.les_matieres
 		nb_datas = nb_datas+1
 	}else if(e.data === 'remplissage'){
-		if(nb_datas === 1){
-			document.title = "Bulletin de " + datas['nom'] + ' ' + datas['prenoms'] //todo: changer le titre si classe entier
-		}else{
-			document.title = "Bulletins de la classe de " + datas['classe']
-		}
+		mettre_titre_document()
 		console.log({datas})
 		console.log({les_matieres})
 
@@ -29,17 +32,78 @@ window.addEventListener('message', function(e) {
 		page_courante.style.display = ''
 
 		remplir_bulletins(datas, les_matieres)		
-	}else if(e.data === 'impression'){
-		//imprimer sous 1 seconde
-		setTimeout(function(){
-			trier_les_pages()
-			window.document.close();
-			window.print();		
-		},1000)
+	}else{
+		console.log('on a recu:',e.data)
 	}
 
 })
+*/
 
+
+
+function traiter_bulletins(e){
+	console.log("j'ai été ouvert par",window.opener.location)
+
+	//récupérer ici les données poussées dans liste_datas_bulletin 
+	liste_datas_bulletin = window.opener.liste_datas_bulletin
+
+	//récupérer ici les données poussées dans liste_matieres_bulletin  
+	liste_matieres_bulletin = window.opener.liste_matieres_bulletin
+
+	//récupérer ici si variables_bulletins_pretes  
+	variables_bulletins_pretes = window.opener.variables_bulletins_pretes
+
+
+	//si les variables sont prêtes 
+	if((variables_bulletins_pretes || e.data === 'impression') && liste_datas_bulletin.length === liste_matieres_bulletin.length){
+		console.log({liste_datas_bulletin})
+		console.log({liste_matieres_bulletin})
+
+		for(index_eleve=0;index_eleve<liste_datas_bulletin.length;index_eleve++){
+			datas = liste_datas_bulletin[index_eleve]
+			les_matieres = liste_matieres_bulletin[index_eleve]
+
+			console.log({datas})
+			console.log({les_matieres})
+
+
+			page_courante =  page_modele.cloneNode(true)
+			page_courante.id = datas['identifiant_eleve']
+			page_courante.style.display = ''
+
+			remplir_bulletins(datas, les_matieres)		
+		}
+
+
+		titre_et_ordre_donnees()
+
+
+	}else{
+		console.error("Les données de bulletins ne sont pas encore prêtes. Refaire traiter_bulletins() plus tard.")
+	}
+
+}
+
+function titre_et_ordre_donnees(){
+	mettre_titre_document()
+	trier_les_pages()
+
+}
+
+function trier_et_imprimer(){
+	titre_et_ordre_donnees()
+	window.document.close();
+	window.print();	
+
+}
+
+function mettre_titre_document(){
+	if(nb_datas === 1){
+		document.title = "Bulletin de " + datas['nom'] + ' ' + datas['prenoms'] //todo: changer le titre si classe entier
+	}else{
+		document.title = "Bulletins de la classe de " + datas['classe']
+	}
+}
 
 function trier_les_pages(){
 	var mylist = document.getElementById('dossier');
@@ -154,7 +218,7 @@ function remplir_bulletins(datas,les_matieres){
 	ajouter_ligne_moyennes(datas)
 
 	//rajouter les notes de leleve
-	console.log({page_courante})
+	//console.log({page_courante})
 	document.getElementById('dossier').append(page_courante)
 
 	//masquer le modele
