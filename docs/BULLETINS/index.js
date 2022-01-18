@@ -12,6 +12,9 @@ function init(){
 	console.log({les_matieres})
 	document.title = "Bulletin de " + datas['nom'] + ' ' + datas['prenoms'] 
 	remplir_bulletins(datas, les_matieres)
+
+	window.document.close();
+    window.print();
 }
 
 

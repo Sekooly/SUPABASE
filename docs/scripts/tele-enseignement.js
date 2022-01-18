@@ -14409,7 +14409,7 @@ async function creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_cl
 
 	stocker('les_matieres_bulletin',JSON.stringify(les_matieres))
 	stocker('datas_bulletin',JSON.stringify(datas))
-	var fenetre_bulletin = window.open("./BULLETINS/index.html");
+	var fenetre_bulletin = window.open("./BULLETINS/index.html","");
 
 
 	return true
