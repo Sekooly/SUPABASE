@@ -13569,16 +13569,18 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 						//récupérer les données de l'identifiant élève apres 3 secondes
 						//selectionner la ligne qui m'intéresse
 						//console.log({leleve})
-						chargement(true)
-						$('tr[id="'+pour_bulletin['leleve']+'"]').click()
-						//console.log("avant")
-						
-						creer_et_envoyer_donnees_bulletin_eleve(pour_bulletin['leleve'],pour_bulletin['la_periode'],pour_bulletin['la_classe'],liste_profs)
-						
 
-						//console.log("apres")
-						chargement(false)
-						afficher_alerte("Bulletin créé dans un nouvel onglet!")
+
+						if(pour_bulletin['leleve'] === 'tous'){
+							id_eleve = "---"
+							alert("CREATION DES BULLETINS DE TOUTE LA CLASSE EN COURS DE DEVELOPPEMENT.")
+						}else{
+							id_eleve = pour_bulletin['leleve']
+							faire_le_bulletin(pour_bulletin['leleve'],pour_bulletin['la_periode'],pour_bulletin['la_classe'],liste_profs)
+						}
+
+
+
 
 
 				}
@@ -13603,6 +13605,21 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 
 
 
+
+}
+
+
+function faire_le_bulletin(id_eleve,la_periode,la_classe,liste_profs){
+	chargement(true)
+	$('tr[id="'+id_eleve+'"]').click()
+	//console.log("avant")
+	
+	creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_classe,liste_profs)
+	
+
+	//console.log("apres")
+	afficher_alerte("Ouverture du bulletin en cours...")
+	chargement(false)
 
 }
 
@@ -14284,6 +14301,7 @@ function calcul_annee_scolaire(){
 }
 
 function mention_moyenne(moyenne){
+	moyenne = Number(moyenne)
 	var res = moyenne >=12 &&  moyenne <14 ? "Assez bien"
 				:  moyenne >=14 &&  moyenne <16 ? "Bien"
 				:  moyenne >=16 &&  moyenne <18 ? "Très bien"
@@ -14432,8 +14450,8 @@ async function lister_eleves_bulletins(){
 	//console.log({tous_les_eleves})
 
 	//pour chaque eleve
-	var options_eleves = tous_les_eleves.map(function(eleve){
-		return '<option id="'+eleve['Identifiant']+'">'+eleve['Nom'] + " " +eleve['Prénom(s)']+ '</option>' 
+	var options_eleves = '<option id="tous">(Tous)</option>' + tous_les_eleves.map(function(eleve){
+		return '<option value="'+eleve['Identifiant']+'" id="'+eleve['Identifiant']+'">'+eleve['Nom'] + " " +eleve['Prénom(s)']+ '</option>' 
 	}).join('')
 
 
