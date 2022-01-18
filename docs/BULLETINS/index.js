@@ -102,7 +102,7 @@ function remplir_bulletins(datas,les_matieres){
 function ajouter_ligne_moyennes(datas){
 	var html_ligne_moyennes = `
 	<tr>
-		<th></th>
+		<th style="border: none;"></th>
 		<th class="droite"><strong>Moyenne générale</strong></th>
 
 
