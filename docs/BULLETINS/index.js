@@ -45,8 +45,8 @@ function afficher_chargement(oui){
 
 function traiter_bulletins(e){
 	afficher_chargement(true)
-	console.log("j'ai été ouvert par",window.opener.location)
-	
+	//console.log("j'ai été ouvert par",window.opener.location)
+
 	//enlever toutes les anciennes pages
 	document.querySelectorAll('.page:not(#modele_page)').forEach(e => e.remove())
 
@@ -92,7 +92,7 @@ function traiter_bulletins(e){
 		console.error("Les données de bulletins ne sont pas encore prêtes. Refaire traiter_bulletins() plus tard.")
 	}
 
-	afficher_chargement(false)
+	//afficher_chargement(false)
 
 }
 
@@ -235,6 +235,7 @@ function remplir_bulletins(datas,les_matieres){
 
 	//masquer le modele
 	//document.getElementById('modele_page').style.display = 'none'
+	afficher_chargement(false)
 
 }
 
