@@ -12266,9 +12266,13 @@ async function telecharger_parametre(id_parametre){
 	if(!id_parametre) id_parametre = ($(".un_menu_orange")[0].id || $(".un_menu_orange")[0].value)
 
 	var entetes_seulement = $("#choix_download_param")[0].value === "En-têtes"
+	var suite_nom = entetes_seulement ? "-modele-" : ""
+	var nom_filtre = $('[id="filtre_parametre"]').val() !== "(Tous)" ? $('[id="filtre_parametre"]').val() : $('[id="zone_recherche"]').val()
+	var suite_extrait = $('tr').length !== $('tr:visible').length && !entetes_seulement ? '-extrait '+nom_filtre+'-' : ''
+	var nom_fichier =  id_parametre+suite_nom+suite_extrait+maintenant_sans_caracteres_speciaux();
 
 
-	
+	/*
 	var contenu_recup = entetes_seulement ? nom_des_champs(id_parametre) : await rechercher_tout(id_parametre) // recuperer(id_parametre) ? JSON.parse(recuperer(id_parametre)) : nom_des_champs(id_parametre)
 	//console.log(contenu_recup)
 
@@ -12281,14 +12285,15 @@ async function telecharger_parametre(id_parametre){
 
 	var contenu = convertir_csv(contenu_recup, entetes_seulement)
 	//console.log(contenu)
-	var suite_nom = entetes_seulement ? "-modele-" : ""
-	var nom_fichier =  id_parametre+suite_nom+maintenant_sans_caracteres_speciaux()+".csv";
-
+	
 
 
 	enregistrer_donnees_en_csv(contenu, nom_fichier);
 
+	*/
 
+
+	telecharger_tableau_en_csv(nom_fichier,entetes_seulement)
 
 
 
@@ -13097,9 +13102,9 @@ function telecharger_fiche_en_csv(nom_fichier){
 
 
 
-function htmlToCSV(filename) {
+function htmlToCSV(filename,ne_pas_telecharger) {
 	var data = [];
-	var rows = document.querySelectorAll("tr:not(.ignore)"); //uniquement les lignes non ignorées
+	var rows = $('tr:visible:not(.ignore)') // document.querySelectorAll("tr:not(.ignore):visible"); //uniquement les lignes non ignorées ET VISIBLES
 	var avec_coef = $("#avec_coef:checked").length > 0
 	
 	if(avec_coef) filename = filename + " (coefs personnels)"
@@ -13146,7 +13151,12 @@ function htmlToCSV(filename) {
 		}	
 	}
 	//console.log({data})
-	downloadCSVFile(data.join("\n"), filename);
+	if(!ne_pas_telecharger){
+		downloadCSVFile(data.join("\n"), filename);	
+	}
+
+	return data
+	
 }
 
 

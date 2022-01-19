@@ -892,6 +892,48 @@ function convertir_csv(arr, entetes_seulement){
 }
 
 
+function telecharger_tableau_en_csv(filename,entetes_seulement,ne_pas_telecharger) {
+  var data = [];
+  var le_selecteur = entetes_seulement ? 'thead > tr:visible:not(.ignore)' : 'tr:visible:not(.ignore)'
+  var rows = $(le_selecteur) // document.querySelectorAll("tr:not(.ignore):visible"); //uniquement les lignes non ignorées ET VISIBLES
+  //console.log({le_selecteur})
+
+  //pour chaque ligne
+  for (var i = 0; i < rows.length; i++) {
+
+    //console.log("ligne numero ",i+1)
+    //on récupère les valeur colonnes de la ligne i
+    var row = [], cols = $(rows[i]).children(':visible') // rows[i].querySelectorAll("td, th");
+
+      for (var j = 0; j < cols.length; j++) {
+        valeur_cellule = cols[j].textContent.trim()
+        row.push(valeur_cellule)
+        //console.log(" colonne numero ",j+1," de valeur ",valeur_cellule)
+      }
+              
+      data.push(row.join(separateur));  
+
+    
+  }
+
+
+
+  //console.log({data})
+  if(!ne_pas_telecharger){
+    downloadCSVFile(data.join("\n"), filename); 
+  }
+
+  return data
+  
+}
+
+
+
+
+
+
+
+
 function garder_les_colonnes_non_automatiques(arr){
 
   //pour chaque ligne
@@ -901,8 +943,8 @@ function garder_les_colonnes_non_automatiques(arr){
       //console.log({index_param:nom_parametre})
       //console.log("   ",valeur[nom_parametre])
 
-      //si ce parametre auto existe dans le arr -> on le supprime
-      if(valeur[nom_parametre] !== undefined){
+      //si ce parametre auto existe dans le arr  ET NON VISIBLE -> on le supprime
+      if(valeur[nom_parametre] !== undefined && $("[id='"+nom_parametre+"'].header_table:not(:visible)").length > 0){
         //console.log("supprimer ", nom_parametre)
         delete valeur[nom_parametre]
       }
@@ -910,6 +952,7 @@ function garder_les_colonnes_non_automatiques(arr){
 
     //console.log('\n')
   })
+
 
   return arr
 }
