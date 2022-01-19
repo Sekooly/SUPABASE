@@ -14117,7 +14117,7 @@ async function approuver_avis(oui){
 	data['id_appreciation'] = $('.selected > th[id_appreciation]')[0].getAttribute('id_appreciation')
 	data['contenu_commentaire'] = phrase_approbation()
 	data['id_commentateur'] = recuperer('identifiant_courant')
-	data['role_commentateur'] = $('.votre_matiere')[0].text() || mon_role
+	data['role_commentateur'] = $('.votre_matiere')[0] ? $('.votre_matiere')[0].text() || mon_role : mon_role
 
 	if(oui){
 		afficher_alerte("✅ Vous avez approuvé l'appréciation de la Vie Scolaire.")
