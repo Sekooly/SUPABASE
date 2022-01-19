@@ -13086,6 +13086,7 @@ function telecharger_fiche_en_pdf(){
 
     //ne pas afficher les coches à l'impression
     printWindow.document.getElementById('coches_colonnes_export').remove()
+    supprimer_les_boutons(printWindow)
 
     printWindow.document.close();
     printWindow.print();
@@ -13093,6 +13094,14 @@ function telecharger_fiche_en_pdf(){
 
 	chargement(false)
 
+}
+
+function supprimer_les_boutons(printWindow){
+	var element = printWindow.document.getElementsByTagName("button"), index;
+
+	for (index = element.length - 1; index >= 0; index--) {
+	    element[index].parentNode.removeChild(element[index]);
+	}
 }
 
 function telecharger_fiche_en_csv(nom_fichier){
