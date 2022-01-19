@@ -114,3 +114,11 @@
         width: 50%;
     }
 
+    /*chargement*/
+    .centered {
+      position: fixed; 
+      top: 50%;
+      left: 50%;
+      z-index: 500; /*toujours tout en haut*/
+      transform: translate(-50%, -50%);
+    }

@@ -14502,7 +14502,7 @@ async function creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_cl
 }
 
 function envoyer_donnees_bulletin_eleve(domaine_bulletin,imprimer,les_matieres,datas){
-	console.log("on envoie les données")
+	console.log("on envoie les données de",datas['identifiant_eleve'])
 
 	/*
 	fenetre_bulletin.postMessage({les_matieres: les_matieres, datas: datas}, domaine_bulletin)
@@ -14572,6 +14572,7 @@ async function lister_eleves_bulletins(){
 function vider_donnees_bulletin_eleve(){
 	liste_datas_bulletin = []
 	liste_matieres_bulletin = []
+	variables_bulletins_pretes = false
 
 }
 

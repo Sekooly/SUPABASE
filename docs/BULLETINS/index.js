@@ -39,10 +39,16 @@ window.addEventListener('message', function(e) {
 })
 */
 
-
+function afficher_chargement(oui){
+	document.getElementById('img_chargement').style.display = oui ? "" : "none"
+}
 
 function traiter_bulletins(e){
+	afficher_chargement(true)
 	console.log("j'ai été ouvert par",window.opener.location)
+	
+	//enlever toutes les anciennes pages
+	document.querySelectorAll('.page:not(#modele_page)').forEach(e => e.remove())
 
 	//récupérer ici les données poussées dans liste_datas_bulletin 
 	liste_datas_bulletin = window.opener.liste_datas_bulletin
@@ -52,10 +58,14 @@ function traiter_bulletins(e){
 
 	//récupérer ici si variables_bulletins_pretes  
 	variables_bulletins_pretes = window.opener.variables_bulletins_pretes
+	console.log({variables_bulletins_pretes})
+
+
 
 
 	//si les variables sont prêtes 
 	if((variables_bulletins_pretes || (e && e.data === 'impression')) && liste_datas_bulletin.length === liste_matieres_bulletin.length){
+
 		console.log({liste_datas_bulletin})
 		console.log({liste_matieres_bulletin})
 
@@ -81,6 +91,8 @@ function traiter_bulletins(e){
 	}else{
 		console.error("Les données de bulletins ne sont pas encore prêtes. Refaire traiter_bulletins() plus tard.")
 	}
+
+	afficher_chargement(false)
 
 }
 
