@@ -15185,13 +15185,8 @@ async function trouver_mes_eleves(){
 
 
 			mes_eleves_initiaux = demande.body
-			//console.log({mes_eleves_initiaux})
+			console.log({mes_eleves_initiaux})
 
-
-			//ne garder que les saisie que LE PROF ACTUEL a fait
-			mes_eleves_initiaux = mes_eleves_initiaux.filter(e => e['identifiant_prof'] === $('[id="enseignant"]').val() || e['identifiant_prof'] === null)
-
-			//console.log({mes_eleves_initiaux})
 
 
 			chargement(false)
@@ -15356,17 +15351,18 @@ function transformer_notes_en_array(mes_eleves){
 		var periode_bulletin = tout.periode_bulletin
 		var saison_note = tout.saison_note
 		var Classe_Matiere = tout.Classe_Matiere
+		var identifiant_prof = tout.identifiant_prof
  
 		//si saison_note n'est pas TOUT, filtrer
 		if(saison_note!=="Toutes"){
-			var notes_de_leleve = mes_eleves.filter(e =>  e['Classe_Matiere'] === Classe_Matiere && e['Identifiant'] === un_eleve && e['periode_bulletin'] === periode_bulletin && e['saison_note'] === saison_note).map(e => e['note'] + '|' + e['coef'] + '|' + e['saison_note'])	
+			var notes_de_leleve = mes_eleves.filter(e =>  e['Classe_Matiere'] === Classe_Matiere && e['Identifiant'] === un_eleve && e['periode_bulletin'] === periode_bulletin && e['saison_note'] === saison_note  && e['identifiant_prof'] === identifiant_prof).map(e => e['note'] + '|' + e['coef'] + '|' + e['saison_note'])	
 		
 		//si saison_note=Toutes
 		//-> on récupère toutes les notes et on rend NON MODIFIABLE!!
 		//-> on rajoute la moyenne périodique si demandé
 		}else{
 
-			var notes_de_leleve = mes_eleves.filter(e =>  e['Classe_Matiere'] === Classe_Matiere && e['Identifiant'] === un_eleve && e['periode_bulletin'] === periode_bulletin).map(e =>  e['note'] + '|' + e['coef'] + '|' + e['saison_note'] )	
+			var notes_de_leleve = mes_eleves.filter(e =>  e['Classe_Matiere'] === Classe_Matiere && e['Identifiant'] === un_eleve && e['periode_bulletin'] === periode_bulletin && e['identifiant_prof'] === identifiant_prof).map(e =>  e['note'] + '|' + e['coef'] + '|' + e['saison_note'] )	
 			//console.log({notes_de_leleve})
 
 			var moyenne_periodique = calculer_moyenne_periodique(notes_de_leleve)
