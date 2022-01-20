@@ -5085,6 +5085,20 @@ async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_init
 		chargement(false);
 
 
+	//si c'est un audio MP3
+	}else if(extension === 'mp3'){
+		//alert('TODO')
+
+		element_DOM('previsualisation').outerHTML = `
+			<audio controls="" src="https://drive.google.com/uc?id=`+id_fichier+`" class="previz">
+	            Votre navigateur ne supporte pas la lecture des éléments <code>audio</code>.
+	    	</audio>
+
+
+		`
+
+		chargement(false)
+
 	//si c'est PAS une image
 	}else{
 
