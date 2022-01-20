@@ -15183,7 +15183,15 @@ async function trouver_mes_eleves(){
 
 			}
 
+
 			mes_eleves_initiaux = demande.body
+			//console.log({mes_eleves_initiaux})
+
+
+			//ne garder que les saisie que LE PROF ACTUEL a fait
+			mes_eleves_initiaux = mes_eleves_initiaux.filter(e => e['identifiant_prof'] === $('[id="enseignant"]').val() || e['identifiant_prof'] === null)
+
+			//console.log({mes_eleves_initiaux})
 
 
 			chargement(false)
