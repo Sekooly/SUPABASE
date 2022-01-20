@@ -13567,9 +13567,11 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 
 
 	//rajouter les coefficients SI CEST PAS UNE OPTION PARTICULIERE à partir de la colonne 7 (indice 6)
-	var ligne_coefs = ',,,,,COEFF,' + matieres_de_classe.map(e => !e['nom_liste_et_coefs'] && e['coefficient_matiere'] > 0 ? e['coefficient_matiere'] :  "-").join(',')
+	var ligne_coefs = ',,,,,COEFF,' + matieres_de_classe.map(function(e){
+		return  (!e['nom_liste_et_coefs'] || e['nom_liste_et_coefs'] === 'null') && e['coefficient_matiere'] > 0 ? e['coefficient_matiere'] :  "-"
+	} ).join(',')
 	ligne_coefs = ligne_coefs.split(',')
-	//console.log({ligne_coefs})
+	console.log({ligne_coefs})
 	$("#contenu_fiche_conseil").append('<tr class="ligne_coefs">'+ligne_coefs.map(un_coef => `<th>${un_coef}</th>`)+'</tr>')
 
 
