@@ -3795,7 +3795,7 @@ function recuperer_les_fichiers(id_dossier){
 
 	}).catch(error => {
 		console.error(error)
-		alert('Erreur : fichiers impossibles à récupérer pour cette classe.')
+		//alert('Erreur : fichiers impossibles à récupérer pour cette classe.')
 		chargement(false)
 
 	})
