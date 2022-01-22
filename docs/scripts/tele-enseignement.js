@@ -13899,6 +13899,9 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe,ap
 	cumul_eleves = 0
 	somme_coef_eleves = 0
 	moyenne_generale = 0
+
+	nom_eleve_test = "----"
+
 	$('[id="'+identifiant_eleve+'"] > .moyenne_eleve').each(function(index,moyenne_matiere){
 
 
@@ -13913,17 +13916,24 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe,ap
 
 
 		la_moyenne = Number(la_moyenne)
-		/*
-		if(identifiant_eleve==="mahonjo.hierro"){
+		
+		if(identifiant_eleve===nom_eleve_test){
+			console.log('\n\n')
+			console.log({index})
 			console.log({la_moyenne})
+			console.log({moyenne_matiere})
 			console.log({le_coef})
+			console.log({somme_coef_eleves})
 		}
-		*/
+		
 
 
 		//cumuler
 		if(la_moyenne){
+			if(identifiant_eleve===nom_eleve_test) console.log({'avant': cumul_eleves})
 			cumul_eleves += la_moyenne*le_coef
+			if(identifiant_eleve===nom_eleve_test) console.log({'apres': cumul_eleves})
+			
 
 			//si c'est PAS UN BONUS, alors on cumule la somme de coef
 			if(est_bonus!=="true"){
@@ -13932,13 +13942,14 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe,ap
 		}
 
 	}) 
-	/*
-
-	if(identifiant_eleve==="mahonjo.hierro"){
+	
+	
+	if(identifiant_eleve===nom_eleve_test){
 		console.log({cumul_eleves})
 		console.log({somme_coef_eleves})
 	}
-	*/
+	
+	
 	if(cumul_eleves > 0 && somme_coef_eleves > 0) moyenne_generale = Number(cumul_eleves/somme_coef_eleves).toFixed(2)
 
 
