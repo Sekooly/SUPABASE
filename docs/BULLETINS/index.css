@@ -122,3 +122,26 @@
       z-index: 500; /*toujours tout en haut*/
       transform: translate(-50%, -50%);
     }
+
+    .image_signature{
+        height: 100px;
+    }
+
+    .case_images {
+        position: relative;
+        left: 0;
+        top: 0;
+    }
+
+    .span_signature {
+        position: relative;
+        top: 0;
+        left: 0;
+    }
+
+    .span_tampon {
+        position: absolute;
+        top: 20px;
+        left: 150px;
+        opacity: 70%;
+    }

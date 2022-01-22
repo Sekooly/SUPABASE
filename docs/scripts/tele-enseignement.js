@@ -14293,11 +14293,26 @@ function generer_bulletin(){
 
 		var nom_periode = data_etablissement['config_notes']['nom_periode_bulletin']
 		var les_periodes = Object.keys(data_etablissement['config_notes'][nom_periode])
-		elements_html += "<br><br>"+nom_periode+":<br><select id='periode_principale_bulletin_eleve'>"+les_periodes.map(e => '<option value="'+e+'">'+e+'</option>')+"</select><br></div>"
+		elements_html += "<br><br>"+nom_periode+":<br><select id='periode_principale_bulletin_eleve'>"+les_periodes.map(e => '<option value="'+e+'">'+e+'</option>')+"</select><br>"
+
+		avec_signature = recuperer('avec_signature') === "true" ? " checked" : ""
+		avec_tampon = recuperer('avec_tampon') === "true"  ? " checked" : ""
+		elements_html += `<br><br><div><input class="image_bulletin" id="avec_signature" type="checkbox"`+avec_signature+`><label for="avec_signature">Avec signature</label></div>`
+		elements_html += `<br><br><div><input class="image_bulletin" id="avec_tampon" type="checkbox"`+avec_tampon+`><label for="avec_tampon">Avec tampon</label></div>`
+
+
+		elements_html += "</div>"
 
 		creer_mini_popup("Choisissez la classe à consulter",elements_html, "Voir le bulletin","voir_bulletin_eleve()")
 		
+		//au moment de checker -> enregistrer
+		$(".image_bulletin").on("click",function(e){
+			console.log(e.target.id, e.target.checked)
+			stocker(e.target.id,e.target.checked)
+		})
 
+		//lister les élèves
+		lister_eleves_bulletins()
 
 
 
@@ -14460,7 +14475,17 @@ async function creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_cl
 		identifiant_eleve: id_eleve
 	}
 
+
+	if(recuperer('avec_signature') === "true"){
+		datas['signature_etablissement'] = prefixe_image + "/" + data_etablissement['images']["signature_etablissement"]
+	}
+
+	if(recuperer('avec_tampon') === "true"){
+		datas['tampon_etablissement'] = prefixe_image + "/" + data_etablissement['images']["tampon_etablissement"]
+	}
+
 	//console.log({datas})
+
 
 	//récupérer toutes les appréciations de l'éleve
 	var les_appreciations_eleve = await rechercher("Appreciations", "identifiant_eleve",id_eleve)
@@ -22384,7 +22409,7 @@ async function upload_une_image(id_img,nom_champ_image_dans_data_etablissement,n
 		try{
 			//récupérer l'ancienne image
 			autorisations = recuperer_autorisations()
-			
+
 
 
 			upload_image_etablissement(mon_image)	

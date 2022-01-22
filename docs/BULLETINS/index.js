@@ -8,37 +8,6 @@ document.addEventListener('click',trier_et_imprimer)
 document.addEventListener("DOMContentLoaded", traiter_bulletins);
 window.addEventListener('message',traiter_bulletins)
 
-//TODO
-//au moment de changer variables_bulletins_pretes, on appelle traiter_bulletins
-
-/*
-window.addEventListener('message', function(e) {
-
-
-	//console.log("on a recu: ",e.data)
-
-	if(e.data.datas && e.data.les_matieres){
-		datas = e.data.datas
-		les_matieres = e.data.les_matieres
-		nb_datas = nb_datas+1
-	}else if(e.data === 'remplissage'){
-		mettre_titre_document()
-		console.log({datas})
-		console.log({les_matieres})
-
-
-		page_courante =  page_modele.cloneNode(true)
-		page_courante.id = datas['identifiant_eleve']
-		page_courante.style.display = ''
-
-		remplir_bulletins(datas, les_matieres)		
-	}else{
-		console.log('on a recu:',e.data)
-	}
-
-})
-*/
-
 function afficher_chargement(oui){
 	document.getElementById('img_chargement').style.display = oui ? "" : "none"
 }
@@ -49,44 +18,51 @@ function traiter_bulletins(e){
 
 	//enlever toutes les anciennes pages
 	document.querySelectorAll('.page:not(#modele_page)').forEach(e => e.remove())
+	/*
+	liste_datas_bulletin = {}
+	liste_matieres_bulletin = []
+	variables_bulletins_pretes = false
+	*/
 
-	//récupérer ici les données poussées dans liste_datas_bulletin 
-	liste_datas_bulletin = window.opener.liste_datas_bulletin
+	if(window.opener){
 
-	//récupérer ici les données poussées dans liste_matieres_bulletin  
-	liste_matieres_bulletin = window.opener.liste_matieres_bulletin
+		//récupérer ici les données poussées dans liste_datas_bulletin 
+		liste_datas_bulletin = window.opener.liste_datas_bulletin
 
-	//récupérer ici si variables_bulletins_pretes  
-	variables_bulletins_pretes = window.opener.variables_bulletins_pretes
-	console.log({variables_bulletins_pretes})
+		//récupérer ici les données poussées dans liste_matieres_bulletin  
+		liste_matieres_bulletin = window.opener.liste_matieres_bulletin
 
-
-
-
-	//si les variables sont prêtes 
-	if((variables_bulletins_pretes || (e && e.data === 'impression')) && liste_datas_bulletin.length === liste_matieres_bulletin.length){
-
-		console.log({liste_datas_bulletin})
-		console.log({liste_matieres_bulletin})
-
-		for(index_eleve=0;index_eleve<liste_datas_bulletin.length;index_eleve++){
-			datas = liste_datas_bulletin[index_eleve]
-			les_matieres = liste_matieres_bulletin[index_eleve]
-
-			console.log({datas})
-			console.log({les_matieres})
+		//récupérer ici si variables_bulletins_pretes  
+		variables_bulletins_pretes = window.opener.variables_bulletins_pretes
+		console.log({variables_bulletins_pretes})
 
 
-			page_courante =  page_modele.cloneNode(true)
-			page_courante.id = datas['identifiant_eleve']
-			page_courante.style.display = ''
+		//si les variables sont prêtes 
+		if((variables_bulletins_pretes || (e && e.data === 'impression')) && liste_datas_bulletin.length === liste_matieres_bulletin.length){
 
-			remplir_bulletins(datas, les_matieres)		
+			console.log({liste_datas_bulletin})
+			console.log({liste_matieres_bulletin})
+
+			for(index_eleve=0;index_eleve<liste_datas_bulletin.length;index_eleve++){
+				datas = liste_datas_bulletin[index_eleve]
+				les_matieres = liste_matieres_bulletin[index_eleve]
+
+				console.log({datas})
+				console.log({les_matieres})
+
+
+				page_courante =  page_modele.cloneNode(true)
+				page_courante.id = datas['identifiant_eleve']
+				page_courante.style.display = ''
+
+				remplir_bulletins(datas, les_matieres)		
+			}
+
+
+			titre_et_ordre_donnees()
+
+
 		}
-
-
-		titre_et_ordre_donnees()
-
 
 	}else{
 		console.error("Les données de bulletins ne sont pas encore prêtes. Refaire traiter_bulletins() plus tard.")
@@ -196,7 +172,8 @@ function remplir_bulletins(datas,les_matieres){
 			if (mon_element.localName === 'img'){
 
 				mon_element.src = datas[cle]
-
+				console.log({mon_element})
+				
 				//imprimer la page dès que l'image est prete
 				/*
 		        mon_element.onload = function () {
