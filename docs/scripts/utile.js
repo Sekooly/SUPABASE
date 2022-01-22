@@ -663,6 +663,14 @@ function nombre_de_rows(xmlHttp){
   return contentRange ? Number(contentRange.split('/')[1]) : 0
 }
 
+function get_resultat_avec_autorisation(url,autorisation){   
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", url, false ); // false for synchronous request
+    if(autorisation) xmlHttp.setRequestHeader("Authorization", "Bearer " + autorisation)
+    xmlHttp.send( null ); 
+    //console.log(nombre_de_rows(xmlHttp))
+    return JSON.parse(xmlHttp.responseText);
+}
 
 function get_resultat(url){    
     var xmlHttp = new XMLHttpRequest();
