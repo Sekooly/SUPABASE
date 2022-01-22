@@ -10910,9 +10910,17 @@ function information_etablissement(id_info, etiquette_info, valeur_info, est_mod
 	valeur_info = est_consultable ? oeil : valeur_info
 
 	//si c'est une image -> afficher 
-	if(etiquette_info === "Logo"){
+	if(etiquette_info === "Logo" || etiquette_info === "Paraphe" ||  etiquette_info === "Signature" ||  etiquette_info === "Tampon" ){
+
+		la_fonction = etiquette_info === "Logo" ? 'nouveau_logo()' :
+						etiquette_info === "Paraphe" ?  'maj_paraphe()' :
+						etiquette_info === "Signature" ?  'maj_signature()':
+						etiquette_info === "Tampon" ? 'maj_tampon()' : 
+						'alert("Aucune correspondance image.")'
+
+
 		valeur_info = '<img id="mon_logo_etablissement" style="width: auto;" class="pp" src="'+prefixe_image+'/'+valeur_info+'">' 
-		crayon = '<img onclick="nouveau_logo()" src="'+prefixe_image+'/img_edit.png" alt="MODIFIER" class="editer">'
+		crayon = '<img onclick="'+la_fonction+'" src="'+prefixe_image+'/img_edit.png" alt="MODIFIER" class="editer">'
 	}
 
 	return '<div class="un_detail"><b class="sekooly-mode">'+etiquette_info+': </b><br><span id="' + id_info +'">'+valeur_info+crayon+'</span></div>';
@@ -10933,7 +10941,7 @@ function actualiser_details_parametre(id_parametre){
 	}else if(id_parametre === "Infos établissement"){
 
 		var id_contrat = data_etablissement.donnees_contrat.id_newTempFile ? "id_newTempFile" : "id_contrat"
-
+		var liste_images_etablissement = ['Paraphe', 'Signature', 'Tampon']
 		liste_id_infos_etablissement = ["nom_fichier_logo:Logo:true",
 										"nom_etablissement:Nom de l'établissement:false",
 										"date_premier_abonnement:Date de début d'abonnement:false" ,
@@ -10941,6 +10949,9 @@ function actualiser_details_parametre(id_parametre){
 										"adresse_etablissement:Adresse:true",
 										"contact_etablissement:Contact de l'Administration:true",
 										"contact_economat:Contact de l'Economat:true",
+										"paraphe_etablissement:Paraphe:true",
+										"signature_etablissement:Signature:true",
+										"tampon_etablissement:Tampon:true",
 										"mots_interdits:Liste des mots interdits (séparés par une virgule):true",
 										"nb_heures_delai_examen:Nombre d'heures de tolérance pour les examens:true",
 										"donnees_contrat.montant_par_user:Montant par utilisateur",
@@ -10958,7 +10969,8 @@ function actualiser_details_parametre(id_parametre){
 			etiquette_info =  info.split(':')[1]
 
 
-			valeur_info = id_info.includes(".") ? data_etablissement[id_info.split('.')[0]][id_info.split('.')[1]] : data_etablissement[id_info]
+			valeur_info = id_info.includes(".") ? data_etablissement[id_info.split('.')[0]][id_info.split('.')[1]] :
+							liste_images_etablissement.indexOf(etiquette_info) >= 0 ? data_etablissement['images'][id_info] : data_etablissement[id_info]
 
 
 
@@ -22311,6 +22323,88 @@ async function upload_nouveau_logo(){
 		afficher_alerte("Erreur de mise en ligne: vérifiez que vous êtes toujours connecté à internet.")
 	}
 
+
+	chargement(false)
+}
+
+
+
+
+
+
+
+
+
+
+
+/**************************** IMAGE SIGNATURE + PARAPHE **********************************/
+function maj_paraphe(){
+	nouvelle_image('paraphe_etablissement','paraphe_etablissement','paraphe')
+	
+}
+
+function maj_tampon(){
+	nouvelle_image('tampon_etablissement','tampon_etablissement','tampon')
+}
+
+function maj_signature(){
+	nouvelle_image('signature_etablissement','signature_etablissement','signature')
+	
+}
+
+
+
+function nouvelle_image(id_img,nom_champ_image_dans_data_etablissement,nom_image){
+
+	//input file
+	var elements_html = "<input type='file' accept='.png,.jpeg,.jpg,.bmp,.svg,.gif' id='"+id_img+"'>"
+
+	//créer un mini popup
+	//bouton upload avec au_clic = upload_nouveau_logo()
+	creer_mini_popup("Nouvelle image de " + nom_image,elements_html,"Mettre en ligne","upload_une_image('"+id_img+"','"+nom_champ_image_dans_data_etablissement+"','"+nom_image+"')")
+	
+}
+
+
+async function upload_une_image(id_img,nom_champ_image_dans_data_etablissement,nom_image){
+	chargement(true)
+
+	console.log({id_img})
+
+	var mon_image = $("input#"+id_img)[0].files[0]
+
+	//on a une image
+	if(mon_image){
+
+		//forcément une image
+		if(!mon_image.type.includes("image")) return afficher_alerte("Merci de choisir une image.")
+
+		eval(get_resultat_brut("https://sekooly.com/assets/web/assets/jquery/contact.js"))
+
+		try{
+			//récupérer l'ancienne image
+			autorisations = recuperer_autorisations()
+			
+
+
+			upload_image_etablissement(mon_image)	
+
+			data_etablissement['images'][nom_champ_image_dans_data_etablissement] = mon_image.name
+			await actualiser_info_etablissement()
+			afficher_alerte("Image de "+nom_image+" mise en ligne.")
+			$("#mini_popup").remove()
+
+			//actualiser au bout de 2 secondes
+			setTimeout(actualiser_parametre, 2000)
+
+		}catch(e){
+			console.log("Erreur de mise en ligne: ",e)
+			afficher_alerte("Erreur de mise en ligne: ",e)
+		}
+	
+
+
+	}
 
 	chargement(false)
 }
