@@ -66,7 +66,7 @@ var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","UR
 								
 							]
 
-var parametres_facultatifs = ['description','nom_liste_et_coefs', 'position']
+var parametres_facultatifs = ['description','nom_liste_et_coefs', 'position','droit_apercu_bulletin', 'sexe', 'ancien_ou_nouveau']
 
 
 var elements_menu_haut_avec_modifs = ["Classes","Matieres","Eleves","Profs","Administration","Liste_appreciations"]
@@ -78,7 +78,7 @@ nom_etablissement = data_etablissement['nom_etablissement']
 
 
 var champs_avec_listes_dynamiques = ['Classe','classe_bis','Classe_principale','Cycle','cycle','Matiere']
-var champs_oui_ou_non = ['Est_délégué','Reponse_sondage','Ecolage_OK','Droits_modifs', 'Droit_acces_anticipe_examen','Droit_changer_ecolage','commun_au_cycle','droit_hors_maintenance','Est_délégué']
+var champs_oui_ou_non = ['Est_délégué','Reponse_sondage','Ecolage_OK','Droits_modifs', 'Droit_acces_anticipe_examen','Droit_changer_ecolage','commun_au_cycle','droit_hors_maintenance','Est_délégué','droit_apercu_bulletin']
 var liste_couleurs = ['blanc','bleu ciel', 'bleu foncé', 'gris','jaune','marron','noir','orange','rose','rouge','vert clair','vert foncé', 'violet']
 
 var identifiants_appreciations = ['admin.tech','admin.tech2','ramiandriray.pierrot','ramiandriray-pierrot']
@@ -14239,7 +14239,7 @@ function voir_bulletin_classe_choisie(){
 
 
 
-function clic_bulletin(){
+async function clic_bulletin(){
 	//si prof
 	if(recuperer('mon_type').includes('Prof') ){
 		//lister les classes-matières que j'enseigne
@@ -14247,14 +14247,61 @@ function clic_bulletin(){
 		var toutes_les_matieres = recuperer("Matieres") ? JSON.parse(recuperer("Matieres")) : mes_matieres
 
 		creer_fenetre_bulletin(toutes_les_matieres)
+
+	//si admin
 	}else if(recuperer('mon_type').includes('Admin')){
 
 		creer_mini_popup('<div style="border-bottom-style: ridge;font-size: 20px;">Bulletins<br><b>Que voulez-vous faire?</b></div>',choix_admin_bulletins(),"Valider", "valider_choix_admin_bulletins()")
+	
+	//todo
+	//si eleve
+	}else{
+		//check si l'élève a le droit de consulter
+		var mes_donnees = await rechercher('Eleves', 'Identifiant',recuperer('identifiant_courant'))
+		console.log({mes_donnees})
+
+		if(mes_donnees.length > 0){
+			mes_donnees = mes_donnees[0]
+			droit_apercu_bulletin = mes_donnees['droit_apercu_bulletin']
+			console.log({droit_apercu_bulletin})
+
+			if(droit_apercu_bulletin === "oui"){
+				generer_bulletin()
+
+				//masquer les données
+				$('[id="mini_popup"]').hide()
+
+				//insérer les données: moi en eleve, trimestre dispo OUSS 1 SECONDE
+				setTimeout(function(){
+					$('[id="identifiant_eleve_bulletin"]').val(recuperer("identifiant_courant"))	
+
+
+					//configuré par l'admin
+					avec_signature_tampon = data_etablissement['avec_signature_tampon']
+
+					//avec signature
+					//avec tampon
+					element_DOM('avec_signature').checked = avec_signature_tampon
+					element_DOM('avec_tampon').checked = avec_signature_tampon	
+					stocker('avec_signature',avec_signature_tampon)
+					stocker('avec_tampon',avec_signature_tampon)
+						
+					//récupérer les données 
+					voir_bulletin_eleve()
+
+
+				},1000)
+				
+
+				
+
+
+			}else{
+				alert("❌ Vous ne pouvez pas encore consulter vos bulletins scolaires. Merci de vous rapprocher de l'Administration de votre école.")
+			}
+		}
 	}
 
-	//todo
-	//si admin
-	//si eleve
 }
 
 function valider_choix_admin_bulletins(){
@@ -14274,7 +14321,10 @@ function valider_choix_admin_bulletins(){
 
 function generer_bulletin(){
 	var mon_type = recuperer('mon_type')
-	if(mon_type.includes('Admin') || mon_type.includes('Profs')){
+
+
+
+	//if(mon_type.includes('Admin') || mon_type.includes('Profs')){
 
 		les_matieres = JSON.parse(recuperer("mes_matieres"))
 		les_classes = valeursUniquesDeCetteKey(les_matieres,'Classe')
@@ -14315,10 +14365,11 @@ function generer_bulletin(){
 		lister_eleves_bulletins()
 
 
-
+	/*
 	}else{
 		alert("Fonctionnalité en cours de développement.")
 	}
+	*/
 }
 
 async function voir_bulletin_eleve(){
@@ -14506,7 +14557,7 @@ async function creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_cl
 	for (mon_index=index_sexe+1;mon_index<index_moyenne_generale;mon_index++){
 
 		//si la colonne est cochée avec une moyenne
-		colonne_a_exporter = $('tr[id="coches_colonnes_export"]')[0].children[mon_index].children[0].checked
+		colonne_a_exporter = $('tr[id="coches_colonnes_export"]')[0] ? $('tr[id="coches_colonnes_export"]')[0].children[mon_index].children[0].checked : true
 		nom_champ = nom_colonne_de_cet_index(mon_index)
 		moy_eleve = nom_champ.length > 0 ? recuperer_dans_le_selected(id_eleve,nom_champ) : ""
 		if(colonne_a_exporter && moy_eleve.length > 0 && nom_champ.length > 0) {
@@ -14867,8 +14918,8 @@ function configurer_periodes_bulletins(){
 	var elements_html = '<div class="donnees_saisies">'
 	var nom_periode_bulletin = un_element_de_config_bulletin("saisie_des_periodes_principales()",'Identifiant des périodes principales (Exemples: <b>Trimestres</b> ou <b>Semestres</b> ...)', 'nom_periode_bulletin', recuperer_nom_periodes_principales_bulletin())
 	var nom_saison_note = un_element_de_config_bulletin("saisie_des_periodes_secondaires()",'Identifiant des périodes secondaires (Exemples: <b>Périodes</b> ou <b>Mois</b> ...)', 'nom_saison_note',recuperer_nom_periodes_secondaires_bulletin() )
-	var liste_des_appreciations_auto = ''
-	elements_html = elements_html + nom_periode_bulletin + nom_saison_note +liste_des_appreciations_auto+ '</div>'
+	var images_bulletins = `<label><input id="avec_signature_tampon" type="checkbox" `+(data_etablissement['avec_signature_tampon'] ? "checked" : "") +`>Bulletin téléchargé par un élève AVEC SIGNATURE ET TAMPON</label>`
+	elements_html = elements_html + nom_periode_bulletin + nom_saison_note +images_bulletins+ '</div>'
 
 	creer_mini_popup('<div style="border-bottom-style: ridge;font-size: 20px;">Configuration des périodes de notation</div>',elements_html,'Enregistrer', 'enregistrer_config_bulletins(1)')
 
@@ -14975,6 +15026,7 @@ async function enregistrer_config_bulletins(numero_etape,les_periodes_principale
 
 		data_etablissement['config_notes']['nom_periode_bulletin'] = element_DOM('nom_periode_bulletin').value.trim()
 		data_etablissement['config_notes']['nom_saison_note'] = element_DOM('nom_saison_note').value.trim()
+		data_etablissement['avec_signature_tampon'] = element_DOM('avec_signature_tampon').checked
 		alerte_a_afficher = 'Périodes enregistrées avec succès.'
 
 
