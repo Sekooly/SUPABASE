@@ -14297,8 +14297,8 @@ function generer_bulletin(){
 
 		avec_signature = recuperer('avec_signature') === "true" ? " checked" : ""
 		avec_tampon = recuperer('avec_tampon') === "true"  ? " checked" : ""
-		elements_html += `<br><br><div><input class="image_bulletin" id="avec_signature" type="checkbox"`+avec_signature+`><label for="avec_signature">Avec signature</label></div>`
-		elements_html += `<br><br><div><input class="image_bulletin" id="avec_tampon" type="checkbox"`+avec_tampon+`><label for="avec_tampon">Avec tampon</label></div>`
+		elements_html += `<br><br><div><input class="image_bulletin" id="avec_signature" type="checkbox"`+avec_signature+`><label for="avec_signature">Avec signature</label>`
+		elements_html += `<input class="image_bulletin" id="avec_tampon" type="checkbox"`+avec_tampon+`><label for="avec_tampon">Avec tampon</label></div>`
 
 
 		elements_html += "</div>"
@@ -14413,10 +14413,12 @@ function calcul_annee_scolaire(){
 
 function mention_moyenne(moyenne){
 	moyenne = Number(moyenne)
-	var res = moyenne >=12 &&  moyenne <14 ? "Assez bien"
-				:  moyenne >=14 &&  moyenne <16 ? "Bien"
-				:  moyenne >=16 &&  moyenne <18 ? "Très bien"
-				:  moyenne >=18 &&  moyenne <20 ? "Excellent"
+	var res = moyenne >=0 && moyenne <9 ? "BLAME POUR INSUFFISANCE DE TRAVAIL"
+				:  moyenne >=9 &&  moyenne <10 ? "RESULTATS INSUFFISANTS"
+				:  moyenne >=10 &&  moyenne <12 ? "PASSABLE"
+				:  moyenne >=12 &&  moyenne <13 ? "TABLEAU D'HONNEUR"
+				:  moyenne >=13 &&  moyenne <15 ? "ENCOURAGEMENT"
+				:  moyenne >=15 &&  moyenne <20 ? "FELICITATIONS"
 				: ""
 
 	return res
