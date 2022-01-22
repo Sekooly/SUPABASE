@@ -232,6 +232,9 @@ CREATE TABLE public."Eleves"
     "statut" text COLLATE pg_catalog."default" DEFAULT 'Déconnecté'::text,
     "liste_notifs_lues" text COLLATE pg_catalog."default",    
     liste_options text COLLATE pg_catalog."default",
+    droit_apercu_bulletin character varying COLLATE pg_catalog."default" NOT NULL DEFAULT 'non'::character varying,
+    sexe character varying COLLATE pg_catalog."default" NOT NULL DEFAULT 'F/M'::character varying,
+    ancien_ou_nouveau character varying COLLATE pg_catalog."default" NOT NULL DEFAULT 'A'::character varying,
     CONSTRAINT "Eleves_pkey" PRIMARY KEY ("Identifiant")
 )
 
