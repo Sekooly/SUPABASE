@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		
+		<link rel="shortcut icon" href="images/logo-no-background-128x128.png" type="image/x-icon">
+		<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.16/mammoth.browser.min.js"></script>
+		<script src="scripts/jquery.min.js"></script>		
+		<script type="text/javascript" src="scripts/aes.js"></script>
+		<script type="text/javascript" src="scripts/utile.js"></script>
+		<script src="scripts/donnees_client.js"></script>
+		
+	</head>
+
+	<body>
+
+
+		<style type="text/css">
+			.logo_droite{
+				position: absolute;
+				height: 100px;
+				display: inline-flex;
+				right: 2%;
+			}
+		</style>
+
+		<h>Choissisez votre modèle:</h>
+		<input type="file" id="modele" name="modele_bulletin" onchange="afficher_doc()" accept="docx,doc">
+
+		<div id="previz_modele"></div>
+		
+
+
+		<script type="text/javascript">
+			var periode_bulletin = "PREMIER TRIMESTRE"
+			var data_eleves = get_resultat(racine_data + "Eleves?Identifiant=eq.test&" + apikey)
+
+			function afficher_doc(){
+				var mon_fichier = $("#modele")[0].files[0]
+
+				if(mon_fichier){
+					console.log(mon_fichier.name)
+					var reader = new FileReader();
+				    reader.onloadend = function(event) {
+				    	generer_html(reader,mon_fichier)
+				    };
+
+				    reader.readAsArrayBuffer(mon_fichier);
+				}
+			}
+
+			function generer_html(reader,mon_fichier){
+				var arrayBuffer = reader.result;
+				var options = {
+				    styleMap: [
+				        "[style-name='Section Title'] => h1",
+				        "[style-name='Subsection Title'] => h2"
+				    ]
+				};
+				
+				//generer pour chaque eleve
+				data_eleves.forEach(function(data_eleve){
+
+
+					mammoth.convertToHtml({arrayBuffer: arrayBuffer}, options).then(function (resultObject) {
+						$("#previz_modele")[0].innerHTML = resultObject.value
+						remplacer_les_donnees_fixes()
+						remplacer_donnees_eleve(data_eleve)
+					})
+	
+				})
+
+			}
+
+
+			function remplacer_les_donnees_fixes(){
+				remplacer($("#previz_modele")[0], "<p>{d.logo_etablissement}</p>","<span><img class='logo_droite' src='images/"+data_etablissement["nom_fichier_logo"]+"'><span>")
+				remplacer($("#previz_modele")[0], "{d.nom_etablissement}","<h2>"+data_etablissement["nom_etablissement"].toUpperCase() +"</h2>")
+				remplacer($("#previz_modele")[0], "{d.adresse_etablissement}","<h3>"+data_etablissement["adresse_etablissement"]+"</h3>")
+				remplacer($("#previz_modele")[0], "{d.periode_bulletin}",periode_bulletin)
+				
+			}
+
+			function remplacer_donnees_eleve(data_eleve){
+
+				remplacer($("#previz_modele")[0], "{d.Nom}",data_eleve["Nom"])
+				remplacer($("#previz_modele")[0], "{d.Prénoms}",data_eleve["Prénom(s)"])
+				remplacer($("#previz_modele")[0], "{d.Date_de_naissance}",data_eleve["Date_de_naissance"])
+				remplacer($("#previz_modele")[0], "{d.Classe}",data_eleve["Classe"])
+				remplacer($("#previz_modele")[0], "{d.prof_principal}","Monsieur prof principal")
+			}
+
+			function remplacer(element_html_principal, motif_html,donnee_remplacante){
+				element_html_principal.innerHTML = element_html_principal.innerHTML.replaceAll(motif_html,donnee_remplacante.replace(new RegExp('\r?\n','g'), '<br />'))
+
+			}
+
+
+
+		</script>
+	</body>
+
+</html>
+
