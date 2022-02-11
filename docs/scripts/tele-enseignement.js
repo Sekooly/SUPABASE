@@ -112,7 +112,7 @@ var ma_tentative = {}
 var mes_reponses = {}
 
 var fenetre_bulletin;
-var domaine_bulletin = window.location.href.replaceAll('tele-enseignement',"") + "bulletins.html" //"BULLETINS/index.html"
+var domaine_bulletin = window.location.href.replaceAll('tele-enseignement',"") + "BULLETINS/index.html"
 
 const { createClient } = supabase
 supabase = createClient(racine_data.replace("/rest/v1/",""),  data_etablissement["apikey"])
