@@ -14824,6 +14824,8 @@ var bulletin_enregistre = false
 async function sauvegarder_saisie_bulletin(){
 	chargement(true)
 
+	if(impossible_de_cliquer()) return afficher_alerte("Enregistrement déjà en cours, merci de patienter.")
+
 	if($("#saison_note").val()  === "Toutes"){
 
 
