@@ -14824,7 +14824,10 @@ var bulletin_enregistre = false
 async function sauvegarder_saisie_bulletin(){
 	chargement(true)
 
-	if(impossible_de_cliquer()) return afficher_alerte("Enregistrement déjà en cours, merci de patienter.")
+	if(recuperer("enregistrement_en_cours") === "oui") return afficher_alerte("Enregistrement déjà en cours, merci de patienter.")
+
+
+	stocker("enregistrement_en_cours","oui")
 
 	if($("#saison_note").val()  === "Toutes"){
 
@@ -14852,6 +14855,7 @@ async function sauvegarder_saisie_bulletin(){
 		if(appreciations.length === 0){
 			chargement(false)
 			bulletin_enregistre = true
+			effacer("enregistrement_en_cours")
 			return afficher_alerte(alerte_a_afficher)			
 		}
 
@@ -14865,7 +14869,7 @@ async function sauvegarder_saisie_bulletin(){
 			bulletin_enregistre = true
 		}
 
-
+		effacer("enregistrement_en_cours")
 		afficher_alerte(alerte_a_afficher)
 		chargement(false)
 
@@ -14892,6 +14896,7 @@ async function sauvegarder_saisie_bulletin(){
 		if (notes_saisies.length === 0) {
 			chargement(false)
 			bulletin_enregistre = true
+			effacer("enregistrement_en_cours")
 			return afficher_alerte(alerte_a_afficher)
 		}
 
@@ -14906,7 +14911,7 @@ async function sauvegarder_saisie_bulletin(){
 			bulletin_enregistre = true
 		}
 
-
+		effacer("enregistrement_en_cours")
 		afficher_alerte(alerte_a_afficher)
 		chargement(false)
 	}
