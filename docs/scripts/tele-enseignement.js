@@ -13029,9 +13029,9 @@ function telecharger_fiche_en_pdf(){
 	periode = $("#la_periode_bulletin>option")[0].innerText + ' ' + $("#la_periode_bulletin").val()
 	classe = $("#la_classe_fiche").val()
     var avec_coef = $("#avec_coef:checked").length > 0
+    var phrase_mode_examen = $("#examens_uniquement").is(":checked") ? ' EXAMENS ' : ""
 
-
-	nom_fichier_sans_extension = 'FICHE CC '+periode+' - '+classe
+	nom_fichier_sans_extension = 'FICHE CC '+periode+' - ' + phrase_mode_examen +classe  
 	if(avec_coef) nom_fichier_sans_extension = nom_fichier_sans_extension + " (coefs personnels)"
 	nom_fichier = nom_fichier_sans_extension+'.pdf'
 	le_style = $('style#mon_style')[0].innerText
@@ -13291,6 +13291,7 @@ function voir_fiche_classe_choisie(){
 			<rouge style="cursor: pointer;" id="aide_fiche">(?)</rouge>
 			`+html_bouton_appreciations+`
 			<div><i style="font-size: 12px;">Les éventuelles cases en rouge sont sans appréciations saisies.</i></div>
+			<label class="sekooly-mode" for="examens_uniquement"><input id="examens_uniquement" type="checkbox">Examens uniquement</label>
 		</div>
 		<div id="menu_params" style="overflow-x: auto;" class="menu_params">
 			<div id="previsualisation"></div>
@@ -13298,6 +13299,7 @@ function voir_fiche_classe_choisie(){
 	</div>`)
 
 	au_clic("#aide_fiche","alerte_aide_fiche()")
+	au_changement("#examens_uniquement","render_fiche()")
 	afficher_fenetre(true)
 
 }
@@ -13603,6 +13605,12 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 		//rechercher(nom_table, nom_champ_reference, valeur_champ_reference, nom_champ_a_chercher, nombrelimite, orderby)
 		les_notes = await rechercher("Notes", "identifiant_eleve", un_eleve['Identifiant'], false, false, "Classe_Matiere,saison_note")
 		//console.log({les_notes})
+
+		//si on ne garde que les examens -> filtrer
+		var examens_uniquement = $("#examens_uniquement").is(":checked")
+		if(examens_uniquement){
+			les_notes = les_notes.filter(e => e['saison_note'] === 'Examen')
+		}
 	
 		rajouter_notes_eleves(un_eleve['Identifiant'],les_notes,matieres_de_classe,appreciations_classe)
 		
