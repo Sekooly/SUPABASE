@@ -15914,8 +15914,8 @@ function calcul_moyenne_bulletin(identifiant, moyenne_generale){
 
 
 		moyenne_journaliere = calcul_moyenne_bulletin(identifiant)
-		coef_examen = moyenne_journaliere>0 ? 0.7 : 1
-		coef_journalier = note_examen>0 ? 0.3 : 1
+		coef_examen = moyenne_journaliere>0 ? 0.6667 : 1
+		coef_journalier = note_examen>0 ? 0.3333 : 1
 		moyenne_generale_matiere = Number(moyenne_journaliere * coef_journalier + note_examen * coef_examen)
 
 		 //  Number($('[id="'+identifiant+'"].un_eleve_bulletin > .est_examen').text())
