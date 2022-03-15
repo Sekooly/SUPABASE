@@ -13606,6 +13606,10 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 		les_notes = await rechercher("Notes", "identifiant_eleve", un_eleve['Identifiant'], false, false, "Classe_Matiere,saison_note")
 		//console.log({les_notes})
 
+		//ne garder que les notes de la période choisie
+		les_notes = les_notes.filter(e => e['saison_note'] === la_periode_bulletin)
+		//console.log({les_notes})
+
 		//si on ne garde que les examens -> filtrer
 		var examens_uniquement = $("#examens_uniquement").is(":checked")
 		if(examens_uniquement){
