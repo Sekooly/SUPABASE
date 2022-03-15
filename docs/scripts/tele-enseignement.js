@@ -13607,7 +13607,7 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 		//console.log({les_notes})
 
 		//ne garder que les notes de la période choisie
-		les_notes = les_notes.filter(e => e['saison_note'] === la_periode_bulletin)
+		les_notes = les_notes.filter(e => e['periode_bulletin'] === la_periode_bulletin)
 		//console.log({les_notes})
 
 		//si on ne garde que les examens -> filtrer
