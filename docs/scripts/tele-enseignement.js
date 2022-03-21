@@ -13323,16 +13323,18 @@ async function generer_appreciations(){
 	if(!la_classe_fiche) return alert("Merci de choisir une classe.")
 
 
-	var confirmation = confirm("⚠️ Voulez-vous regénérer les appréciations pour la classe de "+la_classe_fiche+"? Cette action est irréversible.")
-	if(!confirmation) return false
-
+	var confirmation = confirm("⚠️ Voulez-vous regénérer les appréciations de la période "+la_periode_bulletin+" pour la classe de "+la_classe_fiche+"? Cette action est irréversible.")
+	
 	//récupérer les éventuelles appréciations de la vie scolaire (retard / absence notamment)
 	var toutes_les_appreciations_de_la_classe = await supabase
 												.from('Appreciations')
 												.select('*')
 												.eq('Classe_Matiere','('+la_classe_fiche+'|Vie scolaire)')
+												.eq('periode_principale',la_periode_bulletin)
 	toutes_les_appreciations_de_la_classe = toutes_les_appreciations_de_la_classe.data
-	//console.log({toutes_les_appreciations_de_la_classe})
+	console.log({toutes_les_appreciations_de_la_classe})
+
+	if(!confirmation) return false
 
 
 	//récupérer toutes les appréciations possibles de la classe
@@ -13392,8 +13394,7 @@ async function generer_appreciations(){
 	console.log({appreciations_generees})
 
 
-	//PEUT ETRE: supprimer toutes les appréciations de la (classe|Vie scolaire)
-
+	//PEUT ETRE: supprimer toutes les appréciations de la (classe|Vie scolaire) de la période courante (inutile)
 
 	await stocker_appreciations_server(appreciations_generees)
 	render_fiche()
@@ -15623,8 +15624,8 @@ async function actualiser_liste_eleves_bulletins(changement_enseignant){
 			var identifiant_appreciateur = tout.identifiant_prof 
 			var la_classe_matiere = tout.Classe_Matiere
 
-			//on récup les appreciations 1 fois pour toutes
-			var url = racine_data + 'Appreciations?identifiant_appreciateur=eq.'+identifiant_appreciateur+'&Classe_Matiere=eq.'+ la_classe_matiere + "&" +apikey
+			//on récup les appreciations 1 fois pour toutes POUR LA PERIODE CHOISIE
+			var url = racine_data + 'Appreciations?identifiant_appreciateur=eq.'+identifiant_appreciateur+'&Classe_Matiere=eq.'+ la_classe_matiere + '&periode_principale=eq.'+ $("#periode_bulletin").val() +  "&" +apikey
 			var toutes_les_appreciations = get_resultat(url)
 			//console.log({toutes_les_appreciations})
 
