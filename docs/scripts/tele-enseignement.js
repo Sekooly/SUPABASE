@@ -13594,7 +13594,10 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 	var liste_profs = await recuperer_profs(true)
 	var appreciations_classe = await rechercher_contenant_motif('Appreciations','Classe_Matiere','('+la_classe+'|')
 
-
+	//ne garder que les appréciations de la bonne période
+	//console.log({avant: appreciations_classe})
+	appreciations_classe = appreciations_classe.filter(e => e['periode_principale'] === $("#la_periode_bulletin").val())
+	//console.log({apres: appreciations_classe})
 
 	//pour chaque élève		
 	les_eleves.forEach(async function(un_eleve,indice_eleve){
@@ -15794,7 +15797,8 @@ function actualiser_nb_cases(ceci){
 
 		var tout = donnees_generiques_bulletin()
 		var identifiant_appreciateur = tout.identifiant_prof 
-		url = racine_data + 'Appreciations?identifiant_appreciateur=eq.'+identifiant_appreciateur+'&identifiant_eleve=eq.'+ le_parent.id +'&Classe_Matiere=eq.'+ tout.Classe_Matiere + "&" +apikey
+		var periode_bulletin = tout.periode_bulletin
+		url = racine_data + 'Appreciations?identifiant_appreciateur=eq.'+identifiant_appreciateur+'&identifiant_eleve=eq.'+ le_parent.id +'&Classe_Matiere=eq.'+ tout.Classe_Matiere +'&periode_principale=eq.'+ periode_bulletin + "&" +apikey
 		var contenu_appreciation = get_resultat(url)
 		//console.log({appreciation: contenu_appreciation[0]})
 
