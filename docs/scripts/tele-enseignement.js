@@ -15262,6 +15262,7 @@ async function trouver_mes_eleves(){
 			var nb_identifiants_classe = valeursUniquesDeCetteKey(demande_classe.body,'Identifiant').length
 			console.log({demande_classe: demande_classe.body})
 			console.log({nb_identifiants_classe})
+			console.log('\n')
 
 			//récupérer toutes les notes (classe|matiere) pour la période choisie 
 			//avec saison note précise si saison_note<>Toutes
@@ -15275,11 +15276,13 @@ async function trouver_mes_eleves(){
 				var demande = await supabase.from('bulletins').select('*').eq('Classe_Matiere',Classe_Matiere).eq('periode_bulletin',periode_bulletin).order('Identifiant', { ascending: true })
 			}
 			var nb_identifiants_notes = valeursUniquesDeCetteKey(demande.body,'Identifiant').length
-			//console.log({demande: demande.body})
-			//console.log({nb_identifiants_notes})
+			console.log({demande: demande.body})
+			console.log({nb_identifiants_notes})
 
 			//il manque des notes de certains éleves
 			if(nb_identifiants_notes < nb_identifiants_classe){
+
+				console.log("il manque des eleves")
 
 				//pour chaque élève de la classe
 				demande_classe.body.forEach(function(un_eleve){
@@ -15310,8 +15313,15 @@ async function trouver_mes_eleves(){
 
 
 				})
-			}
 
+			//trop de notes : il y a une (ou+) personne(s) en trop
+			}else if(nb_identifiants_notes > nb_identifiants_classe){
+				les_eleves = valeursUniquesDeCetteKey(demande_classe.body,'Identifiant')
+				les_eleves_notes = valeursUniquesDeCetteKey(demande.body,'Identifiant')
+
+				console.log({les_eleves})
+				console.log({les_eleves_notes})
+			}
 
 			mes_eleves_initiaux = demande.body
 
