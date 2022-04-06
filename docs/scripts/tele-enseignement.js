@@ -13884,8 +13884,8 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe,ap
 
 		//faire la moyenne générale (moyenne_journaliere*0.7+note_examen*0.3) et l'ajouter
 		//les coefs valent 1 si l'autre est vide
-		coef_examen = moyenne_journaliere>0 ? 0.7 : 1
-		coef_journalier = note_examen>0 ? 0.3 : 1
+		coef_examen = moyenne_journaliere>0 ? 0.6667 : 1
+		coef_journalier = note_examen>0 ? 0.3333 : 1
 		moyenne_generale_matiere = moyenne_journaliere * coef_journalier + note_examen * coef_examen
 
 
