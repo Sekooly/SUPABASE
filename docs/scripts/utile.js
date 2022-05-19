@@ -269,15 +269,24 @@ function nb_coms(id_topic){
   //console.log(url)
   data = '{"valeur_id_topic":'+id_topic+'}'
   //console.log(data)
-  resultat = post_resultat_synchrone(url,data)
-  return Number(resultat.slice(resultat.indexOf('[') +1,resultat.indexOf(']')));
+  resultat = post_resultat_synchrone(url, data)
+
+  nombre_coms = JSON.parse(resultat)[0]['nombre_coms']
+  return Number(nombre_coms);
 }
 
 
 function post_resultat_synchrone(url,data){
     var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "POST", url, false ); // false for synchronous request
+    
+
+    var tout = transformer_apikey("POST",url,xmlHttp, false) // false for synchronous request
+    xmlHttp = tout.xmlHttp
+    url = tout.url
+
     data_json = data
+
+
     xmlHttp.setRequestHeader("Content-Type","application/json") 
     xmlHttp.send( data_json );
     
@@ -377,6 +386,15 @@ function supprimer_initial(nom_table,nom_champ_reference,valeur_champ_reference)
   return delete_resultat_asynchrone(url)
 }
 
+function random_uuid(){
+  return "a24a6ea4-ce75-4665-a070-57453082c256";
+}
+
+function is_uuid(str){
+  const regexExp = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi;
+  return regexExp.test(str);
+}
+
 
 function supprimer_tout(nom_table){
   if(elements_menu_haut_generiques_local.indexOf(nom_table)>=0 ){
@@ -384,6 +402,31 @@ function supprimer_tout(nom_table){
   }else{
     url = racine_data + nom_table + "?"+apikey
   }
+
+  var nom_identifiant_table = identifiant_par_table(nom_table)
+  var un_identifiant = get_resultat(url + "&select=" + nom_identifiant_table + "&limit=1")
+  //console.log({un_identifiant})
+  un_identifiant = un_identifiant[0][nom_identifiant_table]
+  //console.log({un_identifiant})
+
+  //si l'identifiant est un nombre -> mettre -1
+  if (!isNaN(un_identifiant)) {
+    egal_a = "-1"
+
+  //si c'est un uuid
+  }else if(is_uuid(un_identifiant)){
+    egal_a = random_uuid()
+
+  //sinon -> mettre null
+  }else {
+    egal_a = "null"  
+  }
+
+
+  //mettre un where identifiant non null / non vide
+  url = url+ "&" + nom_identifiant_table + "=not.eq." + egal_a
+  console.log({url})
+
   return delete_resultat_asynchrone(url)
 }
 
@@ -672,12 +715,45 @@ function get_resultat_avec_autorisation(url,autorisation){
     return JSON.parse(xmlHttp.responseText);
 }
 
+function transformer_apikey(methode_open, url, xmlHttp, mode_asynchrone){
+
+
+    xmlHttp.open( methode_open, url, mode_asynchrone );  // false for synchronous request
+
+
+  //si l'url contient apikey ou api_initial
+  //---> on enleve l'api key dans l'URL
+  //---> mettre dans le header
+  if (url.includes(apikey) ){
+    xmlHttp.setRequestHeader("apikey", apikey.replaceAll("apikey=",""))
+  } else if ( url.includes(api_initial)){
+    xmlHttp.setRequestHeader("apikey", api_initial.replaceAll("apikey=",""))
+  
+  }
+
+  return {xmlHttp: xmlHttp,url: url}
+}
+
 function get_resultat(url){    
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", url, false ); // false for synchronous request
+
+
+    var xmlHttp = new XMLHttpRequest(); 
+
+    var tout = transformer_apikey("GET",url,xmlHttp, false) // false for synchronous request
+    xmlHttp = tout.xmlHttp
+    url = tout.url
+
+
+
+    //console.log({xmlHttp})
+    //console.log({url})
+
     //xmlHttp.setRequestHeader("Prefer", "count=exact")
     xmlHttp.send( null ); 
     //console.log(nombre_de_rows(xmlHttp))
+
+
+
     return JSON.parse(xmlHttp.responseText);
 }
 
@@ -694,35 +770,66 @@ function get_resultat_initial(url){
 
 function get_resultat_brut(url){
     var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", url, false ); // false for synchronous request
-    //xmlHttp.setRequestHeader("Prefer", "count=exact")
+    var tout = transformer_apikey("GET",url,xmlHttp, false) // false for synchronous request
+    
+    xmlHttp = tout.xmlHttp
+    url = tout.url
+    
     xmlHttp.send( null );
     //console.log(nombre_de_rows(xmlHttp))
     return xmlHttp.responseText;  
 }
 
 
+function rajouter_apijey_ajax(url,objet_envoi){
+
+  if (url.includes(apikey)){
+    objet_envoi.headers = {'apikey': apikey.replaceAll("apikey=","")}
+  }else if (url.includes(api_initial)){
+    objet_envoi.headers = {'apikey': api_initial.replaceAll("apikey=","")}
+  }
+
+  return objet_envoi;
+  console.log({objet_envoi})
+}
 
 
 function get_resultat_asynchrone(url){
-    
-  return $.ajax({
+
+  objet_envoi = {
     type: 'GET',
     url: url,
     //headers: { 'Prefer': 'count=exact' }
-  }).done(function(data) {
+  }
+
+  objet_envoi = rajouter_apijey_ajax(url,objet_envoi)
+
+    
+  return $.ajax(objet_envoi).done(function(data) {
     return data
   });
+
+
+
+
+
 
 }
 
 
 function patch_resultat_asynchrone(url,data_json){
-  return $.ajax({
+
+
+  objet_envoi = {
     type: 'PATCH',
     url: url,
     data: data_json
-  }).done(function(data) {
+  }
+
+  objet_envoi = rajouter_apijey_ajax(url,objet_envoi)
+  //console.log({objet_envoi})
+
+  return $.ajax(objet_envoi).done(function(data) {
     //console.log(data)
     return data
   });
@@ -730,13 +837,15 @@ function patch_resultat_asynchrone(url,data_json){
 }
 
 function post_resultat_asynchrone(url,data_json){
-
-
-  return $.ajax({
+  objet_envoi = {
     type: 'POST',
     url: url,
     data: data_json
-  }).done(function(data) {
+  }
+
+  objet_envoi = rajouter_apijey_ajax(url,objet_envoi)
+
+  return $.ajax(objet_envoi).done(function(data) {
     //console.log(data)
     return data
   });
@@ -744,10 +853,16 @@ function post_resultat_asynchrone(url,data_json){
 }
 
 function delete_resultat_asynchrone(url){
-  return $.ajax({
+  objet_envoi = {
     type: 'DELETE',
     url: url,
-  }).done(function(data) {
+  }
+
+  objet_envoi = rajouter_apijey_ajax(url,objet_envoi)
+  console.log({objet_envoi})
+
+
+  return $.ajax(objet_envoi).done(function(data) {
     //console.log(data)
     return data
   });

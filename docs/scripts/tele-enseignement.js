@@ -2456,7 +2456,7 @@ function recuperer_eleves(sans_fenetre){
 	if (impossible_de_cliquer()) return -1;
 
 	//si dossier vie scolaire et non admin: pas de dépôt
-	console.log({sans_fenetre})
+	//console.log({sans_fenetre})
 	if(!recuperer('mon_type').includes('Admin') && element_DOM('accueil_utilisateur').innerText.includes('Vie scolaire') && sans_fenetre === false){
 		alert("Vous n'avez pas les droits pour consulter cette liste.");
 		return -1;
@@ -14516,8 +14516,8 @@ async function creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_cl
 	var index_moyenne_generale = index_de_cette_colonne('Moyenne générale')
 	var moy_generale = recuperer_dans_le_selected(id_eleve,"Moyenne générale")
 	var nb_eleves = $('.une_ligne_de_donnees').length
-	var id_responsable_vie_sco = $('[identifiant_appreciateur]')[0].getAttribute('identifiant_appreciateur')
-	var responsable_vie_sco = id_responsable_vie_sco.split('.')[0].toUpperCase() + " " + left(id_responsable_vie_sco.split('.')[1].toUpperCase(),1)+ right(id_responsable_vie_sco.split('.')[1],id_responsable_vie_sco.split('.')[1].length-1)
+	var id_responsable_vie_sco =  $('[identifiant_appreciateur]')[0] ? $('[identifiant_appreciateur]')[0].getAttribute('identifiant_appreciateur') : ""
+	var responsable_vie_sco = id_responsable_vie_sco.length > 0 ? id_responsable_vie_sco.split('.')[0].toUpperCase() + " " + left(id_responsable_vie_sco.split('.')[1].toUpperCase(),1)+ right(id_responsable_vie_sco.split('.')[1],id_responsable_vie_sco.split('.')[1].length-1) : ""
 
 	var datas = {
 		nom_etablissement: data_etablissement['nom_etablissement'].toUpperCase(),
@@ -16454,7 +16454,7 @@ function proceder_a_linitialisation(){
 		"Cycle" : a_stocker["Cycle"],
 		"Classe" : '(Tous|' + a_stocker["Cycle"] + ')'
 	}
-	url = racine_data + "Administration?Identifiant=eq.admin&"+ apikey
+	url = racine_data + "Administration?Identifiant=eq.admin.tech&"+ apikey
 	//console.log(url)
 	patch_resultat_asynchrone(url,nouveau_data)
 
