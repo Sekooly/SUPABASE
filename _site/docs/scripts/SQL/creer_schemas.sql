@@ -1489,6 +1489,8 @@ GRANT ALL ON TABLE public."Cycles" TO service_role;
 
 
 
+
+
 -- View: public.Espace etablissement restant
 
 -- DROP VIEW public."Espace etablissement restant";
@@ -1841,25 +1843,6 @@ where "Fichiers".categorie_fichier <> 'Profil';
 
 
 
-
--- View: public.periodes_saisies
-
--- DROP VIEW public.periodes_saisies;
-
-CREATE OR REPLACE VIEW public.periodes_saisies
- AS
- SELECT DISTINCT "Notes".periode_bulletin
-   FROM "Notes"
-  ORDER BY "Notes".periode_bulletin;
-
-ALTER TABLE public.periodes_saisies
-    OWNER TO supabase_admin;
-
-GRANT ALL ON TABLE public.periodes_saisies TO anon;
-GRANT ALL ON TABLE public.periodes_saisies TO postgres;
-GRANT ALL ON TABLE public.periodes_saisies TO supabase_admin;
-GRANT ALL ON TABLE public.periodes_saisies TO authenticated;
-GRANT ALL ON TABLE public.periodes_saisies TO service_role;
 
 
 

@@ -34,8 +34,7 @@ var elements_generiques_en_haut = [{"Général": [
 										  "Topic",
 										  "Coms",
 										  "Notifs",
-										  "Liste_appreciations",
-										  "Mentions"
+										  "Liste_appreciations"
 										]								
 
 									},
@@ -70,10 +69,10 @@ var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","UR
 var parametres_facultatifs = ['description','nom_liste_et_coefs', 'position','droit_apercu_bulletin', 'sexe', 'ancien_ou_nouveau']
 
 
-var elements_menu_haut_avec_modifs = ["Classes","Matieres","Eleves","Profs","Administration","Liste_appreciations","Mentions"]
+var elements_menu_haut_avec_modifs = ["Classes","Matieres","Eleves","Profs","Administration","Liste_appreciations"]
 var elements_menu_haut_avec_reset = ["Eleves","Profs","Administration"]
 
-var elements_menu_haut_generiques = ['Liste_appreciations','Mentions']
+var elements_menu_haut_generiques = ['Liste_appreciations']
 
 nom_etablissement = data_etablissement['nom_etablissement']
 
@@ -124,8 +123,6 @@ var liste_matieres_bulletin = []
 var liste_datas_bulletin = []
 var variables_bulletins_pretes = false
 
-
-var nom_eleve_test = ''//'ratsinjomanana.kailahy'
 
 
 /*********************** CONSEIL DE CLASSE ***********************************/
@@ -1281,7 +1278,7 @@ function rendre_devoir(){
 	var le_fichier_choisi = $("#file_devoir")[0].value;
 
 	
-	// interdire l'upload si la date est dépassée
+	//TODO: interdire l'upload si la date est dépassée
 	if(le_devoir_choisi !== "--" && le_fichier_choisi!=="") {
 
 
@@ -2189,7 +2186,7 @@ function afficher_ou_non_choix_fichier(oui,forcing){
 	}else{
 		//console.log("on va afficher");
 
-		// apres le 7 juin: reautoriser
+		//TODO apres le 7 juin: reautoriser
 		var autoriser_ajout_fichiers = true;
 		if(!autoriser_ajout_fichiers){
 
@@ -5090,6 +5087,7 @@ async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_init
 
 	//si c'est un audio MP3
 	}else if(extension === 'mp3'){
+		//alert('TODO')
 
 		element_DOM('previsualisation').outerHTML = `
 			<audio controls="" src="https://drive.google.com/uc?id=`+id_fichier+`" class="previz">
@@ -11201,7 +11199,7 @@ function actualiser_filtre_onglet(id_parametre){
 	//maintenance: filtre = etablissement
 	//alerte:  filtre = etablissement
 	//un seul établissement
-	if(id_parametre === "Cycles" || id_parametre === "Maintenance" || id_parametre === "Alerte" || id_parametre === "Logs"  || id_parametre === "Espace etablissement restant" || id_parametre === "Infos établissement" || id_parametre === "Liste_appreciations" || id_parametre === "Mentions"){
+	if(id_parametre === "Cycles" || id_parametre === "Maintenance" || id_parametre === "Alerte" || id_parametre === "Logs"  || id_parametre === "Espace etablissement restant" || id_parametre === "Infos établissement" || id_parametre === "Liste_appreciations"){
 
 		etiquette_filtre = "Etablissement"
 		filtre_liste = [nom_etablissement];
@@ -12395,7 +12393,7 @@ function importer_parametres(){
   			}
 
 
-  			//tous les champs obligatoires sont renseignés 
+  			//tous les champs obligatoires sont renseignés (todo?)
   			//tous les champs automatiques renseignés automatiquement
   			//aucun champ IDENTIFIANT déjà existant tenté d'être rajouté
   			//fenêtre de résumé: OK ou pas OK
@@ -13292,7 +13290,7 @@ function voir_fiche_classe_choisie(){
 			</select>
 			<rouge style="cursor: pointer;" id="aide_fiche">(?)</rouge>
 			`+html_bouton_appreciations+`
-			<div><rouge class="sans_appreciation "><i style="font-size: 12px;">Les éventuelles cases en rouge sont sans appréciations saisies.</i></rouge></div>
+			<div><i style="font-size: 12px;">Les éventuelles cases en rouge sont sans appréciations saisies.</i></div>
 			<label class="sekooly-mode" for="examens_uniquement"><input id="examens_uniquement" type="checkbox">Examens uniquement</label>
 		</div>
 		<div id="menu_params" style="overflow-x: auto;" class="menu_params">
@@ -13313,198 +13311,19 @@ function alerte_aide_fiche(){
 	alert(texte)
 }
 
-
-function recuperer_moyennes_generales(){
-	var a_stocker = {}
-
-	$('tr.une_ligne_de_donnees').each(function(){
-		identifiant_eleve = $(this).attr('id')
-		moyenne_eleve = Number( $(this).children('.moyenne_generale').text() )
-		a_stocker[identifiant_eleve] = moyenne_eleve
-
-	});
-
-	//console.log({liste_a_stocker})
-	return a_stocker
-}
-
-
-function test(){
-
-	clic_bulletin()
-	choix_classe_fiche()
-	$('[id="la_periode_bulletin"]').val('3')
-	$('[id="la_classe_fiche"]').val('6ème')
-	$('[id="la_classe_fiche"]').change()
-
-}
-
-function calcul_moyenne_generale_toutes_periodes(periode_en_cours,la_classe_fiche){
-
-	//par rapport aux  saisies antérieures
-	var liste_periodes_principales = get_resultat(racine_data + 'periodes_saisies' + '?' + apikey) 
-	
-	//périodes de ce qui a été saisi depuis
-	if(liste_periodes_principales){
-		liste_periodes_principales = liste_periodes_principales.map(e => e['periode_bulletin'])
-	
-	//aucune saisie pour le moment -> on part sur data_etablissement
-	}else{
-		liste_periodes_principales = Object.keys(data_etablissement.config_notes[recuperer_nom_periodes_principales_bulletin()])
-	}
-
-
-	console.log({liste_periodes_principales})
-
-	var a_stocker = {}
-
-	liste_periodes_principales.forEach(async function(une_periode,index_periode){
-
-		//todo
-		//await render_fiche(false,false,une_periode).then(e => console.log({moyennes_periodes}))
-		
-	})
-
-
-	return moyennes_periodes
-}
-
-
-
-function get_toutes_les_mentions_etablissement(){
-	var url = racine_initiale + 'Mentions?nom_etablissement=eq.'+data_etablissement['nom_etablissement']
-			+'&order=note_max_exclus.desc' 
-			+'&' +api_initial
-	var les_mentions = get_resultat(url)
-
-	return les_mentions
-}
-
-function phrase_supp_mention(les_mentions, est_niveau_max,valeur){
-
-
-
-	var res = les_mentions.filter(e => (valeur >= Number(e['note_min_inclus']) && valeur < Number(e['note_max_exclus'])))
-	if (res.length === 0) res =  les_mentions.filter(e => (valeur >= Number(e['note_min_inclus']) ))
-	return res[0] ? (est_niveau_max ? res[0]['conclusion_dernier_niveau'] : res[0]['conclusion']) : ''
-
-
-
-}
-
-function niveau_classe(classe){
-	var url = racine_data + 'Classes?Classe=eq.'+classe
-			+'&' +apikey
-
-	var res = get_resultat(url)
-	if(res){
-		res = res.map(e => e['niveau'])
-	}
-
-
-	return res[0] ? Number(res[0]) : -1
-}
-
-function niveau_max_cycle(cycle){
-	var url = racine_data + 'Classes?cycle=eq.'+cycle
-			+'&' +apikey
-
-	var res = get_resultat(url)
-	if(res){
-		res = res.map(e => Number(e['niveau']))
-		//console.log({res})
-	}
-
-	return res ? Math.max(...res) : -1
-
-}
-
-function classes_niveau(cycle,niveau,terminaison){
-	var classes = []
-	var url = racine_data + 'Classes?cycle=eq.'+cycle
-			+'&niveau=eq.' +niveau
-			+'&order=Classe.asc' 
-			+'&' +apikey
-
-	//console.log({url})
-	var res = get_resultat(url)
-	if(res){
-		res = res.map(e => e['Classe'])
-		//console.log({res})
-
-		if(terminaison && terminaison.length > 1){ //POUR STMG
-			classes = res.filter(e => right(e.toLowerCase(),terminaison.length) === terminaison.toLowerCase() )
-			if(classes.length === 0) classes = res.map(e => e.split(' ')[0])	
-		}else{
-			classes = res.map(e => e.split(' ')[0])	
-		}
-
-		
-	}
-	
-
-	//valeurs uniques
-	classes = [...new Set(classes)].join(' ou ')		
-	console.log({classes})
-
-	return classes || '(?)'
-}
-
-function classe_niveau_max(cycle){
-	var classes = []
-	var niveau_max = niveau_max_cycle(cycle)
-	var url = racine_data + 'Classes?cycle=eq.'+cycle
-			+'&niveau=eq.' +niveau_max
-			+'&order=Classe.asc' 
-			+'&' +apikey
-
-	//console.log({url})
-	var res = get_resultat(url)
-	if(res){
-		classes = res.map(e => e['Classe'])
-	}
-
-
-	return classes.join(', ')
-}
-
-function check_si_niveau_max(cycle,classe){
-
-	var niveau_max = niveau_max_cycle(cycle)
-	var niveau = niveau_classe(classe)
-
-	return niveau === niveau_max
-}
-
-function ma_moyenne_annuelle(identifiant_eleve,valeurs_moyennes_periodes){
-	
-}
-
 async function generer_appreciations(){
 
 
 	var appreciations_generees = []
 	var la_periode_bulletin = $('#la_periode_bulletin').val()
 	var la_classe_fiche = $('#la_classe_fiche').val()
-	var mon_cycle = JSON.parse(recuperer('mes_matieres'))[0]['Cycle']
-			
 
-	var classe_actuelle = la_classe_fiche
-	//console.log({classe_actuelle})
-	
-
-	var avec_conclusions = parmi_les_periodes_avec_conclusions_finales(la_periode_bulletin)
-
-	//si on est passe en terminale -> on garde la bonne terminaison
-	var classe_fiche_interm = left(la_classe_fiche,1)==='T' ? 'T ' + right(la_classe_fiche,la_classe_fiche.length-1) : la_classe_fiche
-	var classe_passage = classes_niveau(mon_cycle,(niveau_classe(classe_actuelle)+1), classe_fiche_interm.split(' ')[1])
 
 	if(!la_periode_bulletin) return alert("Merci de choisir une période.")
 	if(!la_classe_fiche) return alert("Merci de choisir une classe.")
 
-	var texte_confirmation = 'appréciations'
-	if(avec_conclusions) texte_confirmation += ' (+ conclusions du jury final)'
-	var confirmation = confirm("⚠️ Voulez-vous regénérer les "+texte_confirmation+" pour la période "+la_periode_bulletin+" de la classe de "+la_classe_fiche+"? Cette action est irréversible.")
+
+	var confirmation = confirm("⚠️ Voulez-vous regénérer les appréciations de la période "+la_periode_bulletin+" pour la classe de "+la_classe_fiche+"? Cette action est irréversible.")
 	
 	//récupérer les éventuelles appréciations de la vie scolaire (retard / absence notamment)
 	var toutes_les_appreciations_de_la_classe = await supabase
@@ -13517,22 +13336,12 @@ async function generer_appreciations(){
 
 	if(!confirmation) return false
 
-	chargement(true)
-	var est_niveau_max = check_si_niveau_max(mon_cycle, la_classe_fiche)
-	var les_mentions =  get_toutes_les_mentions_etablissement()
-
-
-	if(avec_conclusions){
-		var valeurs_moyennes_periodes = calcul_moyenne_generale_toutes_periodes(la_periode_bulletin,la_classe_fiche)
-	} 
-
 
 	//récupérer toutes les appréciations possibles de la classe
 	var toutes_les_phrases_appreciations = await supabaseInit
 												.from('Liste_appreciations')
 												.select('*')
 												.eq('nom_etablissement',data_etablissement['nom_etablissement'])
-												.order('note_max_exclus', { ascending: false })
 	toutes_les_phrases_appreciations = toutes_les_phrases_appreciations.data
 	console.log({toutes_les_phrases_appreciations})
 
@@ -13545,43 +13354,14 @@ async function generer_appreciations(){
 		identifiant_eleve = la_moyenne.parentNode.id
 		prenom_eleve =  identifiant_eleve.includes('.') ? identifiant_eleve.split('.')[1] : identifiant_eleve
 		prenom_eleve = prenom_eleve[0].toUpperCase() + prenom_eleve.slice(1); 
-
-		var a_afficher= {[prenom_eleve]:valeur}
-		console.log(a_afficher)
-		chargement(true)
-		//afficher_alerte(JSON.stringify(a_afficher),false)
+		console.log({[prenom_eleve]:valeur})
 
 		//filtrer pour ne garder que les appréciations [min;max[
-		appreciations_possibles = toutes_les_phrases_appreciations.filter(e => valeur >= Number(e['note_min_inclus']) && valeur < Number(e['note_max_exclus'])  ) //nouveau: cas où ca dépasse ?
+		appreciations_possibles = toutes_les_phrases_appreciations.filter(e => valeur >= Number(e['note_min_inclus']) && valeur < Number(e['note_max_exclus'])  )
 		//console.log({appreciations_possibles})
-
-		//si au dela du max : garder l'appreciation max
-		if(appreciations_possibles.length === 0){
-			//console.log({toutes_les_phrases_appreciations})
-			appreciations_possibles = toutes_les_phrases_appreciations.filter(e => valeur >= Number(e['note_min_inclus']) )	
-			//console.log({appreciations_possibles})
-		} 
 
 		choix_appreciation = piocher_aleatoirement(appreciations_possibles)
 		choix_appreciation = choix_appreciation['contenu']
-
-		//NOUVEAU: rajouter la conclusion finale depuis la table Mentions si besoin
-		var phrase_supp = ""
-		if (avec_conclusions){
-			// utiliser la moyenne generale sur toutes les périodes
-			var moyenne_generale_toutes_periodes = valeur //todo: via function ma_moyenne_annuelle(identifiant_eleve,valeurs_moyennes_periodes)
-			//console.log({les_mentions})
-			//console.log({est_niveau_max})
-			phrase_supp = phrase_supp_mention(les_mentions,est_niveau_max,moyenne_generale_toutes_periodes)
-			//console.log({phrase_supp})
-
-			//console.log({classe_passage})
-			phrase_supp = phrase_supp.replaceAll('#classe_actuelle#',classe_actuelle).replaceAll('#classe_passage#',classe_passage)
-
-			//console.log({phrase_supp_FINAL: phrase_supp})
-		}
-
-		if(phrase_supp) choix_appreciation = choix_appreciation + '\n' + phrase_supp
 		choix_appreciation = choix_appreciation.replaceAll('#X#',prenom_eleve)
 		//console.log({choix_appreciation})
 
@@ -13615,9 +13395,7 @@ async function generer_appreciations(){
 
 
 	//PEUT ETRE: supprimer toutes les appréciations de la (classe|Vie scolaire) de la période courante (inutile)
-	chargement(false)
 
-	//A DECOMMENTER
 	await stocker_appreciations_server(appreciations_generees)
 	render_fiche()
 
@@ -13628,40 +13406,35 @@ function piocher_aleatoirement(mon_array){
 	return mon_array[random];
 }
 
-async function render_fiche(ignorer_absence_classe, pour_bulletin, la_periode_bulletin_precise){
+async function render_fiche(ignorer_absence_classe, pour_bulletin){
 
 
-	return new Promise(async function (res, rej) {
+	$("#fiche_conseil").remove()
 
+	var la_classe = $('#la_classe_fiche').val()
+	var la_periode_bulletin = $('#la_periode_bulletin').val()
 
+	if(!la_periode_bulletin) return alert("Merci de choisir une période.")
+	if(!la_classe) return ignorer_absence_classe ? false : alert("Merci de choisir une classe pour créer la fiche.")
+	
+	//afficher les matières en colonnes
+	//var toutes = JSON.parse(recuperer('mes_matieres'))
+	var toutes = await rechercher('Matieres', 'Classe', la_classe, '*') 
+	//console.log({toutes})
+	
+	//toutes = toutes.body
+	var matieres_de_classe = toutes.filter(e => e['Classe'] === la_classe).sort()
+	//console.log({matieres_de_classe})
 
-		while ($("#fiche_conseil")[0]) $("#fiche_conseil").remove()
+	//afficher les eleves en lignes
+	var les_eleves = await rechercher("Eleves", "Classe", la_classe, "")
+	//console.log({les_eleves})
 
-		var la_classe = $('#la_classe_fiche').val()
-		var la_periode_bulletin = la_periode_bulletin_precise || $('#la_periode_bulletin').val()
+	//console.log('\n\n\n')
 
-
-		if(!la_periode_bulletin) return alert("Merci de choisir une période.")
-		if(!la_classe) return ignorer_absence_classe ? false : alert("Merci de choisir une classe pour créer la fiche.")
-		
-		//afficher les matières en colonnes
-		//var toutes = JSON.parse(recuperer('mes_matieres'))
-		var toutes = await rechercher('Matieres', 'Classe', la_classe, '*') 
-		//console.log({toutes})
-		
-		//toutes = toutes.body
-		var matieres_de_classe = toutes.filter(e => e['Classe'] === la_classe).sort()
-		//console.log({matieres_de_classe})
-
-		//afficher les eleves en lignes
-		var les_eleves = await rechercher("Eleves", "Classe", la_classe, "")
-		//console.log({les_eleves})
-
-		//console.log('\n\n\n')
-
-		//console.log({pour_bulletin})
-		return await creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulletin, la_periode_bulletin_precise)
-	})
+	//console.log({pour_bulletin})
+	creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulletin)
+	
 }
 
 function nouveau_tableau_avec_ce_titre(id_tableau, array_ligne){
@@ -13750,16 +13523,13 @@ function actualiser_liste_champs_masques(){
 
 }
 
-var moyennes_periodes = {}
-async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulletin, la_periode_bulletin_precise){
 
-	var la_periode_bulletin = la_periode_bulletin_precise || $("#la_periode_bulletin").val()
+async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulletin){
 
-	/*
-	console.log('\n--------------------------')
-	console.log({la_periode_bulletin})	
-	*/
+	var la_periode_bulletin = $("#la_periode_bulletin").val()
 
+
+	
 
 	//créer la premiere ligne: Numéro, Nom, Prénom(s), Ancien/Nouveau, Date de naissance, Sexe, [matieres], Moyenne, Rang, Absence(s) demi-journée(s), Retards//, Epreuve facultative
 	var premiere_ligne = 'Numéro,Nom,Prénom(s),Ancien/Nouveau,Date de naissance,Sexe,'+matieres_de_classe.map(e => e['Matiere']).join(',')+',Moyenne générale,Rang,Absence(s) demi-journée(s),Retards,Appréciations de la Vie Scolaire,Avis du Conseil de classe'
@@ -13816,7 +13586,7 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 		return  (!e['nom_liste_et_coefs'] || e['nom_liste_et_coefs'] === 'null') && e['coefficient_matiere'] > 0 ? e['coefficient_matiere'] :  "-"
 	} ).join(',')
 	ligne_coefs = ligne_coefs.split(',')
-	//console.log({ligne_coefs})
+	console.log({ligne_coefs})
 	$("#contenu_fiche_conseil").append('<tr class="ligne_coefs">'+ligne_coefs.map(un_coef => `<th>${un_coef}</th>`)+'</tr>')
 
 
@@ -13831,7 +13601,7 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 	//console.log({apres: appreciations_classe})
 
 	//pour chaque élève		
-	await les_eleves.forEach(async function(un_eleve,indice_eleve){
+	les_eleves.forEach(async function(un_eleve,indice_eleve){
 		$("#contenu_fiche_conseil").append(une_ligne_eleve('fiche_conseil',un_eleve,indice_eleve+1))
 		//console.log({indice_eleve})
 
@@ -13850,22 +13620,17 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 			les_notes = les_notes.filter(e => e['saison_note'] === 'Examen')
 		}
 	
-		await rajouter_notes_eleves(un_eleve['Identifiant'],les_notes,matieres_de_classe,appreciations_classe)
+		rajouter_notes_eleves(un_eleve['Identifiant'],les_notes,matieres_de_classe,appreciations_classe)
 		
 
 		//apres le dernier élève -> rajouter la valeur des min-max-moy
 		if(indice_eleve === les_eleves.length-1){
-
-			//console.log("dernier élève!",un_eleve)
+			//console.log("dernier élève!")
 			setTimeout(async function(){
 
-				/*
 				await rajouter_min_max_moy(matieres_de_classe)				
 				await rajouter_rangs_eleves()
-				*/
-
-				await actualiser_colonnes_calculees_bulletins(matieres_de_classe)
-				await rajouter_absences_et_retards_eleves(la_periode_bulletin)
+				await rajouter_absences_et_retards_eleves()
 				
 
 				//console.log({pour_bulletin})
@@ -13910,12 +13675,6 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 
 
 				}
-
-
-
-				//on stocke les moyennes générales
-				moyennes_periodes[la_periode_bulletin] = recuperer_moyennes_generales()
-				console.log({moyennes_periodes})
 				
 			},1000)
 
@@ -13958,15 +13717,6 @@ async function faire_le_bulletin(id_eleve,la_periode,la_classe,liste_profs,impri
 
 }
 
-async function actualiser_colonnes_calculees_bulletins(matieres_de_classe){
-	//recalculer les min/max/moy
-	await rajouter_min_max_moy()
-
-	//recalculer les rangs
-	await rajouter_rangs_eleves()
-
-	return true
-}
 
 function afficher_ou_masquer_ligne_entiere(event){
 	event.preventDefault()
@@ -13985,7 +13735,11 @@ function afficher_ou_masquer_ligne_entiere(event){
 		$(ceci).toggleClass('ignore')
 		$(ceci).toggleClass('une_ligne_de_donnees')
 		
-		actualiser_colonnes_calculees_bulletins()
+		//recalculer les min/max/moy
+		rajouter_min_max_moy()
+
+		//recalculer les rangs
+		rajouter_rangs_eleves()
 
 		//si on masque -> rajouter dans la liste à masquer
 		var eleves_ignores = recuperer('eleves_ignores') || ""
@@ -14112,23 +13866,19 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe,ap
 	matieres_de_classe.forEach(function(une_matiere,index_matiere){
 
 		//console.log('\n\n\n')
-		afficher_details_calcul_eleve_test(identifiant_eleve,'\n\n\n'+une_matiere['Matiere'])
 		notes_de_la_matiere = colonnes_notes.map(e => e.includes(une_matiere['Matiere']) ? e.split(':')[3] + ':' + e.split(':')[4] : "" ).filter(e => e!== "")
 		//console.log(notes_de_la_matiere)
-		afficher_details_calcul_eleve_test(identifiant_eleve,{notes_de_la_matiere})
 
 		//recuperer les notes NON examen -> faire la moyenne
 		moyenne_journaliere = notes_de_la_matiere.filter(e => !e.includes('Examen')).map(e =>  Number(e.split(':')[1]))
 		moyenne_journaliere = moyenne_de_larray(moyenne_journaliere)
 		//console.log({[une_matiere['Matiere']]: moyenne_journaliere})
-		afficher_details_calcul_eleve_test(identifiant_eleve,{moyenne_journaliere})
 
 
 		//recuperer la note examen
 		note_examen = notes_de_la_matiere.filter(e => e.includes('Examen')).map(e =>  Number(e.split(':')[1]))
 		note_examen = moyenne_de_larray(note_examen)
 		//console.log({[une_matiere['Matiere'] + ' EXAMEN']: note_examen})
-		afficher_details_calcul_eleve_test(identifiant_eleve,{note_examen})
 
 
 
@@ -14146,7 +13896,6 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe,ap
 		} 
 
 		//if(identifiant_eleve==='hasiniatsy.fanambisoa' && une_matiere['Matiere'] === 'Physique Chimie') alert(moyenne_journaliere + ' et ' + note_examen + ' donc ' + moyenne_generale_matiere)
-		afficher_details_calcul_eleve_test(identifiant_eleve,moyenne_journaliere + ' et ' + note_examen + ' donc ' + moyenne_generale_matiere)
 		
 
 
@@ -14154,7 +13903,6 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe,ap
 		liste_options_eleve = $("[id='"+identifiant_eleve+"']")[0].getAttribute('liste_options')
 		coefficient_matiere = liste_options_eleve.includes(une_matiere['Classe_Matiere']) ? liste_options_eleve.split(';').filter(e => e.includes(une_matiere['Classe_Matiere']))[0].split(' coef ')[1] : $('.ligne_coefs > :nth-child('+(7+index_matiere)+')').text()
 		//console.log({coefficient_matiere})
-		afficher_details_calcul_eleve_test(identifiant_eleve,{coefficient_matiere})
 
 		est_bonus = une_matiere['nom_liste_et_coefs'] && une_matiere['nom_liste_et_coefs'].toLowerCase().includes("bonus")
 		
@@ -14180,8 +13928,8 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe,ap
 	somme_coef_eleves = 0
 	moyenne_generale = 0
 
+	nom_eleve_test = "----"
 
-	afficher_details_calcul_eleve_test(identifiant_eleve,'\n\n -------------------------------- CALCUL MOYENNE GENERALE FICHE CONSEIL -------------------------------- ')
 	$('[id="'+identifiant_eleve+'"] > .moyenne_eleve').each(function(index,moyenne_matiere){
 
 
@@ -14197,7 +13945,6 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe,ap
 
 		la_moyenne = Number(la_moyenne)
 		
-		/*
 		if(identifiant_eleve===nom_eleve_test){
 			console.log('\n\n')
 			console.log({index})
@@ -14206,29 +13953,14 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe,ap
 			console.log({le_coef})
 			console.log({somme_coef_eleves})
 		}
-		*/
-		afficher_details_calcul_eleve_test(identifiant_eleve,'\n')
-		afficher_details_calcul_eleve_test(identifiant_eleve,{index})
-		afficher_details_calcul_eleve_test(identifiant_eleve,{le_coef})
-		afficher_details_calcul_eleve_test(identifiant_eleve,{est_bonus})
-		afficher_details_calcul_eleve_test(identifiant_eleve,{la_moyenne})
-		afficher_details_calcul_eleve_test(identifiant_eleve,moyenne_matiere)
-		afficher_details_calcul_eleve_test(identifiant_eleve,{somme_coef_eleves})
-
+		
 
 
 		//cumuler
 		if(la_moyenne){
-			//if(identifiant_eleve===nom_eleve_test) console.log({'avant': cumul_eleves})
-			afficher_details_calcul_eleve_test(identifiant_eleve,{'avant': cumul_eleves})
-
-			calcul = la_moyenne*le_coef
-			afficher_details_calcul_eleve_test(identifiant_eleve,{'rajouter': calcul})
-			cumul_eleves += calcul
-
-			//if(identifiant_eleve===nom_eleve_test) console.log({'apres': cumul_eleves})
-			afficher_details_calcul_eleve_test(identifiant_eleve,{'apres': cumul_eleves})
-
+			if(identifiant_eleve===nom_eleve_test) console.log({'avant': cumul_eleves})
+			cumul_eleves += la_moyenne*le_coef
+			if(identifiant_eleve===nom_eleve_test) console.log({'apres': cumul_eleves})
 			
 
 			//si c'est PAS UN BONUS, alors on cumule la somme de coef
@@ -14239,15 +13971,11 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe,ap
 
 	}) 
 	
-	/*
+	
 	if(identifiant_eleve===nom_eleve_test){
 		console.log({cumul_eleves})
 		console.log({somme_coef_eleves})
 	}
-	*/
-	afficher_details_calcul_eleve_test(identifiant_eleve,'\n\n----- FINAL -----')
-	afficher_details_calcul_eleve_test(identifiant_eleve,{cumul_eleves})
-	afficher_details_calcul_eleve_test(identifiant_eleve,{somme_coef_eleves})
 	
 	
 	if(cumul_eleves > 0 && somme_coef_eleves > 0) moyenne_generale = Number(cumul_eleves/somme_coef_eleves).toFixed(2)
@@ -14262,13 +13990,13 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe,ap
 	$('tr[id="'+identifiant_eleve+'"]').children('th:nth-child('+indice_moyenne_generale+')').after('<th class="border_bottom moyenne_generale">'+moyenne_generale+'</th>');
 
 
-	return moyenne_generale
+
 
 	
 }
 
-async function rajouter_absences_et_retards_eleves(la_periode_bulletin){
-	var periode_bulletin = la_periode_bulletin || $("#la_periode_bulletin").val();
+async function rajouter_absences_et_retards_eleves(){
+	var periode_bulletin = $("#la_periode_bulletin").val();
 	var la_classe = $("#la_classe_fiche").val();
 
 	var les_appreciations_globales = await supabase
@@ -14541,6 +14269,7 @@ async function clic_bulletin(){
 
 		creer_mini_popup('<div style="border-bottom-style: ridge;font-size: 20px;">Bulletins<br><b>Que voulez-vous faire?</b></div>',choix_admin_bulletins(),"Valider", "valider_choix_admin_bulletins()")
 	
+	//todo
 	//si eleve
 	}else{
 		//check si l'élève a le droit de consulter
@@ -15271,10 +15000,6 @@ function saisie_des_periodes_principales(){
 
 }
 
-function parmi_les_periodes_avec_conclusions_finales(periode){
-	return liste_periodes_avec_conclusions().includes('|'+periode+'|')
-}
-
 function saisie_des_periodes_secondaires(){
 	var nom_periode_bulletin = recuperer_nom_periodes_principales_bulletin()
 	var liste_principale = recuperer_liste_periodes_principales()
@@ -15302,7 +15027,7 @@ function saisie_des_periodes_secondaires(){
 		liste_principale_array.forEach( function(une_periode_principale, index_periode_principale) {
 
 			//créer input à virgules	
-			elements_html +=  un_element_de_config_bulletin(false, une_periode_principale, une_periode_principale, recuperer_liste_periodes_secondaires(index_periode_principale),`<label><input id="avec_mentions" type="checkbox" `+(parmi_les_periodes_avec_conclusions_finales(une_periode_principale) ? 'checked' : '')+`>Conclusion annuelle finale</label>`)
+			elements_html +=  un_element_de_config_bulletin(false, une_periode_principale, une_periode_principale, recuperer_liste_periodes_secondaires(index_periode_principale))
 
 		});
 
@@ -15336,7 +15061,7 @@ async function enregistrer_config_bulletins(numero_etape,les_periodes_principale
 		var liste_finale = {}
 
 		liste_array.forEach( function(une_periode_principale, index) {
-			liste_finale[une_periode_principale.trim()] = ""		
+			liste_finale[une_periode_principale.trim()] = ""
 		});
 		//console.log({liste_finale})
 		data_etablissement['config_notes'][nom_periode_bulletin] = liste_finale
@@ -15373,10 +15098,6 @@ async function enregistrer_config_bulletins(numero_etape,les_periodes_principale
 		//console.log({resultat_final})
 		data_etablissement['config_notes'][nom_periode_bulletin] = resultat_final
 
-		//nouveau : si étape de configuration de période finale -> le mettre dans periodes_avec_conclusions_finales
-		data_etablissement['config_notes']['periodes_avec_conclusions_finales'] = liste_periodes_avec_conclusions()
-
-
 		alerte_a_afficher = 'Liste des '+ nom_saison_note +' dans les ' + nom_periode_bulletin +' enregistrée.'
 		$("#mini_popup2").remove()
 
@@ -15392,22 +15113,7 @@ async function enregistrer_config_bulletins(numero_etape,les_periodes_principale
 
 }
 
-function liste_periodes_avec_conclusions(){
-	var list = ''
-
-	if($('#mini_popup2')[0]){
-		$('#mini_popup2').find('input:checked').each(function(i,el) {
-			//console.log(el.parentNode.previousElementSibling.id)
-			list += '|' + el.parentNode.previousElementSibling.id + '|'
-		})
-	}else{
-		list = data_etablissement['config_notes']['periodes_avec_conclusions_finales']
-	}
-	
-	return list 
-}
-
-function un_element_de_config_bulletin(avec_bouton_voir, intitule_label, id_input, valeur_initiale,conclusion_annuelle){
+function un_element_de_config_bulletin(avec_bouton_voir, intitule_label, id_input, valeur_initiale){
 
 	var bouton_voir = avec_bouton_voir ? `<button onclick="`+avec_bouton_voir+`">VOIR</button>` : ""
 
@@ -15422,7 +15128,6 @@ function un_element_de_config_bulletin(avec_bouton_voir, intitule_label, id_inpu
 	  </label>
 	  <input class="donnee" value="`+valeur_initiale+`" id="`+id_input+`" name="`+id_input+`">
 	  `+bouton_voir+`
-	  `+(conclusion_annuelle || '')+`
 	</div>
 	`
 }
@@ -16163,16 +15868,7 @@ function rajouter_champ_appreciations(contenu_appreciation, le_parent,contenu_pl
 
 }
 
-function afficher_details_calcul_eleve_test(identifiant,contenu_log){
-	if(nom_eleve_test && identifiant === nom_eleve_test ){
-		console.log(contenu_log)
-	}
-}
-
 function calcul_moyenne_bulletin(identifiant, moyenne_generale){
-
-	
-
 	var total = 0;
 	var taille = 0;
 	var resultat = 0
@@ -16186,7 +15882,6 @@ function calcul_moyenne_bulletin(identifiant, moyenne_generale){
 			
 			
 			//console.log({total})
-			afficher_details_calcul_eleve_test(identifiant,{total})
 
 			if(saisie.innerText!== "") taille=taille+1
 		})
@@ -16195,12 +15890,10 @@ function calcul_moyenne_bulletin(identifiant, moyenne_generale){
 
 
 		//console.log({taille})
-		afficher_details_calcul_eleve_test(identifiant,{taille})
 
 		resultat = taille > 0 ? total/taille : ""
 		resultat = resultat ? resultat.toFixed(2) :  ""
 		//console.log(resultat)
-		afficher_details_calcul_eleve_test(identifiant,{resultat})
 
 		return resultat
 
@@ -16214,7 +15907,6 @@ function calcul_moyenne_bulletin(identifiant, moyenne_generale){
 			
 			
 			//console.log({total})
-			afficher_details_calcul_eleve_test(identifiant,{total})
 
 			if(saisie.innerText!== "") taille=taille+1
 		})
@@ -16222,7 +15914,6 @@ function calcul_moyenne_bulletin(identifiant, moyenne_generale){
 		var note_examen = taille > 0 ? total/taille : ""
 		note_examen = note_examen ? note_examen.toFixed(2) :  ""
 		//console.log({note_examen})
-		afficher_details_calcul_eleve_test(identifiant,{note_examen})
 
 
 		moyenne_journaliere = calcul_moyenne_bulletin(identifiant)
@@ -21626,7 +21317,7 @@ async function submit_quiz(sans_terminer){
 }
 
 
-//save what has been submitted
+//save what has been submitted (todo)
 function save_current_submition(){
 
 	var current_question = recuperer("current_question")
