@@ -310,6 +310,7 @@ GRANT EXECUTE ON FUNCTION public.maj_coef_rendu_bis() TO service_role;
 
 
 
+--drop function number_of_rows;
 create function public.number_of_rows(tab text, field_count text)
    returns bigint
    language plpgsql
@@ -318,13 +319,16 @@ $$
 declare 
 -- variable declaration
   c bigint;
+  tempo text;
 begin
  -- logic
-  EXECUTE  concat('SELECT count(' || field_count || ') as rows_count FROM ' || tab) into c ;
+  tempo = case when field_count = '*' then  '*' else  '"' || field_count || '"' end;
+  EXECUTE  concat('SELECT count('  ||    tempo || ') as rows_count FROM "' || tab || '"'      ) into c ;
   return c;
   
 end;
 $$
+
 
 
 
