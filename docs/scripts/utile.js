@@ -250,6 +250,89 @@ function convertir_en_date(date_str_initiale){
   }
 }
 
+async function number_of_rows(tab,field_count,mode_initial){
+  
+
+  if(mode_initial){
+    var url = racine_initiale + 'rpc/number_of_rows?' + api_initial
+  }else{
+    var url = racine_data + 'rpc/number_of_rows?' + apikey
+  }
+
+  return await post_resultat_asynchrone(url, {"tab":tab, "field_count":field_count})
+
+}
+
+final_datas = []
+async function select_all(name_table,function_callback,depth,from,into){
+  //console.error({function_callback})
+  var more_datas = []
+
+  //>=2nd page
+  if(from && into){
+    depth += 1
+    count = count !== 9999999999 && count > 0 ? count : await number_of_rows(name_table,'*',false)
+    var {data,error} = await supabase
+        .from(name_table)
+        .select('*')
+        .range(from,into)
+
+
+    //if data is not big enough -> recursive
+    //console.warn({data})
+    add(data)
+    more_datas = await check_if_datas_complete_or_recursive_call(name_table,count,data,depth,from,into,function_callback)
+    //console.warn({more_datas})
+    if(more_datas) add(more_datas)
+    //console.warn({final_datas})
+
+    if(function_callback) function_callback(data)
+    final_datas = [...new Set(final_datas)];
+    return data
+
+  //very first query with only 1 element
+  }else{
+
+    depth = 0 //no depth at the beginning
+
+    //count number of elements
+    count = 9999999999
+    //console.warn({count})
+
+    var  {data,error} = await supabase
+        .from(name_table)
+        .select('*')
+
+    add(data)
+    await check_if_datas_complete_or_recursive_call(name_table,count,data,depth,from,into,function_callback)
+  }
+  
+}
+
+function add(more){
+  return Array.prototype.push.apply(final_datas,more);
+}
+
+async function check_if_datas_complete_or_recursive_call(name_table,count,data,depth,from,into,function_callback){
+  console.log({final_datas})
+  console.log({count})
+  //alert("check")
+  if(final_datas.length < count){
+
+    depth = depth+1
+    //console.warn({depth})
+
+    from = data.length * depth
+    //console.warn({from})
+
+    into = Math.min(from + data.length -1,count-1)
+    //console.warn({into})
+
+    return await select_all(name_table,function_callback,depth,from,into,function_callback)
+  
+  }
+}
+
 
 
 function reinitialiser_unseul_mdp_datenotif(id_parametre, identifiant_a_init){
