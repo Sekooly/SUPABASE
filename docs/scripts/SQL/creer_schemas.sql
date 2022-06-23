@@ -310,6 +310,21 @@ GRANT EXECUTE ON FUNCTION public.maj_coef_rendu_bis() TO service_role;
 
 
 
+create function number_of_rows(tab text, field_count text)
+   returns TABLE (rows_count bigint)  
+   language plpgsql
+  as
+$$
+declare 
+-- variable declaration
+
+begin
+ -- logic
+  return query EXECUTE  concat('SELECT count(' || field_count || ') FROM ' || tab) ;
+  
+end;
+$$
+
 
 
 
