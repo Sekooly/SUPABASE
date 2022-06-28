@@ -14218,7 +14218,7 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe,ap
 
 
 		//cumuler
-		if(la_moyenne){
+		if(la_moyenne && !isNaN(le_coef)){
 			//if(identifiant_eleve===nom_eleve_test) console.log({'avant': cumul_eleves})
 			afficher_details_calcul_eleve_test(identifiant_eleve,{'avant': cumul_eleves})
 
