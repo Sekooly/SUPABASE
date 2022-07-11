@@ -14744,7 +14744,7 @@ function calcul_annee_scolaire(){
 
 	//si entre janvier et juin -> premiere année c'est l'année d'avant
 	//si entre juin et décembre -> première année c'est l'année en cours
-	var premiere_annee = new Date().getMonth() <= 5 ? new Date().getFullYear() -1 : new Date().getFullYear()
+	var premiere_annee = new Date().getMonth() <= 8 ? new Date().getFullYear() -1 : new Date().getFullYear()
 	var annee_scolaire = premiere_annee + " - "  + (premiere_annee+1)
 	return annee_scolaire
 }
