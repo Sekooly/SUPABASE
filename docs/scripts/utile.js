@@ -2294,7 +2294,7 @@ function actualiser_image_non_trouvee(new_node){
   $("img").off("error")
   $("img").on("error",function(e){
     //console.log(e.target.src , "non trouvée ")
-    remplacer_avec_defaut(e)
+    //remplacer_avec_defaut(e)
   });
 
 
@@ -2323,7 +2323,7 @@ function appliquer_images(){
       $(img_locale).one("error",function(e){
         //e.preventDefault()
         //console.log("image non trouvée.",img_locale)
-        remplacer_avec_defaut(e)
+        //remplacer_avec_defaut(e)
         
       });
 

@@ -19,7 +19,7 @@
 
 		
 		<script type="text/javascript" src="scripts/aes.js"></script>
-		<script type="text/javascript" src="scripts/utile.min.js"></script>
+		<script type="text/javascript" src="scripts/utile.js"></script>
 		<script type="text/javascript" src="scripts/donnees_client.js"></script>
 
 
@@ -1566,6 +1566,8 @@
 		  width: 90%;
 		  font-size: 90%;
 
+		  margin: auto;
+
 		}
 		.grid-container> div {
 		  align-self: center;
@@ -1726,7 +1728,8 @@
 			border-radius: 6px;
 			overflow: hidden;
 			visibility: hidden;
-			box-shadow: 1px 0px 10px 1px;
+			/*box-shadow: 1px 0px 10px 1px;*/
+			box-shadow: 0px 5px 10px 1px grey;
 
 
 
@@ -2441,6 +2444,82 @@
 
 		}
 
+		.onefolder {
+			padding: 10px;
+			border-radius: 15px;
+			background-color: #33333321;
+			margin-bottom: 20px;
+			height: min-content;
+			width: 100%;
+			overflow-wrap: anywhere;
+		}
+
+		.folder-ressource {
+			display: grid;
+			grid-template-columns: auto;
+			grid-gap: 10px;
+			padding: 15px 15px 0 15px;
+		}
+
+		.folder-title {
+			margin: 0;
+			display: inline;
+		}
+
+		.file-ressource {
+			text-align: center;
+			font-weight: initial;
+			padding: 20px 5px;
+			width: 90%;
+			cursor: pointer;
+			max-width: 300px;
+			margin: 5px auto;
+			border: 1px gray solid;
+			border-radius: 15px;
+		}
+		.file-ressource:hover {
+		  background-color: #6f6f6f24;
+		}
+
+		.menu_params_ressources {
+
+			position: relative;
+			overflow: hidden auto;
+			height: 90%;
+			text-align: center;
+		}
+
+		.ressources-wrap {
+			display: grid;
+			grid-template-columns: auto auto auto;
+			justify-content: center;
+		}
+
+		@media only screen and (max-width: 800px) {
+		  .ressources-wrap {
+		    grid-template-columns: auto 
+		  }
+		}
+
+		@media only screen and (min-width: 800px) and (max-width: 1024px) {
+		  .ressources-wrap {
+		    grid-template-columns: auto auto
+		  }
+		}
+
+		.filesize {
+			font-style: oblique;
+			color: #888;
+		}
+
+		#bouton_precedent {
+			margin-top: 5px;
+		}
+
+		marker {
+		  background-color: #fffb00;
+		}
+
 	</style>
 
 
@@ -2522,6 +2601,7 @@
 
 	<div id="side-bar-top-right"  style="right:0;position: fixed;z-index: 4;">
 		<div class="droite sidebar top navbar-color"  style="height: min-content;float: right;position: relative;width: 750px;">
+			<div id="recup_biblio">Bibliothèque</div>
 			<div id="recup_eleves">Liste des élèves</div>
 			<div id="recup_profs">Liste des professeurs</div>
 			<div id="recup_admin">Liste de l'Administration</div>
@@ -2816,7 +2896,7 @@
 
 	<!--overwrites some local rules-->
 	<style type="text/css" id="custom-css"></style>
-	<script type="text/javascript" src="scripts/tele-enseignement.min.js"></script>
+	<script type="text/javascript" src="scripts/tele-enseignement.js"></script>
 
 	</body>
 

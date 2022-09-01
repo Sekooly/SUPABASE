@@ -309,8 +309,8 @@ function recuperer_details_plateforme(identifiant_eleve){
 
 }
 
-function dupliquer_visualisation(identifiant_eleve){
-	var fenetre_bis_html = '<div class="ma_fenetre" id="fenetre_bis" style="visibility: visible; opacity:95%; top: 0px; left: 0px; width: 99%; height: 99%;"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev_bis" onclick="quitter_previsualisation_bis()" style="width: 30px; height: 30px; cursor: pointer; position: fixed; z-index: 3; top: 0px; left: 673px;"></div><div class="titre_fenetre" id="titre_fenetre_bis">Détails sur ' + identifiant_eleve + '</div><div class="fullscreen-btn" id="conteneur_plein_ecran_bis"> <img alt="plein écran" style="position: fixed;" id="pleinecran_bis" src="'+ prefixe_image + '/img_petitecran.png" onclick="switch_mode_bis()" class="pleinecran"> </div></div>';
+function dupliquer_visualisation(titre_fenetre_dupliquee){
+	var fenetre_bis_html = '<div class="ma_fenetre" id="fenetre_bis" style="visibility: visible; opacity:95%; top: 0px; left: 0px; width: 99%; height: 99%;"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev_bis" onclick="quitter_previsualisation_bis()" style="width: 30px; height: 30px; cursor: pointer; position: fixed; z-index: 3; top: 0px; left: 673px;"></div><div class="titre_fenetre" id="titre_fenetre_bis">' + titre_fenetre_dupliquee + '</div><div class="fullscreen-btn" id="conteneur_plein_ecran_bis"> <img alt="plein écran" style="position: fixed;" id="pleinecran_bis" src="'+ prefixe_image + '/img_petitecran.png" onclick="switch_mode_bis()" class="pleinecran"> </div></div>';
 
 	//on rajoute tout
 	var fenetre_bis = document.createElement('div');
@@ -2944,7 +2944,7 @@ function mettre_le_contact_etablissement(){
 function attribuer_les_clics(){
 
 
-
+	au_clic("#recup_biblio", "voir_biblio()" )
 	au_clic("#a2hs", "ajouter_a_laccueil()")//
 	au_clic('[class="haut_droite dropdown"]', "switch_side_bar_top()")//
 	au_clic("#recup_notifs, #bulle_notif", "switch_pannel_notifs()")//
@@ -4956,7 +4956,7 @@ function renommer_fichier(id_fichier,ancien_nom){
 
 
 
-async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, pas_de_telechargement, mode_extrait_png_canva, mode_extrait_png_div, mode_site_web){
+async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, pas_de_telechargement, mode_extrait_png_canva, mode_extrait_png_div, fonction_bouton_retour){
 
 	chargement(true);
 
@@ -4966,8 +4966,9 @@ async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_init
 
 	//vider_fenetre(titre_fenetre,est_visio, save_button_function, avec_bande_noire)
 	vider_fenetre(titre_initial ? titre_initial : (nom_fichier + (nom_proprio_devoir ? nom_proprio_devoir : "")), false, false, est_youtube(extension) );
-		
+	
 	afficher_fenetre(true);
+
 
 	//console.log(mode_extrait_png_canva)
 	//on ajoute le bouton télécharger sauf en cas de PAS DE TELECHARGENEMTN
@@ -4996,6 +4997,26 @@ async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_init
 	}else{
 		var bouton_corriger = ""
 	}
+
+
+
+
+
+	//new :  retour en callback
+	if(fonction_bouton_retour){
+		//console.log({fonction_bouton_retour})
+		const btn_precedent_html = '<span id="fenetre-back" class="retourner_en_arriere" style="padding: 0;font-size: initial;">'+ btn_precedent('<< Revenir à la bibliotheque') + '</span>'
+		//console.log({btn_precedent_html})
+		
+		$("#titre_fenetre").prepend(btn_precedent_html)
+		au_clic('#fenetre-back',fonction_bouton_retour)
+
+	}else{
+		console.log('pas de fonction_bouton_retour')
+		$('#fenetre-back').remove()
+	}
+
+
 
 
 	//console.log(bouton_télécharger)
@@ -5261,6 +5282,9 @@ function quitter_previsualisation(){
 	effacer("tmp_quiz")
 	effacer("proprietaire_devoir")
 
+	effacerSession("expandRes")
+	effacerSession("rechercherRessource")
+
 }
 
 
@@ -5489,12 +5513,15 @@ function afficher_les_dossiers_dynamiques(oui){
 	
 }
 
+function btn_precedent(alt){
+	return '<img title="'+alt+'" alt="'+alt+'" src="'+ prefixe_image + '/img_retour.png" width = 25 height = 25>'
+}
 
 function avec_bouton_back(oui){
 
 	if (oui){
 
-		element_DOM('bouton_precedent').innerHTML = '<img alt="<<" src="'+ prefixe_image + '/img_retour.png" width = 25 height = 25>'
+		element_DOM('bouton_precedent').innerHTML = btn_precedent('<<')
 
 		//test click 1er élément
 		element_DOM('bouton_precedent').addEventListener('click', function(e) {
@@ -9502,6 +9529,7 @@ function afficher_parametres(oui){
 		$("#recup_params").remove()
 		$("#recup_analyses").remove()
 		$("#recup_pref").remove()
+		if(!recuperer("API_BIBLIOTHEQUE")) $("#recup_biblio").remove()
 	}else{
 		element_DOM("recup_params").style.display = "block"
 		element_DOM("recup_analyses").style.display = "block"
@@ -18074,10 +18102,15 @@ function details_tdb_4(ceci){
 
 
 		id_classe_matiere = le_fichier["id_dossier"]
-		nom_classe = mon_type === "Eleves" ? "" : mes_matieres.filter(e => e['ID_URL'] === id_classe_matiere)[0]['Classe'] + " "
-		nom_matiere = mes_matieres.filter(e => e['ID_URL'] === id_classe_matiere)[0]['Matiere'] +" ("+le_fichier['categorie_fichier']+")"
+		//console.log({id_classe_matiere})
+		if( mes_matieres.filter(e => e['ID_URL'] === id_classe_matiere).length > 0){
 
-		elements_html += creer_element_journee(nom_classe + nom_matiere,le_fichier['nom_fichier'],le_fichier['date_effet'],le_fichier['heure_effet'],le_fichier["id_fichier"],id_classe_matiere,"fichier",false,false,false)
+			nom_classe = mon_type === "Eleves" ? "" : mes_matieres.filter(e => e['ID_URL'] === id_classe_matiere)[0]['Classe'] + " "
+			nom_matiere = mes_matieres.filter(e => e['ID_URL'] === id_classe_matiere)[0]['Matiere'] +" ("+le_fichier['categorie_fichier']+")"
+
+			elements_html += creer_element_journee(nom_classe + nom_matiere,le_fichier['nom_fichier'],le_fichier['date_effet'],le_fichier['heure_effet'],le_fichier["id_fichier"],id_classe_matiere,"fichier",false,false,false)
+
+		}
 	})
 
 
@@ -19881,6 +19914,7 @@ async function afficher_resultats_recherche(){
 
 	if(!mot_cle){
 		alert("Merci de d'abord saisir un mot-clé.")
+		chargement(false)
 		return false
 	} 
 
@@ -19898,10 +19932,10 @@ async function afficher_resultats_recherche(){
 	var fichiers_trouves = mes_fichiers_intermediaires.filter(function(un_fichier, index){
 
 		//console.log("\n\n\n\non a ça: " + index)
-		console.log(un_fichier)
+		//console.log(un_fichier)
 
 		//chercher dans la Classe_Matiere
-		dans_classe_matiere = un_fichier['Classe_Matiere'].toLowerCase().replaceAll(" ","").includes(mot_cle)
+		dans_classe_matiere = (un_fichier['Classe_Matiere'] ? un_fichier['Classe_Matiere'] : "").toLowerCase().replaceAll(" ","").includes(mot_cle)
 		/*
 		console.log(un_fichier['Classe_Matiere'])
 		console.log(dans_classe_matiere)
@@ -22813,4 +22847,235 @@ async function upload_une_image(id_img,nom_champ_image_dans_data_etablissement,n
 	}
 
 	chargement(false)
+}
+
+// NEW : bibliotheque
+async function voir_biblio(forcing){
+
+	chargement(true)
+
+	var urlScript = await chercher_lien_script(9)
+	const API_BIBLIOTHEQUE = recuperer('API_BIBLIOTHEQUE') //todo
+	urlScript += '?API_BIBLIOTHEQUE='+ API_BIBLIOTHEQUE
+	urlScript += '&_action=read' 
+
+	const allRessources = recuperer('allRessources') && !forcing ? JSON.parse(recuperer('allRessources'))  : await fetch(urlScript)
+						.then(response => response.json())
+						.then(data => data)
+	stocker('allRessources',JSON.stringify(allRessources))
+
+	const titre = "Bibliothèque"
+	vider_fenetre(titre)
+
+	const hlKeyword = (html) => {
+		const keyword = $('#rechercherRessource').val()
+
+		if(html){
+
+			html = html.toString()
+			if(keyword && html.toLowerCase().includes(keyword.toLowerCase())){
+				const finalHTML =  '<marker>'+html+'</marker>'
+				return finalHTML
+			}
+		}else{
+			html = ""
+		}
+
+		return html
+	}
+
+
+	const renderBiblio = (allRessources) => {
+
+		const dossierParents = valeursUniquesDeCetteKey(allRessources,'Dossier parent').sort()
+
+		const biblioContent = () => {
+			return dossierParents.map(function(dossier_parent){
+				var folderFiles = allRessources.filter(e => e['Dossier parent'] === dossier_parent)
+
+				folderFiles = folderFiles.sort((a,b) => (a['Nom fichier'] < b['Nom fichier']) ? -1 : ((a['Nom fichier'] > b['Nom fichier']) ? 1 : 0))
+				const open = $('#expandRes:checked').length > 0 ? 'open=""' : ""
+
+				return `<details class="onefolder" `+open+` >
+				<summary><strong><h2 class="folder-title">${hlKeyword(dossier_parent)}</h2></strong></summary>
+				<div class="ressources-wrap">
+				${folderFiles.map(f => {
+						const extension = f['Nom fichier'].split('.').pop()
+						const tailleKO = (f["Taille fichier"]/1000).toFixed(2)
+						const tailleMO = (f["Taille fichier"]/1000000).toFixed(2)
+						const tailleAffichee = tailleKO <= 1000 ? tailleKO.toString() + ' Ko' : tailleMO.toString() + ' Mo'
+
+						const test = false
+						const target = test ? ' target="_blank" ' : ""
+						const href = test ? ` href="https://docs.google.com/file/d/${f['ID fichier']}/preview" `: ""
+
+
+						//visualiser(nom_fichier, id_fichier, nom_proprio_devoir, titre_initial, pas_de_telechargement, mode_extrait_png_canva, mode_extrait_png_div, fonction_bouton_retour)
+						return `<a onclick="visualiser('${f['Nom fichier']}','${f['ID fichier']}',false,false,true,false,false,'voir_biblio()')" ${target} ${href} class="file-ressource" id="${f['ID fichier']}">
+								<img width="141" loading="lazy" onerror="switchSource(this, '${extension}')" extension="${extension}" src="${lien_icone_ressource(f["Image fichier"], extension )}"><br/>
+								` +
+								
+
+								`<strong class="sekooly-mode">${hlKeyword(f["Nom fichier"])}</strong>
+								<i class="filesize">${tailleAffichee} (${hlKeyword(f["Taille fichier"]+' octets')})</i>
+								`
+
+								+'</a>'
+					}).join('')
+				}
+				</div>
+				</details>`
+
+
+			}).join('')
+		}
+
+		//very first rendering
+		if($('#conteneur_menu').length === 0){
+			const valueExpandRes = recupererSession('expandRes') ? 'value="'+recupererSession('expandRes')+'"' : ""
+			const valueRechercherRessource = recupererSession('rechercherRessource') ? 'value="'+recupererSession('rechercherRessource')+'"' : ""
+			const htmlFiles = `<div id="conteneur_menu">
+				<div id="menu_haut" class="menu_haut">
+					<input id="rechercherRessource" ${valueRechercherRessource} class="barre_recherche" name="rechercher" placeholder="Rechercher par mot(s)-clé(s)...">
+					<div style="font-weight: bold;text-align: center;"><span id="nombre_elements_ressources">0</span> éléments</div>
+					<div style="text-align: center;">
+						<input type="checkbox" onchange="expandAllRessources()" ${valueExpandRes} id="expandRes" name="expandRes" checked><label for="expandRes">Afficher tous les fichiers</label>
+					</div>
+				</div>
+				<div class="menu_params_ressources">
+					<div class="folder-ressource">
+
+						${biblioContent()}
+
+					</div>
+				</div>
+			</div>
+			`
+			$('#fenetre').append(htmlFiles)
+
+
+			//on typing, re-render list
+			$('#rechercherRessource').on('input',function(e){
+				const  val = e.currentTarget.value
+				//console.log(val)
+
+				const filteredFiles = val ? allRessources.filter(e => {
+					const objString = JSON.stringify(e)
+					//console.log(e['correlation'])
+
+					//const newCorr = computeCorr(objString, val)
+					//console.log({newCorr})
+
+					//multiple words => return key that contains at least one word
+					const allSearchedWords = val.split(' ')
+					const contained = allSearchedWords.map(oneword => {
+						const res = oneword && objString.toLowerCase().includes(oneword.trim().toLowerCase())
+						//if(res) console.log(val + ' VS ' + objString, res)
+						return res || res.length === 0
+					})
+
+					//console.log({contained})
+					return contained.filter(e => e===true).length === allSearchedWords.length
+					
+					
+				}) : allRessources
+
+				//console.log({allRessources})
+				//console.log({filteredFiles})
+
+				stockerSession('rechercherRessource',val)
+				renderBiblio(filteredFiles)
+			})
+
+			//consider re-rendering if needed
+			$('#expandRes').change()
+			$('#rechercherRessource').trigger("input")
+
+		//updating
+		}else{
+			//console.log('rerender with',{allRessources})
+			$('.folder-ressource').html( biblioContent() )
+		}
+
+		$('#nombre_elements_ressources').html(allRessources.length)
+
+
+	}
+
+
+	renderBiblio(allRessources)
+	afficher_fenetre(true)
+
+	chargement(false)
+	return allRessources
+	
+}
+
+
+
+function lien_icone_ressource(lien_image, extension){
+	const ID_FICHIER = lien_image ? lien_image.split('/')[5] : ""
+	const link = "https://drive.google.com/uc?export=download&id=" + ID_FICHIER  
+	//console.log({extension})
+
+	//OLD - not working with google
+	//return ID_FICHIER ? link : prefixe_image + "/img_icone_" + extension + ".png";
+
+	//NEW
+	return prefixe_image + "/img_icone_" + extension + ".png";
+}
+
+
+
+function switchSource(ceci, extension){
+	ceci.src = prefixe_image + "/img_icone_" + extension + ".png";
+}
+
+function expandAllRessources(){
+	const yes = $('#expandRes:checked').length > 0
+	Array.from($('.onefolder')).map(e => {
+		res = yes ? e.setAttribute('open', "") : e.removeAttribute('open')
+	})
+
+	stockerSession('expandRes',!yes)
+
+}
+
+function recupererSession(nom){
+	return window.sessionStorage.getItem(nom)
+}
+
+function stockerSession(nom,val){
+	window.sessionStorage.setItem(nom, val)
+	return recupererSession(nom)
+}
+
+function effacerSession(nom){
+	window.sessionStorage.removeItem(nom)
+}
+
+
+function computeCorr(longString, word){
+	var corr = 0
+	const longStringWords = longString.split(' ')
+
+	longStringWords.forEach(wordFromLongString => {
+
+		for (var i = 0; i < word.length; i++) {
+
+			//char found anywhere
+			if(wordFromLongString.includes(word.charAt(i))){
+				corr = corr+1
+
+				//char found exactly at the same place of the word
+				if(wordFromLongString.charAt(i) === word.charAt(i)){
+					corr = corr+5
+				}
+
+			}
+		}
+	})
+
+	return corr
+
 }
