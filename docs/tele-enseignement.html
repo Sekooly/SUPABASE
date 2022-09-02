@@ -765,12 +765,11 @@
 			border-radius: 20px;
 			padding: 5px;
 			width: 90%;
-		    position: relative;
-		    float: right;
-		    margin: 5px 5%;
-		    display: block;
-		    z-index: 1;
-		    overflow-wrap: anywhere;
+			position: relative;
+			margin: auto;
+			display: block;
+			z-index: 1;
+			overflow-wrap: anywhere;
 		}
 
 		.mode_affichage_fichiers {
@@ -2456,13 +2455,20 @@
 			height: min-content;
 			width: 100%;
 			overflow-wrap: anywhere;
+			margin-right: auto;
 		}
 
 		.folder-ressource {
 			display: grid;
-			grid-template-columns: auto;
-			grid-gap: 10px;
+			grid-template-columns: repeat(auto-fit, minmax(700px,1fr)); /*todo: 700px not ok with mobile*/
+			grid-gap: 50px;
 			padding: 15px 15px 0 15px;
+		}
+
+		@media only screen and (max-width: 700px) {
+		  .folder-ressource {
+		    grid-template-columns: repeat(auto-fit, minmax(320px,1fr));
+		  }
 		}
 
 		.folder-title {
@@ -2495,20 +2501,8 @@
 
 		.ressources-wrap {
 			display: grid;
-			grid-template-columns: auto auto auto;
+			grid-template-columns: repeat(auto-fit, 170px);
 			justify-content: center;
-		}
-
-		@media only screen and (max-width: 800px) {
-		  .ressources-wrap {
-		    grid-template-columns: auto 
-		  }
-		}
-
-		@media only screen and (min-width: 800px) and (max-width: 1024px) {
-		  .ressources-wrap {
-		    grid-template-columns: auto auto
-		  }
 		}
 
 		.filesize {
@@ -2551,6 +2545,19 @@
 			border-radius: 5px;
 		    z-index: 2;
 
+		}
+
+		.text-center {
+			text-align: center;
+		}
+
+		.whole-line {
+			width: 100%;
+			display: block;
+		}
+
+		.important-text {
+			font-weight: bolder;
 		}
 
 	</style>
@@ -2805,7 +2812,7 @@
 			<option value="Autres">Autres</option>
 
 
-			<option value="Bulletins">Bulletins</option>
+			<!--<option value="Bulletins">Bulletins</option>-->
 		</select>
 
 
@@ -2884,7 +2891,7 @@
 		<div style="font-size: 10px;" id="telechargeable">
 	      <input type="checkbox" id="est_telechargeable" name="est_telechargeable" checked><label for="est_telechargeable">Fichier téléchargeable</label>
 	  	</div>
-
+	  	<button id="sekooly_ressources">Vous pouvez directement publier une ressource Sekooly</button>
 
 
 
@@ -2929,7 +2936,7 @@
 
 	<!--overwrites some local rules-->
 	<style type="text/css" id="custom-css"></style>
-	<script type="text/javascript" src="scripts/tele-enseignement.js"></script>
+	<script type="text/javascript" src="scripts/tele-enseignement.min.js"></script>
 
 	</body>
 
