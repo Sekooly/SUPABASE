@@ -6078,8 +6078,8 @@ function pre_validation(nom_champ_obli){
 		return false;
 	}
 
-	//forcément une date d'effet du fichier
-	if($('#date_effet_fichier')[0].value === "" || $('#date_effet_fichier')[0].value === null){
+	//forcément une date d'effet du fichier SI NON MANUEL
+	if($('#categorie_choisie').val() !== 'Manuels' && ($('#date_effet_fichier')[0].value === "" || $('#date_effet_fichier')[0].value === null)){
 		afficher_alerte("Merci de choisir la date d'effet de votre fichier.")
 		return false;
 	}else{
@@ -16540,7 +16540,7 @@ function mode_bulletin(oui){
 		element_DOM('file').setAttribute('accept','application/pdf')
 		element_DOM('choix_popup').setAttribute('style','visibility: visible;overflow-y: scroll;width: 450px;max-width: 95%;overflow-x: hidden;')
 		element_DOM("file").value = "";
-		$("[value='Bulletins']")[0].style.display = ""
+		//$("[value='Bulletins']")[0].style.display = ""
 		element_DOM("choix_chapitre").style.display = "none"
 
 
@@ -16556,7 +16556,7 @@ function mode_bulletin(oui){
 		element_DOM("est_telechargeable").checked = true
 		element_DOM('file').setAttribute('accept',".txt,.bmp,.gif,.jpeg,.jpg,.png,.png,.pdf,.bmp,.xlsx,.xls,.xlsm,.ppt,.pptx,.doc,.docx,.html,.csv,.js,.rtf,.mp4,.mp3,.wav")
 		element_DOM('choix_popup').setAttribute('style','visibility: visible')
-		$("[value='Bulletins']")[0].style.display = "none"
+		//$("[value='Bulletins']")[0].style.display = "none"
 		$("#categorie_choisie > [value='Manuels']")[0].style.display = !recuperer("mon_type").includes("Administration") ? "none" : "" //manuels interdits sauf aux membres de l'administration
 		element_DOM("choix_chapitre").style.display = ""
 	}
@@ -23144,6 +23144,8 @@ function preparer_publication_ressource(){
 	//garder la fenetre ouverte
 	afficher_fenetre(true)
 
+
+
 	//forcément mode youtube => ne pas le montrer
 	$('#est_video_youtube').click()
 	$('#choix_youtube').hide()
@@ -23171,8 +23173,9 @@ function preparer_publication_ressource(){
 	$('#choix_popup')[0].style.zIndex = 4
 	console.log('z index done')
 
+
 	//visible
-	element_DOM('choix_popup').style.visibility = 'visible'
+	$("#choix_popup")[0].style.visibility = 'visible'
 	$('#choix_popup').show()
 
 
