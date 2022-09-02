@@ -4450,7 +4450,7 @@ function changer_telechargeable(id_fichier,ancien_telechargeable){
 	
 	//console.log(id_fichier)
 	var categorie_actuelle = $("[id='"+id_fichier+"'].span_un_fichier")[0].parentNode.id.split("_")[1];
-	var extension_fichier =  $("[id='"+id_fichier+"']")[0].innerText.split('.')[1].split('\n')[0]
+	var extension_fichier =  $(".span_un_fichier[id='"+id_fichier+"']")[0].innerText.split('.')[1].split('\n')[0]
 
 
 	//console.log(extension_fichier)
@@ -5168,13 +5168,7 @@ async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_init
 
 	//new :  retour en callback
 	if(callback_apres_render_fenetre){
-		console.log('callback after rendering...')
 		eval(callback_apres_render_fenetre)
-
-	}else{
-		//console.log('pas de callback_apres_render_fenetre')
-		//todo => enlever les éléments en trop
-		$('#fenetre-back').remove()
 	}
 
 
@@ -5947,7 +5941,7 @@ function switch_affichage_youtube(){
 
 
 				//dans 3 secondes, on masque l'alerte et on actualise
-				var texte_final = (est_un_lien_drive() ? "Le fichier drive a bien été rattaché à la plateforme." : "La vidéo youtube a bien été partagée.")
+				var texte_final = (est_un_lien_drive() ? "La ressource Sekooly a bien été rattachée à la plateforme." : "La vidéo youtube a bien été partagée.")
 				afficher_alerte(texte_final,true)
 
 
@@ -6006,6 +6000,7 @@ function est_un_lien_drive(){
 
 function afficher_choix_youtube(oui){
 	element_DOM('youtube').style.display = oui ? "" : "none";
+	element_DOM('block_yt_link').style.display = oui ? "" : "none";
 }
 
 
@@ -18486,6 +18481,7 @@ function render_ces_pages(canvasContainer,url,numeros_pages){
 							//console.log(numeros_pages.toString())
 							var boutons_valider_ou_annuler = '<div id="choix_pages_pdf" style="text-align: center;" class=""><rouge>Voici les pages que vous avez choisies. Voulez-vous valider ou annuler?</rouge><button class="mon_bouton sekooly-mode-background" onclick="annuler_mon_choix()">Annuler</button><button class="mon_bouton sekooly-mode-background" onclick="choisir_ces_pages(\''+numeros_pages.toString()+'\')">Valider</button></div>'
 							$("#fenetre").append(boutons_valider_ou_annuler)
+							$("#fenetre")[0].style.zIndex = 5;
 
 		    				chargement(false)
 		    			}
@@ -22853,8 +22849,13 @@ async function voir_biblio(forcing){
 
 	chargement(true)
 
+	$('#choix_popup').hide()
+	$('#mini_popup').remove()
+	effacerSession('ressource_ouverte')
+
+
 	var urlScript = await chercher_lien_script(9)
-	const API_BIBLIOTHEQUE = recuperer('API_BIBLIOTHEQUE') //todo
+	const API_BIBLIOTHEQUE = recuperer('API_BIBLIOTHEQUE')
 	urlScript += '?API_BIBLIOTHEQUE='+ API_BIBLIOTHEQUE
 	urlScript += '&_action=read' 
 
@@ -22915,7 +22916,7 @@ async function voir_biblio(forcing){
 
 
 						//visualiser(nom_fichier, id_fichier, nom_proprio_devoir, titre_initial, pas_de_telechargement, mode_extrait_png_canva, mode_extrait_png_div, callback_apres_render_fenetre)
-						return `<a onclick="visualiser('${f['Nom fichier']}','${f['ID fichier']}',false,false,true,false,false,'ajouter_ressource_features()')" ${target} ${href} class="file-ressource" id="${f['ID fichier']}">
+						return `<a onclick="stocker_temp('ressource_ouverte', '${f['ID fichier']}');visualiser('${f['Nom fichier']}','${f['ID fichier']}',false,false,true,false,false,'ajouter_ressource_features(this)')" ${target} ${href} class="file-ressource" id="${f['ID fichier']}">
 								<img width="141" loading="lazy" onerror="switchSource(this, '${extension}')" extension="${extension}" src="${lien_icone_ressource(f["Image fichier"], extension )}"><br/>
 								` +
 								
@@ -23037,9 +23038,87 @@ function pages_extract_change(){
 
 }
 
-function publier_ressource(){
-	alert("FONCTIONNALITE EN COURS DE DEVELOPPEMENT.\nCe bouton permettra de publier la ressource dans une des matières que vous enseignez.")
+function current_extension(){
+	return $('#titre_fenetre').text().split('.').pop().toLowerCase()
 }
+
+function publier_ressource(){
+	
+	const extension = current_extension()
+
+	//si mp3 => direct OK pour publier
+	if(extension === 'mp3'){
+
+	//si pdf => il faut choisir (ou pas) les pages à récupérer => todo
+	}else if(extension === 'pdf' && $('#num_pages_extract').val()){
+		return alert('PDF => extraction des pages en cours de développement.')
+	}
+	
+	choix_classe_matiere_ressource()
+
+
+
+}
+
+function choix_classe_matiere_ressource(){
+	les_matieres = JSON.parse(recuperer("mes_matieres"))
+	classes_matieres = valeursUniquesDeCetteKey(les_matieres,'Classe_Matiere')
+	classes_matieres.sort()
+
+
+	elements_html = "Classe - Matière:<select id='classe_matiere_ressource'>"
+	for (i = 0; i< classes_matieres.length;i++){
+		const cl_ma = classes_matieres[i].replace('(','').replace(')','')
+		const id_classe_matiere = les_matieres.find(e => e['Classe_Matiere'] === classes_matieres[i])['ID_URL']
+		elements_html += '<option value="'+id_classe_matiere+'">'+ cl_ma.split('|')[0] + ' - ' + cl_ma.split('|')[1] +'</option>'
+	}
+	elements_html += "</select>"
+	
+
+	creer_mini_popup("<h2>Choisissez la classe matière où vous souhaitez publier</h2>",elements_html, "Publier la ressource","preparer_publication_ressource()")
+	
+}
+
+function preparer_publication_ressource(){
+	const ID_URL = $('#classe_matiere_ressource').val()
+	const nom_classe_matiere = $('#classe_matiere_ressource option:selected').text()
+	//alert('FONCTIONNALITE EN COURS DE DEVELOPPEMENT.\nCe bouton permettra de publier la ressource dans ' + nom_classe_matiere )
+
+	stocker_temp('dossier_chargé',ID_URL)
+
+	
+	//mettre le popup créé en arrière
+	console.log('z index 1/2...')
+	$('#mini_popup')[0].style.zIndex = 3
+	console.log('z index 2/2...')
+	$('#choix_popup')[0].style.zIndex = 4
+	console.log('z index done')
+
+
+	//afficher le pop up de mise en ligne
+	chargement_a_larrivee()
+	afficher_ou_non_choix_fichier(true)
+
+	//garder la fenetre ouverte
+	afficher_fenetre(true)
+
+	//forcément mode youtube => ne pas le montrer
+	$('#est_video_youtube').click()
+	$('#choix_youtube').hide()
+
+	//titre par défaut ce qui est affiché
+	$('#nom_youtube').val($('#titre_fenetre').text())
+
+	//lien  => celui sur drive directement
+	const ID_FICHIER = recuperer('ressource_ouverte')
+	const lien_fichier_drive = "https://drive.google.com/file/d/"+ID_FICHIER+"/view"
+	$('#lien_youtube').val(lien_fichier_drive)
+
+	//masquer le lien 
+	$('#block_yt_link').hide()
+
+}
+
 
 function voir_extrait(){
 	alert("FONCTIONNALITE EN COURS DE DEVELOPPEMENT.\nCe bouton permettra de voir l'extrait choisi en format PDF.")
@@ -23049,9 +23128,9 @@ function voir_original(){
 	alert("Vous visualisez déjà l'original.")
 }
 
-function ajouter_ressource_features(){
+function ajouter_ressource_features(ceci){
 
-	const extension = $('#titre_fenetre').text().split('.').pop().toLowerCase()
+	const extension = current_extension()
 
 	//bouton retour
 	const btn_precedent_html = '<span id="fenetre-back" class="retourner_en_arriere" style="padding: 0;font-size: initial;">'+ btn_precedent('<< Revenir à la bibliotheque') + '</span>'
@@ -23076,6 +23155,7 @@ function ajouter_ressource_features(){
 	$(btnsTop).insertBefore( "#previsualisation iframe:nth-child(1), audio" );
 	pages_extract_change()
 
+	
 }
 
 

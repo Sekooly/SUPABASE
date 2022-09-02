@@ -1970,7 +1970,7 @@
 			transform: translate(-50%, -50%); /*bien centré*/
 			border-radius: 6px;
 			box-shadow: 1px 0px 10px 1px;
-			z-index: 1; /*utile pour pas se superposer avec les fichiers*/
+			z-index: 4 !important; /*utile pour pas se superposer avec les fichiers*/
 			max-height: 400px
 			overflow: hidden auto;
 		}
@@ -2548,6 +2548,8 @@
 			left: 41%;
 			padding: 10px;
 			border-radius: 5px;
+		    z-index: 2;
+
 		}
 
 	</style>
@@ -2827,7 +2829,7 @@
 		    	<div>Titre:
 		    		<input id="nom_youtube" style="width: 240px;" class="element_yt">
 		    	</div>
-		    	<div>Lien:
+		    	<div id="block_yt_link">Lien:
 		    		<input style="width: 240px;" id="lien_youtube" class="element_yt">
 		    	</div>
 			</div>
