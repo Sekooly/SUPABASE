@@ -4956,7 +4956,7 @@ function renommer_fichier(id_fichier,ancien_nom){
 
 
 
-async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, pas_de_telechargement, mode_extrait_png_canva, mode_extrait_png_div, fonction_bouton_retour){
+async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_initial, pas_de_telechargement, mode_extrait_png_canva, mode_extrait_png_div, callback_apres_render_fenetre){
 
 	chargement(true);
 
@@ -4998,23 +4998,6 @@ async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_init
 		var bouton_corriger = ""
 	}
 
-
-
-
-
-	//new :  retour en callback
-	if(fonction_bouton_retour){
-		//console.log({fonction_bouton_retour})
-		const btn_precedent_html = '<span id="fenetre-back" class="retourner_en_arriere" style="padding: 0;font-size: initial;">'+ btn_precedent('<< Revenir à la bibliotheque') + '</span>'
-		//console.log({btn_precedent_html})
-		
-		$("#titre_fenetre").prepend(btn_precedent_html)
-		au_clic('#fenetre-back',fonction_bouton_retour)
-
-	}else{
-		console.log('pas de fonction_bouton_retour')
-		$('#fenetre-back').remove()
-	}
 
 
 
@@ -5133,7 +5116,7 @@ async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_init
 
 		//si PAS youtube ET SANS téléchargement -> on cache le côté haut-droit en cas de PAS DE TELECHARGEMENT
 		if (pas_de_telechargement && est_youtube(extension)===false){
-			var le_inner_html = '<iframe id="viz_frame" src="'+lien_de_visu+'"    frameborder="0" scrolling="no" seamless=""></iframe><div style="width: 80px; height: 80px; position: absolute; opacity: 0; right: 0px; top: 0px;"> </div>'
+			var le_inner_html = '<iframe id="viz_frame" src="'+lien_de_visu+'"    frameborder="0" scrolling="no" seamless=""></iframe><div id="squareDOC" style="width: 80px; height: 80px; position: absolute; opacity: 0; right: 12px; top: 0px;"> </div>'
 			element_DOM('previsualisation').innerHTML = le_inner_html
 			chargement(false);
 		
@@ -5179,6 +5162,22 @@ async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_init
 	ajuster_boutons_fenetre();
 	ajuster_boutons_fenetre(true);
 	choisir_height_viz_si_pdf();
+
+
+
+
+	//new :  retour en callback
+	if(callback_apres_render_fenetre){
+		console.log('callback after rendering...')
+		eval(callback_apres_render_fenetre)
+
+	}else{
+		//console.log('pas de callback_apres_render_fenetre')
+		//todo => enlever les éléments en trop
+		$('#fenetre-back').remove()
+	}
+
+
 
 }
 
@@ -18418,7 +18417,7 @@ function switch_extrait_manuel(){
 
 			
 			//choisir les pages à publier
-			numeros_pages_str = prompt("Choisissez les numéros de pages (séparés de virgules et SANS ESPACES):","1,2,3")
+			numeros_pages_str = prompt("Choisissez les numéros de pages (séparés par une virgule):","1,2,3")
 
 			if(!numeros_pages_str){
 				e.target.value = "--"
@@ -18427,7 +18426,7 @@ function switch_extrait_manuel(){
 				return true
 			}
 
-			numeros_pages = numeros_pages_str.split(',').map(e => Number(e))
+			numeros_pages = numeros_pages_str.split(',').map(e => Number(e.trim()))
 			var url = 'https://www.googleapis.com/drive/v2/files/'+e.target.value+'?key='+google_api_file_access+'&alt=media&source=downloadUrl'
 			var extension = $("#manuel_choisi option:selected" ).text().split(".").pop()
 			var nom_fichier = $( "#manuel_choisi option:selected" ).text().replace("."+extension, " (page "+ numeros_pages_str + ").png")
@@ -22888,8 +22887,13 @@ async function voir_biblio(forcing){
 	const renderBiblio = (allRessources) => {
 
 		const dossierParents = valeursUniquesDeCetteKey(allRessources,'Dossier parent').sort()
+		$('#nombre_elements_ressources').html(allRessources.length)
+
 
 		const biblioContent = () => {
+
+
+
 			return dossierParents.map(function(dossier_parent){
 				var folderFiles = allRessources.filter(e => e['Dossier parent'] === dossier_parent)
 
@@ -22910,8 +22914,8 @@ async function voir_biblio(forcing){
 						const href = test ? ` href="https://docs.google.com/file/d/${f['ID fichier']}/preview" `: ""
 
 
-						//visualiser(nom_fichier, id_fichier, nom_proprio_devoir, titre_initial, pas_de_telechargement, mode_extrait_png_canva, mode_extrait_png_div, fonction_bouton_retour)
-						return `<a onclick="visualiser('${f['Nom fichier']}','${f['ID fichier']}',false,false,true,false,false,'voir_biblio()')" ${target} ${href} class="file-ressource" id="${f['ID fichier']}">
+						//visualiser(nom_fichier, id_fichier, nom_proprio_devoir, titre_initial, pas_de_telechargement, mode_extrait_png_canva, mode_extrait_png_div, callback_apres_render_fenetre)
+						return `<a onclick="visualiser('${f['Nom fichier']}','${f['ID fichier']}',false,false,true,false,false,'ajouter_ressource_features()')" ${target} ${href} class="file-ressource" id="${f['ID fichier']}">
 								<img width="141" loading="lazy" onerror="switchSource(this, '${extension}')" extension="${extension}" src="${lien_icone_ressource(f["Image fichier"], extension )}"><br/>
 								` +
 								
@@ -22997,7 +23001,7 @@ async function voir_biblio(forcing){
 			$('.folder-ressource').html( biblioContent() )
 		}
 
-		$('#nombre_elements_ressources').html(allRessources.length)
+
 
 
 	}
@@ -23013,13 +23017,75 @@ async function voir_biblio(forcing){
 
 
 
+function btn_publier_ressource(absolute){
+	return `<button onclick="publier_ressource()" class="sekooly-mode-background `+ (absolute ? "btn_publish_absolute" : "") +`">Publier dans une matière</button>`
+}
+
+function pages_extract_change(){
+	//keep only numbers and commas
+	if($("#num_pages_extract")[0]) $('#num_pages_extract').val($("#num_pages_extract").val().replace(/[^\d,-]/g, ''))
+
+
+	if($("#num_pages_extract")[0] && $("#num_pages_extract").val().length > 0){
+		$('#btn_voir_ressource').show()
+
+
+	}else{
+		$('#btn_voir_ressource').hide()
+	}
+
+
+}
+
+function publier_ressource(){
+	alert("FONCTIONNALITE EN COURS DE DEVELOPPEMENT.\nCe bouton permettra de publier la ressource dans une des matières que vous enseignez.")
+}
+
+function voir_extrait(){
+	alert("FONCTIONNALITE EN COURS DE DEVELOPPEMENT.\nCe bouton permettra de voir l'extrait choisi en format PDF.")
+}
+
+function voir_original(){
+	alert("Vous visualisez déjà l'original.")
+}
+
+function ajouter_ressource_features(){
+
+	const extension = $('#titre_fenetre').text().split('.').pop().toLowerCase()
+
+	//bouton retour
+	const btn_precedent_html = '<span id="fenetre-back" class="retourner_en_arriere" style="padding: 0;font-size: initial;">'+ btn_precedent('<< Revenir à la bibliotheque') + '</span>'
+	$("#titre_fenetre").prepend(btn_precedent_html)
+	au_clic('#fenetre-back','voir_biblio()')
+
+
+	//rajouter numéros de pages + 3 boutons :
+	const btnsTop = extension === 'pdf' ? `
+	<div class="btn_wrapper_rsrc">
+	  
+		<input type="text" id="num_pages_extract" oninput="pages_extract_change()" class="num_pages_extract" placeholder="Numéros de pages à extraire séparés par une virgule ou un tiret (ex: 1-5,10,11 extrait les pages 1 à 5, avec la page 10 et 11)">
+
+		<div>
+			<span id="btn_voir_ressource">
+				<button onclick="voir_extrait()" class="sekooly-mode">Voir l'extrait</button>
+				<button onclick="voir_original()" >Voir l'original</button>
+			</span>
+			`+btn_publier_ressource()+`
+		</div>
+	</div>` : btn_publier_ressource(true)
+	$(btnsTop).insertBefore( "#previsualisation iframe:nth-child(1), audio" );
+	pages_extract_change()
+
+}
+
+
 function lien_icone_ressource(lien_image, extension){
 	const ID_FICHIER = lien_image ? lien_image.split('/')[5] : ""
 	const link = "https://drive.google.com/uc?export=download&id=" + ID_FICHIER  
 	//console.log({extension})
 
 	//OLD - not working with google
-	//return ID_FICHIER ? link : prefixe_image + "/img_icone_" + extension + ".png";
+	return ID_FICHIER ? link : prefixe_image + "/img_icone_" + extension + ".png";
 
 	//NEW
 	return prefixe_image + "/img_icone_" + extension + ".png";
@@ -23052,30 +23118,4 @@ function stockerSession(nom,val){
 
 function effacerSession(nom){
 	window.sessionStorage.removeItem(nom)
-}
-
-
-function computeCorr(longString, word){
-	var corr = 0
-	const longStringWords = longString.split(' ')
-
-	longStringWords.forEach(wordFromLongString => {
-
-		for (var i = 0; i < word.length; i++) {
-
-			//char found anywhere
-			if(wordFromLongString.includes(word.charAt(i))){
-				corr = corr+1
-
-				//char found exactly at the same place of the word
-				if(wordFromLongString.charAt(i) === word.charAt(i)){
-					corr = corr+5
-				}
-
-			}
-		}
-	})
-
-	return corr
-
 }
