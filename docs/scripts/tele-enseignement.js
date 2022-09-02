@@ -5256,6 +5256,7 @@ function quitter_previsualisation(){
 
 	if(element_DOM("previsualisation")) element_DOM("previsualisation").src="";
 	if(element_DOM("viz_frame")) element_DOM("viz_frame").src="";
+	if(document.querySelector('audio.previz')) document.querySelector('audio.previz').src = ""
 	
 
 	if($("#visio")[0]) $("#visio")[0].remove(); //éviter la pub dans visio
@@ -22939,12 +22940,26 @@ async function voir_biblio(forcing){
 		if($('#conteneur_menu').length === 0){
 			const valueExpandRes = recupererSession('expandRes') ? 'value="'+recupererSession('expandRes')+'"' : ""
 			const valueRechercherRessource = recupererSession('rechercherRessource') ? 'value="'+recupererSession('rechercherRessource')+'"' : ""
+			
 			const htmlFiles = `<div id="conteneur_menu">
 				<div id="menu_haut" class="menu_haut">
 					<input id="rechercherRessource" ${valueRechercherRessource} class="barre_recherche" name="rechercher" placeholder="Rechercher par mot(s)-clé(s)...">
 					<div style="font-weight: bold;text-align: center;"><span id="nombre_elements_ressources">0</span> éléments</div>
 					<div style="text-align: center;">
 						<input type="checkbox" onchange="expandAllRessources()" ${valueExpandRes} id="expandRes" name="expandRes" checked><label for="expandRes">Afficher tous les fichiers</label>
+					</div>
+					<div style="text-align: center;">
+						<input type="checkbox" id="withPDF" name="withPDF" onchange="update_filter_ressource(this.checked, '.pdf')"><label for="withPDF">PDF uniquement</label>
+						<input type="checkbox" id="withAudio" name="withAudio" onchange="update_filter_ressource(this.checked, '.mp3')"><label for="withAudio">Audio uniquement</label>
+						<input type="checkbox" id="6e" name="6e" onchange="update_filter_ressource(this.checked, '6e')"><label for="6e">6ème</label>
+						<input type="checkbox" id="5e" name="5e" onchange="update_filter_ressource(this.checked, '5e')"><label for="5e">5ème</label>
+						<input type="checkbox" id="4e" name="4e" onchange="update_filter_ressource(this.checked, '4e')"><label for="4e">4ème</label>
+						<input type="checkbox" id="3e" name="3e" onchange="update_filter_ressource(this.checked, '3e')"><label for="3e">3ème</label>
+						<input type="checkbox" id="cp" name="cp" onchange="update_filter_ressource(this.checked, 'cp')"><label for="cp">CP</label>
+						<input type="checkbox" id="ce1" name="ce1" onchange="update_filter_ressource(this.checked, 'ce1')"><label for="ce1">CE1</label>
+						<input type="checkbox" id="ce2" name="ce2" onchange="update_filter_ressource(this.checked, 'ce2')"><label for="ce2">CE2</label>
+						<input type="checkbox" id="cm1" name="cm1" onchange="update_filter_ressource(this.checked, 'cm1')"><label for="cm1">CM1</label>
+						<input type="checkbox" id="cm2" name="cm2" onchange="update_filter_ressource(this.checked, 'cm2')"><label for="cm2">CM2</label>
 					</div>
 				</div>
 				<div class="menu_params_ressources">
@@ -22965,11 +22980,14 @@ async function voir_biblio(forcing){
 				//console.log(val)
 
 				const filteredFiles = val ? allRessources.filter(e => {
-					const objString = JSON.stringify(e)
-					//console.log(e['correlation'])
+					const keys_for_search = ['Nom fichier', 'Taille fichier', 'Dossier parent']
+					var obj_init = {}
+					keys_for_search.map(key_to_keep => {
+						obj_init[key_to_keep] = e[key_to_keep]
+					})
 
-					//const newCorr = computeCorr(objString, val)
-					//console.log({newCorr})
+					//console.log({obj_init})
+					const objString = JSON.stringify(obj_init)
 
 					//multiple words => return key that contains at least one word
 					const allSearchedWords = val.split(' ')
@@ -22995,6 +23013,8 @@ async function voir_biblio(forcing){
 			//consider re-rendering if needed
 			$('#expandRes').change()
 			$('#rechercherRessource').trigger("input")
+			$('#withPDF').change()
+			$('#withAudio').change()
 
 		//updating
 		}else{
@@ -23014,6 +23034,21 @@ async function voir_biblio(forcing){
 	chargement(false)
 	return allRessources
 	
+}
+
+function update_filter_ressource(boolean_addfilter, val){
+	const current_query = $('#rechercherRessource').val()
+	var final_query = ""
+
+	if(boolean_addfilter && !current_query.includes(val)){
+		final_query = (current_query + ' ' +val).trim()
+
+	}else if(!boolean_addfilter){
+		final_query = $('#rechercherRessource').val().replaceAll(val,'').trim()
+	}
+
+	$('#rechercherRessource').val(final_query)
+	$('#rechercherRessource').trigger('input')
 }
 
 
