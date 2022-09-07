@@ -114,6 +114,15 @@ function actualiser(nom_table, nom_champ_reference, valeur_champ_reference, nouv
 
 //limité à 5000
 function rechercher_tout(nom_table, avec_where){
+
+  //get_datas(name_table,where_condition,csv_mode,SUPABASE_URL, SUPABASE_APIKEY)
+
+  const SUPABASE_URL = elements_menu_haut_generiques_local.indexOf(nom_table)>=0  ? supabaseInit.supabaseUrl : supabase.supabaseUrl 
+  const SUPABASE_APIKEY = elements_menu_haut_generiques_local.indexOf(nom_table)>=0  ? supabaseInit.supabaseKey : supabase.supabaseKey 
+  return get_datas(nom_table,false,false,SUPABASE_URL,SUPABASE_APIKEY)
+
+  /*
+
   //url = racine_data + nom_table + "?" + apikey + "&limit=5000" + ordonner(nom_table)
   table = avec_where ? nom_table : '"'+nom_table+'"'
   //alert(table)
@@ -126,6 +135,11 @@ function rechercher_tout(nom_table, avec_where){
 
   //alert(url)
   return get_resultat_asynchrone(url)
+  
+  */
+
+
+
 }
 
 
@@ -261,76 +275,6 @@ async function number_of_rows(tab,field_count,mode_initial){
 
   return await post_resultat_asynchrone(url, {"tab":tab, "field_count":field_count})
 
-}
-
-final_datas = []
-async function select_all(name_table,function_callback,depth,from,into){
-  //console.error({function_callback})
-  var more_datas = []
-
-  //>=2nd page
-  if(from && into){
-    depth += 1
-    count = count !== 9999999999 && count > 0 ? count : await number_of_rows(name_table,'*',false)
-    var {data,error} = await supabase
-        .from(name_table)
-        .select('*')
-        .range(from,into)
-
-
-    //if data is not big enough -> recursive
-    //console.warn({data})
-    add(data)
-    more_datas = await check_if_datas_complete_or_recursive_call(name_table,count,data,depth,from,into,function_callback)
-    //console.warn({more_datas})
-    if(more_datas) add(more_datas)
-    //console.warn({final_datas})
-
-    if(function_callback) function_callback(data)
-    final_datas = [...new Set(final_datas)];
-    return data
-
-  //very first query with only 1 element
-  }else{
-
-    depth = 0 //no depth at the beginning
-
-    //count number of elements
-    count = 9999999999
-    //console.warn({count})
-
-    var  {data,error} = await supabase
-        .from(name_table)
-        .select('*')
-
-    add(data)
-    await check_if_datas_complete_or_recursive_call(name_table,count,data,depth,from,into,function_callback)
-  }
-  
-}
-
-function add(more){
-  return Array.prototype.push.apply(final_datas,more);
-}
-
-async function check_if_datas_complete_or_recursive_call(name_table,count,data,depth,from,into,function_callback){
-  console.log({final_datas})
-  console.log({count})
-  //alert("check")
-  if(final_datas.length < count){
-
-    depth = depth+1
-    //console.warn({depth})
-
-    from = data.length * depth
-    //console.warn({from})
-
-    into = Math.min(from + data.length -1,count-1)
-    //console.warn({into})
-
-    return await select_all(name_table,function_callback,depth,from,into,function_callback)
-  
-  }
 }
 
 
@@ -653,7 +597,8 @@ async function fin_envoi_log(partir, mon_identifiant, ma_classe, mon_statut,
 }
 
 function chargement(oui){
-  $("#img_chargement")[0].style.display = oui ? "" : "none";
+  $("#img_chargement")[0].style.display = oui ? "" : "none"
+  $('body')[0].style.cursor = oui ? "progress" : ""
 }
 
 
@@ -1095,6 +1040,36 @@ function convertir_csv(arr, entetes_seulement){
   
 
 
+}
+
+
+//json à arrays [[ligne1],[ligne2],[ligne3],...]
+function json2arrays(json_list){  
+
+  var array = [];
+  var headers = []
+  var firstline = json_list[0]
+  if(firstline){
+    headers =  Object.keys(firstline)
+    array.push(headers)
+  }  
+  for(var i = 0; i < json_list.length; i++) {
+    var obj = json_list[i];
+    var temp = []
+    Object.keys(obj).map((key) => temp.push(obj[key]))
+    array.push(temp);
+  }
+  return array 
+}
+
+function arrays_to_csv(data){
+  var lineArray = [];
+  data.forEach(function (infoArray, index) {
+      var line = infoArray.join(separateur);
+      lineArray.push(index == 0 ? "data:text/csv;charset=utf-8," + line : line);
+  });
+  var csvContent = lineArray.join("\n");
+  return csvContent
 }
 
 
@@ -2022,10 +1997,20 @@ async function recuperer_mes_donnees(){
   return mes_donnees
 }
 
-function compter(nom_table){
-
+async function compter(nom_table){
+  /*
   url = entete_heroku + convertir_db(racine_data) + '/SELECT COUNT(*) as result FROM "'+nom_table+'"'
   return get_resultat(url)
+  */
+
+  try {
+    return await number_of_rows(nom_table,'*')  
+  }catch(err){
+    //console.log(err)
+    return await number_of_rows(nom_table,'*',true)  
+  }
+  
+
 }
 
 function taille_fichier_quiz(liste_questions_str){
@@ -2477,4 +2462,115 @@ function dragElement(elmnt) {
     document.onmouseup = null;
     document.onmousemove = null;
   }
+}
+
+function makeid(length) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * 
+ charactersLength));
+   }
+   return result;
+}
+
+
+
+
+
+
+const BATCH_SIZE = 2000
+async function get_datas(name_table,where_condition,csv_mode,SUPABASE_URL, SUPABASE_APIKEY){
+
+  var finalDatas = []
+
+  if(!SUPABASE_URL) SUPABASE_URL = supabase.supabaseUrl
+  if(!SUPABASE_APIKEY) SUPABASE_APIKEY = supabase.supabaseKey
+
+  //get 1st data to know the exact amount of datas
+  const content_range = await get_datas_chunk(false,SUPABASE_URL, SUPABASE_APIKEY, name_table,where_condition,0,1,true)
+
+  if(content_range){
+
+
+    const number_of_records = content_range.split('/')[1]
+    console.log({number_of_records})
+    
+    for(var optionalOffset = 0 ; optionalOffset <= number_of_records ; optionalOffset = optionalOffset+BATCH_SIZE ){
+      chargement(true)
+      console.log('\n\n\n\n'+name_table,optionalOffset + ' / ' + number_of_records)
+      
+      //temp is ALWAYS in json
+      var temp = await get_datas_chunk(false,SUPABASE_URL, SUPABASE_APIKEY, name_table,where_condition,optionalOffset,BATCH_SIZE)    
+      
+      if(csv_mode){
+
+        //convert temp to arrays
+        temp = json2arrays(temp).map(row => JSON.stringify(row.join(separateur)))
+
+
+      }
+      
+      finalDatas.push.apply(finalDatas, temp);  
+
+      afficher_alerte('     ('+name_table+') Données récupérées = ' + finalDatas.length + ' / ' + number_of_records)
+    }
+
+
+
+    if(csv_mode) finalDatas = finalDatas.join('\n')
+
+    return finalDatas
+
+  }else {
+
+    chargement(false)
+    return []
+  }
+}
+
+function symbole_avant_url_param(url){
+   return url.includes('?') ? '&' : '?'
+}
+
+//called function in get_datas
+async function get_datas_chunk(csv_mode,SUPABASE_URL, SUPABASE_APIKEY, name_table,where_condition,optionalOffset,optionalBatchsize,content_range_mode) {
+
+  var url = SUPABASE_URL  + '/rest/v1/'+ name_table + (where_condition ? "?" + where_condition : '') 
+
+
+
+  url += optionalOffset ? symbole_avant_url_param(url) + 'offset='+optionalOffset : ""
+  url += optionalBatchsize ?  symbole_avant_url_param(url) + 'limit=' + optionalBatchsize :
+          BATCH_SIZE ?  symbole_avant_url_param(url) + 'limit=' + BATCH_SIZE : ""
+
+
+
+  var headers = {
+      Prefer: 'count=exact',
+      apikey: SUPABASE_APIKEY,
+      Accept: csv_mode ? 'text/csv' : '*/*'
+  }
+  //console.log({headers})
+
+  //fetching with the right headers
+  if(content_range_mode){
+
+      return await fetch(url, {
+        headers : headers
+      }).then(response => response).then(data => data.headers.get('content-range'))
+        
+
+  }else{
+
+    return await fetch(url, {
+        headers : headers
+      }).then(response => csv_mode ?  response.text() : response.json())
+        .then(data => data)
+
+  }
+
+
+  
 }

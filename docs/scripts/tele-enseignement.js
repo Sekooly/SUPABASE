@@ -3,7 +3,9 @@ var elements_generiques_en_haut = [{"Général": [
 										  "Espace etablissement restant",
 										  "Infos établissement",
 										  "Maintenance",
-										  "</> Intégrer Sekooly à mon site"
+										  "Réinitialiser la plateforme",
+										  "</> Intégrer Sekooly à mon site",
+
 										]
 								
 									},
@@ -45,6 +47,37 @@ var elements_generiques_en_haut = [{"Général": [
 										  "Reponses"
 										]										
 									}]
+
+const description_activite = (nom_table_activite) => {
+	switch (nom_table_activite) {
+		case "Logs":
+			return "L'historique des connexions de vos utilisateurs"
+		case "Visio":
+			return "L'historique des visioconférences qui ont eu lieu sur Sekooly"
+		case "Fichiers":
+			return "Les fichiers publiés dans toutes les matières"
+		case "Rendus":
+			return "Les devoirs/examens rendus par les élèves dans toutes les matières"
+		case "Notes":
+			return "Les notes saisies par les professeurs pour les bulletins"
+		case "Appreciations":
+			return "Les appréciations saisies par les professeurs pour les bulletins"
+		case "Jury":
+			return "L'avis du jury pour les bulletins"
+		case "Topic":
+			return "Les fils de discussions créés dans les matières"
+		case "Coms":
+			return "Les commentaires des fils de discussions créés dans les matières"
+		case "Notifs":
+			return "Les notifications associées aux activités sur la plateforme"
+		case "Liste_appreciations":
+			return "Les appréciations possibles à assigner dans les bulletins des élèves"
+		case "Mentions":
+			return "Les conclusions finales possibles en fonction de la moyenne générale de l'élève dans son bulletin"
+		default:
+			return ""
+	}
+}									
 var elements_menu_haut = elements_generiques_en_haut.map(e => Object.values(e) ).join(',').split(',')
 
 var elements_menu_analyses = ["Analyses des connexions"]
@@ -1325,7 +1358,7 @@ function rendre_devoir(){
 
         	//alert(params.file)
             
-            nom_fichier = file.name;
+            nom_fichier = file.name.replaceAll(',', ' ');
 
             coefficient_rendu = Number($("#"+le_devoir_choisi)[0].getAttribute('coefficient_rendu'))
             taille_fichier = file.size;
@@ -1593,11 +1626,12 @@ function afficher_alerte(contenu,actualiser){
 
 	// on affiche l'alerte
 	msg_alerte.innerHTML = contenu;
+	//console.log({'alerte': contenu})
 	msg_alerte.className = "show";
 
-	//dans 3 secondeds, on masque l'alerte 
+	//dans 3 secondes, on masque l'alerte (si le contenu est tjr celui initialement mis)
 	setTimeout(function(){
-		msg_alerte.className = "";
+		if(msg_alerte.innerHTML === contenu) msg_alerte.className = "";
 		if(actualiser) location.reload();
 	}, 3000);
 }
@@ -6188,7 +6222,7 @@ $(function charger_fichiers(e){
 		var file = image_temporaire ? base64toBlob(image_temporaire,'image/png') : les_fichiers[0] ;
 		//console.log(file)
 
-        nom_fichier = nom_image_temporaire ? nom_image_temporaire : file.name ;
+        nom_fichier = nom_image_temporaire ? nom_image_temporaire : file.name.replaceAll(',', ' ') ;
         //console.log(nom_fichier)
 
 		extension = nom_fichier.split(".").pop().toUpperCase();
@@ -10386,6 +10420,7 @@ async function update_viz_logs(){
 async function un_menu_clic(id_parametre,mode_pref,sans_changement){
 
 	chargement(true)
+	$("#nombre_elements_param")[0].innerText = "0"
 
 	$("#mini_popup").remove()
     mettre_en_forme_onglet_clicked(id_parametre,sans_changement);
@@ -10664,11 +10699,11 @@ function visualiser_avec_demande_signature(nom_fichier,id_fichier){
 	$("#titre_fenetre").append('<span onclick="signer_contrat()" class="sign">Signer contrat</span>') // pour signer
 }
 
-function contrat_datas(keep_temp){
+async function contrat_datas(keep_temp){
 
-	var nb_eleves = compter("Eleves")[0]['result']
-	var nb_admin = compter("Administration")[0]['result']
-	var nb_profs = compter("Profs")[0]['result']
+	var nb_eleves = await compter("Eleves")
+	var nb_admin = await compter("Administration")
+	var nb_profs = await compter("Profs")
 	var nb_total = nb_eleves + nb_admin + nb_profs
 
 	var datas = {
@@ -10955,10 +10990,10 @@ function information_etablissement(id_info, etiquette_info, valeur_info, est_mod
 }
 
 
-function actualiser_details_parametre(id_parametre){
+async function actualiser_details_parametre(id_parametre){
 	
 	$("#menu_details")[0].innerHTML = "";
-
+	
 	//liste ARRAY (1 élement)
 	if (id_parametre === "Maintenance"){
 		mettre_details_maintenance()
@@ -11025,23 +11060,63 @@ function actualiser_details_parametre(id_parametre){
 			</h3>
 			<button onclick="copier_liste('#contenu_code_iframe','contenu_code_iframe')">COPIER LE CODE</button>`)
 		var code_iframe = `
-	<!DOCTYPE html>
-	<html>
-	<head>
-		<link rel="icon" href="https://`+nom_etablissement+`.sekooly.com/favicon.ico">
-		<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
-		<title>Sekooly | `+nom_etablissement.toUpperCase()+`</title>
-	</head>
-	<body style="margin:0px;padding:0px;overflow:hidden;height: 100vh;width: 100vw;">
-		<iframe src="https://`+nom_etablissement+`.sekooly.com/tele-enseignement" frameborder="0" style="overflow:hidden;height:100%;width:100%" height="100%" width="100%"></iframe>
-	</body>
-	</html>
+			<!DOCTYPE html>
+			<html>
+			<head>
+				<link rel="icon" href="https://`+nom_etablissement+`.sekooly.com/favicon.ico">
+				<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+				<title>Sekooly | `+nom_etablissement.toUpperCase()+`</title>
+			</head>
+			<body style="margin:0px;padding:0px;overflow:hidden;height: 100vh;width: 100vw;">
+				<iframe src="https://`+nom_etablissement+`.sekooly.com/tele-enseignement" frameborder="0" style="overflow:hidden;height:100%;width:100%" height="100%" width="100%"></iframe>
+			</body>
+			</html>
 
 		`
 
 
 		$("#contenu_code_iframe").text(code_iframe)
 		$("#contenu_code_iframe").attr("contenu_code_iframe",code_iframe)
+
+
+	}else if(id_parametre === "Réinitialiser la plateforme"){
+		const liste_tables_activites = elements_generiques_en_haut.find(e => Object.keys(e)[0] === "Activités")["Activités"]
+		
+		var inputs_suppr = []
+		liste_tables_activites.map(async function(table,index_table){
+			const table_suppr = await une_table_activite_a_suppr(table, description_activite(table))
+			//console.log({table_suppr})
+
+			inputs_suppr.push(table_suppr)
+
+			if(index_table === liste_tables_activites.length-1){
+				//console.log({inputs_suppr})
+				const etat_initial = `
+						<div id="suppr_activites_liste">
+							<p>En réinitialisant la plateforme à son état d'origine, <rouge><strong>vous allez effacer :</strong></rouge></p>
+							<ul id="liste_tables_suppr" style="text-align: left;">
+							  
+							  ${inputs_suppr.join('')} 
+
+							</ul>
+							<p><input onchange="switch_checkboxes_suppr()" type="checkbox" id="tout_cocher_suppr" name="tout_cocher_suppr"><label for="tout_cocher_suppr" "="">Tout cocher</label></p>
+							
+							<p><vert>La liste des utilisateurs et <strong>toutes les données non cochées</strong> seront <strong>maintenues</strong>.</vert></p>
+								
+							<p>
+							<rouge><strong>CETTE ACTION EST IRREVERSIBLE, merci de bien tenir compte de tous les éléments cités ci-dessus.</strong></rouge>
+							</p>
+							<button class="bouton_sekooly sekooly-mode-background" onclick="download_tables_cochees()">Télécharger d'abord les données cochées</button>
+							<button class="bouton_sekooly" onclick="vider_tables_cochees()"><rouge>Effacer les données cochées</rouge></button>
+						</div>
+				`
+				$("#menu_details").append(etat_initial)
+				return true
+
+			}
+		  	
+		})
+
 
 
 	//LISTE JSON
@@ -11084,6 +11159,105 @@ function actualiser_details_parametre(id_parametre){
 
 
 }
+
+
+
+async function une_table_activite_a_suppr(id_table, desc_table) {
+	try {
+		const nombre_elements = await compter(id_table)
+		return `<li>
+					<input id="supp_${id_table}"
+						name="supp_${id_table}"
+						type="checkbox">
+					<label for="supp_${id_table}">${desc_table} (<strong>${nombre_elements}</strong> élément${nombre_elements > 1 ? "s" : ""}) </label>
+				</li>`
+
+	}catch(err){
+		//console.error(err)
+		return ""
+	}
+	
+	
+}
+
+function download_tables_cochees(){
+	
+	//si Fichiers inclus => exclure les categorie_fichier = "Profil" puis rediriger vers chaque drive des cycles
+	const toutes_les_tables_a_vider = liste_donnees_cochees()
+	if(toutes_les_tables_a_vider.length === 0) return afficher_alerte('Merci de cocher les données à télécharger.')
+
+	toutes_les_tables_a_vider.forEach(async (nom_table,index_table) => {
+
+		if(nom_table === "Fichiers"){
+			//alert('Fichiers compris =>\n• exclure les categorie_fichier = "Profil" avant téléchargement \n• ouvrir les dossiers drive de chaque cycle')
+
+		}
+
+		await telecharger_toutes_les_donnees_supabase(nom_table)
+		if(index_table === toutes_les_tables_a_vider.length -1) chargement(false)
+	})
+
+}
+
+async function telecharger_toutes_les_donnees_supabase(nom_table){
+	
+	const SUPABASE_URL = supabase.supabaseUrl
+	const SUPABASE_APIKEY = supabase.supabaseKey
+	
+	afficher_alerte('Téléchargement en cours : ' + nom_table +'...')
+	const datas_json = await get_datas(nom_table,false,true)
+	afficher_alerte('Téléchargement terminé : ' + nom_table)
+	
+
+	const datas_csv = (datas_json)
+	downloadCSVFile(datas_csv, 'SEKOOLY_' + data_etablissement['nom_etablissement'].toUpperCase() + '_' + nom_table + '_' +maintenant_sans_caracteres_speciaux()); 
+
+}
+
+function liste_donnees_cochees(){
+	return Array.from($('#liste_tables_suppr input:checked')).map(e => e.id.replace('supp_',''))
+}
+
+function switch_checkboxes_suppr(){
+
+	$('#liste_tables_suppr input[type="checkbox"]').attr('checked',$('#tout_cocher_suppr:checked').length > 0)
+	
+}
+
+function vider_tables_cochees(){
+	const toutes_les_tables_a_vider = liste_donnees_cochees()
+	
+	if(toutes_les_tables_a_vider.length === 0) return afficher_alerte('Merci de cocher les données à effacer.')
+
+	const code_a_saisir = makeid(8)
+	const confirmation = prompt("⚠️Êtes-vous sûr de vouloir effacer les données suivantes ?\n"+
+							toutes_les_tables_a_vider+
+							"\n\nSi oui, merci de saisir le code suivant : "+code_a_saisir+
+							"\nATTENTION : Cette action est irréversible.","")
+
+	if(confirmation === code_a_saisir){
+		chargement(true)
+
+
+		toutes_les_tables_a_vider.forEach(async (nom_table,index_table) => {
+			
+
+			if(nom_table === 'Fichiers') return alert('Fichiers compris (todo) :\n• exclure les categorie_fichier = "Profil" avant téléchargement \n• ouvrir les dossiers drive de chaque cycle')
+			
+			const id_table = identifiant_par_table(nom_table)
+			await supabase.from(nom_table).delete().not(id_table, 'eq', '-1')
+
+			if(index_table === toutes_les_tables_a_vider.length -1 ){
+				afficher_alerte(toutes_les_tables_a_vider.length + ' ensemble'+ (toutes_les_tables_a_vider.length > 1 ? "s" : "") +' de données effacées.')
+				actualiser_parametre()				
+			}
+			
+		})
+
+		if(toutes_les_tables_a_vider.length === 0) actualiser_parametre()
+	}
+}
+
 
 async function supprimer_etablissement(){
 	var mon_type = recuperer("mon_type").split("_")[0]
@@ -11315,16 +11489,65 @@ function assigner_label_et_liste_parametres(etiquette_filtre, filtre_liste){
 	var bouton_import = un_bouton_param("importer_param", "importer_parametres", "Importer", "img_import.png")
 	var bouton_init = un_bouton_param("reset_param", "init_donnees", "Initialiser", "img_reset.png")
 	
+	//un_bouton_param(id_bouton_param, fonction_bouton_param, alt_bouton_param, src_image)
+	var bouton_suppr_classes_profs =  JSON.parse(recuperer('mes_donnees'))['Droits_modifs'] === "oui" && $('.un_menu.sekooly-mode-background').val() === 'Profs'
+										? un_bouton_param("suppr_classe_prof", "supprimer_classes_profs_affiches", "Effacer les classes-matières des profs affichés", "reinit_matieres.png")
+										: ""
+	var bouton_tout_voir = un_bouton_param("tout_voir", "afficher_colonnes", "Afficher toutes les colonnes", "img_previz.png") 
 
-	var bouton_tout_voir = un_bouton_param("tout_voir", "afficher_colonnes", "Afficher toutes les colonnes", "img_previz.png")
 
-
-	$("#conteneur_filtre")[0].innerHTML	= $("#conteneur_filtre")[0].innerHTML + '<span id="boutons_params"> ' +bouton_actualiser+bouton_ajouter+bouton_supprimer+bouton_dupliquer+bouton_telecharger+bouton_import+bouton_init+bouton_tout_voir+' </span>'
+	$("#conteneur_filtre")[0].innerHTML	= $("#conteneur_filtre")[0].innerHTML + '<span id="boutons_params"> ' +
+											bouton_actualiser+
+											bouton_ajouter+
+											bouton_supprimer+
+											bouton_dupliquer+
+											bouton_telecharger+
+											bouton_import+
+											bouton_init+
+											bouton_suppr_classes_profs+
+											bouton_tout_voir+' </span>'
 
     //quand on update le filtre -> on met à jour
     $("#filtre_parametre").on('change',function(e){
     	appliquer_filtre_choisi();
     })
+}
+
+async function supprimer_classes_profs_affiches(){
+	const nb_profs = $('tbody tr:visible').length
+	const motif_a_ecrire = 'suppression-classes'
+	var confirm_effacer = prompt("Vous êtes sur le point d'effacer les matières assignées à "+nb_profs+" professeur"+(nb_profs > 1 ? "s" : "")+".\n"+
+								  "Pour confirmer la suppression, merci d'écrire '"+motif_a_ecrire+"', sinon cliquez sur Annuler.","")
+	
+	if(confirm_effacer === motif_a_ecrire){
+		chargement(true)
+		const tous_les_profs_visibles = $('tr td:nth-child(1):visible')
+
+		const match_update_profs = Array.from(tous_les_profs_visibles).map((e,index_prof) => {
+			const id_prof = e.innerText
+			return 'Identifiant.eq.'+id_prof
+
+		}).join(',')
+
+		//console.log('Suppression de la classe en cours...',match_update_profs)
+		
+		const { data, error } = await supabase
+								.from('Profs')
+								.update({ Classe: '' })
+								.or(match_update_profs)
+
+		if(!error){
+			actualiser_parametre()		
+			console.log(data)
+		}else{
+			alert(JSON.stringify(error))
+			chargement(false)
+		}
+		
+
+		
+	}
+
 }
 
 function mettre_barre_recherche(){
@@ -11394,12 +11617,16 @@ function chercher(){
 
 	// Declarer les variables
 	table = element_DOM("table_affichee");
-	tr = table.getElementsByTagName("tr");
+
+	if(table){
+		tr = table.getElementsByTagName("tr");
+	}
+
 	mon_filtre = element_DOM("zone_recherche").value.toUpperCase().trim();
 
 
 
-	if (mon_filtre){
+	if (table && mon_filtre){
 
 
 		// pour chaque ligne de la table
@@ -11459,7 +11686,7 @@ function chercher(){
 
 function un_bouton_param(id_bouton_param, fonction_bouton_param, alt_bouton_param, src_image){
 
-	return '<img id="'+id_bouton_param+'" onclick="'+fonction_bouton_param+'()" alt="'+alt_bouton_param+'" src="'+ prefixe_image + '/'+src_image+'" class="icone_param">'
+	return '<img title="'+alt_bouton_param+'" id="'+id_bouton_param+'" onclick="'+fonction_bouton_param+'()" alt="'+alt_bouton_param+'" src="'+ prefixe_image + '/'+src_image+'" class="icone_param">'
 }
 
 
@@ -12315,11 +12542,13 @@ function telecharger_donnees_parametres(id_parametre){
 }
 
 
-async function telecharger_parametre(id_parametre){
+async function telecharger_parametre(id_parametre, entetes_seulement){
 
 	if(!id_parametre) id_parametre = ($(".un_menu_orange")[0].id || $(".un_menu_orange")[0].value)
 
-	var entetes_seulement = $("#choix_download_param")[0].value === "En-têtes"
+	//alert(id_parametre)
+
+	var entetes_seulement = ( $("#choix_download_param")[0] && $("#choix_download_param")[0].value === "En-têtes" )|| (entetes_seulement ? entetes_seulement : false )
 	var suite_nom = entetes_seulement ? "-modele-" : ""
 	var nom_filtre = $('[id="filtre_parametre"]').val() !== "(Tous)" ? $('[id="filtre_parametre"]').val() : $('[id="zone_recherche"]').val()
 	var suite_extrait = $('tr').length !== $('tr:visible').length && !entetes_seulement ? '-extrait '+nom_filtre+'-' : ''
