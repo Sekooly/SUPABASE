@@ -10420,7 +10420,7 @@ async function update_viz_logs(){
 async function un_menu_clic(id_parametre,mode_pref,sans_changement){
 
 	chargement(true)
-	$("#nombre_elements_param")[0].innerText = "0"
+	$("#nombre_elements_param").text('0')
 
 	$("#mini_popup").remove()
     mettre_en_forme_onglet_clicked(id_parametre,sans_changement);
