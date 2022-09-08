@@ -1073,11 +1073,20 @@ function arrays_to_csv(data){
 }
 
 
-function telecharger_tableau_en_csv(filename,entetes_seulement,ne_pas_telecharger) {
+function telecharger_tableau_en_csv(filename,entetes_seulement,nom_table,ne_pas_telecharger) {
   var data = [];
   var le_selecteur = entetes_seulement ? 'thead > tr:visible:not(.ignore)' : 'tr:visible:not(.ignore)'
   var rows = $(le_selecteur) // document.querySelectorAll("tr:not(.ignore):visible"); //uniquement les lignes non ignorées ET VISIBLES
   //console.log({le_selecteur})
+
+
+  //on retourne uniquement l'entête
+  if($('thead').length === 0 || entetes_seulement){
+    const headers = nom_des_champs(nom_table)
+    downloadCSVFile(headers, filename)
+    return headers
+  }
+
 
   //pour chaque ligne
   for (var i = 0; i < rows.length; i++) {
@@ -1140,10 +1149,14 @@ function garder_les_colonnes_non_automatiques(arr){
 
 
 function csv_en_JSON(contenu){
-  console.log({contenu})
+  //console.log({contenu})
   var toutes_les_lignes = contenu.split('\n')
   var entete = toutes_les_lignes[0].split(separateur)
-  console.log(entete)
+  //console.log(entete)
+
+  //get rid of " in keys
+  entete = entete.map(nom => nom.replaceAll('"',''))
+
 
   var json_final = []
 
@@ -1162,15 +1175,14 @@ function csv_en_JSON(contenu){
       nouvel_objet[entete[numero_colonne]] = toutes_les_lignes[index].split(separateur)[numero_colonne]
     }
 
-    /*
-    console.log(nouvel_objet)
-    console.log(entete[0])
-    */
 
 
     //if(nouvel_objet[entete[0]] > 0) json_final.push(nouvel_objet)
     if(nouvel_objet !== {}) json_final.push(nouvel_objet)
   })
+
+
+  console.log({json_final})
 
   return json_final
 
@@ -2499,7 +2511,7 @@ async function get_datas(name_table,where_condition,csv_mode,SUPABASE_URL, SUPAB
     
     for(var optionalOffset = 0 ; optionalOffset <= number_of_records ; optionalOffset = optionalOffset+BATCH_SIZE ){
       chargement(true)
-      console.log('\n\n\n\n'+name_table,optionalOffset + ' / ' + number_of_records)
+      console.log(name_table,optionalOffset + ' / ' + number_of_records)
       
       //temp is ALWAYS in json
       var temp = await get_datas_chunk(false,SUPABASE_URL, SUPABASE_APIKEY, name_table,where_condition,optionalOffset,BATCH_SIZE)    
@@ -2507,7 +2519,18 @@ async function get_datas(name_table,where_condition,csv_mode,SUPABASE_URL, SUPAB
       if(csv_mode){
 
         //convert temp to arrays
-        temp = json2arrays(temp).map(row => JSON.stringify(row.join(separateur)))
+        temp = json2arrays(temp).map(row => /*JSON.stringify*/(row.map(cell_value => {
+          
+          if(cell_value){
+            return JSON.stringify(cell_value.toString()
+                            //.replaceAll('"','″')
+                            .replace(/\n/g, " ") //no new line
+                            .trim()) 
+          } else{
+            return ""
+          }
+
+        }).join(separateur)))
 
 
       }

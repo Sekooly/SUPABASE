@@ -96,7 +96,8 @@ var parametres_automatiques = ["Classe_bis","Classe_Matiere", "ID_URL","URL","UR
 								"id", "Id_classe_matiere", "id_notif", "Id_source", "id_fichier", "id_dossier", "id_devoir", "id_dossier_sujetdevoir", "id_fichier_sujetdevoir", "Id_topic", "id_com", "ID_FICHIER", "id_msg","id_conv", "id_chapitre",
 								"id_quiz", "id_question", "id_reponse","id_classe_matiere", "resultat_immediat", "nb_tentatives", "questions_aleatoires", "position_question",
 								"1er_Prénom", "LV1","LV2","LV3","Option_1","Option_2","Spécialité","Numeros_telephone_original",
-								"created_at","id_etablissement"
+								"created_at","id_etablissement",
+								"nom_etablissement"
 								
 							]
 
@@ -3569,7 +3570,13 @@ function editer_description_matiere(id_matiere,la_matiere){
 }
 
 function saisie_vide(){
-	return '<br data-cke-filler=\"true\">'
+	return '<p><br data-cke-filler=\"true\"></p>'
+}
+
+function saisie_est_vide(){
+	return $('.ck-editor__main p').length >= 0 &&
+			$('.ck-editor__main p').text().length === 0
+
 }
 
 function pied_modifs(){
@@ -3582,7 +3589,7 @@ function pied_modifs(){
 async function sauvegarder_description(){
 	console.log("Enregistrement de la description...")
 	
-	nouvelle_description = (recuperer_html_saisie_riche().includes(saisie_vide())) ? "Aucune description fournie" : recuperer_html_saisie_riche() 
+	nouvelle_description = (saisie_est_vide()) ? "Aucune description fournie" : recuperer_html_saisie_riche() 
 	nouvelle_description +=  pied_modifs()
 
 
@@ -7182,7 +7189,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 
 
 
-			if(mon_titre!=="" && mon_contenu!=="" &&       !mon_contenu.includes(saisie_vide())           ){
+			if(mon_titre!=="" && mon_contenu!=="" &&  !saisie_est_vide()           ){
 
 				//on n'envoie qu'une fois le message				
 				element_DOM('envoi').disabled=true;
@@ -7554,7 +7561,7 @@ async function afficher_les_devoirs_de_la_date(champ_date_reference, valeur_cham
 			chargement(true);
 			var contenu_poste = recuperer_html_saisie_riche().trim() //element_DOM('mon_com').value.trim();
 
-			contenu_vide = contenu_poste.includes(saisie_vide()) 
+			contenu_vide = saisie_est_vide()
 			//console.log({contenu_poste,contenu_vide})
 			
 
@@ -11199,18 +11206,28 @@ function download_tables_cochees(){
 
 }
 
+function nom_fichier_final(nom_table){
+	return 'SEKOOLY_' + data_etablissement['nom_etablissement'].toUpperCase() + '_' + nom_table + '_' +maintenant_sans_caracteres_speciaux()
+}
+
 async function telecharger_toutes_les_donnees_supabase(nom_table){
 	
 	const SUPABASE_URL = supabase.supabaseUrl
 	const SUPABASE_APIKEY = supabase.supabaseKey
+	const nom_fichier = nom_fichier_final(nom_table)
 	
 	afficher_alerte('Téléchargement en cours : ' + nom_table +'...')
 	const datas_json = await get_datas(nom_table,false,true)
+	console.log({datas_json})
+
+	if(datas_json.length === 0){
+		datas_json = telecharger_tableau_en_csv(nom_fichier,true,nom_table)
+		chargement(false)	
+	} 
 	afficher_alerte('Téléchargement terminé : ' + nom_table)
 	
-
 	const datas_csv = (datas_json)
-	downloadCSVFile(datas_csv, 'SEKOOLY_' + data_etablissement['nom_etablissement'].toUpperCase() + '_' + nom_table + '_' +maintenant_sans_caracteres_speciaux()); 
+	downloadCSVFile(datas_csv, nom_fichier); 
 
 }
 
@@ -12575,8 +12592,9 @@ async function telecharger_parametre(id_parametre, entetes_seulement){
 
 	*/
 
-
-	telecharger_tableau_en_csv(nom_fichier,entetes_seulement)
+	
+	await telecharger_tableau_en_csv(nom_fichier,entetes_seulement,id_parametre)
+	
 
 
 
@@ -12624,8 +12642,6 @@ function importer_parametres(){
 		reader.onload = function () {
 			var contenu = reader.result
 			var json_final = csv_en_JSON(contenu)
-
-  			console.log(json_final)
 
   			//au moins une donnée
   			if(json_final.length === 0){
@@ -13086,7 +13102,8 @@ function ajouter_donnees_saisies(id_parametre,ne_pas_actualiser){
 
 	var mon_JSON = convertir_saisie_en_JSON("donnees_saisies", id_parametre)
 	//console.log(id_parametre)
-	//console.log(mon_JSON)
+	console.log({mon_JSON})
+
 	var nouvel_id = recuperer(id_parametre) ? JSON.parse(recuperer(id_parametre)).length : 1
 	//console.log(nouvel_id)
 
