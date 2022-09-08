@@ -1359,7 +1359,7 @@ function rendre_devoir(){
 
         	//alert(params.file)
             
-            nom_fichier = file.name.replaceAll(',', ' ');
+            nom_fichier = file.name.replaceAll(',', ' ').replaceAll('-', ' ');
 
             coefficient_rendu = Number($("#"+le_devoir_choisi)[0].getAttribute('coefficient_rendu'))
             taille_fichier = file.size;
@@ -6229,7 +6229,7 @@ $(function charger_fichiers(e){
 		var file = image_temporaire ? base64toBlob(image_temporaire,'image/png') : les_fichiers[0] ;
 		//console.log(file)
 
-        nom_fichier = nom_image_temporaire ? nom_image_temporaire : file.name.replaceAll(',', ' ') ;
+        nom_fichier = nom_image_temporaire ? nom_image_temporaire : file.name.replaceAll(',', ' ').replaceAll('-', ' ') ;
         //console.log(nom_fichier)
 
 		extension = nom_fichier.split(".").pop().toUpperCase();
