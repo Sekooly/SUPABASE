@@ -11741,7 +11741,7 @@ function json2Table(json, id_table) {
   let rows = json
     .map((row,index) => {
       if(row!==null){
-	      let tds = cols.map(col => `<td>${row[col]}</td>`).join("");
+	      let tds = cols.map(col => `<td>${row[col] !== null ? row[col] : ""}</td>`).join("");
 	      return `<tr suppression_id="${row[id_table]}" id="${row[id_table]}"  class= "border_bottom une_ligne_de_donnees">${tds}</tr>`;
 	  }
     })
