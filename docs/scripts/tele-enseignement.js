@@ -12808,6 +12808,7 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 				if(liste_champs[i] === "Couleur_matiere"){
 
 					html_du_input = '<select class="donnee" id="'+liste_champs[i]+'" name="'+liste_champs[i]+'" >'
+					liste_couleurs = liste_couleurs.sort()
 
 					for (j = 0; j<liste_couleurs.length ; j ++){
 						selectionner_la_donnee_dupliquee = ""
@@ -12824,6 +12825,7 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 
 					
 					toutes_les_matieres = get_resultat(racine_data + 'Matieres' +'?' + apikey)
+					
 
 					choix_classe_dun_admin = (liste_champs[i] === "Classe" || liste_champs[i] === "classe_bis") && $(".un_menu_orange")[0].innerText === "Administration"
 					choix_classe_dun_prof = (liste_champs[i] === "Classe" || liste_champs[i] === "classe_bis") && $(".un_menu_orange")[0].innerText === "Profs"
@@ -12840,7 +12842,8 @@ function creer_formulaire_ajout_donnee_html(id_parametre, liste_champs, avec_dup
 					if(choix_classe_dun_admin) valeurs_possibles = valeurs_possibles.map(e => '(Tous|' +e+ ')')
 					multiple_choix_classes = choix_classe_dun_prof ? 'multiple' : ""
 
-
+					valeurs_possibles = valeurs_possibles.sort()
+					
 					
 					//il y a des valeurs déja existantes
 					if(valeurs_possibles.length === 0){
