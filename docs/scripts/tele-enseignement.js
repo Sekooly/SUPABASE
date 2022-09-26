@@ -11490,7 +11490,7 @@ function assigner_label_et_liste_parametres(etiquette_filtre, filtre_liste){
 	$("#label_filtre_parametre")[0].innerText = etiquette_filtre;
 	$("#filtre_parametre")[0].innerHTML	= $("#filtre_parametre")[0].innerHTML + '<option value="(Tous)">(Tous)</option>'
 
-
+	filtre_liste = filtre_liste.sort()
 	for (var i = filtre_liste.length - 1; i >= 0; i--) {
 		$("#filtre_parametre")[0].innerHTML	= $("#filtre_parametre")[0].innerHTML + '<option value="'+filtre_liste[i]+'">'+filtre_liste[i]+'</option>'
 

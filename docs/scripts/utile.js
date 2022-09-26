@@ -2567,7 +2567,7 @@ async function get_datas_chunk(csv_mode,SUPABASE_URL, SUPABASE_APIKEY, name_tabl
   url += optionalOffset ? symbole_avant_url_param(url) + 'offset='+optionalOffset : ""
   url += optionalBatchsize ?  symbole_avant_url_param(url) + 'limit=' + optionalBatchsize :
           BATCH_SIZE ?  symbole_avant_url_param(url) + 'limit=' + BATCH_SIZE : ""
-
+  url +=  ordonner(name_table)
 
 
   var headers = {
