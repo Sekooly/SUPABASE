@@ -55,7 +55,7 @@ const description_activite = (nom_table_activite) => {
 		case "Visio":
 			return "L'historique des visioconférences qui ont eu lieu sur Sekooly"
 		case "Fichiers":
-			return "Les fichiers publiés dans toutes les matières"
+			return "Les fichiers publiés dans toutes les matières : les photos de profil et les manuels sont comptablisés ici mais ne seront PAS supprimés"
 		case "Rendus":
 			return "Les devoirs/examens rendus par les élèves dans toutes les matières"
 		case "Notes":
@@ -4348,8 +4348,9 @@ function autoriser_clic_droit_supprimer_et_renommer(e,ceci){
 	//ajouter l'offset
 
 	ajouter_fonction_clic_droit(e,ceci,4+mon_offset,"changer_coef","Coefficient",id_fichier,null,$("#"+id_fichier)[0].getAttribute("coefficient_rendu"));
-	ajouter_fonction_clic_droit(e,ceci,5+mon_offset,"changer_telechargeable","Téléchargeable",id_fichier);
-	ajouter_fonction_clic_droit(e,ceci,6+mon_offset,"supprimer_fichier","Supprimer",id_fichier);
+	ajouter_fonction_clic_droit(e,ceci,5+mon_offset,"republier_fichier","Republier ailleurs",id_fichier);
+	ajouter_fonction_clic_droit(e,ceci,6+mon_offset,"changer_telechargeable","Téléchargeable",id_fichier);
+	ajouter_fonction_clic_droit(e,ceci,7+mon_offset,"supprimer_fichier","Supprimer",id_fichier);
 
 	//au clic de n'importe où : ça enleve le clic droit
 	$(document).click(function() {
@@ -4357,6 +4358,18 @@ function autoriser_clic_droit_supprimer_et_renommer(e,ceci){
 		$('#clic_droit_titres_param').remove();    		
 
 	});
+
+}
+
+function republier_fichier(id_fichier,nom_fichier){
+
+	stockerSession('ressource_ouverte',id_fichier)
+	stockerSession('nom_ressource_ouverte',nom_fichier)
+	stockerSession('categorie_ressource_ouverte',  $("[id="+id_fichier+'].span_un_fichier')[0].parentNode.id.split("_")[1])
+	stockerSession('republication',true)
+	publier_ressource()
+
+
 
 }
 
@@ -5594,6 +5607,12 @@ function avec_bouton_back(oui){
 
 function decharger_dossier_final(){
 	
+
+	effacerSession('ressource_ouverte')
+	effacerSession('nom_ressource_ouverte')
+	effacerSession('categorie_ressource_ouverte')
+
+
 	
 	positionner_bulle_notif();
 	positionner_pannel_notif();
@@ -5922,6 +5941,12 @@ function switch_affichage_youtube(){
 			}else{
 				chargement(true)
 				
+
+				//si jamais mode republication => supprimer les valeurs des sessions utiles
+				effacerSession('ressource_ouverte')
+				effacerSession('nom_ressource_ouverte')
+				effacerSession('categorie_ressource_ouverte')
+				effacerSession('republication')
 
 
 
@@ -11241,7 +11266,7 @@ function switch_checkboxes_suppr(){
 	
 }
 
-function vider_tables_cochees(){
+async function vider_tables_cochees(){
 	const toutes_les_tables_a_vider = liste_donnees_cochees()
 	
 	if(toutes_les_tables_a_vider.length === 0) return afficher_alerte('Merci de cocher les données à effacer.')
@@ -11259,16 +11284,46 @@ function vider_tables_cochees(){
 		toutes_les_tables_a_vider.forEach(async (nom_table,index_table) => {
 			
 
-			if(nom_table === 'Fichiers') return alert('Fichiers compris (todo) :\n• exclure les categorie_fichier = "Profil" avant téléchargement \n• ouvrir les dossiers drive de chaque cycle')
-			
-			const id_table = identifiant_par_table(nom_table)
-			await supabase.from(nom_table).delete().not(id_table, 'eq', '-1')
+			if(nom_table === 'Fichiers'){
+				
 
-			if(index_table === toutes_les_tables_a_vider.length -1 ){
-				afficher_alerte(toutes_les_tables_a_vider.length + ' ensemble'+ (toutes_les_tables_a_vider.length > 1 ? "s" : "") +' de données effacées.')
-				actualiser_parametre()				
+				var liste_fichiers = await supabase.from('Fichiers').select('id_fichier').not('categorie_fichier', 'in', '(Profil,Manuels)')
+				liste_fichiers = liste_fichiers['data'].map(e => e['id_fichier'])
+				console.log({liste_fichiers})
+
+				
+				var lien_script = await chercher_lien_script(10)
+				try {
+					
+					res = await post_resultat_asynchrone(lien_script + '?go_store_massively=true', {
+						id_files: liste_fichiers.join('\n')
+					})	
+					console.log({res})
+
+
+					await supabase.from('Fichiers').delete().not('categorie_fichier', 'in', '(Profil,Manuels)')
+					
+				}catch(err){
+					console.log(err)
+				}
+				
+
+
+			}else{					
+				
+				const id_table = identifiant_par_table(nom_table)
+				await supabase.from(nom_table).delete().not(id_table, 'eq', '-1')
+
 			}
-			
+		
+			if(index_table === toutes_les_tables_a_vider.length -1 ){
+				setTimeout(function(){
+
+					afficher_alerte(toutes_les_tables_a_vider.length + ' ensemble'+ (toutes_les_tables_a_vider.length > 1 ? "s" : "") +' de données effacées.')
+					actualiser_parametre()		
+
+				}, 2500)		
+			}
 		})
 
 		if(toutes_les_tables_a_vider.length === 0) actualiser_parametre()
@@ -18307,7 +18362,7 @@ async function recuperer_mes_fichiers(forcing){
 
 		//alert(les_id_dossier_classe)
 
-		nom_table = '"Fichiers_tout"'
+		nom_table = 'Fichiers_tout'
 		url = nom_table
 
 		//prof ou eleve (PAS pour admin car trop de matieres)
@@ -23105,6 +23160,7 @@ async function voir_biblio(forcing){
 	$('#choix_popup').hide()
 	$('#mini_popup').remove()
 	effacerSession('ressource_ouverte')
+	effacerSession('nom_ressource_ouverte')
 
 
 	var urlScript = await chercher_lien_script(9)
@@ -23376,7 +23432,7 @@ function choix_classe_matiere_ressource(){
 	
 
 	creer_mini_popup("<h2>Choisissez la classe matière où vous souhaitez publier</h2>",elements_html, "Publier la ressource","preparer_publication_ressource()")
-	
+
 }
 
 function preparer_publication_ressource(){
@@ -23390,22 +23446,37 @@ function preparer_publication_ressource(){
 	//ouvrir le dossier de la matiere
 	chargement_a_larrivee()
 
-	//garder la fenetre ouverte
-	afficher_fenetre(true)
+
+	//garder la fenetre ouverte si depuis la bibliotheque
+	if(!recuperer('republication')){
+		afficher_fenetre(true)	
+
+	//si republication d'un fichier => supprimer le mini pop up + mettre la meme categorie de fichier
+}else{
+		$('#mini_popup').remove()
+		$('#categorie_choisie').val(recuperer('categorie_ressource_ouverte'))
+	}
 
 
 
 	//forcément mode youtube => ne pas le montrer
-	$('#est_video_youtube').click()
-	$('#choix_youtube').hide()
+	//$('#est_video_youtube').prop('checked', true);
+	//$('#est_video_youtube').click()
+	switch_affichage_youtube()
+	$('#label_lien_a_mettre_en_ligne').text('Republication')
+
+
 
 	//titre par défaut ce qui est affiché
-	$('#nom_youtube').val($('#titre_fenetre').text())
+	const nom_fichier = $('#titre_fenetre').text() || recuperer('nom_ressource_ouverte')
+	$('#nom_youtube').val(nom_fichier)
+	console.log({nom_fichier})
 
 	//lien  => celui sur drive directement
 	const ID_FICHIER = recuperer('ressource_ouverte')
 	const lien_fichier_drive = "https://drive.google.com/file/d/"+ID_FICHIER+"/view"
 	$('#lien_youtube').val(lien_fichier_drive)
+	console.log({nom_fichier})
 
 	//masquer le lien 
 	$('#block_yt_link').hide()
@@ -23416,17 +23487,18 @@ function preparer_publication_ressource(){
 
 	
 	//mettre le popup créé en arrière
-	console.log('z index 1/2...')
-	$('#mini_popup')[0].style.zIndex = 3
-	console.log('z index 2/2...')
-	$('#choix_popup')[0].style.zIndex = 4
-	console.log('z index done')
+	if($('#mini_popup')[0]){
 
+		console.log('z index 1/2...')
+		$('#mini_popup')[0].style.zIndex = 3
+		console.log('z index 2/2...')
+		$('#choix_popup')[0].style.zIndex = 4
+		console.log('z index done')
+	}
 
 	//visible
 	$("#choix_popup")[0].style.visibility = 'visible'
 	$('#choix_popup').show()
-
 
 }
 
