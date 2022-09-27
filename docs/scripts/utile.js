@@ -2597,3 +2597,6 @@ async function get_datas_chunk(csv_mode,SUPABASE_URL, SUPABASE_APIKEY, name_tabl
 
   
 }
+
+const capitalizeFirstLetter = ([ first, ...rest ], locale = navigator.language) =>
+  first === undefined ? '' : first.toLocaleUpperCase(locale) + rest.join('')

@@ -5913,7 +5913,11 @@ function switch_affichage_youtube(){
 	element_DOM('lien_youtube').value = ""
 	afficher_choix_youtube(mode_youtube);
 	afficher_choix_fichier(!mode_youtube);
-	afficher_checkbox('choix_extrait_manuel',!mode_youtube)
+
+	const affichage_choix_extrait_manuel = !mode_youtube && $('#drive_manuels').children().length > 0
+	afficher_checkbox('choix_extrait_manuel', affichage_choix_extrait_manuel)
+	
+
 	afficher_checkbox_fichier_telechargeable(!mode_youtube);
 	$("#est_telechargeable")[0].checked = !mode_youtube;
 
@@ -23412,8 +23416,6 @@ function publier_ressource(){
 	
 	choix_classe_matiere_ressource()
 
-
-
 }
 
 function choix_classe_matiere_ressource(){
@@ -23432,10 +23434,15 @@ function choix_classe_matiere_ressource(){
 	
 
 	creer_mini_popup("<h2>Choisissez la classe matière où vous souhaitez publier</h2>",elements_html, "Publier la ressource","preparer_publication_ressource()")
-
+	if(recuperer('dossier_chargé')) $('#classe_matiere_ressource').val(recuperer('dossier_chargé'))
 }
 
 function preparer_publication_ressource(){
+
+	chargement(true)
+
+
+
 	const ID_URL = $('#classe_matiere_ressource').val()
 	const nom_classe_matiere = $('#classe_matiere_ressource option:selected').text()
 	//alert('FONCTIONNALITE EN COURS DE DEVELOPPEMENT.\nCe bouton permettra de publier la ressource dans ' + nom_classe_matiere )
@@ -23452,9 +23459,9 @@ function preparer_publication_ressource(){
 		afficher_fenetre(true)	
 
 	//si republication d'un fichier => supprimer le mini pop up + mettre la meme categorie de fichier
-}else{
+	}else{
 		$('#mini_popup').remove()
-		$('#categorie_choisie').val(recuperer('categorie_ressource_ouverte'))
+		$('#categorie_choisie').val(capitalizeFirstLetter(recuperer('categorie_ressource_ouverte')))
 	}
 
 
@@ -23462,13 +23469,15 @@ function preparer_publication_ressource(){
 	//forcément mode youtube => ne pas le montrer
 	//$('#est_video_youtube').prop('checked', true);
 	//$('#est_video_youtube').click()
+	$('#est_video_youtube').prop('checked',true)
+	$('#est_video_youtube').attr('disabled',true)
 	switch_affichage_youtube()
 	$('#label_lien_a_mettre_en_ligne').text('Republication')
 
 
 
 	//titre par défaut ce qui est affiché
-	const nom_fichier = $('#titre_fenetre').text() || recuperer('nom_ressource_ouverte')
+	const nom_fichier = recuperer('nom_ressource_ouverte') || $('#titre_fenetre').text()
 	$('#nom_youtube').val(nom_fichier)
 	console.log({nom_fichier})
 
@@ -23478,7 +23487,8 @@ function preparer_publication_ressource(){
 	$('#lien_youtube').val(lien_fichier_drive)
 	console.log({nom_fichier})
 
-	//masquer le lien 
+	//afficher le bloc yt mais masquer le lien 
+	$('#youtube').show()
 	$('#block_yt_link').hide()
 
 	//masquer le bouton
@@ -23496,9 +23506,41 @@ function preparer_publication_ressource(){
 		console.log('z index done')
 	}
 
+	//masquer le fichier 
+	$('#file').hide()
+
+
+
 	//visible
 	$("#choix_popup")[0].style.visibility = 'visible'
 	$('#choix_popup').show()
+
+
+
+
+	chargement(false)
+
+
+}
+
+function affichage_mini_popup_ajout_fichier_par_defaut(){
+	//toujours afficher : coche video youtube DECOCHE et ACTIF
+	$('#choix_youtube').prop('checked',false)
+	$('#choix_youtube').show()
+	$('#est_video_youtube').attr('disabled',false)
+
+	//bloc spécial youtube => caché
+	$('#youtube').hide()
+
+	//afficher extrait manuel si pas de manuels dans la classe
+	if($('#drive_manuels').children().length > 0){
+		$('choix_extrait_manuel').show() 
+	} else{
+		$('choix_extrait_manuel').hide() 
+	}
+
+	//toujours afficher choix de fichier 
+	$('#file').show()
 
 }
 
