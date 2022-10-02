@@ -5310,7 +5310,8 @@ function quitter_previsualisation_bis(){
 
 function quitter_previsualisation(){
 
-
+	$('#ccbacFrame').remove()
+	
 	if(element_DOM("previsualisation")) element_DOM("previsualisation").src="";
 	if(element_DOM("viz_frame")) element_DOM("viz_frame").src="";
 	if(document.querySelector('audio.previz')) document.querySelector('audio.previz').src = ""
