@@ -9559,7 +9559,10 @@ function afficher_parametres(oui){
 		$("#recup_params").remove()
 		$("#recup_analyses").remove()
 		$("#recup_pref").remove()
-		if(!recuperer("API_BIBLIOTHEQUE")) $("#recup_biblio").remove()
+		if(!recuperer("API_BIBLIOTHEQUE")){
+			$("#recup_biblio, #recup_ccbac").remove()
+
+		} 
 	}else{
 		element_DOM("recup_params").style.display = "block"
 		element_DOM("recup_analyses").style.display = "block"
