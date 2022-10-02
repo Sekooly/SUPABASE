@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<noscript>
+		<meta http-equiv="refresh" content="0; url=https://sekooly.com/no-script">
+	</noscript>
+
+
+	<title>Connexion | Sekooly</title>
+	<link rel="icon" href="favicon.ico">
+	<link rel="shortcut icon" href="favicon.ico">
+	<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Connectez-vous grâce à votre Identifiant et Code d'accès pour accéder aux ressources Sekooly." />
+
+
+	<script type="text/javascript" src="scripts/aes.js"></script>
+	<script type="text/javascript" src="scripts/utile.min.js"></script>
+	<script src="scripts/donnees_client.js"></script>
+
+
+
+	<script src="scripts/jquery.min.js"></script>
+	<script src="scripts/moment.js"></script>
+	<script type="text/javascript" src="scripts/hash.js"></script>
+
+
+
+</head> 
+
+<body>
+
+	<link id="style-sekooly" rel="stylesheet" href="https://sekooly.com/assets/style/sekooly.css" ></link>
+	<link id="style-sekooly" rel="stylesheet" href="https://sekooly.com/assets/style/sekooly-dark.css" ></link>
+
+	<style>
+
+		.dark-mode {
+			background-color: rgb(56, 66, 77);
+			color: white;
+		}
+
+		.dark-mode #mode{
+			filter: invert(1);
+		}
+
+		#mode{
+			width: 25px;
+			height: 25px;
+		}
+		
+		a{
+			text-decoration: none;
+		}
+
+		.logo_sekooly {
+			width: 30%;
+		}
+
+		.logo_portrait {
+			width: 15%;
+		}
+
+		/*on portrait*/
+		@media (orientation: portrait) {
+
+			.logo_sekooly {
+				width: 45%;
+			}
+
+		}
+
+		.mon_formulaire{
+			text-align: center;
+			margin-top: 5%;
+			font-family: Arial, sans-serif;
+		}
+
+		.mon_formulaire > div > label {
+			font-weight: bold;
+
+
+		}
+
+
+		.mon_formulaire > div > input{
+			width: 300px;
+			height: 20px;
+			
+		}
+
+		.mon_formulaire > div {
+
+			margin-top: 20px;
+
+		}
+
+		.bouton_connexion {
+			text-align: center;
+			margin-top: 20px;
+			width: 100px;
+			height: 25px;
+		}
+
+		.bas_de_page{
+			position: fixed;
+			bottom: 0px;
+			width: -moz-available;
+			text-align: center;
+			color: #bcbcbc;
+			font-size: 12px;
+		}
+
+		.lien_mail {
+			color: #bcbcbc;
+			font-weight: bold;
+		}
+
+	</style>
+
+	<div onclick="changer_mode()" style="text-align: end;"><img alt="MODE-NUIT" id="mode" src="https://sekooly.com/assets/images/img_day.png"></div>
+
+	<iframe class="mon_log" src="" id="mon_log" style='display: none;'></iframe> 
+	<div style="text-align: center;">
+		<a href="https://sekooly.com">
+			<img class="logo_sekooly" alt="SEKOOLY - Connexion" src="https://sekooly.com/assets/images/default-logo.svg">
+		</a><a id="site_etablissement" href="">
+			<img id="logo_etablissement" class="logo_sekooly" alt="Site web établissement" src="">
+		</a>
+	</div>
+
+
+	<div class="mon_formulaire">
+		<div>
+			<label for="Identifiant">Identifiant:</label><br>
+			<input type="text" id="Identifiant" name="identifiant" autocomplete="off"  autocapitalize="none" placeholder="Identifiant"><br>
+		</div>
+		
+		<div>
+			<label for="Code">Code d'accès:</label><br>
+			<input type="password" id="Code" name="code" autocomplete="off"  autocapitalize="none" placeholder="Code d'accès"> <br>
+	  	</div>
+
+		<input id="connect" class="btn-setup sekooly-mode-background" type="submit" value="Se connecter">
+		<font color="red"> <p id="remarque">  </p> </font>
+
+	</div>
+
+  	
+
+	<div style="display:block;text-align:center;margin-right:auto;margin-left:auto">
+		<img id="img_chargement" alt="Chargement..." src="images/loading.webp" border="0" width="30">
+	</div>
+
+	<div id="bas_de_page" class="bas_de_page">
+		<span> Pour tout problème de contenu, contactez l'Administration en envoyant un mail à <a class="lien_mail" id="contact_etablissement" href=""></a> en précisant votre nom, prénom, classe(s).</span>
+		<br>
+		<span> Pour tout problème d'ordre <strong>technique</strong>, contactez SEKOOLY en envoyant un mail à <a class="lien_mail" href="mailto:contact@sekooly.com">contact@sekooly.com</a> en précisant votre établissement.</span>
+	</div>
+
+
+	<!--overwrites some local rules-->
+	<style type="text/css" id="custom-css"></style>
+
+	<script type="text/javascript" src="scripts/index.js"></script>
+	<script type="text/javascript" src="scripts/index-logo.js"></script>
+
+
+	</script>
+	
+
+
+</body>
+
+
+</html>
