@@ -2544,6 +2544,7 @@ async function get_datas(name_table,where_condition,csv_mode,SUPABASE_URL, SUPAB
 
     if(csv_mode) finalDatas = finalDatas.join('\n')
 
+    chargement(false)
     return finalDatas
 
   }else {

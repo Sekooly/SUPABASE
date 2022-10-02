@@ -9561,8 +9561,12 @@ function afficher_parametres(oui){
 		$("#recup_analyses").remove()
 		$("#recup_pref").remove()
 		if(!recuperer("API_BIBLIOTHEQUE")){
-			$("#recup_biblio, #recup_ccbac").remove()
+			$("#recup_biblio").remove()
 
+			const classe_eleve = JSON.parse(recuperer('mes_donnees'))['Classe']
+			if(!data_etablissement['classes_ccbac'].includes(classe_eleve)){
+				$('#recup_ccbac').remove()
+			}
 		} 
 	}else{
 		element_DOM("recup_params").style.display = "block"
@@ -23126,8 +23130,10 @@ async function upload_une_image(id_img,nom_champ_image_dans_data_etablissement,n
 function voir_ccbac(){
 	chargement(true)
 
-	vider_fenetre('Sujets CCBAC <rouge class="mini-image" id="helper-ccbac">(?)</rouge>')
+	const param_ccbac = recuperer('mon_type').includes('Admin') ? '<span id="param_ccbac" title="Paramétrer" class="mini-image">⚙️</span>' : ""
+	vider_fenetre('Sujets CCBAC <rouge class="mini-image" id="helper-ccbac">(?)</rouge>'+param_ccbac)
 	au_clic("#helper-ccbac","afficher_aide_ccbac()")
+	au_clic("#param_ccbac","parametrer_ccbac()")
 	
 	$('#fenetre').append(`
 		<div class="previz"> 		
@@ -23136,6 +23142,29 @@ function voir_ccbac(){
 	`)
 	afficher_fenetre(true)
 
+}
+
+async function parametrer_ccbac(){
+
+	const toutes_les_classes = await get_datas("Classes","commun_au_cycle=eq.non")
+	const html_liste = '<div id="ccbac_list">' + toutes_les_classes.map(e => e['Classe']).map(c => {
+		const checked = data_etablissement['classes_ccbac'].includes(c) ? '  checked  ' : ''
+		return '<label for="ccbac_'+c+'"><input type="checkbox" id="ccbac_'+c+'" name="ccbac_'+c+'" value="'+c+'" '+checked+'>'+c+'</label><br>'
+	}).join('') + '</div>'
+
+	creer_mini_popup("Paramètres d'accès aux sujets CCBAC",html_liste,"Donner l'accès aux élèves des classes cochées","assigner_classes_sujets_ccbac()")
+}
+
+async function assigner_classes_sujets_ccbac(){
+	
+	afficher_alerte('Accès aux sujets CCBAC mis à jour avec succès.')
+
+	const classes_ccbac = Array.from($('#ccbac_list input:checked')).map(e => e.value).join(';')
+	data_etablissement['classes_ccbac'] = classes_ccbac
+
+	await actualiser_info_etablissement()
+
+	$('#mini_popup').remove()
 }
 
 function newTwitterDiv(){
