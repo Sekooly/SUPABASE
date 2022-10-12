@@ -3254,7 +3254,7 @@ function valeursUniquesDeCetteKey(array, key){
 	return unique;
 	*/
 
-	if(array !== "null" && array !== null){
+	if(array && array !== "null" && array !== null){
 		const key_str = [key]
 		var flags = [], output = [], l = array.length, i;
 		for( i=0; i<l; i++) {
@@ -15938,7 +15938,7 @@ async function trouver_mes_eleves(){
 			var nb_identifiants_classe = valeursUniquesDeCetteKey(eleves_inscrits.body,'Identifiant').length
 			
 			//si ça renvoie + de 1000 -> limiter à la matiere
-			if(demande.body.length >= 1000){
+			if(demande.data.length >= 1000){
 				demande = await supabase.from('bulletins').select('*').like('Classe_Matiere', '%'+Classe_Matiere+'%')
 				console.log("2",{demande})
 
@@ -15978,7 +15978,7 @@ async function trouver_mes_eleves(){
 
 
 			//si la matière ne renvoie rien -> renvoyer tous les inscrits à la matière
-			}else if(demande.body.length === 0){			
+			}else if(demande.data.length === 0){			
 
 				demande = await supabase.from('Eleves').select('Identifiant,Nom,"Prénom(s)",liste_options').like('liste_options', '%'+Classe_Matiere+'%').order('Identifiant')
 				console.log("3",{demande})
@@ -15987,7 +15987,7 @@ async function trouver_mes_eleves(){
 			
 
 			//console.log({demande})
-			mes_eleves_initiaux = demande.body
+			mes_eleves_initiaux = demande.data
 			mes_eleves_initiaux = mes_eleves_initiaux.sort((a,b) =>  a['Identifiant']-b['Identifiant'] )
 
 
