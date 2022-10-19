@@ -15855,13 +15855,23 @@ async function trouver_mes_eleves(){
 		//dans le cas où on veut tous les élèves de la classe, avec leur éventuelle note
 		if(nom_liste_et_coefs === "null" || nom_liste_et_coefs === "" || nom_liste_et_coefs === null ){
 
+			/*
+			console.log('\n')
+			console.log('\n')
+			*/
 
 			//récupérer tous les élèves de la classe choisie
 			var demande_classe = await supabase.from('Eleves').select('*').eq('Classe',classe).order('Identifiant', { ascending: true })
-			var nb_identifiants_classe = valeursUniquesDeCetteKey(demande_classe.body,'Identifiant').length
-			console.log({demande_classe: demande_classe.body})
+			console.log({demande_classe})
+			
+			var nb_identifiants_classe = valeursUniquesDeCetteKey(demande_classe.data,'Identifiant').length
+
+			/*
+			console.log({demande_classe: demande_classe.data})
 			console.log({nb_identifiants_classe})
+			
 			console.log('\n')
+			*/
 
 			//récupérer toutes les notes (classe|matiere) pour la période choisie 
 			//avec saison note précise si saison_note<>Toutes
@@ -15874,8 +15884,8 @@ async function trouver_mes_eleves(){
 				//console.log("TOUTES")
 				var demande = await supabase.from('bulletins').select('*').eq('Classe_Matiere',Classe_Matiere).eq('periode_bulletin',periode_bulletin).order('Identifiant', { ascending: true })
 			}
-			var nb_identifiants_notes = valeursUniquesDeCetteKey(demande.body,'Identifiant').length
-			console.log({demande: demande.body})
+			var nb_identifiants_notes = valeursUniquesDeCetteKey(demande.data,'Identifiant').length
+			console.log({demande: demande.data})
 			console.log({nb_identifiants_notes})
 
 			//il manque des notes de certains éleves
@@ -15884,10 +15894,10 @@ async function trouver_mes_eleves(){
 				console.log("il manque des eleves")
 
 				//pour chaque élève de la classe
-				demande_classe.body.forEach(function(un_eleve){
+				demande_classe.data.forEach(function(un_eleve){
 					//s'il a des notes -> rien
 					//si l'identifiant un_eleve['Identifiant'] n'est pas listé dans demande -> rajouter dans demande
-					identifiant_non_liste = demande.body.filter(e => e['Identifiant'] === un_eleve['Identifiant']).length === 0
+					identifiant_non_liste = demande.data.filter(e => e['Identifiant'] === un_eleve['Identifiant']).length === 0
 
 					if(identifiant_non_liste){
 
@@ -15906,7 +15916,7 @@ async function trouver_mes_eleves(){
 						  "coef": 0
 						}
 
-						demande.body.push(nouvelle_note)
+						demande.data.push(nouvelle_note)
 					}
 
 
@@ -15915,27 +15925,29 @@ async function trouver_mes_eleves(){
 
 			//trop de notes : il y a une (ou+) personne(s) en trop
 			}else if(nb_identifiants_notes > nb_identifiants_classe){
-				les_eleves = valeursUniquesDeCetteKey(demande_classe.body,'Identifiant')
-				les_eleves_notes = valeursUniquesDeCetteKey(demande.body,'Identifiant')
+				les_eleves = valeursUniquesDeCetteKey(demande_classe.data,'Identifiant')
+				les_eleves_notes = valeursUniquesDeCetteKey(demande.data,'Identifiant')
 
 				console.log({les_eleves})
 				console.log({les_eleves_notes})
 			}
 
-			mes_eleves_initiaux = demande.body
+			mes_eleves_initiaux = demande.data
 
 			chargement(false)
+
+
 			return mes_eleves_initiaux
 
 		}else{
 
 			//si la matiere possede un coef spécifiable, on veut uniquement les eleves qui ont cette classe matiere dans leur liste_options
 			var demande = await supabase.from('bulletins').select('*').like('liste_options', '%'+Classe_Matiere+'%').like('Classe_Matiere', '%'+Classe_Matiere+'%')
-			var nb_identifiants_notes = valeursUniquesDeCetteKey(demande.body,'Identifiant').length
+			var nb_identifiants_notes = valeursUniquesDeCetteKey(demande.data,'Identifiant').length
 			console.log("1",{demande})
 
-			var eleves_inscrits = await supabase.from('Eleves').select('*').like('liste_options', '%'+Classe_Matiere+'%')
-			var nb_identifiants_classe = valeursUniquesDeCetteKey(eleves_inscrits.body,'Identifiant').length
+			var eleves_inscrits = await supabase.from('Eleves').select('*').like('liste_options', '%'+Classe_Matiere+'%').order('Identifiant', { ascending: true })
+			var nb_identifiants_classe = valeursUniquesDeCetteKey(eleves_inscrits.data,'Identifiant').length
 			
 			//si ça renvoie + de 1000 -> limiter à la matiere
 			if(demande.data.length >= 1000){
@@ -15949,10 +15961,10 @@ async function trouver_mes_eleves(){
 			}else if(nb_identifiants_classe > nb_identifiants_notes){			
 				console.log("2 BIS",{eleves_inscrits})
 
-				eleves_inscrits.body.forEach( function(un_eleve, index_note) {
+				eleves_inscrits.data.forEach( function(un_eleve, index_note) {
 
 					//si l'identifiant un_eleve['Identifiant'] n'est pas listé dans demande -> rajouter dans demande
-					identifiant_non_liste = demande.body.filter(e => e['Identifiant'] === un_eleve['Identifiant']).length === 0
+					identifiant_non_liste = demande.data.filter(e => e['Identifiant'] === un_eleve['Identifiant']).length === 0
 
 					if(identifiant_non_liste){
 
@@ -15971,7 +15983,7 @@ async function trouver_mes_eleves(){
 						  "coef": 0
 						}
 
-						demande.body.push(nouvelle_note)
+						demande.data.push(nouvelle_note)
 					}
 				})
 
@@ -16205,7 +16217,7 @@ async function actualiser_liste_eleves_bulletins(changement_enseignant){
 		console.log({mes_eleves})
 
 
-		if(mes_eleves.length === 0){
+		if(!mes_eleves || mes_eleves.length === 0){
 			var liste_eleves_bulletins = `<i class="liste_eleves_bulletins contenu_alerte_vide">Aucun élève inscrit à ce cours.</i>`
 
 		}else{	
