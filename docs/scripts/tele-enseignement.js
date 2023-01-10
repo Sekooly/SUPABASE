@@ -15164,7 +15164,7 @@ async function creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_cl
 				premier_prof = premier_prof[0]
 				premier_prof = premier_prof['Nom'] + ' ' + premier_prof['Prénom(s)'] + " " + (premier_prof['2è_Prénom'] || "") + " " + (premier_prof['3è_Prénom'] || "")
 			}else{
-				premier_prof = '(Professeur introuvable)'
+				premier_prof = '-'
 			}
 
 			le_coef = $('tr[id="'+id_eleve+'"]')[0].children[mon_index].getAttribute("coef")
