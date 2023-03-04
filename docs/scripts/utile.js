@@ -277,7 +277,21 @@ async function number_of_rows(tab,field_count,mode_initial){
 
 }
 
+async function remote_function_in_postgres(mode_initial, remote_function_name, json_datas){
 
+  if(mode_initial){
+    var url = racine_initiale + 'rpc/'+remote_function_name+'?' + api_initial
+  }else{
+    var url = racine_data + 'rpc/'+remote_function_name+'?' + apikey
+  }
+  console.log({json_datas})
+  return await post_resultat_synchrone(url, JSON.stringify(json_datas))
+
+}
+
+function serialize(json_datas){
+  return Object.keys(json_datas).map(key => "&" + key + '=' + json_datas[key]).join('')
+}
 
 function reinitialiser_unseul_mdp_datenotif(id_parametre, identifiant_a_init){
   id_parametre = id_parametre === "Profs" ? "prof" : id_parametre.substring(0,5).toLowerCase()
@@ -809,7 +823,7 @@ function get_resultat_brut(url){
 }
 
 
-function rajouter_apijey_ajax(url,objet_envoi){
+function rajouter_apikey_ajax(url,objet_envoi){
 
   if (url.includes(apikey)){
     objet_envoi.headers = {'apikey': apikey.replaceAll("apikey=","")}
@@ -830,7 +844,7 @@ function get_resultat_asynchrone(url){
     //headers: { 'Prefer': 'count=exact' }
   }
 
-  objet_envoi = rajouter_apijey_ajax(url,objet_envoi)
+  objet_envoi = rajouter_apikey_ajax(url,objet_envoi)
 
     
   return $.ajax(objet_envoi).done(function(data) {
@@ -854,7 +868,7 @@ function patch_resultat_asynchrone(url,data_json){
     data: data_json
   }
 
-  objet_envoi = rajouter_apijey_ajax(url,objet_envoi)
+  objet_envoi = rajouter_apikey_ajax(url,objet_envoi)
   //console.log({objet_envoi})
 
   return $.ajax(objet_envoi).done(function(data) {
@@ -871,7 +885,7 @@ function post_resultat_asynchrone(url,data_json){
     data: data_json
   }
 
-  objet_envoi = rajouter_apijey_ajax(url,objet_envoi)
+  objet_envoi = rajouter_apikey_ajax(url,objet_envoi)
 
   return $.ajax(objet_envoi).done(function(data) {
     //console.log(data)
@@ -886,7 +900,7 @@ function delete_resultat_asynchrone(url){
     url: url,
   }
 
-  objet_envoi = rajouter_apijey_ajax(url,objet_envoi)
+  objet_envoi = rajouter_apikey_ajax(url,objet_envoi)
   console.log({objet_envoi})
 
 

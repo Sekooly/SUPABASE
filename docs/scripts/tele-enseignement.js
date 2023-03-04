@@ -12055,6 +12055,7 @@ async function mettre_a_jour_table(nom_table,champ_reference,valeur_champ_refere
 
 
 var current_event={};
+
 function formulaire_id_liste_options(e, nom_matiere){
 	current_event = e
 	//console.log({e})
@@ -12070,12 +12071,14 @@ function formulaire_id_liste_options(e, nom_matiere){
 	//console.log({liste_coef})
 
 	var html_final =  `<form><div class="donnees_saisies"><div class="une_donnee_saisie" style="margin-bottom: 20px;"><label>Nom de liste (Exemples: science, arts, langue, spécialité, ...)</label><input class="donnee" value="`+id_liste+`" id="id_liste" name="id_liste"></div><div class="une_donnee_saisie" style="margin-bottom: 20px;"<label>Coefficients possibles séparés par une virgule (Exemple: 5,16)</label><input class="donnee" value="`+liste_coef+`" id="liste_coef" name="liste_coef"></div><rouge id="coef_nok" style="display: none;">Merci de saisir un nom de liste et des coefficients corrects.</rouge></div></form>`
-	creer_mini_popup("<rouge>En remplissant ce champ, <b>"+nom_matiere + "</b> devient une matière OPTIONNELLE pour les élèves.</rouge>", html_final,"Rattacher à la liste","assigner_liste_et_coef()")
+	creer_mini_popup("<rouge>En remplissant ce champ, <b id='nom_matiere'>"+nom_matiere + "</b> devient une matière OPTIONNELLE pour les élèves.</rouge>", html_final,"Rattacher à la liste","assigner_liste_et_coef('"+liste_coef+"')")
 }
 
 
-function assigner_liste_et_coef(){
+async function assigner_liste_et_coef(liste_anciens_coefs){
 
+	const nom_matiere = $('b#nom_matiere').text()
+	
 	var id_liste = $("#id_liste")[0].value
 	var liste_coef = $("#liste_coef")[0].value.replaceAll(" ","")
 
@@ -12091,6 +12094,14 @@ function assigner_liste_et_coef(){
 		if (id_liste.length + liste_coef.length > 0){
 			resultat = '(' + id_liste + "|" + liste_coef + ')'
 		
+			//todo dans la base de données => fonction maj_coef_liste_options(ancienne_option, nouvelle_option)
+			const anciennes_options = liste_anciens_coefs.split(',').map(coef => nom_matiere + ' coef ' + coef)
+			const nouvelles_options = liste_coef.split(',').map(coef => nom_matiere + ' coef ' + coef)
+			
+			//pour actualiser la liste des élèves
+			const res = await maj_coef_liste_options(nom_matiere,anciennes_options,nouvelles_options)
+			console.log({res})
+
 		//vider
 		}else{
 			alert("Matiere devenue non optionnelle.")
@@ -12101,6 +12112,103 @@ function assigner_liste_et_coef(){
 
 		suite_actualiser_double_clic(current_event, current_event.target.value, resultat, true)
 	}
+}
+
+/*
+recuperer_parametres()
+setTimeout(function(){
+	choisir_ce_parametre('Matieres')
+	switch_mode()
+	setTimeout(function(){
+		$('#filtre_parametre').val('TGA').change()
+		$("tr[id='(TGA|Épreuve Abandonnée en Première Histoire Géographie Géopolitique Sciences Politiques)']").click()
+
+		setTimeout(function(){
+			$("tr[id='(TGA|Épreuve Abandonnée en Première Histoire Géographie Géopolitique Sciences Politiques)']").children('td:contains("EA|6.5")').dblclick()
+		}, 500)
+
+	}, 1000)
+	
+
+}, 2000)
+*/
+
+async function maj_coef_liste_options(nom_matiere,anciennes_options,nouvelles_options){
+	//alert('anciennes_options: ' + anciennes_options.join(';') + '\n\n' + 'nouvelles_options: ' + nouvelles_options.join(';') )
+
+	//si 1 coef dans la nouvelle option => assigner directement à %matiere coef% la nouvelle option
+	if(nouvelles_options.length === 1){
+		const nouvelle_option = nouvelles_options[0]
+
+		//pour chaque ancienne option => changer le coef au nouveau
+		anciennes_options.forEach(async function(ancienne_option){
+			console.log({ancienne_option})
+		
+			//récupérer tous les élèves concernés
+			const { data, error } = await supabase
+									  .from('Eleves')
+									  .select('Identifiant, liste_options')
+									  .like('liste_options', '%'+ancienne_option+'%')
+			
+			//pour chaque eleve => remplacer ancienne_option par nouvelle_option
+			eleves = data.map(function(eleve) {
+				return {
+					Identifiant: eleve.Identifiant,
+					liste_options: eleve.liste_options.replace(ancienne_option,nouvelle_option)
+				}
+			})
+
+			console.log({eleves})
+			maj_coef_eleves(eleves,nom_matiere)
+
+		})
+
+
+	//sinon (plusieurs coef possibles) => proposer de modifier manuellement 1 par 1 (après 2 secondes)
+	}else{
+		setTimeout(function(){
+
+			//aller dans Eleves => chercher le terme %nom_matiere coef%
+			const valider_maj_manuelle = confirm('❓ La matière optionnelle '+nom_matiere+' a désormais PLUSIEURS coefficients.\n'+
+												  'Voulez-vous actualiser les options des élèves concernés ?')
+			if(valider_maj_manuelle){	
+				voir_les_eleves_concernes(nom_matiere)
+			}
+
+		}, 2000)
+		return 0
+	}
+	
+
+}
+
+async function maj_coef_eleves(eleves, nom_matiere){
+	if(eleves.length > 0){
+
+		const {data, error} = await supabase.from('Eleves')
+											.upsert(eleves)
+											.select()
+
+		var msg = 'MISE A JOUR : '+ data.length +' élèves inscrits à '+nom_matiere+'.'
+	}else{
+		var msg = 'Aucun élève inscrit à cette option pour le moment.'
+	}
+
+	setTimeout(function(){
+		afficher_alerte(msg)
+	}, 3000)
+
+}
+
+function voir_les_eleves_concernes(nom_matiere_optionnelle){
+	if($('#titre_fenetre').text() !== "Paramètres") recuperer_parametres()
+	choisir_ce_parametre("Eleves")
+	setTimeout(function(){
+		$('[id="zone_recherche"').val(nom_matiere_optionnelle)
+		chercher()
+		element_DOM('liste_options').scrollIntoView()
+		afficher_fenetre(true)
+	},1000)
 }
 
 function verif_option(id_liste,liste_coef){
