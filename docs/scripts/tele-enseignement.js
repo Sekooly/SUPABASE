@@ -16500,11 +16500,21 @@ function actualiser_nb_cases(ceci){
 
 	var est_moyenne_generale = $('[id="saison_note"]').val() === "Toutes"
 
-	var moyenne_periode = calcul_moyenne_bulletin(le_parent.id,est_moyenne_generale)
+	var moyenne = calcul_moyenne_bulletin(le_parent.id,est_moyenne_generale)
+	var moyenne_periode = moyenne['val']
+	var note_examen = moyenne['note_examen']
+
 	//console.log({moyenne_periode})
 	var classe_case_moyenne = "case_de_moyenne"
 	classe_case_moyenne = classe_case_moyenne + (est_moyenne_generale || moyenne_periode.trim() === ""? "" :' est_moyenne_periodique')
 	$(le_parent).append('<span class="'+classe_case_moyenne+'">'+moyenne_periode+'</span>')
+
+
+
+	//console.log('Attribution de la remarque...',le_parent.id)
+	$('[id="'+le_parent.id+'"] .case_de_moyenne').attr('title','Moyenne générale = '+coef_journalier+' * '+(moyenne_journaliere || 0)+' (moyenne hors examen en gris)    +    ' + coef_examen + ' * '+ (note_examen || 0) +' (examen en orange)'  )
+	//console.log('Attribution de la remarque DONE!',le_parent.id)
+
 
 
 	if($("#saison_note").val()==="Toutes"){
@@ -16626,7 +16636,7 @@ function calcul_moyenne_bulletin(identifiant, moyenne_generale){
 		//console.log(resultat)
 		afficher_details_calcul_eleve_test(identifiant,{resultat})
 
-		return resultat
+		return {val: resultat}
 
 
 	//moyenne générale = 0.30 * moyenne bulletin + 0.70 * examen
@@ -16649,16 +16659,17 @@ function calcul_moyenne_bulletin(identifiant, moyenne_generale){
 		afficher_details_calcul_eleve_test(identifiant,{note_examen})
 
 
-		moyenne_journaliere = calcul_moyenne_bulletin(identifiant)
+		moyenne_journaliere = calcul_moyenne_bulletin(identifiant)['val']
 		coef_examen = moyenne_journaliere>0 ? 0.6667 : 1
 		coef_journalier = note_examen>0 ? 0.3333 : 1
 		moyenne_generale_matiere = Number(moyenne_journaliere * coef_journalier + note_examen * coef_examen)
 
 
-		$('.case_de_moyenne').attr('title','Moyenne générale = '+coef_journalier+' * moyenne hors examen (gris)    +    ' + coef_examen + ' * examen (orange)'  )
-
 		 //  Number($('[id="'+identifiant+'"].un_eleve_bulletin > .est_examen').text())
-		return moyenne_generale_matiere.toFixed(2)
+		return {
+				note_examen: note_examen,
+				val: moyenne_generale_matiere.toFixed(2)
+			}
 
 	}
 
