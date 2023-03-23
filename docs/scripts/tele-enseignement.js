@@ -16795,7 +16795,7 @@ function les_periodes_bulletin(){
 						<option value="--">--</option>	
 
 						`
-						+liste_periodes_secondaires.map(e => '<option value="'+e+'">'+e+'</option>').join('')+
+						+liste_periodes_secondaires.map(e => '<option value="'+e.trim()+'">'+e.trim()+'</option>').join('')+
 
 						`
 
