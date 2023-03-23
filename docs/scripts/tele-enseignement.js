@@ -16654,6 +16654,9 @@ function calcul_moyenne_bulletin(identifiant, moyenne_generale){
 		coef_journalier = note_examen>0 ? 0.3333 : 1
 		moyenne_generale_matiere = Number(moyenne_journaliere * coef_journalier + note_examen * coef_examen)
 
+
+		$('.case_de_moyenne').attr('title','Moyenne générale = '+coef_journalier+' * moyenne hors examen (gris)    +    ' + coef_examen + ' * examen (orange)'  )
+
 		 //  Number($('[id="'+identifiant+'"].un_eleve_bulletin > .est_examen').text())
 		return moyenne_generale_matiere.toFixed(2)
 
