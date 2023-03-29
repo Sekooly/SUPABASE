@@ -16177,7 +16177,7 @@ async function enseignant_de_la_matiere_dans_la_periode_principale(Classe_Matier
 					.select('*')
 					.eq('Classe_Matiere',Classe_Matiere)
 					.eq('periode_principale',periode_principale)
-					.order('horodateur', {ascending: false})
+					.order('horodateur', {ascending: true})
 
 	//si introuvable => chercher depuis les notes
 	if (!data){
@@ -16185,7 +16185,7 @@ async function enseignant_de_la_matiere_dans_la_periode_principale(Classe_Matier
 					.select('*')
 					.eq('Classe_Matiere',Classe_Matiere)
 					.eq('periode_bulletin',periode_principale)
-					.order('date_creation_note', {ascending: false})
+					.order('date_creation_note', {ascending: true})
 	} else{
 		mode_appreciations = true
 	}
