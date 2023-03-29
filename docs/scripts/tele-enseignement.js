@@ -15271,7 +15271,9 @@ async function creer_et_envoyer_donnees_bulletin_eleve(id_eleve,la_periode,la_cl
 			//console.log(mon_index,nom_champ, valeur_colonne_numero(mon_index))
 
 			la_classe_matiere = '('+la_classe+'|'+nom_champ+')'
-			premier_prof = get_les_profs(la_classe_matiere)
+			var id_premier_prof = await enseignant_de_la_matiere_dans_la_periode_principale(la_classe_matiere, la_periode) || '' //le premier qui a apprécié / noté / assigné
+			console.log({la_classe_matiere: id_premier_prof})
+			var premier_prof = get_resultat(racine_data + 'Profs?Identifiant=eq.'+id_premier_prof+'&' +apikey)
 
 			if(premier_prof.length > 0 ){
 
