@@ -2,23 +2,14 @@
 function testtt(){
 	
 	setTimeout(function(){
-		choix_classe_bulletin()
+		choix_classe_fiche()
+		$('#la_periode_bulletin').val(2)
+		$('#la_classe_fiche').val('TGA')
+		$('#la_classe_fiche').change()
 	},200)
-
-	setTimeout(function(){
-		$('#classe_saisie_bulletin').val('TGB')
-		voir_bulletin_classe_choisie()
-	},200)
-
-
-	setTimeout(function(){
-		$('.un_menu').val('(TGB|Éducation Physique et Sportive)').click()
-		$('#periode_bulletin').val('2').change()
-		$('#saison_note').val('Toutes').change()
-	},500)
 }
 
-var nom_eleve_test = ''
+var nom_eleve_test = ''//'rakoto.mahaliana'
 if(nom_eleve_test!==''){		
 	setTimeout(function(){
 		testtt()	
@@ -11972,6 +11963,10 @@ function fonction_td_modifiable(e, sans_suite){
 
 
 		if(id_parametre==='Matieres' && numero_colonne_modifiee === indice_matiere){
+
+			//enlever la virgule partout => éviter les problemes dans la fiche CC
+			nouvelle_valeur = nouvelle_valeur.replaceAll(',','')
+
 			ancienne_valeur_classe_matiere = $('.selected')[0].id
 			valeur_classe = ancienne_valeur_classe_matiere.split('|')[0].replaceAll('(','')
 			nouveau_data = {
@@ -14529,8 +14524,20 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe,ap
 
 	var colonnes_notes = les_notes.map(function(une_note,indice_note){
 		la_matiere = une_note['Classe_Matiere'].split('|')[1].replaceAll(')','')
-		indice_matiere_sur_tableau = $(`[id="${la_matiere}"]`)[0].cellIndex
-		return indice_matiere_sur_tableau + ':'+ une_note['identifiant_eleve'] + ':' + la_matiere  + ':' + une_note['saison_note']+ ':' +une_note['note']
+		try {
+			indice_matiere_sur_tableau = $(`[id="${la_matiere}"]`)[0].cellIndex
+			return indice_matiere_sur_tableau + ':'+ une_note['identifiant_eleve'] + ':' + la_matiere  + ':' + une_note['saison_note']+ ':' +une_note['note']
+		} catch(err){
+			indice_matiere_sur_tableau = -1
+			console.log({erreur : {
+				error: err,
+				identifiant_eleve: identifiant_eleve,
+				une_note: une_note,
+				la_matiere: la_matiere
+
+			}})
+		}
+		
 	})
 
 	//console.log(colonnes_notes)
@@ -14541,7 +14548,7 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe,ap
 
 		//console.log('\n\n\n')
 		afficher_details_calcul_eleve_test(identifiant_eleve,'\n\n\n'+une_matiere['Matiere'])
-		notes_de_la_matiere = colonnes_notes.map(e => e.includes(une_matiere['Matiere']) ? e.split(':')[3] + ':' + e.split(':')[4] : "" ).filter(e => e!== "")
+		notes_de_la_matiere = colonnes_notes.map(e => e && e.includes(une_matiere['Matiere']) ? e.split(':')[3] + ':' + e.split(':')[4] : "" ).filter(e => e!== "")
 		//console.log(notes_de_la_matiere)
 		afficher_details_calcul_eleve_test(identifiant_eleve,{notes_de_la_matiere})
 
@@ -14673,7 +14680,10 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe,ap
 
 	//on met la valeur de la colonne de moyenne générale
 	//$('tr[id="'+identifiant_eleve+'"]').append('<th class="border_bottom moyenne_generale">'+moyenne_generale+'</th>')
+	
 	var indice_moyenne_generale = $('[id="Moyenne générale"]')[0].cellIndex
+	afficher_details_calcul_eleve_test(identifiant_eleve,{somme_coef_eleves})
+
 	//on supprime l'éventuelle ancienne valeur de moyenne
 	$('tr[id="'+identifiant_eleve+'"] > .moyenne_generale').remove()
 	//on rajoute la nouvelle valeur de moyenne
@@ -16881,9 +16891,41 @@ function les_periodes_bulletin(){
 }
 
 
-function get_les_profs(classe_matiere){
+function get_les_profs(classe_matiere,  appreciations_et_notes_comprises){
 	var url = racine_data + 'Profs?Classe=like.*'+classe_matiere + "*&" +apikey
 	var les_profs = get_resultat(url)
+
+
+
+	if (les_profs.length === 0 && appreciations_et_notes_comprises){
+		//récupérer tous les profs qui ont saisie une note et/ou une appréciation
+		var profs_notes = get_resultat(racine_data + 'Notes?select=identifiant_prof&Classe_Matiere=eq.'+classe_matiere + "&" +apikey)
+		var profs_appreciations = get_resultat(racine_data + 'Appreciations?select=identifiant_appreciateur&Classe_Matiere=eq.'+classe_matiere + "&" +apikey)
+		
+		//console.log({profs_notes})
+		//console.log({profs_appreciations})
+
+
+		const les_profs_ayant_saisi = valeursUniquesDeCetteKey(profs_appreciations.concat(profs_notes).map(function(e){
+			return {"Identifiant": e[Object.keys(e)[0]]}
+		}) , "Identifiant"   )
+		//console.log({les_profs_ayant_saisi})
+		
+		//essayer dans profs
+		les_profs = les_profs_ayant_saisi.map(function(id_prof) {
+			return get_resultat(racine_data + 'Profs?Identifiant=eq.'+id_prof + "&" +apikey)
+		}).flat()
+
+		//essayer dans admin
+		if(les_profs.length === 0){
+			//console.log('chercher dans admin...')
+			les_profs = les_profs_ayant_saisi.map(function(id_prof) {
+				return get_resultat(racine_data + 'Administration?Identifiant=eq.'+id_prof + "&" +apikey)
+			}).flat()
+		}
+
+		//console.log({les_profs})
+	} 
 	return les_profs
 }
 
@@ -16901,7 +16943,7 @@ function les_enseignants(){
 	if(recuperer('mon_type').includes('Admin')){
 
 		var classe_matiere = $('.un_menu > option:selected').text()		
-		var les_profs = get_les_profs(classe_matiere)
+		var les_profs = get_les_profs(classe_matiere, true)
 		var label_enseignant = 'Enseignant'
 
 		if($('select.un_menu').val().includes('Vie scolaire')){
