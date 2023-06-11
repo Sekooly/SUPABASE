@@ -9,7 +9,7 @@ function testtt(){
 	},200)
 }
 
-var nom_eleve_test = ''//'rakoto.mahaliana'
+var nom_eleve_test = ''//'andriambololona.nomena'
 if(nom_eleve_test!==''){		
 	setTimeout(function(){
 		testtt()	
@@ -14170,6 +14170,7 @@ function actualiser_liste_champs_masques(){
 
 	//stocker quoi qu'il arrive
 	stocker('liste_colonnes_masquees_fiche',liste_colonnes_masquees_fiche)
+	render_fiche()
 
 }
 
@@ -14339,6 +14340,17 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 				//on stocke les moyennes générales
 				moyennes_periodes[la_periode_bulletin] = recuperer_moyennes_generales()
 				console.log({moyennes_periodes})
+
+
+							
+				//rajouter le grisement des matieres à ignorer
+				Array.from($('[name="exporter_colonne"]:checkbox:not(:checked)')).map(function(unchecked_matiere){
+					const element_colonne_matiere = unchecked_matiere.parentNode
+					console.log({element_colonne_matiere},element_colonne_matiere)
+					console.log(element_colonne_matiere.cellIndex)
+					
+					$('[id="fiche_conseil"] th:nth-child('+(element_colonne_matiere.cellIndex+1)+')').addClass("ignore")
+				})
 				
 			},1000)
 
@@ -14356,7 +14368,6 @@ async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulle
 	au_clic_droit("tr.une_ligne_de_donnees,tr.ignore","afficher_ou_masquer_ligne_entiere(event)")
 	
 	//console.log({matieres_de_classe})
-
 
 
 
@@ -14642,8 +14653,11 @@ function rajouter_notes_eleves(identifiant_eleve,les_notes,matieres_de_classe,ap
 
 
 
-		//cumuler
-		if(la_moyenne && !isNaN(le_coef)){
+		//cumuler si on a une moyenne ET un coef ET la matière est cochée
+		var matiere_cochee = $('#coches_colonnes_export > th input')[moyenne_matiere.cellIndex].checked
+		afficher_details_calcul_eleve_test(identifiant_eleve,{matiere_cochee})
+
+		if(la_moyenne && !isNaN(le_coef)   &&  matiere_cochee ){
 			//if(identifiant_eleve===nom_eleve_test) console.log({'avant': cumul_eleves})
 			afficher_details_calcul_eleve_test(identifiant_eleve,{'avant': cumul_eleves})
 
