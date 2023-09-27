@@ -12410,25 +12410,25 @@ async function suite_actualiser_double_clic(e, ancienne_valeur, nouvelle_valeur,
 
 
 
+
+
 function formulaire_choix_checkbox(nom_champ, e, ancienne_valeur, identifiant, liste_en_array, liste_deja_cochés, un_seul_choix){
 	
 	$("#mini_popup").remove()
 
-	var entetes = '<div id="mini_popup" class="mini_popup" style="overflow: hidden auto;"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div>'
-	var titre_formulaire = '<div>'+nom_champ+' pour <b>'+identifiant+'</b></div><div id="liste_classe_matieres" class="liste_centree"><div>'
-	
-	//pour chaque element de la liste
-	var les_elements = ""
-	for (var i = 0; i <liste_en_array.length;i++) {
-		est_coché = liste_deja_cochés ? (liste_deja_cochés.indexOf(liste_en_array[i]) >=0 ? "checked" : "" ): ""
-		classe_initiale = est_coché === "checked" ? "en_gras" : ""
-		type_element = un_seul_choix ? "radio" : "checkbox"
-		les_elements = les_elements+'<div class="'+classe_initiale+'"><input class="choix_liste_matiere" type="'+type_element+'" id="'+liste_en_array[i]+'" name="choix_liste_matiere" '+est_coché+'><label for="'+liste_en_array[i]+'">'+liste_en_array[i]+'</label></div>'
+	const entetes = '<div id="mini_popup" class="mini_popup" style="overflow: hidden auto;"><div id="entete-fenetre" style="display: inline-flex;float: right;"><img alt="X" src="'+ prefixe_image + '/quitter.png" id="bye_prev" onclick="$(\'#mini_popup\').remove()" style="width: 30px; height: 30px;cursor:pointer;position:fixed;z-index:3;transform: translate(-50%, -50%);"> </div>'
+	const barre_recherche = un_seul_choix ? "" : '<input id="chercher_matiere" class="barre_recherche" name="chercher_matiere" placeholder="Rechercher une matière...">'
+	const titre_formulaire = `<div class="entete_sticky titre_mini_popup" style="border-radius: 5px;">
+								<div>`+nom_champ+` pour <b>`+identifiant+`</b></div>
+								`+barre_recherche+`
+							</div>
 
-	}
+							<div id="liste_classe_matieres" class="liste_centree"><div>`
+	
+
 
 	var bouton_assigner = '</div></div><button type="button" class="rendre sekooly-mode-background" id="assigner">Assigner</button></div>'
-	var html_final = entetes + titre_formulaire + les_elements  + bouton_assigner
+	var html_final = entetes + titre_formulaire + '<div id="wrap_elements">' + actualiser_les_elements(liste_en_array, liste_deja_cochés, un_seul_choix)  + '</div>'  + bouton_assigner
 
 	$("body").append(html_final)
 
@@ -12441,7 +12441,49 @@ function formulaire_choix_checkbox(nom_champ, e, ancienne_valeur, identifiant, l
 		e.target.parentNode.className = e.target.checked ? "en_gras" : ""
 	})
 
+	//réactualiser si changement 
+	$("#chercher_matiere").on('keyup change', function(e){
+
+		const mot_cle = e.target.value.trim()
+
+		//par défaut : on remet tout
+		$("#wrap_elements").children().removeClass("invisible")
+
+		//masquer tout ce qui ne contient pas ce mot clé NON VIDE
+		if(mot_cle !== ""){
+			Array.from($("#wrap_elements").children()).forEach(function(el){
+				if(!el.innerText.toLowerCase().includes(mot_cle.toLowerCase())){
+					$(el).addClass("invisible")		
+				}
+			})
+		}
+
+		//si aucun résultat => prévenir
+		if($("#wrap_elements").children('.invisible').length === $("#wrap_elements").children('').length){
+			afficher_alerte('Aucun résultat trouvé pour le mot clé "' + mot_cle + '"')
+		}
+		
+	})
+
+
 }
+
+function actualiser_les_elements(liste_en_array, liste_deja_cochés, un_seul_choix){
+
+	
+	//pour chaque element de la liste
+	var les_elements = ""
+	for (var i = 0; i <liste_en_array.length;i++) {
+		est_coché = liste_deja_cochés ? (liste_deja_cochés.indexOf(liste_en_array[i]) >=0 ? "checked" : "" ): ""
+		classe_initiale = est_coché === "checked" ? "en_gras" : ""
+		type_element = un_seul_choix ? "radio" : "checkbox"
+		les_elements = les_elements+'<div class="'+classe_initiale+'"><input class="choix_liste_matiere" type="'+type_element+'" id="'+liste_en_array[i]+'" name="choix_liste_matiere" '+est_coché+'><label for="'+liste_en_array[i]+'">'+liste_en_array[i]+'</label></div>'
+
+	}
+
+	return les_elements
+}
+
 
 function retourner_les_cochés(){
 
