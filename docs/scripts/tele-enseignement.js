@@ -14186,7 +14186,7 @@ function une_ligne_eleve(id_tableau,objet_une_ligne,numero){
 					${objet_une_ligne["Date_de_naissance"]} 
 				</th>
 				<th class="border_bottom">
-					F/M
+					${objet_une_ligne["sexe"]}
 				</th>
 			</tr>`
 
