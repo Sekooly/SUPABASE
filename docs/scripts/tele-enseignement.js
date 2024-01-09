@@ -14180,7 +14180,7 @@ function une_ligne_eleve(id_tableau,objet_une_ligne,numero){
 					${objet_une_ligne["Prénom(s)"]} 
 				</th>
 				<th class="border_bottom">
-					A/N
+					${objet_une_ligne["ancien_ou_nouveau"]}
 				</th>
 				<th class="border_bottom">
 					${objet_une_ligne["Date_de_naissance"]} 
