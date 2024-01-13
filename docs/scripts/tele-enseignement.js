@@ -14467,7 +14467,7 @@ function afficher_ou_masquer_ligne_entiere(event){
 	var nom_complet = ceci.children[1].innerText + " " + ceci.children[2].innerText
 	var verbe = ceci.className.includes('ignore') ? 're-afficher':'masquer'
 	var emoji_ask = verbe === 're-afficher' ? '👀' : '❌'
-	var choisir_affichage = confirm(emoji_ask+' Voulez-vous '+verbe+' la ligne de '+nom_complet +' lors de l\'export ?')
+	var choisir_affichage = confirm(emoji_ask+' Voulez-vous '+verbe+' la ligne de '+nom_complet +' lors de l\'export et de la génération des bulletins ?')
 
 	//console.log({choisir_affichage})
 
@@ -15477,7 +15477,9 @@ async function lister_eleves_bulletins(){
 
 	//pour chaque eleve
 	var options_eleves = '<option id="tous">(Tous)</option>' + tous_les_eleves.map(function(eleve){
-		return '<option value="'+eleve['Identifiant']+'" id="'+eleve['Identifiant']+'">'+eleve['Nom'] + " " +eleve['Prénom(s)']+ '</option>' 
+		if (!recuperer('eleves_ignores').includes(','+eleve['Identifiant']+',')){
+			return '<option value="'+eleve['Identifiant']+'" id="'+eleve['Identifiant']+'">'+eleve['Nom'] + " " +eleve['Prénom(s)']+ '</option>' 
+		} 
 	}).join('')
 
 
