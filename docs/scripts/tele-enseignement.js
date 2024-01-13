@@ -2,14 +2,28 @@
 function testtt(){
 	
 	setTimeout(function(){
+		/*
 		choix_classe_fiche()
 		$('#la_periode_bulletin').val(2)
 		$('#la_classe_fiche').val('TGA')
 		$('#la_classe_fiche').change()
+		*/
+
+		choix_classe_bulletin() 
+		$('#classe_saisie_bulletin').val('3ème A') 
+		voir_bulletin_classe_choisie() 
+		$('.un_menu').val('(3ème A|Langue Vivante 3 - Malagasy)')
+		$('.un_menu').click()
+		$('#periode_bulletin').val('1') 
+		$('#periode_bulletin').change()
+		$('#saison_note').val('Septembre à Décembre')
+		$('#saison_note').change()
+
+
 	},200)
 }
 
-var nom_eleve_test = ''//'andriambololona.nomena'
+var nom_eleve_test = '' //'andrianantenaina.nehemia' //'andrianaivonarivo.harena'
 if(nom_eleve_test!==''){		
 	setTimeout(function(){
 		testtt()	
@@ -16634,13 +16648,19 @@ function actualiser_nb_cases(ceci){
 
 
 	//console.log('Attribution de la remarque...',le_parent.id)
-	$('[id="'+le_parent.id+'"] .case_de_moyenne').attr('title',((moyenne_journaliere || note_examen) ? 'Moyenne générale = ' : "")
+	if( typeof moyenne_journaliere !== 'undefined'){
+		$('[id="'+le_parent.id+'"] .case_de_moyenne').attr('title', 'Moyenne générale = ' 
 																	+
 																	(moyenne_journaliere ? (coef_journalier+' * '+(moyenne_journaliere || 0)+' (moyenne hors examen en gris)        ') : '')
 																	+
 																	((moyenne_journaliere && note_examen) ? '+' : "")
 																	+
-																	(note_examen ? (coef_examen + ' * '+ (note_examen || 0) +' (examen en orange)') : "") )
+																	(note_examen ? (coef_examen + ' * '+ (note_examen || 0) +' (examen en orange)') : "")
+															) 
+	}else{
+		$('[id="'+le_parent.id+'"] .case_de_moyenne').attr('title', 'Moyenne des notes saisies')
+	}
+
 	//console.log('Attribution de la remarque DONE!',le_parent.id)
 
 
