@@ -9,15 +9,18 @@ function testtt(){
 		$('#la_classe_fiche').change()
 		*/
 
+		
 		choix_classe_bulletin() 
-		$('#classe_saisie_bulletin').val('3ème A') 
+		$('#classe_saisie_bulletin').val('1ère GA') 
 		voir_bulletin_classe_choisie() 
-		$('.un_menu').val('(3ème A|Langue Vivante 3 - Malagasy)')
+		$('.un_menu').val('(1ère GA|Vie de classe)')
 		$('.un_menu').click()
 		$('#periode_bulletin').val('1') 
 		$('#periode_bulletin').change()
 		$('#saison_note').val('Septembre à Décembre')
 		$('#saison_note').change()
+		
+
 
 
 	},200)
@@ -15670,43 +15673,51 @@ async function sauvegarder_saisie_bulletin(){
 
 	}else{
 
+		if(await verif_avant_enregistrement_notes()){
+
+			//supprimer toutes les saisies de (identifiant_prof,Classe_Matiere,periode_bulletin,saison_note) et vérifier que c'est OK
+			var champs_refs = donnees_generiques_bulletin()
+			//console.log("suppression en cours...")
+			var retour = await supprimer_avec_ces_references('Notes',champs_refs)
+			//console.log("suppression ok!")
+
+			//transformer la saisie en JSON
+			//console.log("transformation en cours...")
+			var notes_saisies = await transformer_notes_saisies()
+			//console.log("transformation ok!")
+			//console.log(notes_saisies)
+			
+			alerte_a_afficher = "Notes saisies enregistrées."
 
 
-		//supprimer toutes les saisies de (identifiant_prof,Classe_Matiere,periode_bulletin,saison_note) et vérifier que c'est OK
-		var champs_refs = donnees_generiques_bulletin()
-		//console.log("suppression en cours...")
-		var retour = await supprimer_avec_ces_references('Notes',champs_refs)
-		//console.log("suppression ok!")
+			if (notes_saisies.length === 0) {
+				chargement(false)
+				bulletin_enregistre = true
+				effacer("enregistrement_en_cours")
+				afficher_alerte(alerte_a_afficher)
+			}
 
-		//transformer la saisie en JSON
-		//console.log("transformation en cours...")
-		var notes_saisies = await transformer_notes_saisies()
-		//console.log("transformation ok!")
-		//console.log(notes_saisies)
-		
-		alerte_a_afficher = "Notes saisies enregistrées."
+			//ajouter le JSON à la table Notes et vérifier que c'est OK
+			//console.log("envoi en cours...")
+			retour = await stocker_notes_server(notes_saisies)
+			console.log({retour})
 
+			if(retour.error !== null){
+				alerte_a_afficher = "⚠️Enregistrement impossible, merci de réessayer."
+			}else{
+				bulletin_enregistre = true
+				effacer("enregistrement_en_cours")
+				afficher_alerte(alerte_a_afficher)
+			}
 
-		if (notes_saisies.length === 0) {
-			chargement(false)
-			bulletin_enregistre = true
-			effacer("enregistrement_en_cours")
-			return afficher_alerte(alerte_a_afficher)
+		}else {
+
+			alerte_a_afficher =  "⚠️Enregistrement impossible, merci de réessayer."
+			afficher_alerte(alerte_a_afficher)
 		}
 
-		//ajouter le JSON à la table Notes et vérifier que c'est OK
-		//console.log("envoi en cours...")
-		retour = await stocker_notes_server(notes_saisies)
-		//console.log(retour)
-
-		if(retour.error !== null){
-			alerte_a_afficher = "⚠️Enregistrement impossible, merci de réessayer."
-		}else{
-			bulletin_enregistre = true
-		}
 
 		effacer("enregistrement_en_cours")
-		afficher_alerte(alerte_a_afficher)
 		chargement(false)
 	}
 
@@ -15719,6 +15730,11 @@ function configurer_periodes_bulletins(){
 	var elements_html = '<div class="donnees_saisies">'
 	var nom_periode_bulletin = un_element_de_config_bulletin("saisie_des_periodes_principales()",'Identifiant des périodes principales (Exemples: <b>Trimestres</b> ou <b>Semestres</b> ...)', 'nom_periode_bulletin', recuperer_nom_periodes_principales_bulletin())
 	var nom_saison_note = un_element_de_config_bulletin("saisie_des_periodes_secondaires()",'Identifiant des périodes secondaires (Exemples: <b>Périodes</b> ou <b>Mois</b> ...)', 'nom_saison_note',recuperer_nom_periodes_secondaires_bulletin() )
+					
+					+ un_element_de_config_bulletin(false, 'Note minimum saisie', 'note_min', note_min_possible())
+					+ un_element_de_config_bulletin(false, 'Note maximum saisie', 'note_max', note_max_possible())
+
+
 	var images_bulletins = `<label><input id="avec_signature_tampon" type="checkbox" `+(data_etablissement['avec_signature_tampon'] ? "checked" : "") +`>Bulletin téléchargé par un élève AVEC SIGNATURE ET TAMPON</label>`
 	elements_html = elements_html + nom_periode_bulletin + nom_saison_note +images_bulletins+ '</div>'
 
@@ -15826,13 +15842,16 @@ async function enregistrer_config_bulletins(numero_etape,les_periodes_principale
 	chargement(true)
 	var alerte_a_afficher = ""
 
-	//nom des périodes
+	//nom des périodes ET notes min/max
 	if(numero_etape === 1){
 
 		data_etablissement['config_notes']['nom_periode_bulletin'] = element_DOM('nom_periode_bulletin').value.trim()
 		data_etablissement['config_notes']['nom_saison_note'] = element_DOM('nom_saison_note').value.trim()
+		data_etablissement['config_notes']['note_min'] = element_DOM('note_min').value.trim()
+		data_etablissement['config_notes']['note_max'] = element_DOM('note_max').value.trim()
 		data_etablissement['avec_signature_tampon'] = element_DOM('avec_signature_tampon').checked
-		alerte_a_afficher = 'Périodes enregistrées avec succès.'
+
+		alerte_a_afficher = 'Périodes et plage de notes enregistrées avec succès.'
 
 
 	//liste des périodes principales
@@ -16579,6 +16598,37 @@ function les_notes_eleve(notes){
 
 }
 
+function note_min_possible(){
+	return Number(data_etablissement['config_notes']['note_min']) || 0
+}
+
+function note_max_possible(){
+	return Number(data_etablissement['config_notes']['note_max']) || 20
+}
+
+function verif_avant_enregistrement_notes(){
+
+	const les_notes = Array.from($('.une_note'))
+
+	for (var index_note_saisie = 0; index_note_saisie  < les_notes.length; index_note_saisie++) {
+		var la_note = les_notes[index_note_saisie].innerText
+		if(la_note){
+			var valeur_note = Number(la_note)
+			if (valeur_note < note_min_possible()){
+				alert("⚠️ Merci de saisir une note supérieure ou égale à "+note_min_possible()+".")
+				return false
+			} else if(valeur_note > note_max_possible()){
+				alert("⚠️ Merci de saisir une note inférieure ou égale à "+note_max_possible()+".")
+				return false
+			}
+		}
+
+	}
+
+	return true
+
+}
+
 function verif_touches_notes(ceci){
 
 	touche = right(ceci.innerText,1)
@@ -16590,6 +16640,7 @@ function verif_touches_notes(ceci){
 		return false
 	}else if (isNaN(Number(ceci.innerText))){
 		alert("⚠️ Merci de saisir une note sous forme de nombre.")
+		ceci.innerText = ceci.innerText.replace(touche,'')
 		return false
 
 	}
