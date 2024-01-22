@@ -15478,12 +15478,17 @@ async function lister_eleves_bulletins(){
 	tous_les_eleves =  await rechercher("Eleves", "Classe", $('#classe_saisie_bulletin').val())
 	//console.log({tous_les_eleves})
 
+	if(recuperer('eleves_ignores')){
+		tous_les_eleves = tous_les_eleves.filter(function(eleve){
+			return !recuperer('eleves_ignores').includes(','+eleve['Identifiant']+',')
+		})
+		//console.log({tous_les_eleves})	
+	}
+	
 	//pour chaque eleve
 	var options_eleves = '<option id="tous">(Tous)</option>' + tous_les_eleves.map(function(eleve){
-		if (!recuperer('eleves_ignores').includes(','+eleve['Identifiant']+',')){
 			return '<option value="'+eleve['Identifiant']+'" id="'+eleve['Identifiant']+'">'+eleve['Nom'] + " " +eleve['Prénom(s)']+ '</option>' 
-		} 
-	}).join('')
+		}).join('')
 
 
 	$("#identifiant_eleve_bulletin")[0].innerHTML = ""
