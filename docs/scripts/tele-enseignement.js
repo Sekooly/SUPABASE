@@ -5205,7 +5205,6 @@ async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_init
 		choisir_height_viz_si_pdf()
 		
 
-
 		//si PAS youtube ET SANS téléchargement -> on cache le côté haut-droit en cas de PAS DE TELECHARGEMENT
 		if (pas_de_telechargement && est_youtube(extension)===false){
 			var le_inner_html = '<iframe id="viz_frame" src="'+lien_de_visu+'"    frameborder="0" scrolling="no" seamless=""></iframe><div id="squareDOC" style="width: 80px; height: 80px; position: absolute; opacity: 0; right: 12px; top: 0px;"> </div>'
@@ -5320,7 +5319,9 @@ function calcul_lien_de_visu(extension,id_fichier){
 
 	//si c'est un fichier image: on change
 	}else if(est_image(extension)){
-		lien_de_visu = 'https://drive.google.com/uc?export=preview&id=' + id_fichier;
+		//lien_de_visu = 'https://drive.google.com/uc?export=preview&id=' + id_fichier;
+
+		lien_de_visu = lien_previz_image(id_fichier)
 	
 
 	//si c'est un lien YOUTUBE
@@ -5334,6 +5335,10 @@ function calcul_lien_de_visu(extension,id_fichier){
 
 	return lien_de_visu;
 
+}
+
+function lien_previz_image(id_fichier_image){
+	return "https://drive.google.com/thumbnail?id=" +id_fichier_image+ "&sz=s4000"
 }
 
 function quitter_previsualisation_bis(){
@@ -19534,7 +19539,8 @@ function sendMessage(message) {
 
 /******************** PHOTO DE PROFIL *************************/
 function lien_pp(id_pp){
-	return id_pp ? "https://drive.google.com/uc?export=download&id=" + id_pp : prefixe_image + "/default-user.png"
+	//return id_pp ? "https://drive.google.com/uc?export=download&id=" + id_pp : prefixe_image + "/default-user.png"
+	return id_pp ?  lien_previz_image(id_pp) : prefixe_image + "/default-user.png"
 }
 
 
