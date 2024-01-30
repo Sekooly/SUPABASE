@@ -5187,13 +5187,9 @@ async function visualiser(nom_fichier,id_fichier, nom_proprio_devoir, titre_init
 	//si c'est un audio MP3
 	}else if(extension === 'mp3'){
 
-		element_DOM('previsualisation').outerHTML = `
-			<audio controls="" src="https://drive.google.com/uc?id=`+id_fichier+`" class="previz">
-	            Votre navigateur ne supporte pas la lecture des éléments <code>audio</code>.
-	    	</audio>
-
-
-		`
+		lien_de_visu = 'https://docs.google.com/file/d/'+id_fichier+'/preview'
+		var le_inner_html = '<iframe id="viz_frame" src="'+lien_de_visu+'"    frameborder="0" scrolling="no" seamless=""></iframe><div id="squareDOC" style="width: 80px; height: 80px; position: absolute; opacity: 0; right: 12px; top: 0px;"> </div>'
+		element_DOM('previsualisation').innerHTML = le_inner_html
 
 		chargement(false)
 
@@ -5288,6 +5284,7 @@ function calcul_lien_de_visu(extension,id_fichier){
 
 	//lien de visu par defaut
 	var lien_de_visu =  "https://drive.google.com/uc?id=" + id_fichier;
+	//var lien_de_visu = "https://drive.usercontent.google.com/download?id=1"+id_fichier
 
 	//si c'est un site directement : on change
 	if(extension==="tutoriels d'utilisation"){
@@ -23985,7 +23982,8 @@ function ajouter_ressource_features(ceci){
 
 function lien_icone_ressource(lien_image, extension, firstime){
 	const ID_FICHIER = lien_image ? lien_image.split('/')[5] : ""
-	const link = "https://drive.google.com/uc?export=download&id=" + ID_FICHIER  + (firstime ? '&dump='+(new Date()).getTime() : "")
+	//const link = "https://drive.google.com/uc?export=download&id=" + ID_FICHIER  + (firstime ? '&dump='+(new Date()).getTime() : "")
+	const link = lien_previz_image(ID_FICHIER)  + (firstime ? '&dump='+(new Date()).getTime() : "")
 	//console.log({extension})
 
 	//OLD - not working with google
