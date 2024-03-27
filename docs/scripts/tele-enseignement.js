@@ -11,13 +11,14 @@ function testtt(){
 
 		
 		choix_classe_bulletin() 
-		$('#classe_saisie_bulletin').val('1ère GA') 
+		$('#classe_saisie_bulletin').val('TGA') 
 		voir_bulletin_classe_choisie() 
-		$('.un_menu').val('(1ère GA|Vie de classe)')
+		//$('.un_menu').val('(TGA|Spécialité - Mathématiques)') //avec notes et appréciations
+		$('.un_menu').val('(TGA|Épreuve Anticipée Français Écrit)') //sans rien
 		$('.un_menu').click()
-		$('#periode_bulletin').val('1') 
+		$('#periode_bulletin').val('2') 
 		$('#periode_bulletin').change()
-		$('#saison_note').val('Septembre à Décembre')
+		$('#saison_note').val('Examen')
 		$('#saison_note').change()
 		
 
@@ -30,7 +31,7 @@ var nom_eleve_test = '' //'andrianantenaina.nehemia' //'andrianaivonarivo.harena
 if(nom_eleve_test!==''){		
 	setTimeout(function(){
 		testtt()	
-	}, 2000)
+	}, 500)
 }
 
 
@@ -14238,13 +14239,9 @@ function actualiser_liste_champs_masques(){
 var moyennes_periodes = {}
 async function creer_fiche(la_classe, matieres_de_classe, les_eleves, pour_bulletin, la_periode_bulletin_precise){
 
+	if(les_eleves.length === 0) return alert("❌ Aucun élève n'est inscrit dans la classe de "+la_classe+".")
+
 	var la_periode_bulletin = la_periode_bulletin_precise || $("#la_periode_bulletin").val()
-
-	/*
-	console.log('\n--------------------------')
-	console.log({la_periode_bulletin})	
-	*/
-
 
 	//créer la premiere ligne: Numéro, Nom, Prénom(s), Ancien/Nouveau, Date de naissance, Sexe, [matieres], Moyenne, Rang, Absence(s) demi-journée(s), Retards//, Epreuve facultative
 	var premiere_ligne = 'Numéro,Nom,Prénom(s),Ancien/Nouveau,Date de naissance,Sexe,'+matieres_de_classe.map(e => e['Matiere']).join(',')+',Moyenne générale,Rang,Absence(s) demi-journée(s),Retards,Appréciations de la Vie Scolaire,Avis du Conseil de classe'
@@ -15718,9 +15715,10 @@ async function sauvegarder_saisie_bulletin(){
 			}
 
 		}else {
-
+			stocker("enregistrement_en_cours","non")
 			alerte_a_afficher =  "⚠️Enregistrement impossible, merci de réessayer."
 			afficher_alerte(alerte_a_afficher)
+
 		}
 
 
@@ -16003,20 +16001,24 @@ function transformer_notes_saisies(){
 		var la_note =0;
 		listes_notes.each(function(index_note,une_note){
 
-			if (une_note.innerText!==""){
+			if (une_note.innerText.trim()!==""){
 
-				la_note = Number(une_note.innerText.replace(",","."))
-				//console.log("on pousse la note " + la_note)
-				//créer 1 donnée
-				notes_saisies.push({
-					date_creation_note: mtn,
-					periode_bulletin: tout.periode_bulletin,
-					saison_note: tout.saison_note,
-					Classe_Matiere: tout.Classe_Matiere,
-					identifiant_prof: tout.identifiant_prof,
-					identifiant_eleve: eleve.id,
-					note: la_note,
-				})
+				la_note = une_note.innerText.trim().replace(",",".")
+				if(la_note.length > 0){
+					//console.log("on pousse la note " + la_note)
+					//créer 1 donnée
+					notes_saisies.push({
+						date_creation_note: mtn,
+						periode_bulletin: tout.periode_bulletin,
+						saison_note: tout.saison_note,
+						Classe_Matiere: tout.Classe_Matiere,
+						identifiant_prof: tout.identifiant_prof,
+						identifiant_eleve: eleve.id,
+						note: Number(la_note),
+					})
+
+
+				}
 				//console.log("donnée poussée!")
 			}
 		})
@@ -16064,8 +16066,10 @@ function creer_fenetre_bulletin(toutes_les_matieres){
 
 
 var mes_eleves_initiaux = []
-async function trouver_mes_eleves(){
+async function trouver_mes_eleves(periode_bulletin, saison_note){
 	chargement(true)
+
+		console.log({periode_bulletin, saison_note})
 
 	//le menu existe
 	//if($('.un_menu_orange')[0]){
@@ -16073,8 +16077,8 @@ async function trouver_mes_eleves(){
 		var tout = donnees_generiques_bulletin()
 		var Classe_Matiere = tout.Classe_Matiere
 		var classe = tout.Classe_Matiere.split('|')[0].replaceAll('(','')
-		var periode_bulletin = tout.periode_bulletin
-		var saison_note = tout.saison_note 
+		var periode_bulletin = periode_bulletin ? periode_bulletin : tout.periode_bulletin
+		var saison_note = saison_note ? saison_note : tout.saison_note 
 
 		var nom_liste_et_coefs = $('.un_menu').find('option:selected').attr("nom_liste_et_coefs")
 		//console.log({nom_liste_et_coefs})
@@ -16241,17 +16245,6 @@ async function trouver_mes_eleves(){
 
 		}
 
-
-
-
-
-
-
-	//le menu n'existe pas -> on quitte
-	//}else{
-	//	chargement(false)
-	//	return mes_eleves_initiaux
-	//}
 }
 
 function remplacer_liste_saison_note(){
@@ -16342,14 +16335,25 @@ function afficher_choix_periode_bulletin(id_classe_matiere){
 	au_clic("#saison_note","demande_enregistrement_avant_changement_periode()")
 }
 
-function transformer_notes_en_array(mes_eleves){
+function transformer_notes_en_array(mes_eleves, periode_bulletin, saison_note){
 
-	//console.log({mes_eleves})
+	//console.log('eleves initialement recus',mes_eleves)
 
 	//garder les identifiants uniques
 	var les_eleves = valeursUniquesDeCetteKey(mes_eleves,"Identifiant")
 	var resultat = []
 	var eleve_en_cours = {}
+
+
+	//ne garder que les notes de LA PERIODE et de LA SAISON
+	var tout = donnees_generiques_bulletin()
+	periode_bulletin = periode_bulletin ? periode_bulletin : tout.periode_bulletin
+	saison_note = saison_note ? saison_note : tout.saison_note
+	var Classe_Matiere = tout.Classe_Matiere
+	var identifiant_prof = tout.identifiant_prof
+
+	//console.log('transformation de notes...', {periode_bulletin,saison_note,Classe_Matiere,identifiant_prof})
+
 
 	//pour chaque élève UNIQUE
 	les_eleves.forEach( function(un_eleve, index) {
@@ -16359,12 +16363,7 @@ function transformer_notes_en_array(mes_eleves){
 		var nom=mes_eleves.find(e => e['Identifiant'] === un_eleve)['Nom']
 		var prenoms= mes_eleves.find(e => e['Identifiant'] === un_eleve)['Prénom(s)']
 
-		//ne garder que les notes de LA PERIODE et de LA SAISON
-		var tout = donnees_generiques_bulletin()
-		var periode_bulletin = tout.periode_bulletin
-		var saison_note = tout.saison_note
-		var Classe_Matiere = tout.Classe_Matiere
-		var identifiant_prof = tout.identifiant_prof
+
  
 		//si saison_note n'est pas TOUT, filtrer
 		if(saison_note!=="Toutes"){
@@ -16464,9 +16463,10 @@ async function demande_enregistrement_avant_changement_periode(){
 
 
 
-async function actualiser_liste_eleves_bulletins(changement_enseignant){
+async function actualiser_liste_eleves_bulletins(changement_enseignant, mes_eleves_initialement, periode_bulletin, saison_note){
 
 	$(".liste_eleves_bulletins").remove()
+	$('#wrap_boutons_import').remove()
 
 	if($("#periode_bulletin").val() === "--" || $("#saison_note").val() === "--" ){
 		//1 champ vide -> on fait rien
@@ -16481,7 +16481,7 @@ async function actualiser_liste_eleves_bulletins(changement_enseignant){
 		}
 		
 
-		mes_eleves = await trouver_mes_eleves()
+		mes_eleves = mes_eleves_initialement ? mes_eleves_initialement : await trouver_mes_eleves()
 		//console.log('INITIAL',{mes_eleves})
 
 
@@ -16490,7 +16490,7 @@ async function actualiser_liste_eleves_bulletins(changement_enseignant){
 
 		}else{	
 
-			mes_eleves = transformer_notes_en_array(mes_eleves)
+			mes_eleves = transformer_notes_en_array(mes_eleves, periode_bulletin, saison_note)
 			//console.log('FINAL',{mes_eleves})
 
 
@@ -16530,12 +16530,19 @@ async function actualiser_liste_eleves_bulletins(changement_enseignant){
 			}).join('')+'</div>'
 			//console.log(liste_eleves_bulletins)
 
+			//si aucune note encore ET on est dans examen ET je suis admin => ajouter éventuellement un bouton d'import des anciennes notes
+			if(mes_eleves.map(e => e['note']).flat().length === 0 && mode_examen() && recuperer('mon_type').includes('Administration')) recuperer_periodes_principales_precedentes_de_cette_classe_matiere()
+
 		}
 
 		$('#previsualisation').append(liste_eleves_bulletins)
 
 		
 	}	
+
+	function mode_examen(){
+		return 'Examen'.includes(donnees_generiques_bulletin()['saison_note'])
+	}
 
 		
 
@@ -16618,9 +16625,11 @@ function verif_avant_enregistrement_notes(){
 	const les_notes = Array.from($('.une_note'))
 
 	for (var index_note_saisie = 0; index_note_saisie  < les_notes.length; index_note_saisie++) {
-		var la_note = les_notes[index_note_saisie].innerText
+		var la_note = les_notes[index_note_saisie].innerText.trim()
 		if(la_note){
+			console.log({la_note})
 			var valeur_note = Number(la_note)
+			console.log({valeur_note})
 			if (valeur_note < note_min_possible()){
 				alert("⚠️ Merci de saisir une note supérieure ou égale à "+note_min_possible()+".")
 				return false
@@ -17025,6 +17034,60 @@ function les_periodes_bulletin(){
 				</label>
 			</form>` + les_enseignants()
 }
+
+function au_singulier(mot){
+	if(mot.slice(-1) === 's'){
+		return mot.substr(0,mot.length-1)	
+	} else {
+		return mot	
+	}
+
+	
+}
+
+function liste_periodes_etab(nom_periode_bulletin){
+	nom_periode_bulletin= nom_periode_bulletin ? nom_periode_bulletin : data_etablissement['config_notes']['nom_periode_bulletin']
+	return Object.keys(data_etablissement['config_notes'][nom_periode_bulletin])
+}
+
+//todo : récupérer les données d'une autre periode principale
+async function recuperer_periodes_principales_precedentes_de_cette_classe_matiere(){
+
+	const classe_matiere = donnees_generiques_bulletin()['Classe_Matiere']
+	const {data, error} = await supabase.from('Notes')
+										.select('periode_bulletin')
+										.not('periode_bulletin', 'in', '('+liste_periodes_etab().join(',')+')')
+										.eq('Classe_Matiere',classe_matiere)
+										.eq('saison_note','Examen')
+
+										
+	if(data.length > 0){
+		console.log('avec déjà des notes précédentes')
+
+		const liste_periodes_precedentes = valeursUniquesDeCetteKey(data, 'periode_bulletin')
+		const boutons_copie = '<div id="wrap_boutons_import">' + liste_periodes_precedentes.map((periode) => {
+			$('[id="import_periode_'+periode+'"]').remove() //seulement UN button par periode
+			return `<button id="import_periode_${periode}" class="rendre sekooly-mode-background" onclick="recuperer_donnees_periode('${periode}')">Importer les notes d'examen de ${au_singulier(data_etablissement['config_notes']['nom_periode_bulletin'])} ${periode}</button>`
+		}).join('') + '</div>'
+
+		$('#menu_periode').append(boutons_copie)
+
+	}else {
+		console.log('pas encore de notes précédentes')
+	}
+}
+
+//todo
+async function recuperer_donnees_periode(periode_bulletin){
+	const saison_note = donnees_generiques_bulletin()['saison_note']
+	const mes_eleves_initialement = await trouver_mes_eleves(periode_bulletin,saison_note)
+	console.log('mes_eleves_initialement',mes_eleves_initialement)
+	actualiser_liste_eleves_bulletins(true,mes_eleves_initialement,periode_bulletin,saison_note)
+
+	afficher_alerte('⚠️ Vous devez sauvegarder pour garder la copie de ces notes.')
+	bulletin_enregistre = false
+}
+
 
 
 function get_les_profs(classe_matiere,  appreciations_et_notes_comprises){
