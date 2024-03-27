@@ -13,12 +13,13 @@ function testtt(){
 		choix_classe_bulletin() 
 		$('#classe_saisie_bulletin').val('TGA') 
 		voir_bulletin_classe_choisie() 
-		//$('.un_menu').val('(TGA|Spécialité - Mathématiques)') //avec notes et appréciations
-		$('.un_menu').val('(TGA|Épreuve Anticipée Français Écrit)') //sans rien
+		//$('.un_menu').val('(TGA|Spécialité - Mathématiques)') //avec notes EXAM et appréciations
+		//$('.un_menu').val('(TGA|Éducation Physique et Sportive)') //avec notes tout et appréciations
+		$('.un_menu').val('(TGA|Épreuve Anticipée Français Oral)') //que exam
 		$('.un_menu').click()
 		$('#periode_bulletin').val('2') 
 		$('#periode_bulletin').change()
-		$('#saison_note').val('Examen')
+		$('#saison_note').val('Toutes')
 		$('#saison_note').change()
 		
 
@@ -12136,7 +12137,7 @@ async function assigner_liste_et_coef(liste_anciens_coefs){
 		if (id_liste.length + liste_coef.length > 0){
 			resultat = '(' + id_liste + "|" + liste_coef + ')'
 		
-			//todo dans la base de données => fonction maj_coef_liste_options(ancienne_option, nouvelle_option)
+			//dans la base de données => fonction maj_coef_liste_options(ancienne_option, nouvelle_option)
 			const anciennes_options = liste_anciens_coefs.split(',').map(coef => nom_matiere + ' coef ' + coef)
 			const nouvelles_options = liste_coef.split(',').map(coef => nom_matiere + ' coef ' + coef)
 			
@@ -13845,7 +13846,6 @@ function calcul_moyenne_generale_toutes_periodes(periode_en_cours,la_classe_fich
 
 	liste_periodes_principales.forEach(async function(une_periode,index_periode){
 
-		//todo
 		//await render_fiche(false,false,une_periode).then(e => console.log({moyennes_periodes}))
 		
 	})
@@ -15622,6 +15622,7 @@ function transformer_en_appreciations(){
 
 
 var bulletin_enregistre = false
+effacer("enregistrement_en_cours")
 async function sauvegarder_saisie_bulletin(){
 	chargement(true)
 
@@ -15668,6 +15669,7 @@ async function sauvegarder_saisie_bulletin(){
 			alerte_a_afficher = "⚠️Enregistrement des appréciations impossible: merci de réessayer."
 		}else{
 			bulletin_enregistre = true
+			effacer("enregistrement_en_cours")
 		}
 
 		effacer("enregistrement_en_cours")
@@ -16454,9 +16456,11 @@ async function demande_enregistrement_avant_changement_periode(){
 			await sauvegarder_saisie_bulletin()
 		}else{
 			bulletin_enregistre = true	
+			effacer("enregistrement_en_cours")
 		}
 	}else{
 		bulletin_enregistre = true
+		effacer("enregistrement_en_cours")
 	}
 
 }
@@ -16491,7 +16495,7 @@ async function actualiser_liste_eleves_bulletins(changement_enseignant, mes_elev
 		}else{	
 
 			mes_eleves = transformer_notes_en_array(mes_eleves, periode_bulletin, saison_note)
-			//console.log('FINAL',{mes_eleves})
+			console.log('FINAL',{mes_eleves})
 
 
 			var tout = donnees_generiques_bulletin()
@@ -16499,7 +16503,7 @@ async function actualiser_liste_eleves_bulletins(changement_enseignant, mes_elev
 			var la_classe_matiere = tout.Classe_Matiere
 
 			//on récup les appreciations 1 fois pour toutes POUR LA PERIODE CHOISIE
-			var url = racine_data + 'Appreciations?identifiant_appreciateur=eq.'+identifiant_appreciateur+'&Classe_Matiere=eq.'+ la_classe_matiere + '&periode_principale=eq.'+ $("#periode_bulletin").val() +  "&" +apikey
+			var url = racine_data + 'Appreciations?identifiant_appreciateur=eq.'+identifiant_appreciateur+'&Classe_Matiere=eq.'+ la_classe_matiere + '&periode_principale=eq.'+ (periode_bulletin ? periode_bulletin : $("#periode_bulletin").val()) +  "&" +apikey
 			var toutes_les_appreciations = get_resultat(url)
 			//console.log({toutes_les_appreciations})
 
@@ -16531,8 +16535,18 @@ async function actualiser_liste_eleves_bulletins(changement_enseignant, mes_elev
 			//console.log(liste_eleves_bulletins)
 
 			//si aucune note encore ET on est dans examen ET je suis admin => ajouter éventuellement un bouton d'import des anciennes notes
-			if(mes_eleves.map(e => e['note']).flat().length === 0 && mode_examen() && recuperer('mon_type').includes('Administration')) recuperer_periodes_principales_precedentes_de_cette_classe_matiere()
+			if(mes_eleves.map(e => e['note']).flat().length === 0 && mode_examen_actif() && recuperer('mon_type').includes('Administration')){
+				recuperer_periodes_principales_precedentes_de_cette_classe_matiere(false) // false car pas en mode appréciation
+			}
 
+
+			//si des notes d'examen uniquement ET si mode appréciations ET aucune appreciation trouvée ET je suis admin => bouton de copie des appréciations
+			if(examens_uniquement(mes_eleves) && mode_appreciation_actif() && toutes_les_appreciations.length === 0 && recuperer('mon_type').includes('Administration')){
+				recuperer_periodes_principales_precedentes_de_cette_classe_matiere(true)	// true car en mode appréciation
+			}
+
+
+			
 		}
 
 		$('#previsualisation').append(liste_eleves_bulletins)
@@ -16540,8 +16554,24 @@ async function actualiser_liste_eleves_bulletins(changement_enseignant, mes_elev
 		
 	}	
 
-	function mode_examen(){
+	function examens_uniquement(mes_eleves){
+		const a = mes_eleves
+		const notes_des_examens = a.map(e=> e.note).flat().filter(e => e.includes('Examen'))
+		const toutes_les_notes = a.map(e=> e.note).flat()
+		/*
+		console.log('notes_des_examens = ',notes_des_examens)
+		console.log('toutes_les_notes = ',toutes_les_notes)
+		*/
+		return notes_des_examens.length === toutes_les_notes.length && toutes_les_notes.length > 0
+	}
+
+	function mode_examen_actif(){
 		return 'Examen'.includes(donnees_generiques_bulletin()['saison_note'])
+	}
+
+
+	function mode_appreciation_actif(){
+		return 'Toutes'.includes(donnees_generiques_bulletin()['saison_note'])
 	}
 
 		
@@ -16553,6 +16583,7 @@ async function actualiser_liste_eleves_bulletins(changement_enseignant, mes_elev
 		if($(eleve).children('.une_note').text() !== ""){
 			$(eleve).children().last().trigger("input")	
 			bulletin_enregistre = true
+			effacer("enregistrement_en_cours")
 		}
 
 		
@@ -16735,21 +16766,26 @@ function actualiser_nb_cases(ceci){
 
 
 	if($("#saison_note").val()==="Toutes"){
-
-		var tout = donnees_generiques_bulletin()
-		var identifiant_appreciateur = tout.identifiant_prof 
-		var periode_bulletin = tout.periode_bulletin
-		url = racine_data + 'Appreciations?identifiant_appreciateur=eq.'+identifiant_appreciateur+'&identifiant_eleve=eq.'+ le_parent.id +'&Classe_Matiere=eq.'+ tout.Classe_Matiere +'&periode_principale=eq.'+ periode_bulletin + "&" +apikey
-		var contenu_appreciation = get_resultat(url)
-		//console.log({appreciation: contenu_appreciation[0]})
-
-		appreciation = contenu_appreciation[0] ? contenu_appreciation[0]['contenu'] : ""
-
-		rajouter_champ_appreciations(appreciation,le_parent,'Votre appréciation ici...','contenu','appreciation')
+		recuperer_et_afficher_les_appreciations(le_parent)
 	}
 
 
 	bulletin_enregistre = false
+
+}
+
+function recuperer_et_afficher_les_appreciations(le_parent, periode_bulletin){
+
+	var tout = donnees_generiques_bulletin()
+	var identifiant_appreciateur = tout.identifiant_prof 
+	periode_bulletin = periode_bulletin ? periode_bulletin : tout.periode_bulletin
+	url = racine_data + 'Appreciations?identifiant_appreciateur=eq.'+identifiant_appreciateur+'&identifiant_eleve=eq.'+ le_parent.id +'&Classe_Matiere=eq.'+ tout.Classe_Matiere +'&periode_principale=eq.'+ periode_bulletin + "&" +apikey
+	var contenu_appreciation = get_resultat(url)
+	//console.log({appreciation: contenu_appreciation[0]})
+
+	const appreciation = contenu_appreciation[0] ? contenu_appreciation[0]['contenu'] : ""
+
+	rajouter_champ_appreciations(appreciation,le_parent,'Votre appréciation ici...','contenu','appreciation')
 
 }
 
@@ -17050,8 +17086,12 @@ function liste_periodes_etab(nom_periode_bulletin){
 	return Object.keys(data_etablissement['config_notes'][nom_periode_bulletin])
 }
 
-//todo : récupérer les données d'une autre periode principale
-async function recuperer_periodes_principales_precedentes_de_cette_classe_matiere(){
+
+//récupérer les données d'une autre periode principale
+async function recuperer_periodes_principales_precedentes_de_cette_classe_matiere(mode_appreciations){
+
+	const contenu_bouton = !mode_appreciations ? 'notes d\'examen' : 'appréciations'
+	const nom_fonction_bouton = !mode_appreciations ? 'recuperer_donnees_periode' : 'recuperer_appreciations_periode'
 
 	const classe_matiere = donnees_generiques_bulletin()['Classe_Matiere']
 	const {data, error} = await supabase.from('Notes')
@@ -17062,30 +17102,60 @@ async function recuperer_periodes_principales_precedentes_de_cette_classe_matier
 
 										
 	if(data.length > 0){
-		console.log('avec déjà des notes précédentes')
+		//console.log('avec déjà des notes précédentes')
 
 		const liste_periodes_precedentes = valeursUniquesDeCetteKey(data, 'periode_bulletin')
 		const boutons_copie = '<div id="wrap_boutons_import">' + liste_periodes_precedentes.map((periode) => {
 			$('[id="import_periode_'+periode+'"]').remove() //seulement UN button par periode
-			return `<button id="import_periode_${periode}" class="rendre sekooly-mode-background" onclick="recuperer_donnees_periode('${periode}')">Importer les notes d'examen de ${au_singulier(data_etablissement['config_notes']['nom_periode_bulletin'])} ${periode}</button>`
+			return `<button id="import_periode_${periode}" class="rendre sekooly-mode-background" onclick="${nom_fonction_bouton}('${periode}')">Importer les ${contenu_bouton} de ${au_singulier(data_etablissement['config_notes']['nom_periode_bulletin'])} ${periode}</button>`
 		}).join('') + '</div>'
 
 		$('#menu_periode').append(boutons_copie)
 
 	}else {
-		console.log('pas encore de notes précédentes')
+		//console.log('pas encore de notes précédentes')
 	}
 }
 
-//todo
 async function recuperer_donnees_periode(periode_bulletin){
 	const saison_note = donnees_generiques_bulletin()['saison_note']
 	const mes_eleves_initialement = await trouver_mes_eleves(periode_bulletin,saison_note)
 	console.log('mes_eleves_initialement',mes_eleves_initialement)
 	actualiser_liste_eleves_bulletins(true,mes_eleves_initialement,periode_bulletin,saison_note)
 
-	afficher_alerte('⚠️ Vous devez sauvegarder pour garder la copie de ces notes.')
-	bulletin_enregistre = false
+	alerter_copie_donnees(false)
+}
+
+//todo
+async function recuperer_appreciations_periode(periode_bulletin){
+
+	const liste_eleves_de_la_matiere = Array.from($('.un_eleve_bulletin')).map(e => e.id)
+	const classe_matiere = donnees_generiques_bulletin()['Classe_Matiere']
+
+	const {data,error} = await supabase.from('Appreciations')
+										.select('*')
+										.eq('Classe_Matiere',classe_matiere)
+										.in('identifiant_eleve', liste_eleves_de_la_matiere)
+		
+	if(data){
+		console.log('les anciennes appréciations : ',data)
+		Array.from($('.un_eleve_bulletin textarea')).map(e => e.value = data.find(appreciations => appreciations['identifiant_eleve'] === e.parentNode.parentNode.id)['contenu'] )
+		alerter_copie_donnees(true)
+
+		$('#wrap_boutons_import').remove()
+	}else{
+		console.log('aucune ancienne appréciation')
+	}
+}
+
+
+function alerter_copie_donnees(mode_appreciations){
+	const contenu_copie = mode_appreciations ? 'appréciations' : 'notes'
+
+
+	afficher_alerte('⚠️ Vous devez sauvegarder pour garder la copie de ces '+contenu_copie+'.')
+	bulletin_enregistre = false	
+
 }
 
 
